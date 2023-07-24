@@ -21,6 +21,8 @@ public static class ReflectionHelper
     public static T[] GetCustomAttributes<T>(this MemberInfo type, bool inherit = true)
         where T : Attribute =>
         Attribute.GetCustomAttributes(type, typeof(T), inherit).Cast<T>().ToArray();
+    public static Attribute[] GetCustomAttributes(this MemberInfo type, Type attributeType, bool inherit = true)
+        => Attribute.GetCustomAttributes(type, attributeType, inherit).ToArray();
 
     public static Type? TryGetGenericTypeDefinition(this Type type)
         => type.IsGenericType ? type.GetGenericTypeDefinition() : null;

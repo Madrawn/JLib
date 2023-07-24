@@ -1,4 +1,4 @@
-﻿namespace JLib.Tests.ValueTypeDemo.Classes;
+﻿namespace JLib.Tests.ValueTypeDemo.BaseTypes;
 
 public interface IEntity { }
 public abstract class CommandEntity : IEntity

@@ -1,4 +1,4 @@
-﻿using JLib.Tests.ValueTypeDemo.Classes;
+﻿using JLib.Tests.ValueTypeDemo.BaseTypes;
 
 using static JLib.FactoryAttributes.TvtFactoryAttributes;
 
@@ -9,11 +9,11 @@ public partial class TypeValueTypes
     public abstract record Entity(Type Value) : TypeValueType(Value);
 
 
-    [DerivesFrom<Classes.QueryEntity>, IsClass, NotAbstract]
+    [IsAssignableTo<BaseTypes.QueryEntity>, IsClass, NotAbstract]
     public record QueryEntity(Type Value) : Entity(Value);
 
-    [DerivesFrom<Classes.CommandEntity>, IsClass, NotAbstract]
+    [IsAssignableTo<BaseTypes.CommandEntity>, IsClass, NotAbstract]
     public record CommandEntity(Type Value) : Entity(Value);
-    [DerivesFrom<IReadOnlyEntity>, IsInterface]
+    [IsAssignableTo<IReadOnlyEntity>, IsInterface]
     public record ReadOnlyEntity(Type Value) : Entity(Value);
 }

@@ -1,21 +1,54 @@
-﻿namespace JLib.FactoryAttributes;
+﻿using JLib.Helper;
+
+namespace JLib.FactoryAttributes;
 
 public abstract class TvtFactoryAttributes
 {
+    public interface ITypeValueTypeFilterAttribute
+    {
+        bool Filter(Type type);
+    }
+
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    public sealed class IsAssignableTo<T> : Attribute, ITypeValueTypeFilterAttribute
+        where T : class
+    {
+        public bool Filter(Type type)
+            => type.IsAssignableTo(type);
+    }
+
     [AttributeUsage(AttributeTargets.Class)]
-    public class DerivesFrom<T> : Attribute
-    where T : class
-    { }
+    public class Implements<T> : Attribute, ITypeValueTypeFilterAttribute
+    {
+        public bool Filter(Type type)
+            => type.Implements<T>();
+    }
+
     [AttributeUsage(AttributeTargets.Class)]
-    public class ImplementationOfInterface<T> : Attribute { }
+    public class ImplementsAny<T> : Attribute, ITypeValueTypeFilterAttribute
+    {
+        public bool Filter(Type type)
+            => type.ImplementsAny<T>();
+    }
+
     [AttributeUsage(AttributeTargets.Class)]
-    public class IsInterface : Attribute { }
+    public class IsInterface : Attribute, ITypeValueTypeFilterAttribute
+    {
+        public bool Filter(Type type)
+            => type.IsInterface;
+    }
+
     [AttributeUsage(AttributeTargets.Class)]
-    public class IsClass : Attribute { }
+    public class IsClass : Attribute, ITypeValueTypeFilterAttribute
+    {
+        public bool Filter(Type type)
+            => type.IsClass;
+    }
+
     [AttributeUsage(AttributeTargets.Class)]
-    public class NotAbstract : Attribute { }
-    [AttributeUsage(AttributeTargets.Class)]
-    public class Implements<T> : Attribute { }
-    [AttributeUsage(AttributeTargets.Class)]
-    public class ImplementsAny<T> : Attribute { }
+    public class NotAbstract : Attribute, ITypeValueTypeFilterAttribute
+    {
+        public bool Filter(Type type)
+            => !type.IsAbstract;
+    }
 }
