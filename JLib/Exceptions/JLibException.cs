@@ -1,5 +1,7 @@
 ﻿using System.Text;
 
+using JLib.Helper;
+
 
 namespace JLib.Exceptions;
 
