@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33815.320
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib", "JLib\JLib.csproj", "{3A4C195D-2F1A-423D-9294-B1B50D7EEC2C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5E282B5F-814C-45E8-B4EA-818C627FFC6D}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
+		.gitignore = .gitignore
+		JLib.sln.DotSettings = JLib.sln.DotSettings
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.Tests", "JLib.Tests\JLib.Tests.csproj", "{21845041-BF53-41D2-AD32-02D1A214EB85}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.HotChocolate", "JLib.HotChocolate\JLib.HotChocolate.csproj", "{739C1F40-5867-4569-89EC-760F3DCC2AB2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3A4C195D-2F1A-423D-9294-B1B50D7EEC2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A4C195D-2F1A-423D-9294-B1B50D7EEC2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A4C195D-2F1A-423D-9294-B1B50D7EEC2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A4C195D-2F1A-423D-9294-B1B50D7EEC2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21845041-BF53-41D2-AD32-02D1A214EB85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21845041-BF53-41D2-AD32-02D1A214EB85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21845041-BF53-41D2-AD32-02D1A214EB85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21845041-BF53-41D2-AD32-02D1A214EB85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{739C1F40-5867-4569-89EC-760F3DCC2AB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{739C1F40-5867-4569-89EC-760F3DCC2AB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{739C1F40-5867-4569-89EC-760F3DCC2AB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{739C1F40-5867-4569-89EC-760F3DCC2AB2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9007D83B-9D61-4FD9-927F-EEAC8281BF90}
+	EndGlobalSection
+EndGlobal
