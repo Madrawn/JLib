@@ -16,6 +16,13 @@ public abstract class TvtFactoryAttributes
         public bool Filter(Type type)
             => type.IsAssignableTo(type);
     }
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    public sealed class IsDerivedFrom<T> : Attribute, ITypeValueTypeFilterAttribute
+        where T : class
+    {
+        public bool Filter(Type type)
+            => type.IsAssignableTo(type) && type != typeof(T);
+    }
 
     [AttributeUsage(AttributeTargets.Class)]
     public class Implements<T> : Attribute, ITypeValueTypeFilterAttribute

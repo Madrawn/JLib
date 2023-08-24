@@ -10,3 +10,6 @@ public abstract class QueryEntity : IEntity
 public interface IReadOnlyEntity : IEntity
 {
 }
+public interface IQueryableEntity<TQe>
+where TQe : QueryEntity
+{ }

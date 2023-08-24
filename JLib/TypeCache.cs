@@ -7,15 +7,21 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace JLib;
 
+public interface ISubCache<T>
+{
+
+}
+
 public interface ITypeCache
 {
-    T Get<T>(Type weakType) where T : class;
-    T? TryGet<T>(Type weakType) where T : class;
+    public T Get<T>(Type weakType) where T : TypeValueType;
+    public T? TryGet<T>(Type weakType) where T : TypeValueType;
+    public IEnumerable<T> All<T>() where T : TypeValueType;
 }
 
 public class TypeCache
 {
-    private record TypeValueTypeVt(Type Value) : TypeValueType(Value)
+    private record ValueTypeForValueTypes(Type Value) : TypeValueType(Value)
     {
         public bool Filter(Type otherType)
             => Value.GetCustomAttributes()
@@ -24,31 +30,39 @@ public class TypeCache
 
     }
 
+    private class PostInitTypeCache : ITypeCache
+    {
+        public T Get<T>(Type weakType) where T : TypeValueType => throw new NotImplementedException();
+
+        public T? TryGet<T>(Type weakType) where T : TypeValueType => throw new NotImplementedException();
+        public IEnumerable<T> All<T>() where T : TypeValueType => throw new NotImplementedException();
+    }
+
+
     public TypeCache(params Assembly[] assemblies) : this(assemblies.AsEnumerable()) { }
     public TypeCache(IEnumerable<Assembly> assemblies) : this(assemblies.SelectMany(a => a.GetTypes())) { }
     public TypeCache(IEnumerable<Type> types) : this(types.ToArray()) { }
+    private static Type[] ctorParam = { typeof(Type) };
     public TypeCache(params Type[] types)
     {
         var typeValueTypes = GetTypeValueTypes(types).ToArray();
         var caches = typeValueTypes.ToDictionary(tvt => tvt,
-                tvt => typeof(SubCache<>)
-                    .MakeGenericType(tvt)
-                    .GetConstructor(Array.Empty<Type>())
-                    !.Invoke(Array.Empty<object>())
+                tvt => type => tvt.Value
+                    .GetConstructor(ctorParam)
+                    ?.Invoke(type ?? throw new($"Invalid Ctor on {tvt.Name}"))
                 );
         var services = new ServiceCollection();
         foreach (var type in types)
         {
             var typeValueType = typeValueTypes.Single(tvt => tvt.Filter(type));
-            typeValueType.Value.const
-
+            caches[typeValueType].Add(type);
         }
 
     }
 
 
-    private static IEnumerable<TypeValueTypeVt> GetTypeValueTypes(IEnumerable<Type> types)
+    private static IEnumerable<ValueTypeForValueTypes> GetTypeValueTypes(IEnumerable<Type> types)
         => types
             .Where(type => type.IsDerivedFromAny<ValueType<object>>() && !type.IsAbstract)
-            .Select(tvt => new TypeValueTypeVt(tvt));
+            .Select(tvt => new ValueTypeForValueTypes(tvt));
 }
