@@ -47,6 +47,7 @@ public class TypeCache : ITypeCache
     public TypeCache(params Assembly[] assemblies) : this(assemblies.AsEnumerable()) { }
     public TypeCache(IEnumerable<Assembly> assemblies) : this(assemblies.SelectMany(a => a.GetTypes())) { }
     public TypeCache(IEnumerable<Type> types) : this(types.ToArray()) { }
+
     public TypeCache(params Type[] types)
     {
         var rawTypes = GetTypeValueTypes(types).ToArray();
@@ -54,37 +55,69 @@ public class TypeCache : ITypeCache
         var exceptions = new List<Exception>();
 
         _typeValueTypes = types.Select(type =>
-        {
-            var validTvts = rawTypes.Where(tvtt => tvtt.Filter(type)).ToArray();
-            switch (validTvts.Length)
             {
-                case > 1:
-                    exceptions.Add(new InvalidSetupException($"multiple tvt candidates found for type {type.Name}:" +
-                                                             string.Join(", ", validTvts.Select(tvt => tvt.Name))));
-                    return null;
-                case 0:
-                    return null;
-                default:
-                    return validTvts.Single().Create(type, this);
-            }
-        }).WhereNotNull()
+                var validTvts = rawTypes.Where(tvtt => tvtt.Filter(type)).ToArray();
+                switch (validTvts.Length)
+                {
+                    case > 1:
+                        exceptions.Add(new InvalidSetupException(
+                            $"multiple tvt candidates found for type {type.Name}:" +
+                            string.Join(", ", validTvts.Select(tvt => tvt.Name))));
+                        return null;
+                    case 0:
+                        return null;
+                    default:
+                        return validTvts.Single().Create(type, this);
+                }
+            }).WhereNotNull()
             .ToArray();
 
         _typeMappings = _typeValueTypes.ToDictionary(tvt => tvt.Value);
 
         foreach (var typeValueType in _typeValueTypes.OfType<NavigatingTypeValueType>())
-            typeValueType.SetCache(this);
+        {
+            try
+            {
+                typeValueType.SetCache(this);
+            }
+            catch (Exception e)
+            {
+                exceptions.Add(e);
+            }
+        }
+
         foreach (var typeValueType in _typeValueTypes.OfType<NavigatingTypeValueType>())
-            typeValueType.MaterializeNavigation();
+        {
+            try
+            {
+                typeValueType.MaterializeNavigation();
+            }
+            catch (Exception e)
+            {
+                exceptions.Add(e);
+            }
+        }
+
         foreach (var typeValueType in _typeValueTypes.OfType<IPostInitValidatedType>())
-            typeValueType.PostInitValidation(this);
+        {
+            try
+            {
+                typeValueType.PostInitValidation(this);
+
+            }
+            catch (Exception e)
+            {
+                exceptions.Add(e);
+            }
+        }
+        exceptions.ThrowIfNotEmpty("typeCache could not be initialized or validated");
     }
 
 
     private static IEnumerable<ValueTypeForValueTypes> GetTypeValueTypes(IEnumerable<Type> types)
-        => types
-            .Where(type => type.IsDerivedFromAny<ValueType<object>>() && !type.IsAbstract)
-            .Select(tvt => new ValueTypeForValueTypes(tvt));
+            => types
+                .Where(type => type.IsDerivedFromAny<ValueType<object>>() && !type.IsAbstract)
+                .Select(tvt => new ValueTypeForValueTypes(tvt));
 
     public T Get<T>(Type weakType)
         where T : TypeValueType
