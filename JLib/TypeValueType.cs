@@ -1,6 +1,8 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 using JLib.Exceptions;
+using JLib.Helper;
 
 namespace JLib;
 
@@ -16,48 +18,63 @@ public abstract record TypeValueType(Type Value) : ValueType<Type>(Value)
 
 internal class TvtNavigationManager
 {
-
-    internal void RegisterNavigation<T>(NavigationPropertyName propertyName, Func<ITypeCache, T> factory)
+    private readonly NavigatingTypeValueType _owner;
+    private readonly ITypeCache _cache;
+    internal TvtNavigationManager(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
+        NavigatingTypeValueType owner,
+        ITypeCache cache)
     {
-        materializer.Add(() =>
+        _owner = owner;
+        _cache = cache;
+    }
+
+    private readonly Dictionary<string, Lazy<TypeValueType?>> _lazies = new();
+
+    internal T Navigate<T>(Func<ITypeCache, T> resolver, string propertyName)
+        where T : TypeValueType?
+        => _lazies.GetValueOrAdd(propertyName, () => new(() =>
         {
+            var value = resolver(_cache);
+            var pi = _owner.Value.GetProperty(propertyName) ?? throw new InvalidSetupException($"property {propertyName} not found in type {_owner.Name}");
 
-        });
-        _lazies.Add<T>(propertyName, factory);
-    }
-    internal void RegisterNavigation<T>(Func<ITypeCache, T?> factory)
-    {
+            if (pi.IsNullable() is false && value is null)
+                throw new InvalidSetupException($"property {_owner.Name}.{propertyName} must not be null");
 
-        _lazies.Add<T>(factory);
-    }
+            return value;
+        })).Value?.As<T>()!;
 
-    internal T GetNavigation<T>(NavigationPropertyName propertyName) where T : TypeValueType?
+    internal void Materialize()
     {
-        if (_navigationLocked)
-            throw new InvalidSetupException("tried to access a navigation property before it could be resolved. " +
-                                            "This hint towards a circular dependency in their Initialization. " +
-                                            "Try resolving one of them manually without using navigation properties");
-        return _lazies.Get<T>(propertyName);
-    }
-    internal T GetNavigation<T>() where T : TypeValueType?
-    {
-        if (_navigationLocked)
-            throw new InvalidSetupException("tried to access a navigation property before it could be resolved. " +
-                                            "This hint towards a circular dependency in their Initialization. " +
-                                            "Try resolving one of them manually without using navigation properties");
-        return _lazies.Get<T>();
+        foreach (var _ in _lazies.Values.Select(value => value.Value)) { }
     }
 }
+
 public abstract record NavigatingTypeValueType(Type Value) : TypeValueType(Value)
 {
 
-    private TvtNavigationManager _navigationManager = new();
-    private bool _navigationLocked = true;
-    internal void UnlockNavigation() => _navigationLocked = false;
-    internal void LockNavigation() => _navigationLocked = true;
+    private TvtNavigationManager? _navigationManager;
 
-    protected T Navigate<T>(Func<ITypeCache, T> resolver, [CallerMemberName] string propertyName = "") where T : TypeValueType?
+    internal void SetCache(ITypeCache typeCache)
     {
+        if (_navigationManager is not null)
+            throw new InvalidSetupException("you must not set the cache twice");
+
+        _navigationManager = new(this, typeCache);
+    }
+    internal void MaterializeNavigation()
+    {
+        if (_navigationManager is null)
+            throw new InvalidSetupException("cache has not been set yet");
+        _navigationManager.Materialize();
+    }
+
+    protected T Navigate<T>(Func<ITypeCache, T> resolver, [CallerMemberName] string propertyName = "")
+        where T : TypeValueType?
+    {
+        if (_navigationManager is null)
+            throw new InvalidSetupException("cache has not been set yet");
+        return _navigationManager.Navigate(resolver, propertyName);
     }
 }
 

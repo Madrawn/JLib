@@ -56,11 +56,24 @@ public partial class TypeValueTypes
     [IsAssignableTo<BaseTypes.CommandEntity>, NotAbstract]
     public record CommandEntity(Type Value) : Entity(Value)
     {
-        private Lazy<QueryEntity?>? _queryEntity;
-        public override QueryEntity? Query { get; }
-        public override CommandEntity Command { get; }
-        public override ReadOnlyEntity ReadOnly { get; }
+        public override QueryEntity? Query => Navigate(cache
+            => Value.GetInterface<IQueryableEntity<BaseTypes.QueryEntity>>() is { } i
+            ? cache.Get<QueryEntity>(i.GenericTypeArguments.First())
+            : null);
+
+        public override CommandEntity Command => this;
+
+        public override ReadOnlyEntity ReadOnly => Navigate(cache
+            => Value.GetInterfaces().Select(cache.TryGet<ReadOnlyEntity>).WhereNotNull().Single()
+        );
     }
+
     [IsAssignableTo<IReadOnlyEntity>, IsInterface]
-    public record ReadOnlyEntity(Type Value) : Entity(Value);
+    public record ReadOnlyEntity(Type Value) : Entity(Value)
+    {
+        public override QueryEntity? Query => Command.Query;
+        public override CommandEntity Command => Navigate(cache =>
+            cache.All<CommandEntity>().Single(ce => ce.ReadOnly == this));
+        public override ReadOnlyEntity ReadOnly => this;
+    }
 }
