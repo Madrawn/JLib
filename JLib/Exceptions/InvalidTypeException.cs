@@ -1,7 +1,8 @@
 ﻿namespace JLib.Exceptions;
 public class InvalidTypeException : InvalidSetupException
 {
-    public InvalidTypeException(string message) : base(message)
+    public InvalidTypeException(Type tvt, Type value, string message) : base(
+        $"Error while initializing {tvt.Name} with {value}: {message}")
     {
 
     }

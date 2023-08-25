@@ -37,7 +37,7 @@ public class TypeCache : ITypeCache
         public TypeValueType Create(Type type)
         {
             var ctor = Value.GetConstructor(new[] { typeof(Type) })
-                ?? throw new InvalidTypeException($"ctor not found for {Value.Name}");
+                ?? throw new InvalidTypeException(Value, Value, $"ctor not found for {Value.Name}");
             var instance = ctor.Invoke(new object[] { type })
                 ?? throw new InvalidSetupException($"ctor could not be invoked for {Value.Name}");
             return instance as TypeValueType
@@ -71,7 +71,7 @@ public class TypeCache : ITypeCache
 
         rawTypes.Where(tvtt => tvtt.Value
                 .CustomAttributes.None(a => a.AttributeType.Implements<TvtFactoryAttributes.ITypeValueTypeFilterAttribute>())
-        ).Select(tvtt => new InvalidTypeException($"{tvtt.Value.Name} does not have any filter attribute added"))
+        ).Select(tvtt => new InvalidTypeException(tvtt.GetType(), tvtt.Value, $"{tvtt.Value.Name} does not have any filter attribute added"))
             .ThrowIfNotEmpty("some TypeValueTypes have no filter attributes");
 
 

@@ -17,9 +17,9 @@ public partial class TypeValueTypes
         public void PostInitValidation(ITypeCache cache)
         {
             if (Command is null)
-                throw new InvalidTypeException(nameof(Command) + "is null");
+                throw CreateInvalidTypeException(nameof(Command) + "is null");
             if (ReadOnly is null)
-                throw new InvalidTypeException(nameof(ReadOnly) + "is null");
+                throw CreateInvalidTypeException(nameof(ReadOnly) + "is null");
         }
     }
 
