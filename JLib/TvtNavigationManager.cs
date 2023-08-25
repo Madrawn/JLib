@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+
 using JLib.Exceptions;
 using JLib.Helper;
 
@@ -17,11 +18,11 @@ internal class TvtNavigationManager
         _cache = cache;
     }
 
-    private readonly Dictionary<string, Lazy<TypeValueType?>> _lazies = new();
+    private readonly Dictionary<string, TypeValueType?> _lazies = new();
 
     internal T Navigate<T>(Func<ITypeCache, T> resolver, string propertyName)
         where T : TypeValueType?
-        => _lazies.GetValueOrAdd(propertyName, () => new(() =>
+        => _lazies.GetValueOrAdd(propertyName, () =>
         {
             var value = resolver(_cache);
             var pi = _owner.GetType().GetProperty(propertyName) ?? throw new InvalidSetupException($"property {propertyName} not found in type {_owner.GetType().Name}");
@@ -30,11 +31,15 @@ internal class TvtNavigationManager
                 throw new InvalidSetupException($"property {_owner.Name}.{propertyName} must not be null");
 
             return value;
-        })).Value?.As<T>()!;
+        })?.As<T>()!;
 
     internal void Materialize()
     {
-        foreach (var _ in _lazies.Values.Select(value => value.Value)) { }
+        _owner.GetType()
+            .GetProperties()
+            .Where(p => p.PropertyType.IsAssignableTo<TypeValueType>())
+            .ToList()
+            .ForEach(p => p.GetValue(_owner));
     }
 
 }

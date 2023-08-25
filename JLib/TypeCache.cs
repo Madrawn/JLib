@@ -34,6 +34,7 @@ public class TypeCache : ITypeCache
             => Value.GetCustomAttributes()
                 .OfType<TvtFactoryAttributes.ITypeValueTypeFilterAttribute>()
                 .All(filterAttr => filterAttr.Filter(otherType));
+
         public TypeValueType Create(Type type)
         {
             var ctor = Value.GetConstructor(new[] { typeof(Type) })
@@ -43,14 +44,6 @@ public class TypeCache : ITypeCache
             return instance as TypeValueType
                 ?? throw new InvalidSetupException($"instance of {Value} is not a {nameof(TypeValueType)}");
         }
-    }
-
-    private class PostInitTypeCache : ITypeCache
-    {
-        public T Get<T>(Type weakType) where T : TypeValueType => throw new NotImplementedException();
-
-        public T? TryGet<T>(Type weakType) where T : TypeValueType => throw new NotImplementedException();
-        public IEnumerable<T> All<T>() where T : TypeValueType => throw new NotImplementedException();
     }
 
     private readonly TypeValueType[] _typeValueTypes;
@@ -64,21 +57,21 @@ public class TypeCache : ITypeCache
     {
         var exceptions = new List<Exception>();
 
-        var rawTypes = types
+        var availableTypeValueTypes = types
             .Where(type => type.IsAssignableTo<TypeValueType>() && !type.IsAbstract)
             .Select(tvt => new ValueTypeForTypeValueTypes(tvt))
             .ToArray();
 
-        rawTypes.Where(tvtt => tvtt.Value
+        availableTypeValueTypes.Where(tvtt => tvtt.Value
                 .CustomAttributes.None(a => a.AttributeType.Implements<TvtFactoryAttributes.ITypeValueTypeFilterAttribute>())
         ).Select(tvtt => new InvalidTypeException(tvtt.GetType(), tvtt.Value, $"{tvtt.Value.Name} does not have any filter attribute added"))
-            .ThrowIfNotEmpty("some TypeValueTypes have no filter attributes");
+            .AddIfNotEmpty("some TypeValueTypes have no filter attributes", exceptions);
 
 
         _typeValueTypes = types
             .Select(type =>
             {
-                var validTvts = rawTypes.Where(tvtt => tvtt.Filter(type)).ToArray();
+                var validTvts = availableTypeValueTypes.Where(availabletvtt => availabletvtt.Filter(type)).ToArray();
                 switch (validTvts.Length)
                 {
                     case > 1:
@@ -125,7 +118,6 @@ public class TypeCache : ITypeCache
             try
             {
                 typeValueType.PostInitValidation(this);
-
             }
             catch (Exception e)
             {

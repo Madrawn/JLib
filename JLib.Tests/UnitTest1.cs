@@ -17,4 +17,12 @@ public class UnitTest1
             );
         var x = typeCache.All<TypeValueType>();
     }
+    [Fact]
+    public void Test2()
+    {
+        var typeCache = new TypeCache(
+            typeof(UnitTest1).Assembly, typeof(TypeValueType).Assembly
+        );
+        var x = typeCache.All<TypeValueType>();
+    }
 }
