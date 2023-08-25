@@ -8,15 +8,23 @@ namespace JLib.Tests.ValueTypeDemo.TypeValueTypes;
 public partial class TypeValueTypes
 {
     [Implements<IEntity>]
-    public abstract record Entity(Type Value) : NavigatingTypeValueType(Value)
+    public abstract record Entity(Type Value) : NavigatingTypeValueType(Value), IPostInitValidatedType
     {
         public abstract QueryEntity? Query { get; }
         public abstract CommandEntity Command { get; }
         public abstract ReadOnlyEntity ReadOnly { get; }
+
+        public void PostInitValidation(ITypeCache cache)
+        {
+            if (Command is null)
+                throw new InvalidTypeException(nameof(Command) + "is null");
+            if (ReadOnly is null)
+                throw new InvalidTypeException(nameof(ReadOnly) + "is null");
+        }
     }
 
 
-    [IsDerivedFrom<BaseTypes.QueryEntity>, NotAbstract]
+    [IsAssignableTo<BaseTypes.QueryEntity>, NotAbstract]
     public record QueryEntity(Type Value) : Entity(Value)
     {
         public override QueryEntity Query => this;
@@ -26,38 +34,29 @@ public partial class TypeValueTypes
             var candidates = cache.All<CommandEntity>()
                 .Where(mce =>
                     mce.Value
-                        .GetInterface<IQueryableEntity<BaseTypes.QueryEntity>>()
+                        .GetAnyInterface<IQueryableEntity<BaseTypes.QueryEntity>>()
                         ?.GenericTypeArguments
                         .First()
                     == Value)
                 .ToArray();
             if (candidates.None())
-                throw new InvalidSetupException($"no interface found");
+                throw TvtNavigationFailedException.Create<QueryEntity, CommandEntity>(Value,
+                    "no interface found");
             if (candidates.Length > 1)
-                throw new InvalidSetupException("multiple interfaces found");
+                throw TvtNavigationFailedException.Create<QueryEntity, CommandEntity>(Value,
+                    "multiple interfaces found");
 
             return candidates.Single();
         });
 
-        public override ReadOnlyEntity ReadOnly => Navigate(cache =>
-        {
-            var candidates = Value.GetInterfaces()
-                .Select(cache.TryGet<ReadOnlyEntity>)
-                .WhereNotNull()
-                .ToArray();
-            if (candidates.None())
-                throw new InvalidSetupException($"no interface found");
-            if (candidates.Length > 1)
-                throw new InvalidSetupException("multiple interfaces found");
-            return candidates.Single();
-        });
+        public override ReadOnlyEntity ReadOnly => Command.ReadOnly;
     }
 
     [IsAssignableTo<BaseTypes.CommandEntity>, NotAbstract]
     public record CommandEntity(Type Value) : Entity(Value)
     {
         public override QueryEntity? Query => Navigate(cache
-            => Value.GetInterface<IQueryableEntity<BaseTypes.QueryEntity>>() is { } i
+            => Value.GetAnyInterface<IQueryableEntity<BaseTypes.QueryEntity>>() is { } i
             ? cache.Get<QueryEntity>(i.GenericTypeArguments.First())
             : null);
 
@@ -73,7 +72,9 @@ public partial class TypeValueTypes
     {
         public override QueryEntity? Query => Command.Query;
         public override CommandEntity Command => Navigate(cache =>
-            cache.All<CommandEntity>().Single(ce => ce.ReadOnly == this));
+            cache.All<CommandEntity>().SingleOrDefault(ce => ce.ReadOnly == this)
+            ?? throw TvtNavigationFailedException.Create<ReadOnlyEntity, CommandEntity>(Value,
+                "no command entities found"));
         public override ReadOnlyEntity ReadOnly => this;
     }
 }

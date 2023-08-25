@@ -14,14 +14,14 @@ public abstract class TvtFactoryAttributes
         where T : class
     {
         public bool Filter(Type type)
-            => type.IsAssignableTo(type);
+            => type.IsAssignableTo<T>();
     }
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public sealed class IsDerivedFrom<T> : Attribute, ITypeValueTypeFilterAttribute
         where T : class
     {
         public bool Filter(Type type)
-            => type.IsAssignableTo(type) && type != typeof(T);
+            => type.IsAssignableTo<T>() && type != typeof(T);
     }
 
     [AttributeUsage(AttributeTargets.Class)]

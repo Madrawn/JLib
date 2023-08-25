@@ -36,7 +36,7 @@ internal class TvtNavigationManager
         => _lazies.GetValueOrAdd(propertyName, () => new(() =>
         {
             var value = resolver(_cache);
-            var pi = _owner.Value.GetProperty(propertyName) ?? throw new InvalidSetupException($"property {propertyName} not found in type {_owner.Name}");
+            var pi = _owner.GetType().GetProperty(propertyName) ?? throw new InvalidSetupException($"property {propertyName} not found in type {_owner.GetType().Name}");
 
             if (pi.IsNullable() is false && value is null)
                 throw new InvalidSetupException($"property {_owner.Name}.{propertyName} must not be null");
@@ -73,8 +73,20 @@ public abstract record NavigatingTypeValueType(Type Value) : TypeValueType(Value
         where T : TypeValueType?
     {
         if (_navigationManager is null)
-            throw new InvalidSetupException("cache has not been set yet");
-        return _navigationManager.Navigate(resolver, propertyName);
+            throw new TvtNavigationFailedException("cache has not been set yet");
+        try
+        {
+            return _navigationManager.Navigate(resolver, propertyName);
+        }
+        catch (TvtNavigationFailedException)
+        {
+            throw;
+        }
+        catch (Exception e)
+        {
+            throw new TvtNavigationFailedException(
+                $"The navigation failed due to an unhandled error: {e.Message}", e);
+        }
     }
 }
 

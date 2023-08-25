@@ -20,17 +20,29 @@ public interface ITypeCache
 
 public class TypeCache : ITypeCache
 {
-    private record ValueTypeForValueTypes(Type Value) : TypeValueType(Value)
+    private record ValueTypeForTypeValueTypes : ValueType<Type>
     {
+        public ValueTypeForTypeValueTypes(Type Value) : base(Value)
+        {
+            if (!Value.IsAssignableTo(typeof(TypeValueType)))
+                throw new TvtNavigationFailedException($"{Value.Name} does not derive from {nameof(TypeValueType)}");
+            if (Value.IsAbstract)
+                throw new TvtNavigationFailedException($"{Value.Name} is abstract");
+        }
+
         public bool Filter(Type otherType)
             => Value.GetCustomAttributes()
                 .OfType<TvtFactoryAttributes.ITypeValueTypeFilterAttribute>()
                 .All(filterAttr => filterAttr.Filter(otherType));
-        public TypeValueType Create(Type value, ITypeCache typeCache)
-            => Value.GetConstructor(new[] { typeof(Type), typeof(ITypeCache) })
-                ?.Invoke(null, new object[] { value, typeCache })
-                ?.As<TypeValueType>()
-               ?? throw new InvalidSetupException($"not tvt ctor found for {Value.Name}");
+        public TypeValueType Create(Type type)
+        {
+            var ctor = Value.GetConstructor(new[] { typeof(Type) })
+                ?? throw new InvalidTypeException($"ctor not found for {Value.Name}");
+            var instance = ctor.Invoke(new object[] { type })
+                ?? throw new InvalidSetupException($"ctor could not be invoked for {Value.Name}");
+            return instance as TypeValueType
+                ?? throw new InvalidSetupException($"instance of {Value} is not a {nameof(TypeValueType)}");
+        }
     }
 
     private class PostInitTypeCache : ITypeCache
@@ -50,24 +62,34 @@ public class TypeCache : ITypeCache
 
     public TypeCache(params Type[] types)
     {
-        var rawTypes = GetTypeValueTypes(types).ToArray();
-
         var exceptions = new List<Exception>();
 
-        _typeValueTypes = types.Select(type =>
+        var rawTypes = types
+            .Where(type => type.IsAssignableTo<TypeValueType>() && !type.IsAbstract)
+            .Select(tvt => new ValueTypeForTypeValueTypes(tvt))
+            .ToArray();
+
+        rawTypes.Where(tvtt => tvtt.Value
+                .CustomAttributes.None(a => a.AttributeType.Implements<TvtFactoryAttributes.ITypeValueTypeFilterAttribute>())
+        ).Select(tvtt => new InvalidTypeException($"{tvtt.Value.Name} does not have any filter attribute added"))
+            .ThrowIfNotEmpty("some TypeValueTypes have no filter attributes");
+
+
+        _typeValueTypes = types
+            .Select(type =>
             {
                 var validTvts = rawTypes.Where(tvtt => tvtt.Filter(type)).ToArray();
                 switch (validTvts.Length)
                 {
                     case > 1:
                         exceptions.Add(new InvalidSetupException(
-                            $"multiple tvt candidates found for type {type.Name}:" +
-                            string.Join(", ", validTvts.Select(tvt => tvt.Name))));
+                            $"multiple tvt candidates found for type {type.Name} : " +
+                            $"[ {string.Join(", ", validTvts.Select(tvt => tvt.Value.Name))} ]"));
                         return null;
                     case 0:
                         return null;
                     default:
-                        return validTvts.Single().Create(type, this);
+                        return validTvts.Single().Create(type);
                 }
             }).WhereNotNull()
             .ToArray();
@@ -113,11 +135,6 @@ public class TypeCache : ITypeCache
         exceptions.ThrowIfNotEmpty("typeCache could not be initialized or validated");
     }
 
-
-    private static IEnumerable<ValueTypeForValueTypes> GetTypeValueTypes(IEnumerable<Type> types)
-            => types
-                .Where(type => type.IsDerivedFromAny<ValueType<object>>() && !type.IsAbstract)
-                .Select(tvt => new ValueTypeForValueTypes(tvt));
 
     public T Get<T>(Type weakType)
         where T : TypeValueType
