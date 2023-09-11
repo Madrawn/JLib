@@ -1,16 +1,4 @@
 ﻿namespace JLib.Helper;
-/// <summary>
-/// used to mark an ignored type parameter like when using typeof() or nameof()<br/>
-/// <example>
-/// <code>
-/// nameof(IEnumerable&lt;Ignored&gt;)
-/// </code>
-/// </example>
-/// </summary>
-public class Ignored
-{
-    private Ignored() { }
-}
 
 public static class TypeHelper
 {
@@ -23,8 +11,10 @@ public static class TypeHelper
             res.Add(cur);
             cur = cur.DeclaringType;
         }
+
         return res;
     }
+
     /// <summary>
     /// a save variant of <see cref="TryGetGenericTypeDefinition"/>. If the type is not generic, it will simply return the given type.
     /// </summary>
@@ -52,15 +42,18 @@ public static class TypeHelper
         var compare = typeof(T).TryGetGenericTypeDefinition();
         while (current is not null && current.TryGetGenericTypeDefinition() != compare)
             current = current.BaseType;
-        return current;
+        return current == compare
+            ? null
+            : current;
     }
+
     /// <summary>
     ///     checks if the type is an static class (i.e. abstract and sealed)
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
     public static bool IsStatic(this Type type)
-        => type.IsClass && type.IsAbstract && type.IsSealed;
+        => type is { IsClass: true, IsAbstract: true, IsSealed: true };
 
     public static bool IsAssignableTo<T>(this Type type)
         => type.IsAssignableTo(typeof(T));
@@ -74,6 +67,7 @@ public static class TypeHelper
     /// <returns></returns>
     public static bool ImplementsAny<T>(this Type type)
         => type.GetInterface(typeof(T).Name) is not null;
+
     public static bool ImplementsAny(this Type type, Type @interface)
         => type.GetInterface(@interface.Name) is not null;
 
@@ -86,6 +80,7 @@ public static class TypeHelper
     /// <returns></returns>
     public static bool Implements<T>(this Type type)
         => type.Implements(typeof(T));
+
     public static bool Implements(this Type type, Type @interface)
         => type.GetInterface(@interface.Name) == @interface;
 
@@ -94,8 +89,10 @@ public static class TypeHelper
 
     public static IEnumerable<Type> WhichAreAssignableTo<T>(this IEnumerable<Type> collection)
         => collection.WhichAreAssignableTo(typeof(T));
+
     public static IEnumerable<Type> WhichAreAssignableTo(this IEnumerable<Type> collection, Type type)
         => collection.Where(t => t.IsAssignableTo(type));
+
     public static IEnumerable<Type> WhichAreInstantiable(this IEnumerable<Type> collection)
         => collection.Where(t => !t.IsAbstract && !t.IsInterface);
 
@@ -104,6 +101,7 @@ public static class TypeHelper
         var tInt = typeof(TInterface);
         return type.GetInterface(tInt.FullName ?? tInt.Name);
     }
+
     public static Type? GetAnyInterface<TInterface>(this Type type)
     {
         var tInt = typeof(TInterface);
@@ -121,6 +119,7 @@ public static class TypeHelper
         var t2 = other.IsGenericType ? other.GetGenericTypeDefinition() : other;
         return t1 == t2;
     }
+
     /// <summary>
     /// applies the given type parameters if they are applicable for the type
     /// if the type is not generic, the type is returned
@@ -138,6 +137,7 @@ public static class TypeHelper
 
     public static Type MakeGenericType(this Type type, params TypeValueType[] genericParams)
         => type.MakeGenericType(genericParams.Select(x => x.Value).ToArray());
+
     /// <summary>
     /// the name of the class and its declaring type, excluding the namespace
     /// </summary>
@@ -159,4 +159,12 @@ public static class TypeHelper
 
         return res;
     }
+
+    public static TTvt CastValueType<TTvt>(this Type type, ITypeCache cache)
+        where TTvt : TypeValueType
+        => cache.Get<TTvt>(type);
+
+    public static TTvt? AsValueType<TTvt>(this Type type, ITypeCache cache)
+        where TTvt : TypeValueType
+        => cache.TryGet<TTvt>(type);
 }
