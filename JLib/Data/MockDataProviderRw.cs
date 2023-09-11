@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using JLib.Helper;
 
 namespace JLib.Data;
 
@@ -8,7 +9,7 @@ public class MockDataProvider<TEntity> : IDataProviderRw<TEntity>, IDisposable
 {
     public MockDataProvider()
     {
-        
+
     }
     private readonly List<TEntity> _items = new();
     public IQueryable<TEntity> Get()
@@ -18,6 +19,9 @@ public class MockDataProvider<TEntity> : IDataProviderRw<TEntity>, IDisposable
         => _items.Add(item);
 
     public void Add(IEnumerable<TEntity> items) => _items.AddRange(items);
+    public void Remove(Guid itemId) => _items.RemoveWhere(i => i.Id == itemId);
+
+    public void Remove(IEnumerable<Guid> itemIds) => _items.RemoveWhere(i => itemIds.Contains(i.Id));
 
     public void Dispose()
     {

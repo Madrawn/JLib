@@ -10,6 +10,7 @@ namespace JLib.Data;
 
 public interface IEntity
 {
+    public Guid Id { get; }
 }
 
 public interface IGraphQlMutationParameter
@@ -41,6 +42,6 @@ public interface IDataProviderRw<TData> : IDataProviderR<TData>
 {
     public void Add(TData item);
     public void Add(IEnumerable<TData> items);
-    public void Remove(Guid item);
-    public void Remove(IEnumerable<Guid> items);
+    public void Remove(Guid itemId);
+    public void Remove(IEnumerable<Guid> itemIds);
 }
