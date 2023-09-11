@@ -85,7 +85,4 @@ public static class Types
                 .First()
                 .CastValueType<Entity>(cache));
     }
-
-    [IsDerivedFrom<Profile>, NotAbstract]
-    public record AutoMapperProfile(Type Value) : TypeValueType(Value);
 }
