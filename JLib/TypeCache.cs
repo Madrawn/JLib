@@ -13,9 +13,25 @@ public interface ISubCache<T>
 
 public interface ITypeCache
 {
-    public T Get<T>(Type weakType) where T : TypeValueType;
-    public T? TryGet<T>(Type weakType) where T : TypeValueType;
-    public IEnumerable<T> All<T>() where T : TypeValueType;
+    public TTvt Get<TTvt>(Type weakType) where TTvt : TypeValueType;
+    public TTvt Get<TTvt, TType>() where TTvt : TypeValueType
+        => Get<TTvt>(typeof(TType));
+    public TTvt? TryGet<TTvt>(Type weakType) where TTvt : TypeValueType;
+    public TTvt? TryGet<TTvt, TType>() where TTvt : TypeValueType
+        => TryGet<TTvt>(typeof(TType).TryGetGenericTypeDefinition() ?? typeof(TType));
+    public IEnumerable<TTvt> All<TTvt>() where TTvt : TypeValueType;
+    public IEnumerable<TTvt> All<TTvt>(Func<TTvt, bool> filter) where TTvt : TypeValueType
+        => All<TTvt>().Where(filter);
+    public TTvt? SingleOrDefault<TTvt>(Func<TTvt, bool> selector) where TTvt : TypeValueType
+    {
+        var res = All<TTvt>().Where(selector).ToArray();
+        if (res.Length > 1)
+            throw new InvalidSetupException($"multiple selectors matched to be cast to {typeof(TTvt).Name}: " + string.Join(", ", res.Select(r => r.Name)));
+        return res.FirstOrDefault();
+    }
+
+    public TTvt Single<TTvt>(Func<TTvt, bool> selector) where TTvt : TypeValueType
+        => SingleOrDefault(selector) ?? throw new InvalidSetupException("no selector matched");
 }
 
 public class TypeCache : ITypeCache
@@ -55,17 +71,19 @@ public class TypeCache : ITypeCache
 
     public TypeCache(params Type[] types)
     {
-        var exceptions = new List<Exception>();
+        IExceptionManager exceptions = new ExceptionManager("Cache Initialization or Validation Failed");
 
         var availableTypeValueTypes = types
             .Where(type => type.IsAssignableTo<TypeValueType>() && !type.IsAbstract)
             .Select(tvt => new ValueTypeForTypeValueTypes(tvt))
             .ToArray();
 
-        availableTypeValueTypes.Where(tvtt => tvtt.Value
-                .CustomAttributes.None(a => a.AttributeType.Implements<TvtFactoryAttributes.ITypeValueTypeFilterAttribute>())
-        ).Select(tvtt => new InvalidTypeException(tvtt.GetType(), tvtt.Value, $"{tvtt.Value.Name} does not have any filter attribute added"))
-            .AddIfNotEmpty("some TypeValueTypes have no filter attributes", exceptions);
+        exceptions.CreateChild(
+            "some Types have no filter attributes",
+                availableTypeValueTypes.Where(tvtt => tvtt.Value
+                    .CustomAttributes.None(a => a.AttributeType.Implements<TvtFactoryAttributes.ITypeValueTypeFilterAttribute>())
+                ).Select(tvtt => new InvalidTypeException(tvtt.GetType(), tvtt.Value, $"{tvtt.Value.Name} does not have any filter attribute added"))
+            );
 
 
         _typeValueTypes = types
@@ -88,6 +106,8 @@ public class TypeCache : ITypeCache
             .ToArray();
 
         _typeMappings = _typeValueTypes.ToDictionary(tvt => tvt.Value);
+
+
 
         foreach (var typeValueType in _typeValueTypes.OfType<NavigatingTypeValueType>())
         {
@@ -112,19 +132,19 @@ public class TypeCache : ITypeCache
                 exceptions.Add(e);
             }
         }
-
-        foreach (var typeValueType in _typeValueTypes.OfType<IPostInitValidatedType>())
+        foreach (var typeValueType in _typeValueTypes.OfType<IValidatedType>())
         {
             try
             {
-                typeValueType.PostInitValidation(this);
+                var tvtValidator = new TvtValidator((TypeValueType)typeValueType);
+                typeValueType.Validate(this, tvtValidator);
             }
             catch (Exception e)
             {
                 exceptions.Add(e);
             }
         }
-        exceptions.ThrowIfNotEmpty("typeCache could not be initialized or validated");
+        exceptions.ThrowIfNotEmpty();
     }
 
 

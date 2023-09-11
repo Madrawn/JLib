@@ -68,7 +68,6 @@ public class JLibAggregateException : AggregateException
         => content.Length switch
         {
             0 => null,
-            1 => content.Single(),
             _ => new JLibAggregateException(message, content)
         };
 
