@@ -1,6 +1,9 @@
 ﻿using JLib.Attributes;
 using JLib.Exceptions;
 using JLib.Helper;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 
 namespace JLib;
 
@@ -29,7 +32,7 @@ public interface IExceptionManager : IExceptionProvider
 
     void Add(Exception exception);
     void Add(IEnumerable<Exception> exceptions);
-    void ThrowIfNotEmpty();
+    void ThrowIfNotEmpty(LogEventLevel? level = LogEventLevel.Error);
     IExceptionManager CreateChild(string message);
     void CreateChild(string message, IEnumerable<Exception> childExceptions);
     void CreateChild(IExceptionProvider exceptionProvider);
@@ -48,7 +51,13 @@ public class ExceptionManager : IExceptionManager
     public void Add(IEnumerable<Exception> exceptions)
         => _exceptions.AddRange(exceptions);
 
-    public void ThrowIfNotEmpty() => JLibAggregateException.ThrowIfNotEmpty(_message, BuildExceptionList().WhereNotNull());
+    public void ThrowIfNotEmpty(LogEventLevel? level = LogEventLevel.Error)
+    {
+        var ex = JLibAggregateException.ReturnIfNotEmpty(_message, BuildExceptionList().WhereNotNull());
+        if (level is not null && ex is not null)
+            Log.Write(level.Value, ex, "an aggregate exception has been thrown");
+    }
+
     public Exception? GetException() => JLibAggregateException.ReturnIfNotEmpty(_message, BuildExceptionList());
 
     public ExceptionManager(string message)
