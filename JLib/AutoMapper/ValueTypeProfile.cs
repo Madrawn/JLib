@@ -51,11 +51,11 @@ public class ValueTypeProfile : Profile
 
         public static void AddMapping(Profile profile)
         {
-            profile.CreateMap<TValueType, TNative>().ConvertUsing(vt => vt.Value);
-            profile.CreateMap<TNative, TValueType>().ConvertUsing(
-                new CtorReplacementExpressionVisitor<TValueType, TNative>().Visit(
-                v =>
-                    CtorReplacementExpressionVisitor<TValueType, TNative>.CtorPlaceholder(v)
+            profile.CreateMap<TValueType?, TNative?>().ConvertUsing(vt => vt == null ? null : vt.Value);
+            profile.CreateMap<TNative?, TValueType?>().ConvertUsing(
+                new CtorReplacementExpressionVisitor<TValueType?, TNative?>().Visit(
+                v => v == null ? null :
+                    CtorReplacementExpressionVisitor<TValueType?, TNative?>.CtorPlaceholder(v)
                 ));
         }
     }
