@@ -91,9 +91,6 @@ public static class ServiceCollectionHelper
         var msg = $"{nameof(AddMockDataProvider)} failed for valueType {typeof(TTvt).Name}";
         IExceptionManager exceptions = parentExceptionMgr?.CreateChild(msg) ?? new ExceptionManager(msg);
 
-        services.AddScoped<MockStorageActionService>();
-        services.AddAlias<MockStorageActionService, IStorageActionService>(ServiceLifetime.Scoped);
-        services.AddGenericServices<TTvt, IMockDataProviderStore<IEntity>, MockDataProviderStore<IEntity>>(typeCache, ServiceLifetime.Singleton, exceptions);
         services.AddGenericServices<TTvt, IDataProviderRw<IEntity>, MockDataProvider<IEntity>>(typeCache, ServiceLifetime.Scoped, exceptions);
         services.AddGenericAlias<TTvt, IDataProviderR<IEntity>, IDataProviderRw<IEntity>>(typeCache, ServiceLifetime.Scoped, exceptions);
 
