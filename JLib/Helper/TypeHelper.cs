@@ -152,7 +152,7 @@ public static class TypeHelper
             .First()
             .Split(".").Last()
             .Replace("+", ".")
-            .Split("`1").First();
+            .Split("`").First();
 
         if (type.IsGenericType)
             res += $"<{string.Join(", ", type.GenericTypeArguments.Select(a => a.FullClassName()))}>";
