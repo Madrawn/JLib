@@ -11,6 +11,7 @@ using JLib.FactoryAttributes;
 using System;
 using System.Formats.Tar;
 using System.Text.Json.Serialization.Metadata;
+using Serilog;
 
 namespace JLib.Helper;
 public static class ServiceCollectionHelper
@@ -79,7 +80,6 @@ public static class ServiceCollectionHelper
     }
     /// <summary>
     /// adds a <see cref="IDataProviderR{TData}"/> and <see cref="IDataProviderRw{TData}"/> with the <see cref="MockDataProvider{TEntity}"/> as implementation for each <typeparamref name="TTvt"/> as scoped
-    /// <br/>adds a <see cref="MockDataProviderStore{TEntity}"/> for each entity as singleton
     /// <br/>exceptions are added as child to the <see cref="parentExceptionMgr"/> or thrown as a <see cref="JLibAggregateException"/> when it was not provided
     /// </summary>
     public static IServiceCollection AddMockDataProvider<TTvt>(
@@ -88,11 +88,12 @@ public static class ServiceCollectionHelper
         IExceptionManager? parentExceptionMgr = null)
         where TTvt : TypeValueType
     {
+        Log.Warning("Providing MockDataProvider");
         var msg = $"{nameof(AddMockDataProvider)} failed for valueType {typeof(TTvt).Name}";
         IExceptionManager exceptions = parentExceptionMgr?.CreateChild(msg) ?? new ExceptionManager(msg);
 
-        services.AddGenericServices<TTvt, IDataProviderRw<IEntity>, MockDataProvider<IEntity>>(typeCache, ServiceLifetime.Scoped, exceptions);
-        services.AddGenericAlias<TTvt, IDataProviderR<IEntity>, IDataProviderRw<IEntity>>(typeCache, ServiceLifetime.Scoped, exceptions);
+        services.AddGenericServices<TTvt, IDataProviderRw<IEntity>, MockDataProvider<IEntity>>(typeCache, ServiceLifetime.Singleton, exceptions);
+        services.AddGenericAlias<TTvt, IDataProviderR<IEntity>, IDataProviderRw<IEntity>>(typeCache, ServiceLifetime.Singleton, exceptions);
 
         if (parentExceptionMgr is null)
             exceptions.ThrowIfNotEmpty();
@@ -127,6 +128,8 @@ public static class ServiceCollectionHelper
             $"{nameof(AddGenericAlias)} failed while adding alias {alias.Name} for service {provided.Name} and valueType {typeof(TTvt).Name}";
         var exceptions = parentExceptionMgr?.CreateChild(msg) ?? new ExceptionManager(msg);
 
+        Log.Debug("Linking {0} to Alias {1} for each {2} with lifetime {3}", typeof(TProvided).Name, typeof(TAlias).Name, typeof(TTvt).Name, lifetime);
+
         foreach (var valueType in typeCache.All(filter))
         {
             exceptions.TryExecution(() =>
@@ -134,7 +137,11 @@ public static class ServiceCollectionHelper
                 var explicitAlias = GetGenericService(alias, valueType, implementationTypeArgumentResolver);
                 var explicitService = GetGenericService(provided, valueType, serviceTypeArgumentResolver);
 
-                services.Add(new(explicitAlias, explicitService, lifetime));
+                services.Add(new(explicitAlias, provider => provider.GetRequiredService(explicitService), lifetime));
+
+                Log.Verbose(
+                    "    {0,-25}: {1,-40} as {2,-20}",
+                    valueType.Name, explicitAlias.FullClassName(), explicitService.FullClassName());
             });
         }
 
@@ -172,6 +179,9 @@ public static class ServiceCollectionHelper
 
         IExceptionManager exceptions = parentExceptionMgr?.CreateChild(msg) ?? new ExceptionManager(msg);
 
+        Log.Debug("Providing {0} as {1} for each {2} with lifetime {3}",
+            typeof(TImplementation).Name, typeof(TService).Name, typeof(TTvt).Name, lifetime);
+
         foreach (var valueType in typeCache.All(filter))
         {
             exceptions.TryExecution(() =>
@@ -181,8 +191,9 @@ public static class ServiceCollectionHelper
 
                 services.Add(new(explicitService, explicitImplementation, lifetime));
 
-                Console.Write(
-                    $"    {valueType.Name}: {explicitImplementation.FullClassName()} as {explicitService.FullClassName()}");
+                Log.Verbose(
+                    "    {0,-25}: {1,-40} as {2,-20}",
+                    valueType.Name, explicitImplementation.FullClassName(), explicitService.FullClassName());
             });
 
         }
