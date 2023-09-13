@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using JLib.Exceptions;
 using JLib.Helper;
+using Serilog;
 
 namespace JLib.Data;
 
@@ -20,11 +21,16 @@ public class MockDataProvider<TEntity> : IDataProviderRw<TEntity>
     }
     private void AddId(TEntity entity)
     {
+        if (_idProperty.GetValue(entity) is not null)
+            return;
         _idProperty.SetValue(entity, _idPropertyVtCtor.Invoke(new object[] { Guid.NewGuid() }));
     }
     private readonly List<TEntity> _items = new();
     public IQueryable<TEntity> Get()
-        => _items.AsQueryable();
+    {
+        Log.Verbose("MockDataProvider Query for {0}",typeof(TEntity).Name);
+        return _items.AsQueryable();
+    }
 
     public void Add(TEntity item)
     {
