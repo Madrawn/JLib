@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.ComponentModel.Design;
+using System.Reflection;
 
 using JLib.Exceptions;
 using JLib.FactoryAttributes;
@@ -13,6 +14,7 @@ public interface ISubCache<T>
 
 public interface ITypeCache
 {
+    public IEnumerable<Type> KnownTypeValueTypes { get; }
     public TTvt Get<TTvt>(Type weakType) where TTvt : TypeValueType;
     public TTvt Get<TTvt, TType>() where TTvt : TypeValueType
         => Get<TTvt>(typeof(TType));
@@ -64,6 +66,7 @@ public class TypeCache : ITypeCache
 
     private readonly TypeValueType[] _typeValueTypes;
     private readonly IReadOnlyDictionary<Type, TypeValueType> _typeMappings;
+    public IEnumerable<Type> KnownTypeValueTypes { get; }
 
     public TypeCache(params Assembly[] assemblies) : this(assemblies.AsEnumerable()) { }
     public TypeCache(IEnumerable<Assembly> assemblies) : this(assemblies.SelectMany(a => a.GetTypes())) { }
@@ -71,12 +74,14 @@ public class TypeCache : ITypeCache
 
     public TypeCache(params Type[] types)
     {
-        IExceptionManager exceptions = new ExceptionManager("Cache Initialization or Validation Failed");
+        IExceptionManager exceptions = new ExceptionManager("Cache setup failed");
 
         var availableTypeValueTypes = types
+            .Where(type => !type.HasCustomAttribute<IgnoreInCache>())
             .Where(type => type.IsAssignableTo<TypeValueType>() && !type.IsAbstract)
             .Select(tvt => new ValueTypeForTypeValueTypes(tvt))
             .ToArray();
+        KnownTypeValueTypes = availableTypeValueTypes.Select(tvtt => tvtt.Value).ToArray();
 
         exceptions.CreateChild(
             "some Types have no filter attributes",
@@ -84,28 +89,51 @@ public class TypeCache : ITypeCache
                     .CustomAttributes.None(a => a.AttributeType.Implements<TvtFactoryAttributes.ITypeValueTypeFilterAttribute>())
                 ).Select(tvtt => new InvalidTypeException(tvtt.GetType(), tvtt.Value, $"{tvtt.Value.Name} does not have any filter attribute added"))
             );
-
-
-        _typeValueTypes = types
-            .Select(type =>
-            {
-                var validTvts = availableTypeValueTypes.Where(availabletvtt => availabletvtt.Filter(type)).ToArray();
-                switch (validTvts.Length)
+        var discoveryExceptions = exceptions.CreateChild("type discovery failed");
+        try
+        {
+            _typeValueTypes = types
+                .Where(type => !type.HasCustomAttribute<IgnoreInCache>())
+                .Select(type =>
                 {
-                    case > 1:
-                        exceptions.Add(new InvalidSetupException(
-                            $"multiple tvt candidates found for type {type.Name} : " +
-                            $"[ {string.Join(", ", validTvts.Select(tvt => tvt.Value.Name))} ]"));
+                    try
+                    {
+                        var validTvts = availableTypeValueTypes
+                            .Where(availableTvtt => availableTvtt.Filter(type))
+                            .GroupBy(t =>
+                                t.Value.GetCustomAttribute<TvtFactoryAttributes.Priority>()?.Value
+                                ?? TvtFactoryAttributes.Priority.DefaultPriority)
+                            .MinBy(x => x.Key)?
+                            .ToArray() ?? Array.Empty<ValueTypeForTypeValueTypes>();
+                        switch (validTvts.Length)
+                        {
+                            case > 1:
+                                discoveryExceptions.Add(new InvalidSetupException(
+                                    $"multiple tvt candidates found for type {type.Name} : " +
+                                    $"[ {string.Join(", ", validTvts.Select(tvt => $"{tvt.Value.Name}(priority {tvt.Value.GetCustomAttribute<TvtFactoryAttributes.Priority>()?.Value ?? TvtFactoryAttributes.Priority.DefaultPriority})"))} ]"));
+                                return null;
+                            case 0:
+                                return null;
+                            default:
+                                return validTvts.Single().Create(type);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        discoveryExceptions.Add(e);
                         return null;
-                    case 0:
-                        return null;
-                    default:
-                        return validTvts.Single().Create(type);
-                }
-            }).WhereNotNull()
-            .ToArray();
+                    }
+                }).WhereNotNull()
+                .ToArray();
 
-        _typeMappings = _typeValueTypes.ToDictionary(tvt => tvt.Value);
+            _typeMappings = _typeValueTypes.ToDictionary(tvt => tvt.Value);
+        }
+        catch (Exception ex)
+        {
+            discoveryExceptions.Add(ex);
+            if (_typeValueTypes is null || _typeMappings is null)
+                throw exceptions.GetException()!;
+        }
 
 
 
@@ -146,6 +174,7 @@ public class TypeCache : ITypeCache
         }
         exceptions.ThrowIfNotEmpty();
     }
+
 
 
     public T Get<T>(Type weakType)

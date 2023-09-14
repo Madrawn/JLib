@@ -44,45 +44,32 @@ public static class Types
                 exceptions.Add("the NativeType could not be found");
         }
     }
-
-    [ImplementsAny<IDataProviderR<Ignored>>, IsClass, IsNotAbstract]
-    public record DataProviderImplementation(Type Value) : TypeValueType(Value), IValidatedType
-    {
-        public bool WriteSupported => Value.ImplementsAny<IDataProviderRw<IEntity>>();
-        public Type CreateImplementation(TypeValueType entity, params Func<TypeValueType, TypeValueType>[] typeArgumentResolver)
-            => Value.MakeGenericType(typeArgumentResolver.Select(resolver => resolver(this).Value).ToArray());
-
-        void IValidatedType.Validate(ITypeCache cache, TvtValidator validator)
-        {
-            validator.MustBeGeneric();
-        }
-    }
     public abstract record DataObject(Type Value) : NavigatingTypeValueType(Value)
     {
     }
 
 
     [Implements<IEntity>, IsClass, NotAbstract]
-    public record Entity(Type Value) : DataObject(Value)
+    public record EntityType(Type Value) : DataObject(Value)
     {
     }
 
     [Implements<IGraphQlDataObject>, IsClass, NotAbstract]
     public record GraphQlDataObject(Type Value) : DataObject(Value)
     {
-        public Entity? CommandEntity => Navigate(cache =>
+        public EntityType? CommandEntity => Navigate(cache =>
             Value.GetAnyInterface<IGraphQlDataObject<IEntity>>()
                 ?.GenericTypeArguments
                 .First()
-                .CastValueType<Entity>(cache));
+                .CastValueType<EntityType>(cache));
     }
     [Implements<IGraphQlMutationParameter>, IsClass, NotAbstract]
     public record GraphQlMutationParameter(Type Value) : DataObject(Value)
     {
-        public Entity? CommandEntity => Navigate(cache =>
+        public EntityType? CommandEntity => Navigate(cache =>
             Value.GetAnyInterface<IGraphQlMutationParameter<IEntity>>()
                 ?.GenericTypeArguments
                 .First()
-                .CastValueType<Entity>(cache));
+                .CastValueType<EntityType>(cache));
     }
 }

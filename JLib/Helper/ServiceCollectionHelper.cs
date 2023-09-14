@@ -100,6 +100,12 @@ public static class ServiceCollectionHelper
         return services;
     }
 
+    public static IServiceCollection AddDataProviderRAlias<TTvt>(this IServiceCollection services, ITypeCache typeCache,
+        ServiceLifetime lifetime, IExceptionManager exceptionManager, Func<TTvt, bool>? filter = null)
+    where TTvt : TypeValueType
+        => services.AddGenericAlias<TTvt, IDataProviderR<IEntity>, IDataProviderRw<IEntity>>(typeCache, lifetime,
+            exceptionManager, filter);
+
     /// <summary>
     /// adds a descriptor which provides <typeparamref name="TAlias"/> as <typeparamref name="TProvided"/> for each instance of <typeparamref name="TTvt"/> which match the <paramref name="filter"/> using the <paramref name="serviceTypeArgumentResolver"/> and <paramref name="implementationTypeArgumentResolver"/> to get the type parameters
     /// <br/>rethrows parentExceptionMgr after execution as <see cref="JLibAggregateException"/> if no <paramref name="parentExceptionMgr"/> has been provided

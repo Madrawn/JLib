@@ -29,6 +29,20 @@ public interface IExceptionManager : IExceptionProvider
             Add(e);
         }
     }
+    /// <summary>
+    /// wraps the exception in a try catch block and adds the exception on throw.
+    /// </summary>
+    void TryExecution(string message, Action<IExceptionManager> action)
+    {
+        try
+        {
+            action(CreateChild(message));
+        }
+        catch (Exception e)
+        {
+            Add(e);
+        }
+    }
 
     void Add(Exception exception);
     void Add(IEnumerable<Exception> exceptions);
@@ -56,6 +70,8 @@ public class ExceptionManager : IExceptionManager
         var ex = JLibAggregateException.ReturnIfNotEmpty(_message, BuildExceptionList().WhereNotNull());
         if (level is not null && ex is not null)
             Log.Write(level.Value, ex, "an aggregate exception has been thrown");
+        if (ex is not null)
+            throw ex;
     }
 
     public Exception? GetException() => JLibAggregateException.ReturnIfNotEmpty(_message, BuildExceptionList());

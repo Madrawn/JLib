@@ -35,8 +35,8 @@ public class JLibAggregateException : AggregateException
     {
         _message = new(() => new StringBuilder()
             .AppendLine(userMessage)
-            .Append(" ├╴")
-            .AppendJoin(Environment.NewLine + " ├╴",
+            .Append(" ├─")
+            .AppendJoin(Environment.NewLine + " ├─",
                 content
                     .GroupBy(ex => ex.GetType())
                     .OrderBy(group => group.Key.Name)

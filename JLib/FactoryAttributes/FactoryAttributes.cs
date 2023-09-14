@@ -1,13 +1,33 @@
 ﻿using System.Reflection;
 using JLib.Helper;
+using static JLib.FactoryAttributes.TvtFactoryAttributes;
 
 namespace JLib.FactoryAttributes;
 
+/// <summary>
+/// classes with this given attribute will not be ignored by the typeCache
+/// <br/>lowest wins
+/// </summary>
+[AttributeUsage(AttributeTargets.Class)]
+public sealed class IgnoreInCache : Attribute { }
 public abstract class TvtFactoryAttributes
 {
     public interface ITypeValueTypeFilterAttribute
     {
         bool Filter(Type type);
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public sealed class Priority : Attribute
+    {
+        public int Value { get; }
+
+        public Priority(int value)
+        {
+            Value = value;
+        }
+
+        public const int DefaultPriority = 10000;
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
