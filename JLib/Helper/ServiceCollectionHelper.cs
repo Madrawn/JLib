@@ -33,23 +33,27 @@ public static class ServiceCollectionHelper
         return services;
     }
 
-    public static IServiceCollection AddTypeCache(this IServiceCollection services, Assembly executingAssembly, Func<AssemblyName, bool> assemblyFilter, out ITypeCache typeCache)
+    public static IServiceCollection AddTypeCache(this IServiceCollection services, out ITypeCache typeCache,
+        params string[] includedPrefixes)
+        => services.AddTypeCache(out typeCache, null, SearchOption.TopDirectoryOnly, includedPrefixes);
+    public static IServiceCollection AddTypeCache(this IServiceCollection services, out ITypeCache typeCache,
+        string? assemblySearchDirectory = null, SearchOption searchOption = SearchOption.TopDirectoryOnly, params string[] includedPrefixes)
     {
-        var assemblyNames = executingAssembly.GetReferencedAssemblies();
-        var assemblies = assemblyNames
-            .Where(assemblyFilter)
-            .Select(Assembly.Load).Append(executingAssembly);
+        assemblySearchDirectory ??= AppDomain.CurrentDomain.BaseDirectory;
+        var assemblyNames = Directory.EnumerateFiles(assemblySearchDirectory, "*.dll", searchOption).Where(file =>
+        {
+            var filename = Path.GetFileName(file);
+            return includedPrefixes.Any(p => filename.StartsWith(p));
+        }).Select(AssemblyName.GetAssemblyName).ToArray();
+
+        var assemblies = assemblyNames.Select(Assembly.Load);
         typeCache = new TypeCache(assemblies);
+
+        Log.Information("TypeCache initialized using {0} as path while looking for files in {1} and filtering using {2} as prefix. This resulted in {3} Assemblies being loaded which are {4}",assemblySearchDirectory,searchOption,includedPrefixes, assemblyNames.Length, assemblyNames);
 
         services.AddSingleton(typeCache);
         return services;
     }
-
-    public static IServiceCollection AddTypeCache(this IServiceCollection services, Assembly executingAssembly, out ITypeCache typeCache, params string[] assemblyPrefix)
-        => services.AddTypeCache(executingAssembly, name => assemblyPrefix.Any(prefix => name.Name?.StartsWith(prefix) ?? false), out typeCache);
-
-    public static IServiceCollection AddTypeCache(this IServiceCollection services, Assembly executingAssembly, params string[] assemblyPrefix)
-        => services.AddTypeCache(executingAssembly, out _, assemblyPrefix);
 
     /// <summary>
     /// Provides a <see cref="IDataProviderR{TData}"/> for each <typeparamref name="TTvt"/> which takes data from a <see cref="IDataProviderR{TData}"/> of the type retrieved by <see cref="sourcePropertyReader"/> and maps it using AutoMapper Projections
