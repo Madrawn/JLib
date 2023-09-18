@@ -3,7 +3,6 @@ using JLib.Attributes;
 using JLib.Exceptions;
 using JLib.Helper;
 using Serilog;
-using Serilog.Core;
 using Serilog.Events;
 
 namespace JLib;

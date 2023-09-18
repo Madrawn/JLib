@@ -3,7 +3,6 @@ using HotChocolate;
 using HotChocolate.Execution.Configuration;
 using JLib.Data;
 using JLib.Exceptions;
-using JLib.Helper;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace JLib.HotChocolate.Helper;
