@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -44,6 +45,20 @@ public static class Types
                 exceptions.Add("the NativeType could not be found");
         }
     }
+
+    [IsDerivedFrom<Profile>, NotAbstract]
+    public record AutoMapperProfileType(Type Value) : TypeValueType(Value)
+    {
+        private static readonly Type[] CtorParamArray = new[] { typeof(ITypeCache) };
+        public Profile Create(ITypeCache typeCache) 
+            => Value.GetConstructor(Array.Empty<Type>())
+                ?.Invoke(null).As<Profile>()
+            ?? Value.GetConstructor(CtorParamArray)
+                ?.Invoke(new object[] { typeCache })
+                .As<Profile>()
+            ?? throw new InvalidOperationException($"Instantiation of {Name} failed.");
+    }
+
     public abstract record DataObject(Type Value) : NavigatingTypeValueType(Value)
     {
     }
@@ -53,7 +68,6 @@ public static class Types
     public record EntityType(Type Value) : DataObject(Value)
     {
     }
-
     [Implements<IGraphQlDataObject>, IsClass, NotAbstract]
     public record GraphQlDataObject(Type Value) : DataObject(Value)
     {

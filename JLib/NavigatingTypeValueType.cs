@@ -39,7 +39,7 @@ public abstract record NavigatingTypeValueType(Type Value) : TypeValueType(Value
         catch (Exception e)
         {
             throw new TvtNavigationFailedException(
-                $"The navigation failed due to an unhandled error: {e.Message}", e);
+                $"{typeof(T).Name} {GetType().Name}.{propertyName}: The navigation failed due to an unhandled error: {e.Message}", e);
         }
     }
 }

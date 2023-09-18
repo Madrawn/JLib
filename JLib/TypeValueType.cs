@@ -1,4 +1,5 @@
-﻿using JLib.Attributes;
+﻿using System.Reflection;
+using JLib.Attributes;
 using JLib.Exceptions;
 using JLib.Helper;
 using Serilog;
@@ -113,14 +114,6 @@ public abstract partial record TypeValueType(Type Value) : ValueType<Type>(Value
     protected InvalidTypeException CreateInvalidTypeException(string message)
         => new(GetType(), Value, message);
 
+    public bool HasCustomAutoMapperProfile => Value.GetCustomAttributes().Any(a => a is ICustomProfileAttribute);
 
 }
-
-
-public record NavigationPropertyName(string Value) : StringValueType(Value)
-{
-    public static implicit operator NavigationPropertyName(string value)
-        => new(value);
-
-}
-
