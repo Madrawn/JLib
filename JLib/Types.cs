@@ -40,7 +40,7 @@ public static class Types
     public record AutoMapperProfileType(Type Value) : TypeValueType(Value)
     {
         private static readonly Type[] CtorParamArray = new[] { typeof(ITypeCache) };
-        public Profile Create(ITypeCache typeCache) 
+        public Profile Create(ITypeCache typeCache)
             => Value.GetConstructor(Array.Empty<Type>())
                 ?.Invoke(null).As<Profile>()
             ?? Value.GetConstructor(CtorParamArray)
@@ -55,8 +55,24 @@ public static class Types
 
 
     [Implements<IEntity>, IsClass, NotAbstract]
-    public record EntityType(Type Value) : DataObject(Value)
+    public record EntityType(Type Value) : DataObject(Value), IValidatedType
     {
+        public GraphQlDataObject? GraphQlDataObject =>
+            Navigate(cache => cache.All<GraphQlDataObject>(gdo => gdo.CommandEntity == this).SingleOrDefault());
+        public void Validate(ITypeCache cache, TvtValidator validator)
+        {
+            if (GetType() == typeof(EntityType))
+                validator.Add($"You have to specify which type of entity this is by implementing a derivation of the {nameof(IEntity)} interface");
+        }
+    }
+
+    /// <summary>
+    /// An entity which uses ValueTypes to ensure data validity
+    /// </summary>
+    [Implements<ICommandEntity>, IsClass, NotAbstract, Priority(5_000)]
+    public record CommandEntityType(Type Value) : EntityType(Value)
+    {
+
     }
     [Implements<IGraphQlDataObject>, IsClass, NotAbstract]
     public record GraphQlDataObject(Type Value) : DataObject(Value)
@@ -67,7 +83,7 @@ public static class Types
                 .First()
                 .CastValueType<EntityType>(cache));
     }
-    [Implements<IGraphQlMutationParameter>, IsClass, NotAbstract]
+    [ImplementsAny<IGraphQlMutationParameter<IEntity>>, IsClass, NotAbstract]
     public record GraphQlMutationParameter(Type Value) : DataObject(Value)
     {
         public EntityType? CommandEntity => Navigate(cache =>

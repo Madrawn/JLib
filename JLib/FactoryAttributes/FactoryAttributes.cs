@@ -5,7 +5,6 @@ namespace JLib.FactoryAttributes;
 
 /// <summary>
 /// classes with this given attribute will not be ignored by the typeCache
-/// <br/>lowest wins
 /// </summary>
 [AttributeUsage(AttributeTargets.Class)]
 public sealed class IgnoreInCache : Attribute { }
@@ -15,7 +14,10 @@ public abstract class TvtFactoryAttributes
     {
         bool Filter(Type type);
     }
-
+    /// <summary>
+    /// lowest wins
+    /// <br/>default is 10_000
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class Priority : Attribute
     {
@@ -26,7 +28,7 @@ public abstract class TvtFactoryAttributes
             Value = value;
         }
 
-        public const int DefaultPriority = 10000;
+        public const int DefaultPriority = 10_000;
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]

@@ -46,10 +46,10 @@ public interface IExceptionManager : IExceptionProvider
 
     void Add(Exception exception);
     void Add(IEnumerable<Exception> exceptions);
-    void ThrowIfNotEmpty(LogEventLevel? level = LogEventLevel.Error);
+    void ThrowIfNotEmpty(LogEventLevel? level = null);
     IExceptionManager CreateChild(string message);
     void CreateChild(string message, IEnumerable<Exception> childExceptions);
-    void CreateChild(IExceptionProvider exceptionProvider);
+    void AddChild(IExceptionProvider exceptionProvider);
 }
 
 public class ExceptionManager : IExceptionManager
@@ -65,7 +65,7 @@ public class ExceptionManager : IExceptionManager
     public void Add(IEnumerable<Exception> exceptions)
         => _exceptions.AddRange(exceptions);
 
-    public void ThrowIfNotEmpty(LogEventLevel? level = LogEventLevel.Error)
+    public void ThrowIfNotEmpty(LogEventLevel? level = null)
     {
         var ex = JLibAggregateException.ReturnIfNotEmpty(_message, BuildExceptionList().WhereNotNull());
         if (level is not null && ex is not null)
@@ -97,7 +97,7 @@ public class ExceptionManager : IExceptionManager
         child.Add(exceptions);
     }
 
-    public void CreateChild(IExceptionProvider exceptionProvider)
+    public void AddChild(IExceptionProvider exceptionProvider)
         => _children.Add(exceptionProvider);
 }
 
@@ -110,7 +110,7 @@ public abstract partial record TypeValueType(Type Value) : ValueType<Type>(Value
 {
     public string Name => Value.Name;
 
-    protected InvalidTypeException CreateInvalidTypeException(string message)
+    protected InvalidTypeException NewInvalidTypeException(string message)
         => new(GetType(), Value, message);
 
     public bool HasCustomAutoMapperProfile => Value.GetCustomAttributes().Any(a => a is ICustomProfileAttribute);

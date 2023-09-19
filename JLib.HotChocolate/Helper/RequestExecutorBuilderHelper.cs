@@ -3,7 +3,9 @@ using HotChocolate;
 using HotChocolate.Execution.Configuration;
 using JLib.Data;
 using JLib.Exceptions;
+using JLib.Helper;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace JLib.HotChocolate.Helper;
 
@@ -13,8 +15,14 @@ public static class RequestExecutorBuilderHelper
         this IRequestExecutorBuilder builder, ITypeCache typeCache, ServiceKind serviceKind = ServiceKind.Default)
         where TTvt : TypeValueType
     {
+        Log.Information("HotChocolate: Registering DataProvider of type {tvt} as {kind} well known Services",
+            typeof(TTvt).Name, serviceKind);
         foreach (var tvt in typeCache.All<TTvt>())
-            builder.RegisterService(typeof(IDataProviderR<>).MakeGenericType(tvt.Value), serviceKind);
+        {
+            var service = typeof(IDataProviderR<>).MakeGenericType(tvt.Value);
+            Log.Verbose("    {type,-25}: {service}", tvt.Name, service.FullClassName());
+            builder.RegisterService(service, serviceKind);
+        }
         return builder;
     }
 

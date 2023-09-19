@@ -2,12 +2,10 @@
 using System.Reflection;
 using AutoMapper;
 using JLib.Exceptions;
+using JLib.Helper;
+using Serilog;
 
 namespace JLib.AutoMapper;
-
-public class CustomMapperProfile : Profile
-{
-}
 
 /// <summary>
 /// Provides Mappings for all value types.<br/>
@@ -50,7 +48,9 @@ public class ValueTypeProfile : Profile
 
         public static void AddMapping(Profile profile)
         {
+            Log.Verbose("            {tvt}? => {tNative}?", typeof(TValueType).Name, typeof(TNative).Name);
             profile.CreateMap<TValueType?, TNative?>().ConvertUsing(vt => vt == null ? null : vt.Value);
+            Log.Verbose("            {tNative}? => {tvt}?", typeof(TNative).Name, typeof(TValueType).Name);
             profile.CreateMap<TNative?, TValueType?>().ConvertUsing(
                 new CtorReplacementExpressionVisitor<TValueType?, TNative?>().Visit(
                 v => v == null ? null :
@@ -66,14 +66,18 @@ public class ValueTypeProfile : Profile
 
         public static void AddMapping(Profile profile)
         {
+            Log.Verbose("            {tvt} => {tNative}", typeof(TValueType).Name, typeof(TNative).Name);
             profile.CreateMap<TValueType, TNative>().ConvertUsing(vt => vt.Value);
+            Log.Verbose("            {tNative} => {tvt}", typeof(TNative).Name, typeof(TValueType).Name);
             profile.CreateMap<TNative, TValueType>().ConvertUsing(
                 new CtorReplacementExpressionVisitor<TValueType, TNative>().Visit(
                     v =>
                         CtorReplacementExpressionVisitor<TValueType, TNative>.CtorPlaceholder(v)
                 ));
 
+            Log.Verbose("            {tvt} => {tNative}", typeof(TValueType).Name, typeof(TNative?).FullClassName());
             profile.CreateMap<TValueType, TNative?>().ConvertUsing(vt => vt == null ? null : vt.Value);
+            Log.Verbose("            {tNative} => {tvt}", typeof(TNative?).FullClassName(), typeof(TValueType).Name);
             profile.CreateMap<TNative?, TValueType?>().ConvertUsing(
                 new CtorReplacementExpressionVisitor<TValueType?, TNative?>().Visit(
                     v => v.HasValue
@@ -94,8 +98,9 @@ public class ValueTypeProfile : Profile
     {
         foreach (var valueType in cache.All<Types.ValueType>(vt => vt is { Mapped: true }))
         {
-            if (!valueType.NativeType.IsValueType)
+            if (valueType.NativeType.IsClass)
             {
+                Log.Debug("        adding map for class-valueType {valueType}", valueType.Name);
                 var addMapping = typeof(ClassValueTypeConversions<,>).MakeGenericType(valueType.Value, valueType.NativeType)
                         .GetMethod(nameof(ClassValueTypeConversions<ValueType<Ignored>, Ignored>.AddMapping)) ??
                     throw new InvalidSetupException("AddProfileMethodNotFound");
@@ -103,6 +108,7 @@ public class ValueTypeProfile : Profile
             }
             else
             {
+                Log.Debug("        adding map for strct-valueType {valueType}", valueType.Name);
                 var addMapping = typeof(StructValueTypeConversions<,>).MakeGenericType(valueType.Value, valueType.NativeType)
                                      .GetMethod(nameof(StructValueTypeConversions<ValueType<int>, int>.AddMapping)) ??
                                  throw new InvalidSetupException("AddProfileMethodNotFound");

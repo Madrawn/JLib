@@ -165,6 +165,7 @@ public class TypeCache : ITypeCache
             {
                 var tvtValidator = new TvtValidator((TypeValueType)typeValueType);
                 typeValueType.Validate(this, tvtValidator);
+                exceptions.AddChild(tvtValidator);
             }
             catch (Exception e)
             {

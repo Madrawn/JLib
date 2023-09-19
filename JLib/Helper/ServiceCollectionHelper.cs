@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using JLib.Data;
 using JLib.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,7 +41,7 @@ public static class ServiceCollectionHelper
         var assemblies = assemblyNames.Select(Assembly.Load);
         typeCache = new TypeCache(assemblies);
 
-        Log.Information("TypeCache initialized using {0} as path while looking for files in {1} and filtering using {2} as prefix. This resulted in {3} Assemblies being loaded which are {4}",assemblySearchDirectory,searchOption,includedPrefixes, assemblyNames.Length, assemblyNames);
+        Log.Information("TypeCache initialized using {0} as path while looking for files in {1} and filtering using {2} as prefix. This resulted in {3} Assemblies being loaded which are {4}", assemblySearchDirectory, searchOption, includedPrefixes, assemblyNames.Length, assemblyNames);
 
         services.AddSingleton(typeCache);
         return services;
@@ -53,25 +54,45 @@ public static class ServiceCollectionHelper
     public static IServiceCollection AddMapDataProvider<TTvt>(
         this IServiceCollection services,
         ITypeCache typeCache,
+        Func<TTvt, bool>? filter,
         Func<TTvt, TypeValueType?> sourcePropertyReader,
+        bool readOnly = false,
         IExceptionManager? parentExceptionMgr = null)
         where TTvt : TypeValueType
     {
         var msg = $"{nameof(AddMapDataProvider)} failed for valueType {typeof(TTvt).Name}";
         IExceptionManager exceptions = parentExceptionMgr?.CreateChild(msg) ?? new ExceptionManager(msg);
 
-        services.AddGenericServices<TTvt, IDataProviderR<Ignored>, MapDataProvider<IEntity, Ignored>>(typeCache, ServiceLifetime.Scoped, exceptions,
-             destination => sourcePropertyReader(destination) is not null,
-             null,
-             new Func<TTvt, TypeValueType>[]
+        var typeArguments =
+            new Func<TTvt, TypeValueType>[]
             {
-                destination=>sourcePropertyReader(destination)!,
-                destination=>destination
-            });
+                destination => sourcePropertyReader(destination)!,
+                destination => destination
+            };
+
+        if (readOnly)
+            services.AddGenericServices<TTvt, IDataProviderR<Ignored>, MapDataProvider<IEntity, Ignored>>(typeCache, ServiceLifetime.Scoped, exceptions,
+                 AppliedFilter,
+                 null,
+                 typeArguments);
+        else
+        {
+            services.AddGenericServices<TTvt, IDataProviderRw<IEntity>, WritableMapDataProvider<IEntity, IEntity>>(
+                typeCache, ServiceLifetime.Scoped, exceptions,
+                AppliedFilter,
+                null,
+                typeArguments);
+            services.AddGenericAlias<TTvt, IDataProviderR<IEntity>, IDataProviderRw<IEntity>>(
+                typeCache, ServiceLifetime.Scoped, exceptions,
+                AppliedFilter);
+        }
 
         if (parentExceptionMgr is null)
             exceptions.ThrowIfNotEmpty();
         return services;
+
+        bool AppliedFilter(TTvt destination) =>
+            sourcePropertyReader(destination) is not null && (filter?.Invoke(destination) ?? true);
     }
     /// <summary>
     /// adds a <see cref="IDataProviderR{TData}"/> and <see cref="IDataProviderRw{TData}"/> with the <see cref="MockDataProvider{TEntity}"/> as implementation for each <typeparamref name="TTvt"/> as scoped
@@ -141,7 +162,7 @@ public static class ServiceCollectionHelper
                 services.Add(new(explicitAlias, provider => provider.GetRequiredService(explicitService), lifetime));
 
                 Log.Verbose(
-                    "    {0,-25}: {1,-40} as {2,-20}",
+                    "    {0,-25}: {1,-65} as {2,-20}",
                     valueType.Name, explicitAlias.FullClassName(), explicitService.FullClassName());
             });
         }
@@ -193,7 +214,7 @@ public static class ServiceCollectionHelper
                 services.Add(new(explicitService, explicitImplementation, lifetime));
 
                 Log.Verbose(
-                    "    {0,-25}: {1,-40} as {2,-20}",
+                    "    {0,-25}: {1,-65} as {2,-20}",
                     valueType.Name, explicitImplementation.FullClassName(), explicitService.FullClassName());
             });
 

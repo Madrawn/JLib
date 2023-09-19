@@ -1,15 +1,29 @@
-﻿namespace JLib.Data;
+﻿using JLib.AutoMapper;
 
+namespace JLib.Data;
+
+/// <summary>
+/// enables a class to be requested and edited via <see cref="IDataProviderRw{TData}"/> 
+/// </summary>
 public interface IEntity
 {
     public Guid Id { get; }
 }
 
-public interface IGraphQlMutationParameter
+/// <summary>
+/// marks an entity as being the primary domain representation using value types etc for the command side of the CQRS app.
+/// </summary>
+public interface ICommandEntity : IEntity
 {
 
 }
-public interface IGraphQlMutationParameter<TEntity> : IGraphQlMutationParameter
+
+/// <summary>
+/// marks the class as parameter for a GraphQl mutation and creates a map from the parameter to the given entity (using <see cref="EntityProfile"/>)
+/// </summary>
+/// <typeparam name="TEntity"></typeparam>
+public interface IGraphQlMutationParameter<TEntity>
+    where TEntity : IEntity
 {
 
 }
@@ -20,7 +34,7 @@ public interface IGraphQlDataObject
 public interface IGraphQlDataObject<TEntity> : IGraphQlDataObject
     where TEntity : IEntity
 {
-    
+
 }
 
 
