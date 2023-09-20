@@ -3,11 +3,32 @@ using JLib.Helper;
 
 namespace JLib.FactoryAttributes;
 
+/// <summary>
+/// classes with this given attribute will not be ignored by the typeCache
+/// </summary>
+[AttributeUsage(AttributeTargets.Class)]
+public sealed class IgnoreInCache : Attribute { }
 public abstract class TvtFactoryAttributes
 {
     public interface ITypeValueTypeFilterAttribute
     {
         bool Filter(Type type);
+    }
+    /// <summary>
+    /// lowest wins
+    /// <br/>default is 10_000
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class)]
+    public sealed class Priority : Attribute
+    {
+        public int Value { get; }
+
+        public Priority(int value)
+        {
+            Value = value;
+        }
+
+        public const int DefaultPriority = 10_000;
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]

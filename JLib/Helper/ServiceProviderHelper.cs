@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace JLib.Helper;
+﻿namespace JLib.Helper;
 
 
 public static class ServiceProviderHelper

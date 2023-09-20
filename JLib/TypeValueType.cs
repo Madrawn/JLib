@@ -1,6 +1,9 @@
-﻿using JLib.Attributes;
+﻿using System.Reflection;
+using JLib.Attributes;
 using JLib.Exceptions;
 using JLib.Helper;
+using Serilog;
+using Serilog.Events;
 
 namespace JLib;
 
@@ -26,13 +29,27 @@ public interface IExceptionManager : IExceptionProvider
             Add(e);
         }
     }
+    /// <summary>
+    /// wraps the exception in a try catch block and adds the exception on throw.
+    /// </summary>
+    void TryExecution(string message, Action<IExceptionManager> action)
+    {
+        try
+        {
+            action(CreateChild(message));
+        }
+        catch (Exception e)
+        {
+            Add(e);
+        }
+    }
 
     void Add(Exception exception);
     void Add(IEnumerable<Exception> exceptions);
-    void ThrowIfNotEmpty();
+    void ThrowIfNotEmpty(LogEventLevel? level = null);
     IExceptionManager CreateChild(string message);
     void CreateChild(string message, IEnumerable<Exception> childExceptions);
-    void CreateChild(IExceptionProvider exceptionProvider);
+    void AddChild(IExceptionProvider exceptionProvider);
 }
 
 public class ExceptionManager : IExceptionManager
@@ -48,7 +65,15 @@ public class ExceptionManager : IExceptionManager
     public void Add(IEnumerable<Exception> exceptions)
         => _exceptions.AddRange(exceptions);
 
-    public void ThrowIfNotEmpty() => JLibAggregateException.ThrowIfNotEmpty(_message, BuildExceptionList().WhereNotNull());
+    public void ThrowIfNotEmpty(LogEventLevel? level = null)
+    {
+        var ex = JLibAggregateException.ReturnIfNotEmpty(_message, BuildExceptionList().WhereNotNull());
+        if (level is not null && ex is not null)
+            Log.Write(level.Value, ex, "an aggregate exception has been thrown");
+        if (ex is not null)
+            throw ex;
+    }
+
     public Exception? GetException() => JLibAggregateException.ReturnIfNotEmpty(_message, BuildExceptionList());
 
     public ExceptionManager(string message)
@@ -72,7 +97,7 @@ public class ExceptionManager : IExceptionManager
         child.Add(exceptions);
     }
 
-    public void CreateChild(IExceptionProvider exceptionProvider)
+    public void AddChild(IExceptionProvider exceptionProvider)
         => _children.Add(exceptionProvider);
 }
 
@@ -85,17 +110,9 @@ public abstract partial record TypeValueType(Type Value) : ValueType<Type>(Value
 {
     public string Name => Value.Name;
 
-    protected InvalidTypeException CreateInvalidTypeException(string message)
+    protected InvalidTypeException NewInvalidTypeException(string message)
         => new(GetType(), Value, message);
 
+    public bool HasCustomAutoMapperProfile => Value.GetCustomAttributes().Any(a => a is ICustomProfileAttribute);
 
 }
-
-
-public record NavigationPropertyName(string Value) : StringValueType(Value)
-{
-    public static implicit operator NavigationPropertyName(string value)
-        => new(value);
-
-}
-

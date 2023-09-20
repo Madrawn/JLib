@@ -1,11 +1,9 @@
 ﻿using System.Reflection;
-using System.Reflection.Metadata;
+using System.Security.Cryptography.X509Certificates;
 using JLib.Data;
 using JLib.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
-using static JLib.Types;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Linq;
+using Serilog;
 
 namespace JLib.Helper;
 public static class ServiceCollectionHelper
@@ -21,98 +19,216 @@ public static class ServiceCollectionHelper
     /// <summary>
     /// provides the alias as existing service
     /// </summary>
-    /// <param name="services"></param>
-    /// <param name="existing"></param>
-    /// <param name="alias"></param>
-    /// <param name="lifetime"></param>
-    /// <returns></returns>
     public static IServiceCollection AddAlias(this IServiceCollection services, Type existing, Type alias, ServiceLifetime lifetime)
     {
         services.Add(new(alias, provider => provider.GetRequiredService(existing), lifetime));
         return services;
     }
 
-    public static IServiceCollection AddTypeCache(this IServiceCollection services, Assembly executingAssembly, Func<AssemblyName, bool> assemblyFilter, out ITypeCache typeCache)
+    public static IServiceCollection AddTypeCache(this IServiceCollection services, out ITypeCache typeCache,
+        params string[] includedPrefixes)
+        => services.AddTypeCache(out typeCache, null, SearchOption.TopDirectoryOnly, includedPrefixes);
+    public static IServiceCollection AddTypeCache(this IServiceCollection services, out ITypeCache typeCache,
+        string? assemblySearchDirectory = null, SearchOption searchOption = SearchOption.TopDirectoryOnly, params string[] includedPrefixes)
     {
-        var assemblyNames = executingAssembly.GetReferencedAssemblies();
-        var assemblies = assemblyNames
-            .Where(assemblyFilter)
-            .Select(Assembly.Load).Append(executingAssembly);
+        assemblySearchDirectory ??= AppDomain.CurrentDomain.BaseDirectory;
+        var assemblyNames = Directory.EnumerateFiles(assemblySearchDirectory, "*.dll", searchOption).Where(file =>
+        {
+            var filename = Path.GetFileName(file);
+            return includedPrefixes.Any(p => filename.StartsWith(p));
+        }).Select(AssemblyName.GetAssemblyName).ToArray();
+
+        var assemblies = assemblyNames.Select(Assembly.Load);
         typeCache = new TypeCache(assemblies);
+
+        Log.Information("TypeCache initialized using {0} as path while looking for files in {1} and filtering using {2} as prefix. This resulted in {3} Assemblies being loaded which are {4}", assemblySearchDirectory, searchOption, includedPrefixes, assemblyNames.Length, assemblyNames);
 
         services.AddSingleton(typeCache);
         return services;
     }
 
-    public static IServiceCollection AddTypeCache(this IServiceCollection services, Assembly executingAssembly, out ITypeCache typeCache, params string[] assemblyPrefix)
-        => services.AddTypeCache(executingAssembly, name => assemblyPrefix.Any(prefix => name.Name?.StartsWith(prefix) ?? false), out typeCache);
-
-    public static IServiceCollection AddTypeCache(this IServiceCollection services, Assembly executingAssembly, params string[] assemblyPrefix)
-        => services.AddTypeCache(executingAssembly, out _, assemblyPrefix);
-
-    public static IServiceCollection AddDataProvider<TTvt, TImplementation>(this IServiceCollection services,
-        ITypeCache typeCache, ServiceLifetime lifetime = ServiceLifetime.Scoped)
-        where TTvt : TypeValueType
-        => services.AddDataProvider<TTvt, TImplementation>(typeCache, lifetime, _ => true, a => a);
-    public static IServiceCollection AddDataProvider<TTvt, TImplementation>(this IServiceCollection services,
+    /// <summary>
+    /// Provides a <see cref="IDataProviderR{TData}"/> for each <typeparamref name="TTvt"/> which takes data from a <see cref="IDataProviderR{TData}"/> of the type retrieved by <see cref="sourcePropertyReader"/> and maps it using AutoMapper Projections
+    /// <br/>exceptions are added as child to the <see cref="parentExceptionMgr"/> or thrown as a <see cref="JLibAggregateException"/> when it was not provided
+    /// </summary>
+    public static IServiceCollection AddMapDataProvider<TTvt>(
+        this IServiceCollection services,
         ITypeCache typeCache,
-        Func<TTvt, bool> filter,
-        params Func<TTvt, TypeValueType>[] typeArgumentResolver)
+        Func<TTvt, bool>? filter,
+        Func<TTvt, TypeValueType?> sourcePropertyReader,
+        bool readOnly = false,
+        IExceptionManager? parentExceptionMgr = null)
         where TTvt : TypeValueType
-        => AddDataProvider<TTvt, TImplementation>(services, typeCache, ServiceLifetime.Scoped, filter,
-            typeArgumentResolver);
+    {
+        var msg = $"{nameof(AddMapDataProvider)} failed for valueType {typeof(TTvt).Name}";
+        IExceptionManager exceptions = parentExceptionMgr?.CreateChild(msg) ?? new ExceptionManager(msg);
 
-    public static IServiceCollection AddDataProvider<TTvt, TImplementation>(
+        var typeArguments =
+            new Func<TTvt, TypeValueType>[]
+            {
+                destination => sourcePropertyReader(destination)!,
+                destination => destination
+            };
+
+        if (readOnly)
+            services.AddGenericServices<TTvt, IDataProviderR<Ignored>, MapDataProvider<IEntity, Ignored>>(typeCache, ServiceLifetime.Scoped, exceptions,
+                 AppliedFilter,
+                 null,
+                 typeArguments);
+        else
+        {
+            services.AddGenericServices<TTvt, IDataProviderRw<IEntity>, WritableMapDataProvider<IEntity, IEntity>>(
+                typeCache, ServiceLifetime.Scoped, exceptions,
+                AppliedFilter,
+                null,
+                typeArguments);
+            services.AddGenericAlias<TTvt, IDataProviderR<IEntity>, IDataProviderRw<IEntity>>(
+                typeCache, ServiceLifetime.Scoped, exceptions,
+                AppliedFilter);
+        }
+
+        if (parentExceptionMgr is null)
+            exceptions.ThrowIfNotEmpty();
+        return services;
+
+        bool AppliedFilter(TTvt destination) =>
+            sourcePropertyReader(destination) is not null && (filter?.Invoke(destination) ?? true);
+    }
+    /// <summary>
+    /// adds a <see cref="IDataProviderR{TData}"/> and <see cref="IDataProviderRw{TData}"/> with the <see cref="MockDataProvider{TEntity}"/> as implementation for each <typeparamref name="TTvt"/> as scoped
+    /// <br/>exceptions are added as child to the <see cref="parentExceptionMgr"/> or thrown as a <see cref="JLibAggregateException"/> when it was not provided
+    /// </summary>
+    public static IServiceCollection AddMockDataProvider<TTvt>(
+        this IServiceCollection services,
+        ITypeCache typeCache,
+        IExceptionManager? parentExceptionMgr = null)
+        where TTvt : TypeValueType
+    {
+        Log.Warning("Providing MockDataProvider");
+        var msg = $"{nameof(AddMockDataProvider)} failed for valueType {typeof(TTvt).Name}";
+        IExceptionManager exceptions = parentExceptionMgr?.CreateChild(msg) ?? new ExceptionManager(msg);
+
+        services.AddGenericServices<TTvt, IDataProviderRw<IEntity>, MockDataProvider<IEntity>>(typeCache, ServiceLifetime.Singleton, exceptions);
+        services.AddGenericAlias<TTvt, IDataProviderR<IEntity>, IDataProviderRw<IEntity>>(typeCache, ServiceLifetime.Singleton, exceptions);
+
+        if (parentExceptionMgr is null)
+            exceptions.ThrowIfNotEmpty();
+        return services;
+    }
+
+    public static IServiceCollection AddDataProviderRAlias<TTvt>(this IServiceCollection services, ITypeCache typeCache,
+        ServiceLifetime lifetime, IExceptionManager exceptionManager, Func<TTvt, bool>? filter = null)
+    where TTvt : TypeValueType
+        => services.AddGenericAlias<TTvt, IDataProviderR<IEntity>, IDataProviderRw<IEntity>>(typeCache, lifetime,
+            exceptionManager, filter);
+
+    /// <summary>
+    /// adds a descriptor which provides <typeparamref name="TAlias"/> as <typeparamref name="TProvided"/> for each instance of <typeparamref name="TTvt"/> which match the <paramref name="filter"/> using the <paramref name="serviceTypeArgumentResolver"/> and <paramref name="implementationTypeArgumentResolver"/> to get the type parameters
+    /// <br/>rethrows parentExceptionMgr after execution as <see cref="JLibAggregateException"/> if no <paramref name="parentExceptionMgr"/> has been provided
+    /// <br/>exceptions are added as child to the <see cref="parentExceptionMgr"/> or thrown as a <see cref="JLibAggregateException"/> when it was not provided
+    /// </summary>
+    public static IServiceCollection AddGenericAlias<TTvt, TAlias, TProvided>(
         this IServiceCollection services,
         ITypeCache typeCache,
         ServiceLifetime lifetime,
-        Func<TTvt, bool> filter,
-        params Func<TTvt, TypeValueType>[] typeArgumentResolver)
+        IExceptionManager? parentExceptionMgr = null,
+        Func<TTvt, bool>? filter = null,
+        Func<TTvt, TypeValueType>[]? serviceTypeArgumentResolver = null,
+        Func<TTvt, TypeValueType>[]? implementationTypeArgumentResolver = null)
         where TTvt : TypeValueType
+        where TProvided : TAlias
+        where TAlias : notnull
     {
-        var implementation = typeCache.TryGet<Types.DataProviderImplementation, TImplementation>()
-                             ?? throw new InvalidSetupException($"DataProvider Implementation {typeof(TImplementation).Name} is not valid or not registered with the typeCache");
+        serviceTypeArgumentResolver ??= new Func<TTvt, TypeValueType>[] { e => e };
+        implementationTypeArgumentResolver ??= new Func<TTvt, TypeValueType>[] { e => e };
+        filter ??= _ => true;
 
-        Console.WriteLine();
-        Console.WriteLine($"Adding data provider implementation '{implementation.Name}' for '{typeof(TTvt).Name}'");
+        var alias = typeof(TAlias).GetGenericTypeDefinition();
+        var provided = typeof(TProvided).GetGenericTypeDefinition();
 
-        IExceptionManager exceptions = new ExceptionManager(
-            $"DataProvider Implementation for Tvt {typeof(TTvt).Name} and Implementation {typeof(TImplementation).Name} failed");
+        var msg =
+            $"{nameof(AddGenericAlias)} failed while adding alias {alias.Name} for service {provided.Name} and valueType {typeof(TTvt).Name}";
+        var exceptions = parentExceptionMgr?.CreateChild(msg) ?? new ExceptionManager(msg);
 
-        foreach (var data in typeCache.All(filter))
+        Log.Debug("Linking {0} to Alias {1} for each {2} with lifetime {3}", typeof(TProvided).Name, typeof(TAlias).Name, typeof(TTvt).Name, lifetime);
+
+        foreach (var valueType in typeCache.All(filter))
         {
-            var arguments = typeArgumentResolver.Select(r => r(data)).ToArray();
-            var explicitImplementation = implementation.Value.MakeGenericType(arguments);
-
-            var readService = typeof(IDataProviderR<>).MakeGenericType(data.Value);
-
-            Console.Write(
-                $"    {data.Name}: {explicitImplementation.FullClassName()} as {readService.FullClassName()}");
-
-            if (implementation.WriteSupported)
+            exceptions.TryExecution(() =>
             {
-                var writeService = typeof(IDataProviderRw<>).MakeGenericType(data.Value);
+                var explicitAlias = GetGenericService(alias, valueType, implementationTypeArgumentResolver);
+                var explicitService = GetGenericService(provided, valueType, serviceTypeArgumentResolver);
 
-                Console.Write($" and {writeService.FullClassName()}");
-                exceptions.TryExecution(() =>
-                    services.Add(new ServiceDescriptor(
-                        writeService,
-                        explicitImplementation, lifetime)));
+                services.Add(new(explicitAlias, provider => provider.GetRequiredService(explicitService), lifetime));
 
-                // not registering the read service as alias would result in a a second instance, which might cause issues, especially when using singleton mocks
-                services.AddAlias(writeService, readService, lifetime);
-            }
-            else
-            {
-                exceptions.TryExecution(() =>
-                    services.Add(new ServiceDescriptor(readService, explicitImplementation, lifetime))
-                );
-            }
-            Console.WriteLine($" as {lifetime} Service");
+                Log.Verbose(
+                    "    {0,-25}: {1,-65} as {2,-20}",
+                    valueType.Name, explicitAlias.FullClassName(), explicitService.FullClassName());
+            });
         }
 
+        if (parentExceptionMgr is null)
+            exceptions.ThrowIfNotEmpty();
+        return services;
+    }
+
+    /// <summary>
+    /// adds a descriptor of <typeparamref name="TService"/> implemented as <typeparamref name="TImplementation"/> for each instance of <typeparamref name="TTvt"/> which match the <paramref name="filter"/> using the <paramref name="serviceTypeArgumentResolver"/> and <paramref name="implementationTypeArgumentResolver"/> to get the type parameters
+    /// <br/>rethrows parentExceptionMgr after execution as <see cref="JLibAggregateException"/> if no <paramref name="parentExceptionMgr"/> has been provided
+    /// <br/>exceptions are added as child to the <see cref="parentExceptionMgr"/> or thrown as a <see cref="JLibAggregateException"/> when it was not provided
+    /// </summary>
+    public static IServiceCollection AddGenericServices<TTvt, TService, TImplementation>(
+        this IServiceCollection services,
+        ITypeCache typeCache,
+        ServiceLifetime lifetime,
+        IExceptionManager? parentExceptionMgr = null,
+        Func<TTvt, bool>? filter = null,
+        Func<TTvt, TypeValueType>[]? serviceTypeArgumentResolver = null,
+        Func<TTvt, TypeValueType>[]? implementationTypeArgumentResolver = null)
+        where TTvt : TypeValueType
+        where TImplementation : TService
+        where TService : notnull
+    {
+        serviceTypeArgumentResolver ??= new Func<TTvt, TypeValueType>[] { e => e };
+        implementationTypeArgumentResolver ??= new Func<TTvt, TypeValueType>[] { e => e };
+
+        var serviceDefinition = typeof(TService).GetGenericTypeDefinition();
+        var implementationDefinition = typeof(TImplementation).GetGenericTypeDefinition();
+        filter ??= _ => true;
+
+        var msg =
+            $"{nameof(AddGenericServices)} failed while adding service {serviceDefinition.Name} with implementation {implementationDefinition.Name} and valueType {typeof(TTvt).Name}";
+
+        IExceptionManager exceptions = parentExceptionMgr?.CreateChild(msg) ?? new ExceptionManager(msg);
+
+        Log.Debug("Providing {0} as {1} for each {2} with lifetime {3}",
+            typeof(TImplementation).Name, typeof(TService).Name, typeof(TTvt).Name, lifetime);
+
+        foreach (var valueType in typeCache.All(filter))
+        {
+            exceptions.TryExecution(() =>
+            {
+                var explicitImplementation = GetGenericService(implementationDefinition, valueType, implementationTypeArgumentResolver);
+                var explicitService = GetGenericService(serviceDefinition, valueType, serviceTypeArgumentResolver);
+
+                services.Add(new(explicitService, explicitImplementation, lifetime));
+
+                Log.Verbose(
+                    "    {0,-25}: {1,-65} as {2,-20}",
+                    valueType.Name, explicitImplementation.FullClassName(), explicitService.FullClassName());
+            });
+
+        }
+        if (parentExceptionMgr is null)
+            exceptions.ThrowIfNotEmpty();
         return services;
 
+    }
+    private static Type GetGenericService<TTvt>(Type genericClass, TTvt currentValueType, Func<TTvt, TypeValueType>[] typeArgumentResolver)
+        where TTvt : TypeValueType
+    {
+        var typeArguments = typeArgumentResolver.Select(resolver => resolver(currentValueType)).ToArray();
+        return genericClass.MakeGenericType(typeArguments);
     }
 
 }

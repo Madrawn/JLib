@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
-using AutoMapper.Configuration.Annotations;
+﻿using AutoMapper;
 using JLib.Attributes;
 using JLib.Data;
-using JLib.Exceptions;
 using JLib.Helper;
-using Microsoft.Extensions.DependencyInjection;
 using static JLib.FactoryAttributes.TvtFactoryAttributes;
 
 namespace JLib;
@@ -45,44 +36,60 @@ public static class Types
         }
     }
 
-    [ImplementsAny<IDataProviderR<Ignored>>, IsClass, IsNotAbstract]
-    public record DataProviderImplementation(Type Value) : TypeValueType(Value), IValidatedType
+    [IsDerivedFrom<Profile>, NotAbstract]
+    public record AutoMapperProfileType(Type Value) : TypeValueType(Value)
     {
-        public bool WriteSupported => Value.ImplementsAny<IDataProviderRw<IEntity>>();
-        public Type CreateImplementation(TypeValueType entity, params Func<TypeValueType, TypeValueType>[] typeArgumentResolver)
-            => Value.MakeGenericType(typeArgumentResolver.Select(resolver => resolver(this).Value).ToArray());
-
-        void IValidatedType.Validate(ITypeCache cache, TvtValidator validator)
-        {
-            validator.MustBeGeneric();
-        }
+        private static readonly Type[] CtorParamArray = new[] { typeof(ITypeCache) };
+        public Profile Create(ITypeCache typeCache)
+            => Value.GetConstructor(Array.Empty<Type>())
+                ?.Invoke(null).As<Profile>()
+            ?? Value.GetConstructor(CtorParamArray)
+                ?.Invoke(new object[] { typeCache })
+                .As<Profile>()
+            ?? throw new InvalidOperationException($"Instantiation of {Name} failed.");
     }
+
     public abstract record DataObject(Type Value) : NavigatingTypeValueType(Value)
     {
     }
 
 
     [Implements<IEntity>, IsClass, NotAbstract]
-    public record Entity(Type Value) : DataObject(Value)
+    public record EntityType(Type Value) : DataObject(Value), IValidatedType
     {
+        public GraphQlDataObject? GraphQlDataObject =>
+            Navigate(cache => cache.All<GraphQlDataObject>(gdo => gdo.CommandEntity == this).SingleOrDefault());
+        public void Validate(ITypeCache cache, TvtValidator validator)
+        {
+            if (GetType() == typeof(EntityType))
+                validator.Add($"You have to specify which type of entity this is by implementing a derivation of the {nameof(IEntity)} interface");
+        }
     }
 
+    /// <summary>
+    /// An entity which uses ValueTypes to ensure data validity
+    /// </summary>
+    [Implements<ICommandEntity>, IsClass, NotAbstract, Priority(5_000)]
+    public record CommandEntityType(Type Value) : EntityType(Value)
+    {
+
+    }
     [Implements<IGraphQlDataObject>, IsClass, NotAbstract]
     public record GraphQlDataObject(Type Value) : DataObject(Value)
     {
-        public Entity? CommandEntity => Navigate(cache =>
+        public EntityType? CommandEntity => Navigate(cache =>
             Value.GetAnyInterface<IGraphQlDataObject<IEntity>>()
                 ?.GenericTypeArguments
                 .First()
-                .CastValueType<Entity>(cache));
+                .CastValueType<EntityType>(cache));
     }
-    [Implements<IGraphQlMutationParameter>, IsClass, NotAbstract]
+    [ImplementsAny<IGraphQlMutationParameter<IEntity>>, IsClass, NotAbstract]
     public record GraphQlMutationParameter(Type Value) : DataObject(Value)
     {
-        public Entity? CommandEntity => Navigate(cache =>
+        public EntityType? CommandEntity => Navigate(cache =>
             Value.GetAnyInterface<IGraphQlMutationParameter<IEntity>>()
                 ?.GenericTypeArguments
                 .First()
-                .CastValueType<Entity>(cache));
+                .CastValueType<EntityType>(cache));
     }
 }

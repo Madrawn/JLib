@@ -6,15 +6,12 @@ namespace JLib.Helper;
 public record TypeAttributeInfo(Type Type, Attribute Attribute);
 public static class ReflectionHelper
 {
-    public static IEnumerable<TypeAttributeInfo> GetTypesWithAttribute<TAttribute>(this Assembly assembly)
-        where TAttribute : Attribute =>
-        assembly
-            .GetTypes()
-            .Select(type =>
-            {
-                var attribute = type.GetCustomAttribute<TAttribute>();
-                return attribute is null ? null : new TypeAttributeInfo(type, attribute);
-            }).WhereNotNull();
+    public static bool HasAnyCustomAttribute<T>(this Type type, bool inherit = true)
+        where T : Attribute
+    {
+        var compare = type.TryGetGenericTypeDefinition();
+        return Attribute.GetCustomAttributes(type, inherit).Any(t => t.GetType().TryGetGenericTypeDefinition() == compare);
+    }
 
     public static bool HasCustomAttribute<T>(this MemberInfo type, bool inherit = true)
         where T : Attribute =>

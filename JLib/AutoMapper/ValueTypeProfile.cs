@@ -1,12 +1,9 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using AutoMapper;
 using JLib.Exceptions;
 using JLib.Helper;
-using Microsoft.Extensions.Primitives;
+using Serilog;
 
 namespace JLib.AutoMapper;
 
@@ -51,11 +48,13 @@ public class ValueTypeProfile : Profile
 
         public static void AddMapping(Profile profile)
         {
-            profile.CreateMap<TValueType, TNative>().ConvertUsing(vt => vt.Value);
-            profile.CreateMap<TNative, TValueType>().ConvertUsing(
-                new CtorReplacementExpressionVisitor<TValueType, TNative>().Visit(
-                v =>
-                    CtorReplacementExpressionVisitor<TValueType, TNative>.CtorPlaceholder(v)
+            Log.Verbose("            {tvt}? => {tNative}?", typeof(TValueType).Name, typeof(TNative).Name);
+            profile.CreateMap<TValueType?, TNative?>().ConvertUsing(vt => vt == null ? null : vt.Value);
+            Log.Verbose("            {tNative}? => {tvt}?", typeof(TNative).Name, typeof(TValueType).Name);
+            profile.CreateMap<TNative?, TValueType?>().ConvertUsing(
+                new CtorReplacementExpressionVisitor<TValueType?, TNative?>().Visit(
+                v => v == null ? null :
+                    CtorReplacementExpressionVisitor<TValueType?, TNative?>.CtorPlaceholder(v)
                 ));
         }
     }
@@ -67,14 +66,18 @@ public class ValueTypeProfile : Profile
 
         public static void AddMapping(Profile profile)
         {
+            Log.Verbose("            {tvt} => {tNative}", typeof(TValueType).Name, typeof(TNative).Name);
             profile.CreateMap<TValueType, TNative>().ConvertUsing(vt => vt.Value);
+            Log.Verbose("            {tNative} => {tvt}", typeof(TNative).Name, typeof(TValueType).Name);
             profile.CreateMap<TNative, TValueType>().ConvertUsing(
                 new CtorReplacementExpressionVisitor<TValueType, TNative>().Visit(
                     v =>
                         CtorReplacementExpressionVisitor<TValueType, TNative>.CtorPlaceholder(v)
                 ));
 
+            Log.Verbose("            {tvt} => {tNative}", typeof(TValueType).Name, typeof(TNative?).FullClassName());
             profile.CreateMap<TValueType, TNative?>().ConvertUsing(vt => vt == null ? null : vt.Value);
+            Log.Verbose("            {tNative} => {tvt}", typeof(TNative?).FullClassName(), typeof(TValueType).Name);
             profile.CreateMap<TNative?, TValueType?>().ConvertUsing(
                 new CtorReplacementExpressionVisitor<TValueType?, TNative?>().Visit(
                     v => v.HasValue
@@ -95,8 +98,9 @@ public class ValueTypeProfile : Profile
     {
         foreach (var valueType in cache.All<Types.ValueType>(vt => vt is { Mapped: true }))
         {
-            if (!valueType.NativeType.IsValueType)
+            if (valueType.NativeType.IsClass)
             {
+                Log.Debug("        adding map for class-valueType {valueType}", valueType.Name);
                 var addMapping = typeof(ClassValueTypeConversions<,>).MakeGenericType(valueType.Value, valueType.NativeType)
                         .GetMethod(nameof(ClassValueTypeConversions<ValueType<Ignored>, Ignored>.AddMapping)) ??
                     throw new InvalidSetupException("AddProfileMethodNotFound");
@@ -104,38 +108,12 @@ public class ValueTypeProfile : Profile
             }
             else
             {
+                Log.Debug("        adding map for strct-valueType {valueType}", valueType.Name);
                 var addMapping = typeof(StructValueTypeConversions<,>).MakeGenericType(valueType.Value, valueType.NativeType)
                                      .GetMethod(nameof(StructValueTypeConversions<ValueType<int>, int>.AddMapping)) ??
                                  throw new InvalidSetupException("AddProfileMethodNotFound");
                 addMapping.Invoke(null, new object?[] { this });
             }
-        }
-    }
-}
-
-public class EntityProfile : Profile
-{
-    public EntityProfile(ITypeCache cache)
-    {
-        foreach (var gdo in cache.All<Types.GraphQlDataObject>()
-                     .Where(gdo => gdo.CommandEntity is not null))
-            CreateMap(gdo.CommandEntity!.Value, gdo.Value);
-
-        foreach (var gmp in cache.All<Types.GraphQlMutationParameter>()
-                     .Where(gdo => gdo.CommandEntity is not null))
-        {
-            var ceProps = gmp.CommandEntity!.Value.GetProperties();
-            var gmpProps = gmp.Value.GetProperties();
-
-
-            var mapper = CreateMap(gmp.Value, gmp.CommandEntity!.Value);
-
-            // remove all properties which are missing in the mutation parameter and are not required
-            var propsToIgnore = ceProps
-                .ExceptBy(gmpProps.Select(pGmp => pGmp.Name), pCe => pCe.Name)
-                .Where(ceProp => !ceProp.HasCustomAttribute<RequiredMemberAttribute>());
-            foreach (var prop in propsToIgnore)
-                mapper.ForMember(prop.Name, o => o.Ignore());
         }
     }
 }

@@ -66,7 +66,8 @@ public static class TypeHelper
     /// <param name="type"></param>
     /// <returns></returns>
     public static bool ImplementsAny<T>(this Type type)
-        => type.GetInterface(typeof(T).Name) is not null;
+        => type.GetInterface(typeof(T).Name) is not null || type.IsInterface &&
+            (type.TryGetGenericTypeDefinition() ?? type) == (typeof(T).TryGetGenericTypeDefinition() ?? typeof(T));
 
     public static bool ImplementsAny(this Type type, Type @interface)
         => type.GetInterface(@interface.Name) is not null;
@@ -152,7 +153,7 @@ public static class TypeHelper
             .First()
             .Split(".").Last()
             .Replace("+", ".")
-            .Split("`1").First();
+            .Split("`").First();
 
         if (type.IsGenericType)
             res += $"<{string.Join(", ", type.GenericTypeArguments.Select(a => a.FullClassName()))}>";
