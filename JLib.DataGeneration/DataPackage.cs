@@ -6,7 +6,7 @@ using static JLib.FactoryAttributes.TvtFactoryAttributes;
 
 namespace JLib.DataGeneration;
 
-[IsDerivedFrom<DataPackage>, NotAbstract]
+[IsDerivedFrom(typeof(DataPackage)), NotAbstract]
 public record DataPackageType(Type Value) : TypeValueType(Value);
 
 public abstract class DataPackage

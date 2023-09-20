@@ -15,6 +15,17 @@ public interface ICustomProfileAttribute
 {
     public Type CustomProfile { get; }
 }
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+public class CustomProfileAttribute : Attribute, ICustomProfileAttribute
+{
+    public CustomProfileAttribute(Type customProfile)
+    {
+        CustomProfile = customProfile;
+    }
+    public Type CustomProfile { get; }
+}
+
+#if NET7_0_OR_GREATER
 /// <summary>
 /// marks the type as <see cref="TypeValueType.HasCustomAutoMapperProfile"/> = true, which should remove it from all automated profiles and register the <see cref="Profile"/> of <typeparamref name="T"/> to autoMapper
 /// </summary>
@@ -26,4 +37,4 @@ public class CustomProfileAttribute<T> : Attribute, ICustomProfileAttribute
     public Type CustomProfile => typeof(T);
 }
 
-
+#endif

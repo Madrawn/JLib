@@ -31,6 +31,86 @@ public abstract class TvtFactoryAttributes
         public const int DefaultPriority = 10_000;
     }
 
+
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public class IsInterface : Attribute, ITypeValueTypeFilterAttribute
+    {
+        public bool Filter(Type type)
+            => type.IsInterface;
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public class IsClass : Attribute, ITypeValueTypeFilterAttribute
+    {
+        public bool Filter(Type type)
+            => type.IsClass;
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public class IsNotAbstract : Attribute, ITypeValueTypeFilterAttribute
+    {
+        public bool Filter(Type type)
+            => !type.IsAbstract;
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public class NotAbstract : Attribute, ITypeValueTypeFilterAttribute
+    {
+        public bool Filter(Type type)
+            => !type.IsAbstract;
+    }
+
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    public sealed class IsDerivedFromAny : Attribute, ITypeValueTypeFilterAttribute
+    {
+        private readonly Type _type;
+
+        public IsDerivedFromAny(Type type)
+        {
+            _type = type;
+        }
+        public bool Filter(Type type)
+            => type.IsDerivedFromAny(_type);
+    }
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    public sealed class IsDerivedFrom : Attribute, ITypeValueTypeFilterAttribute
+    {
+        private readonly Type _type;
+
+        public IsDerivedFrom(Type type)
+        {
+            _type = type;
+        }
+        public bool Filter(Type type)
+            => type.IsAssignableTo(_type) && type != _type;
+    }
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    public sealed class Implements : Attribute, ITypeValueTypeFilterAttribute
+    {
+        private readonly Type _type;
+
+        public Implements(Type type)
+        {
+            _type = type;
+        }
+        public bool Filter(Type type)
+            => type.Implements(_type);
+    }
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    public sealed class ImplementsAny : Attribute, ITypeValueTypeFilterAttribute
+    {
+        private readonly Type _type;
+
+        public ImplementsAny(Type type)
+        {
+            _type = type;
+        }
+        public bool Filter(Type type)
+            => type.ImplementsAny(_type);
+    }
+#if NET7_0_OR_GREATER
+
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public sealed class IsAssignableTo<T> : Attribute, ITypeValueTypeFilterAttribute
         where T : class
@@ -65,7 +145,7 @@ public abstract class TvtFactoryAttributes
         public bool Filter(Type type)
             => typeof(TTvt).GetCustomAttributes().OfType<ITypeValueTypeFilterAttribute>().All(a => a.Filter(type)) is false;
     }
-
+    
     [AttributeUsage(AttributeTargets.Class)]
     public class Implements<T> : Attribute, ITypeValueTypeFilterAttribute
     {
@@ -92,32 +172,5 @@ public abstract class TvtFactoryAttributes
         public bool Filter(Type type)
             => !type.ImplementsAny<T>();
     }
-
-    [AttributeUsage(AttributeTargets.Class)]
-    public class IsInterface : Attribute, ITypeValueTypeFilterAttribute
-    {
-        public bool Filter(Type type)
-            => type.IsInterface;
-    }
-
-    [AttributeUsage(AttributeTargets.Class)]
-    public class IsClass : Attribute, ITypeValueTypeFilterAttribute
-    {
-        public bool Filter(Type type)
-            => type.IsClass;
-    }
-
-    [AttributeUsage(AttributeTargets.Class)]
-    public class IsNotAbstract : Attribute, ITypeValueTypeFilterAttribute
-    {
-        public bool Filter(Type type)
-            => !type.IsAbstract;
-    }
-
-    [AttributeUsage(AttributeTargets.Class)]
-    public class NotAbstract : Attribute, ITypeValueTypeFilterAttribute
-    {
-        public bool Filter(Type type)
-            => !type.IsAbstract;
-    }
+#endif
 }

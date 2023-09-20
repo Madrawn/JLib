@@ -1,10 +1,16 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.ComponentModel.DataAnnotations;
+#if NET7_0_OR_GREATER
+using System.Runtime.CompilerServices;
+#endif
+using System.Runtime.InteropServices;
 using AutoMapper;
 using JLib.Helper;
 using Serilog;
 
 namespace JLib.AutoMapper;
-
+/// <summary>
+/// to make a property required for mapping, add the <see cref="RequiredAttribute"/> to it or add the required keyword on .net7 or higher
+/// </summary>
 public class EntityProfile : Profile
 {
     public EntityProfile(ITypeCache cache)
@@ -28,10 +34,15 @@ public class EntityProfile : Profile
 
             var mapper = CreateMap(gmp.Value, gmp.CommandEntity!.Value);
 
+
             // remove all properties which are missing in the mutation parameter and are not required
             var propsToIgnore = ceProps
                 .ExceptBy(gmpProps.Select(pGmp => pGmp.Name), pCe => pCe.Name)
-                .Where(ceProp => !ceProp.HasCustomAttribute<RequiredMemberAttribute>());
+                .Where(ceProp => !ceProp.HasCustomAttribute<RequiredAttribute>()
+#if NET7_0_OR_GREATER
+                    && !ceProp.HasCustomAttribute<RequiredMemberAttribute>()
+#endif
+                );
             foreach (var prop in propsToIgnore)
             {
                 mapper.ForMember(prop.Name, o => o.Ignore());
