@@ -25,7 +25,7 @@ public abstract class DataPackage
                 throw new(propertyInfo.DeclaringType?.FullClassName() + "." + propertyInfo.Name +
                           " can not be written");
             if (propertyInfo.SetMethod?.IsPublic is true)
-                throw new(propertyInfo.DeclaringType?.FullClassName() + "." + propertyInfo.Name + 
+                throw new(propertyInfo.DeclaringType?.FullClassName() + "." + propertyInfo.Name +
                           " set method must be protected");
             var id = _dataPackages.RetrieveId(propertyInfo);
             propertyInfo.SetValue(this, id);
@@ -41,4 +41,7 @@ public abstract class DataPackage
         where TId : GuidValueType
         => _dataPackages.DeriveId<TId>(id, GetType());
 
+    protected TId? DeriveId<TId>(GuidValueType? idN, GuidValueType? idM)
+        where TId : GuidValueType
+        => _dataPackages.DeriveId<TId>(idN, idM, GetType());
 }

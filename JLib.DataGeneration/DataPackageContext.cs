@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
+using System.Security.Cryptography;
 using AutoMapper;
 using JLib.Data;
 using JLib.Helper;
@@ -16,6 +17,9 @@ public interface IDataPackageStore
         where TPackage : DataPackage;
     internal GuidValueType RetrieveId(PropertyInfo property);
     TId? DeriveId<TId>(GuidValueType? id, Type dataPackage)
+        where TId : GuidValueType;
+
+    TId? DeriveId<TId>(GuidValueType? idN, GuidValueType? idM, Type dataPackage)
         where TId : GuidValueType;
 }
 public interface IDataPackager
@@ -89,6 +93,14 @@ public class DataPackager : IDataPackager, IDataPackageStore
     private Guid GetModifier<TId>(Type dataPackage)
         => _idRegistry.GetId(dataPackage.FullClassName(), $"modifier_{typeof(TId).FullClassName()}");
 
+    private static Guid CombineGuid(Guid id1, Guid id2)
+    {
+        var binary = id1.ToByteArray().Zip(id2.ToByteArray())
+            .Select(x => (byte)(x.First ^ x.Second)).ToArray();
+        var guid = new Guid(binary);
+        return guid;
+    }
+
     /// <summary>
     /// works by taking a guid which is generated for each <see cref="Type"/>+<see cref="GuidValueType"/> of the related entity and applying a bitwise xor between it and the given id.
     /// <br/> this should result in a new, unique and deterministic id per entity relation 
@@ -98,10 +110,21 @@ public class DataPackager : IDataPackager, IDataPackageStore
     {
         if (id is null)
             return null;
-        var binary = id.Value.ToByteArray().Zip(GetModifier<TId>(dataPackage).ToByteArray())
-            .Select(x => (byte)(x.First ^ x.Second)).ToArray();
-        var guid = new Guid(binary);
-        return _mapper.Map<TId?>(guid);
+        return _mapper.Map<TId?>(CombineGuid(id.Value, GetModifier<TId>(dataPackage)));
+    }
+
+    public TId? DeriveId<TId>(GuidValueType? idN, GuidValueType? idM, Type dataPackage)
+        where TId : GuidValueType
+    {
+        if (idN is null && idM is null)
+            return null;
+        if (idN is not null && idM is null)
+            return DeriveId<TId>(idN, dataPackage);
+        if (idN is null && idM is not null)
+            return DeriveId<TId>(idM, dataPackage);
+        var stage1 = CombineGuid(idN!.Value, idM!.Value);
+        var stage2 = CombineGuid(stage1, GetModifier<TId>(dataPackage));
+        return _mapper.Map<TId?>(stage2);
     }
 
     GuidValueType IDataPackageStore.RetrieveId(PropertyInfo property)
