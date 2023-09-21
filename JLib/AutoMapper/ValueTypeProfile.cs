@@ -96,7 +96,7 @@ public class ValueTypeProfile : Profile
 
     public ValueTypeProfile(ITypeCache cache)
     {
-        foreach (var valueType in cache.All<Types.ValueType>(vt => vt is { Mapped: true }))
+        foreach (var valueType in cache.All<ValueTypeType>(vt => vt is { Mapped: true }))
         {
             if (valueType.NativeType.IsClass)
             {

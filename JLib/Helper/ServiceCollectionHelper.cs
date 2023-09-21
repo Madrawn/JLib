@@ -38,13 +38,17 @@ public static class ServiceCollectionHelper
             return includedPrefixes.Any(p => filename.StartsWith(p));
         }).Select(AssemblyName.GetAssemblyName).ToArray();
 
-        var assemblies = assemblyNames.Select(Assembly.Load);
+        var assemblies = assemblyNames.Select(Assembly.Load).ToArray();
+        Log.Information("TypeCache initializing using {0} as path while looking for files in {1} and filtering using {2} as prefix. This resulted in {3} Assemblies being loaded which are {4}", assemblySearchDirectory, searchOption, includedPrefixes, assemblyNames.Length, assemblyNames);
+        return services.AddTypeCache(out typeCache, assemblies);
+    }
+
+    public static IServiceCollection AddTypeCache(this IServiceCollection services, out ITypeCache typeCache,
+        params Assembly[] assemblies)
+    {
+        Log.Information("initializing typeCache for assemblies {assemblies}", assemblies);
         typeCache = new TypeCache(assemblies);
-
-        Log.Information("TypeCache initialized using {0} as path while looking for files in {1} and filtering using {2} as prefix. This resulted in {3} Assemblies being loaded which are {4}", assemblySearchDirectory, searchOption, includedPrefixes, assemblyNames.Length, assemblyNames);
-
-        services.AddSingleton(typeCache);
-        return services;
+        return services.AddSingleton(typeCache);
     }
 
     /// <summary>
@@ -150,7 +154,7 @@ public static class ServiceCollectionHelper
             $"{nameof(AddGenericAlias)} failed while adding alias {alias.Name} for service {provided.Name} and valueType {typeof(TTvt).Name}";
         var exceptions = parentExceptionMgr?.CreateChild(msg) ?? new ExceptionManager(msg);
 
-        Log.Debug("Linking {0} to Alias {1} for each {2} with lifetime {3}", typeof(TProvided).Name, typeof(TAlias).Name, typeof(TTvt).Name, lifetime);
+        Log.Debug("Linking {provided} to Alias {alias} for each {tvt} with lifetime {lifetime}", typeof(TProvided).Name, typeof(TAlias).Name, typeof(TTvt).Name, lifetime);
 
         foreach (var valueType in typeCache.All(filter))
         {
@@ -162,7 +166,7 @@ public static class ServiceCollectionHelper
                 services.Add(new(explicitAlias, provider => provider.GetRequiredService(explicitService), lifetime));
 
                 Log.Verbose(
-                    "    {0,-25}: {1,-65} as {2,-20}",
+                    "    {valueType,-25}: {alias,-65} as {service,-20}",
                     valueType.Name, explicitAlias.FullClassName(), explicitService.FullClassName());
             });
         }
@@ -201,7 +205,7 @@ public static class ServiceCollectionHelper
 
         IExceptionManager exceptions = parentExceptionMgr?.CreateChild(msg) ?? new ExceptionManager(msg);
 
-        Log.Debug("Providing {0} as {1} for each {2} with lifetime {3}",
+        Log.Debug("Providing {implementation} as {service} for each {tvt} with lifetime {lifetime}",
             typeof(TImplementation).Name, typeof(TService).Name, typeof(TTvt).Name, lifetime);
 
         foreach (var valueType in typeCache.All(filter))
@@ -214,7 +218,7 @@ public static class ServiceCollectionHelper
                 services.Add(new(explicitService, explicitImplementation, lifetime));
 
                 Log.Verbose(
-                    "    {0,-25}: {1,-65} as {2,-20}",
+                    "    {valueType,-25}: {implementation,-65} as {service,-20}",
                     valueType.Name, explicitImplementation.FullClassName(), explicitService.FullClassName());
             });
 

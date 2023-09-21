@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using JLib.Helper;
+using Serilog;
 
 namespace JLib.Data;
 
@@ -12,6 +14,7 @@ public class MapDataProvider<TFrom, TTo> : IDataProviderR<TTo>
     {
         _provider = provider;
         _config = config;
+        Log.Verbose("creating {type}",GetType().FullClassName());
     }
     public IQueryable<TTo> Get()
         => _provider.Get().ProjectTo<TTo>(_config);

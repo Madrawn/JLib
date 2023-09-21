@@ -15,8 +15,8 @@ public class EntityProfile : Profile
 {
     public EntityProfile(ITypeCache cache)
     {
-        Log.Debug("        Adding GraphQlDataObject Map");
-        foreach (var gdo in cache.All<Types.GraphQlDataObject>()
+        Log.Debug("        Adding GraphQlDataObjectType Map");
+        foreach (var gdo in cache.All<GraphQlDataObjectType>()
                      .Where(gdo => gdo is { CommandEntity: not null, HasCustomAutoMapperProfile: false }))
         {
             Log.Verbose("            Mapping from {cmd} to {gdo}", gdo.CommandEntity!.Name, gdo.Name);
@@ -24,7 +24,7 @@ public class EntityProfile : Profile
         }
 
         Log.Debug("        Adding GraphQlMutationParameters");
-        foreach (var gmp in cache.All<Types.GraphQlMutationParameter>()
+        foreach (var gmp in cache.All<GraphQlMutationParameterType>()
                      .Where(gdo => gdo is { CommandEntity: not null, HasCustomAutoMapperProfile: false }))
         {
             Log.Verbose("            Mapping from {cmd} to {gdo}", gmp.CommandEntity!.Name, gmp.CommandEntity.Name);

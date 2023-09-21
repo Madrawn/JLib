@@ -3,7 +3,7 @@ using JLib.AutoMapper;
 
 namespace JLib.Attributes;
 /// <summary>
-/// the <see cref="ValueTypeProfile"/> will not create a profile from <see cref="ValueType{T}.Value"/> to the <see cref="ValueType{T}"/>
+/// the <see cref="ValueTypeProfile"/> will not create a profile from <see cref="ValueTypeType{T}.Value"/> to the <see cref="ValueTypeType{T}"/>
 /// </summary>
 [AttributeUsage(AttributeTargets.Class)]
 public class UnmappedAttribute : Attribute

@@ -3,6 +3,8 @@
 using JLib.Exceptions;
 using JLib.FactoryAttributes;
 using JLib.Helper;
+using Serilog;
+using Serilog.Events;
 
 namespace JLib;
 
@@ -33,6 +35,7 @@ public interface ITypeCache
 
     public TTvt Single<TTvt>(Func<TTvt, bool> selector) where TTvt : TypeValueType
         => SingleOrDefault(selector) ?? throw new InvalidSetupException("no selector matched");
+
 }
 
 public class TypeCache : ITypeCache
@@ -154,6 +157,10 @@ public class TypeCache : ITypeCache
             {
                 typeValueType.MaterializeNavigation();
             }
+            catch (TargetInvocationException e) when (e.InnerException is not null)
+            {
+                exceptions.Add(e.InnerException);
+            }
             catch (Exception e)
             {
                 exceptions.Add(e);
@@ -173,6 +180,8 @@ public class TypeCache : ITypeCache
             }
         }
         exceptions.ThrowIfNotEmpty();
+
+        WriteLog();
     }
 
 
@@ -190,4 +199,51 @@ public class TypeCache : ITypeCache
     public IEnumerable<T> All<T>()
         where T : TypeValueType
         => _typeValueTypes.OfType<T>();
+
+    public void WriteLog()
+    {
+        Log.Information("Initialized TypeCache with a total of {typeCount} types", _typeValueTypes.Length);
+        WriteDebug();
+
+        var missing = KnownTypeValueTypes.Except(_typeValueTypes.Select(x => x.GetType()).Distinct()).ToArray();
+        if (missing.Any())
+            Log.Warning("  No types found for: {TypeValueTypeName}", missing);
+        return;
+
+        void WriteDebug()
+        {
+            if (!Log.IsEnabled(LogEventLevel.Debug))
+                return;
+
+            var typesByAssembly = _typeValueTypes
+                .GroupBy(tvt => tvt.Value.Assembly.FullName)
+                .OrderBy(g => g.Key)
+                .ToArray();
+
+            foreach (var typesInAssembly in typesByAssembly)
+            {
+                Log.Debug("  Found {typeCount} types in Assemlby {assemblyName}", typesInAssembly.Count(), typesInAssembly.Key);
+                WriteTypes(typesInAssembly);
+            }
+            //Log.Verbose("  Total Types:");
+            //WriteTypes(_typeValueTypes);
+        }
+
+        void WriteTypes(IEnumerable<TypeValueType> types)
+        {
+            var registeredTypes = types
+                .GroupBy(tvt => tvt.GetType())
+                .OrderBy(g => g.Key.Name)
+                .ToArray();
+            foreach (var group in registeredTypes)
+            {
+                Log.Debug("    ValueTypeType     + {TypeValueTypeName}", group.Key);
+
+                if (!Log.IsEnabled(LogEventLevel.Verbose))
+                    continue;
+                foreach (var tvt in group)
+                    Log.Verbose("      DiscoveredType    - {TypeName}", tvt.Name);
+            }
+        }
+    }
 }
