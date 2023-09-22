@@ -140,7 +140,7 @@ public static class TypeHelper
                 : throw new InvalidOperationException("the type arguments do not match")
             : type;
 
-    public static Type MakeGenericType(this Type type, params TypeValueType[] genericParams)
+    public static Type MakeGenericType(this Type type, params ITypeValueType[] genericParams)
         => type.MakeGenericType(genericParams.Select(x => x.Value).ToArray());
 
     /// <summary>

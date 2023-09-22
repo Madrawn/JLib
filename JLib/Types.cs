@@ -3,9 +3,26 @@ using AutoMapper;
 using JLib.Attributes;
 using JLib.Data;
 using JLib.Helper;
+using Microsoft.VisualBasic.CompilerServices;
 using static JLib.FactoryAttributes.TvtFactoryAttributes;
 
 namespace JLib;
+
+/// <summary>
+/// used for entity mapping in conjunction with any <see cref="IMappedDataObjectType"/>.
+/// <br/>Enables the Profile to ignore the prefix when resolving the correlated properties.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class)]
+public class PropertyPrefixAttribute : Attribute
+{
+    public string Prefix { get; }
+
+    public PropertyPrefixAttribute(string prefix)
+    {
+        Prefix = prefix;
+    }
+}
+
 [IsDerivedFromAny(typeof(ValueType<>))]
 public record ValueTypeType(Type Value) : TypeValueType(Value), IValidatedType
 {
@@ -35,6 +52,36 @@ public record ValueTypeType(Type Value) : TypeValueType(Value), IValidatedType
     }
 }
 
+[ImplementsAny(typeof(IMappedGraphQlDataObject<>)), NotAbstract, Priority(3_000)]
+public sealed record MappedGraphQlDataObjectType(Type Value) : GraphQlDataObjectType(Value), IMappedDataObjectType, IInitializedType
+{
+    public EntityType SourceEntity =>
+        Navigate(typeCache => Value.GetAnyInterface<IMappedGraphQlDataObject<IEntity>>()?.GenericTypeArguments.First()
+                                  .CastValueType<EntityType>(typeCache)
+                              ?? throw NewInvalidTypeException("SourceEntity could not be found"));
+    /// <summary>
+    /// add the <see cref="PropertyPrefixAttribute"/> to the <see cref="SourceEntity"/> type
+    /// </summary>
+    public PropertyPrefix? PropertyPrefix { get; private set; }
+
+    public bool ReverseMap => false;
+
+    public void Initialize(IExceptionManager exceptions) 
+        => PropertyPrefix = SourceEntity.Value.GetCustomAttribute<PropertyPrefixAttribute>()?.Prefix;
+}
+
+[ImplementsAny(typeof(IMappedCommandEntity<>)), NotAbstract, Priority(3_000)]
+public sealed record MappedCommandEntityType(Type Value) : CommandEntityType(Value), IMappedDataObjectType, IInitializedType
+{
+    public EntityType SourceEntity =>
+        Navigate(typeCache => Value.GetAnyInterface<IMappedCommandEntity<IEntity>>()?.GenericTypeArguments.First()
+                                  .CastValueType<EntityType>(typeCache)
+                              ?? throw NewInvalidTypeException("SourceEntity could not be found"));
+    public PropertyPrefix? PropertyPrefix { get; private set; }
+    public bool ReverseMap => true;
+    public void Initialize(IExceptionManager exceptions)
+        => PropertyPrefix = SourceEntity.Value.GetCustomAttribute<PropertyPrefixAttribute>()?.Prefix;
+}
 [IsDerivedFrom(typeof(Profile)), NotAbstract]
 public record AutoMapperProfileType(Type Value) : TypeValueType(Value)
 {
@@ -56,8 +103,6 @@ public abstract record DataObjectType(Type Value) : NavigatingTypeValueType(Valu
 [Implements(typeof(IEntity)), IsClass, NotAbstract]
 public record EntityType(Type Value) : DataObjectType(Value), IValidatedType
 {
-    public GraphQlDataObjectType? GraphQlDataObject =>
-        Navigate(cache => cache.All<GraphQlDataObjectType>(gdo => gdo.CommandEntity == this).SingleOrDefault());
     public void Validate(ITypeCache cache, TvtValidator validator)
     {
         if (GetType() == typeof(EntityType))
@@ -76,12 +121,6 @@ public record CommandEntityType(Type Value) : EntityType(Value)
 [Implements(typeof(IGraphQlDataObject)), IsClass, NotAbstract]
 public record GraphQlDataObjectType(Type Value) : DataObjectType(Value), IValidatedType
 {
-    public CommandEntityType? CommandEntity => Navigate(cache =>
-        Value.GetAnyInterface<IGraphQlDataObject<IEntity>>()
-            ?.GenericTypeArguments
-            .First()
-            .CastValueType<CommandEntityType>(cache));
-
     public void Validate(ITypeCache cache, TvtValidator validator)
     {
         var ctors = Value.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
@@ -100,13 +139,4 @@ public record GraphQlDataObjectType(Type Value) : DataObjectType(Value), IValida
                 validator.Add("found a public parameterless ctor despite having non-nullable properties");
         }
     }
-}
-[ImplementsAny(typeof(IGraphQlMutationParameter<>)), IsClass, NotAbstract]
-public record GraphQlMutationParameterType(Type Value) : DataObjectType(Value)
-{
-    public EntityType? CommandEntity => Navigate(cache =>
-        Value.GetAnyInterface<IGraphQlMutationParameter<IEntity>>()
-            ?.GenericTypeArguments
-            .First()
-            .CastValueType<EntityType>(cache));
 }

@@ -52,44 +52,56 @@ public static class ServiceCollectionHelper
     }
 
     /// <summary>
+    /// adds map data providers for each <see cref="IMappedDataObjectType"/>.
+    /// <br/>generates a <see cref="IDataProviderR{TData}"/> if <see cref="IMappedDataObjectType.ReverseMap"/> is false
+    /// <br/>generates a <see cref="IDataProviderRw{TData}"/> and a <see cref="IDataProviderR{TData}"/> as alias if it is true
+    /// </summary>
+    public static IServiceCollection AddMapDataProvider(
+        this IServiceCollection services,
+        ITypeCache typeCache,
+        IExceptionManager? parentExceptionMgr = null)
+        => services.AddMapDataProvider<IMappedDataObjectType>(typeCache, null, 
+            mdo => mdo.SourceEntity, 
+            mdo => !mdo.ReverseMap,parentExceptionMgr);
+
+    /// <summary>
     /// Provides a <see cref="IDataProviderR{TData}"/> for each <typeparamref name="TTvt"/> which takes data from a <see cref="IDataProviderR{TData}"/> of the type retrieved by <see cref="sourcePropertyReader"/> and maps it using AutoMapper Projections
     /// <br/>exceptions are added as child to the <see cref="parentExceptionMgr"/> or thrown as a <see cref="JLibAggregateException"/> when it was not provided
     /// </summary>
     public static IServiceCollection AddMapDataProvider<TTvt>(
-        this IServiceCollection services,
-        ITypeCache typeCache,
-        Func<TTvt, bool>? filter,
-        Func<TTvt, TypeValueType?> sourcePropertyReader,
-        bool readOnly = false,
-        IExceptionManager? parentExceptionMgr = null)
-        where TTvt : TypeValueType
+    this IServiceCollection services,
+    ITypeCache typeCache,
+    Func<TTvt, bool>? filter,
+    Func<TTvt, ITypeValueType?> sourcePropertyReader,
+    Func<TTvt, bool>? isReadOnly = null,
+    IExceptionManager? parentExceptionMgr = null)
+    where TTvt : class, ITypeValueType
     {
+        isReadOnly ??= _ => false;
         var msg = $"{nameof(AddMapDataProvider)} failed for valueType {typeof(TTvt).Name}";
         IExceptionManager exceptions = parentExceptionMgr?.CreateChild(msg) ?? new ExceptionManager(msg);
 
         var typeArguments =
-            new Func<TTvt, TypeValueType>[]
+            new Func<TTvt, ITypeValueType>[]
             {
                 destination => sourcePropertyReader(destination)!,
                 destination => destination
             };
+        //readonly
+        services.AddGenericServices<TTvt, IDataProviderR<Ignored>, MapDataProvider<IEntity, Ignored>>(typeCache, ServiceLifetime.Scoped, exceptions,
+             tvt => AppliedFilter(tvt) && isReadOnly(tvt),
+             null,
+             typeArguments);
+        // read & write
+        services.AddGenericServices<TTvt, IDataProviderRw<IEntity>, WritableMapDataProvider<IEntity, IEntity>>(
+            typeCache, ServiceLifetime.Scoped, exceptions,
+            tvt => AppliedFilter(tvt) && !isReadOnly(tvt),
+            null,
+            typeArguments);
+        services.AddGenericAlias<TTvt, IDataProviderR<IEntity>, IDataProviderRw<IEntity>>(
+            typeCache, ServiceLifetime.Scoped, exceptions,
+            tvt => AppliedFilter(tvt) && !isReadOnly(tvt));
 
-        if (readOnly)
-            services.AddGenericServices<TTvt, IDataProviderR<Ignored>, MapDataProvider<IEntity, Ignored>>(typeCache, ServiceLifetime.Scoped, exceptions,
-                 AppliedFilter,
-                 null,
-                 typeArguments);
-        else
-        {
-            services.AddGenericServices<TTvt, IDataProviderRw<IEntity>, WritableMapDataProvider<IEntity, IEntity>>(
-                typeCache, ServiceLifetime.Scoped, exceptions,
-                AppliedFilter,
-                null,
-                typeArguments);
-            services.AddGenericAlias<TTvt, IDataProviderR<IEntity>, IDataProviderRw<IEntity>>(
-                typeCache, ServiceLifetime.Scoped, exceptions,
-                AppliedFilter);
-        }
 
         if (parentExceptionMgr is null)
             exceptions.ThrowIfNotEmpty();
@@ -137,14 +149,14 @@ public static class ServiceCollectionHelper
         ServiceLifetime lifetime,
         IExceptionManager? parentExceptionMgr = null,
         Func<TTvt, bool>? filter = null,
-        Func<TTvt, TypeValueType>[]? serviceTypeArgumentResolver = null,
-        Func<TTvt, TypeValueType>[]? implementationTypeArgumentResolver = null)
-        where TTvt : TypeValueType
+        Func<TTvt, ITypeValueType>[]? serviceTypeArgumentResolver = null,
+        Func<TTvt, ITypeValueType>[]? implementationTypeArgumentResolver = null)
+        where TTvt : class, ITypeValueType
         where TProvided : TAlias
         where TAlias : notnull
     {
-        serviceTypeArgumentResolver ??= new Func<TTvt, TypeValueType>[] { e => e };
-        implementationTypeArgumentResolver ??= new Func<TTvt, TypeValueType>[] { e => e };
+        serviceTypeArgumentResolver ??= new Func<TTvt, ITypeValueType>[] { e => e };
+        implementationTypeArgumentResolver ??= new Func<TTvt, ITypeValueType>[] { e => e };
         filter ??= _ => true;
 
         var alias = typeof(TAlias).GetGenericTypeDefinition();
@@ -187,14 +199,14 @@ public static class ServiceCollectionHelper
         ServiceLifetime lifetime,
         IExceptionManager? parentExceptionMgr = null,
         Func<TTvt, bool>? filter = null,
-        Func<TTvt, TypeValueType>[]? serviceTypeArgumentResolver = null,
-        Func<TTvt, TypeValueType>[]? implementationTypeArgumentResolver = null)
-        where TTvt : TypeValueType
+        Func<TTvt, ITypeValueType>[]? serviceTypeArgumentResolver = null,
+        Func<TTvt, ITypeValueType>[]? implementationTypeArgumentResolver = null)
+        where TTvt : class, ITypeValueType
         where TImplementation : TService
         where TService : notnull
     {
-        serviceTypeArgumentResolver ??= new Func<TTvt, TypeValueType>[] { e => e };
-        implementationTypeArgumentResolver ??= new Func<TTvt, TypeValueType>[] { e => e };
+        serviceTypeArgumentResolver ??= new Func<TTvt, ITypeValueType>[] { e => e };
+        implementationTypeArgumentResolver ??= new Func<TTvt, ITypeValueType>[] { e => e };
 
         var serviceDefinition = typeof(TService).GetGenericTypeDefinition();
         var implementationDefinition = typeof(TImplementation).GetGenericTypeDefinition();
@@ -228,8 +240,8 @@ public static class ServiceCollectionHelper
         return services;
 
     }
-    private static Type GetGenericService<TTvt>(Type genericClass, TTvt currentValueType, Func<TTvt, TypeValueType>[] typeArgumentResolver)
-        where TTvt : TypeValueType
+    private static Type GetGenericService<TTvt>(Type genericClass, TTvt currentValueType, Func<TTvt, ITypeValueType>[] typeArgumentResolver)
+        where TTvt : class, ITypeValueType
     {
         var typeArguments = typeArgumentResolver.Select(resolver => resolver(currentValueType)).ToArray();
         return genericClass.MakeGenericType(typeArguments);

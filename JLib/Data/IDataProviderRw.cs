@@ -1,4 +1,6 @@
 ﻿using JLib.AutoMapper;
+using JLib.Helper;
+using static JLib.FactoryAttributes.TvtFactoryAttributes;
 
 namespace JLib.Data;
 
@@ -18,15 +20,13 @@ public interface ICommandEntity : IEntity
 
 }
 
-/// <summary>
-/// marks the class as parameter for a GraphQl mutation and creates a map from the parameter to the given entity (using <see cref="EntityProfile"/>)
-/// </summary>
-/// <typeparam name="TEntity"></typeparam>
-public interface IGraphQlMutationParameter<TEntity>
+public interface IMappedCommandEntity<TEntity> : ICommandEntity
     where TEntity : IEntity
-{
+{ }
+public interface IMappedGraphQlDataObject<TEntity> : IGraphQlDataObject
+    where TEntity : IEntity
+{ }
 
-}
 public interface IGraphQlDataObject
 {
 

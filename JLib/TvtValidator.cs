@@ -4,10 +4,10 @@ namespace JLib;
 
 public class TvtValidator : IExceptionProvider
 {
-    private readonly TypeValueType _typeValueType;
+    private readonly ITypeValueType _typeValueType;
     private Type Value => _typeValueType.Value;
     private readonly List<string> _messages = new();
-    public TvtValidator(TypeValueType typeValueType)
+    public TvtValidator(ITypeValueType typeValueType)
     {
         _typeValueType = typeValueType;
     }

@@ -16,20 +16,20 @@ public interface ISubCache<T>
 public interface ITypeCache
 {
     public IEnumerable<Type> KnownTypeValueTypes { get; }
-    public TTvt Get<TTvt>(Type weakType) where TTvt : TypeValueType;
-    public TTvt Get<TTvt, TType>() where TTvt : TypeValueType
+    public TTvt Get<TTvt>(Type weakType) where TTvt : class, ITypeValueType;
+    public TTvt Get<TTvt, TType>() where TTvt : class, ITypeValueType
         => Get<TTvt>(typeof(TType));
-    public TTvt? TryGet<TTvt>(Type weakType) where TTvt : TypeValueType;
-    public TTvt? TryGet<TTvt, TType>() where TTvt : TypeValueType
+    public TTvt? TryGet<TTvt>(Type weakType) where TTvt : class, ITypeValueType;
+    public TTvt? TryGet<TTvt, TType>() where TTvt : class, ITypeValueType
         => TryGet<TTvt>(typeof(TType).TryGetGenericTypeDefinition() ?? typeof(TType));
-    public IEnumerable<TTvt> All<TTvt>() where TTvt : TypeValueType;
-    public IEnumerable<TTvt> All<TTvt>(Func<TTvt, bool> filter) where TTvt : TypeValueType
+    public IEnumerable<TTvt> All<TTvt>() where TTvt : class, ITypeValueType;
+    public IEnumerable<TTvt> All<TTvt>(Func<TTvt, bool> filter) where TTvt : class, ITypeValueType
         => All<TTvt>().Where(filter);
-    public TTvt? SingleOrDefault<TTvt>(Func<TTvt, bool> selector) where TTvt : TypeValueType
+    public TTvt? SingleOrDefault<TTvt>(Func<TTvt, bool> selector) where TTvt : class, ITypeValueType
     {
         var res = All<TTvt>().Where(selector).ToArray();
         if (res.Length > 1)
-            throw new InvalidSetupException($"multiple selectors matched to be cast to {typeof(TTvt).Name}: " + string.Join(", ", res.Select(r => r.Name)));
+            throw new InvalidSetupException($"multiple selectors matched to be cast to {typeof(TTvt).Name}: " + string.Join(", ", res.Select(r => r.Value.Name)));
         return res.FirstOrDefault();
     }
 
@@ -138,6 +138,17 @@ public class TypeCache : ITypeCache
         }
 
 
+        foreach (var typeValueType in _typeValueTypes.OfType<IInitializedType>())
+        {
+            try
+            {
+                typeValueType.Initialize(exceptions.CreateChild("Initialization failed"));
+            }
+            catch (Exception e)
+            {
+                exceptions.Add(e);
+            }
+        }
 
         foreach (var typeValueType in _typeValueTypes.OfType<NavigatingTypeValueType>())
         {
@@ -170,7 +181,7 @@ public class TypeCache : ITypeCache
         {
             try
             {
-                var tvtValidator = new TvtValidator((TypeValueType)typeValueType);
+                var tvtValidator = new TvtValidator(typeValueType);
                 typeValueType.Validate(this, tvtValidator);
                 exceptions.AddChild(tvtValidator);
             }
@@ -187,17 +198,17 @@ public class TypeCache : ITypeCache
 
 
     public T Get<T>(Type weakType)
-        where T : TypeValueType
+        where T : class, ITypeValueType
         => _typeMappings[weakType].CastTo<T>();
 
     public T? TryGet<T>(Type weakType)
-        where T : TypeValueType
+        where T : class, ITypeValueType
         => _typeMappings.TryGetValue(weakType, out var tvt)
             ? tvt.As<T?>()
             : null;
 
     public IEnumerable<T> All<T>()
-        where T : TypeValueType
+        where T : class, ITypeValueType
         => _typeValueTypes.OfType<T>();
 
     public void WriteLog()
