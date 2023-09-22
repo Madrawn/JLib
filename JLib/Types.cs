@@ -53,7 +53,7 @@ public record ValueTypeType(Type Value) : TypeValueType(Value), IValidatedType
 }
 
 [ImplementsAny(typeof(IMappedGraphQlDataObject<>)), NotAbstract, Priority(3_000)]
-public sealed record MappedGraphQlDataObjectType(Type Value) : GraphQlDataObjectType(Value), IMappedDataObjectType, IInitializedType
+public sealed record MappedGraphQlDataObjectType(Type Value) : GraphQlDataObjectType(Value), IMappedDataObjectType, IPostNavigationInitializedType
 {
     public EntityType SourceEntity =>
         Navigate(typeCache => Value.GetAnyInterface<IMappedGraphQlDataObject<IEntity>>()?.GenericTypeArguments.First()
@@ -71,7 +71,7 @@ public sealed record MappedGraphQlDataObjectType(Type Value) : GraphQlDataObject
 }
 
 [ImplementsAny(typeof(IMappedCommandEntity<>)), NotAbstract, Priority(3_000)]
-public sealed record MappedCommandEntityType(Type Value) : CommandEntityType(Value), IMappedDataObjectType, IInitializedType
+public sealed record MappedCommandEntityType(Type Value) : CommandEntityType(Value), IMappedDataObjectType, IPostNavigationInitializedType
 {
     public EntityType SourceEntity =>
         Navigate(typeCache => Value.GetAnyInterface<IMappedCommandEntity<IEntity>>()?.GenericTypeArguments.First()
@@ -79,7 +79,7 @@ public sealed record MappedCommandEntityType(Type Value) : CommandEntityType(Val
                               ?? throw NewInvalidTypeException("SourceEntity could not be found"));
     public PropertyPrefix? PropertyPrefix { get; private set; }
     public bool ReverseMap => true;
-    public void Initialize(IExceptionManager exceptions)
+    void IPostNavigationInitializedType.Initialize(IExceptionManager exceptions)
         => PropertyPrefix = SourceEntity.Value.GetCustomAttribute<PropertyPrefixAttribute>()?.Prefix;
 }
 [IsDerivedFrom(typeof(Profile)), NotAbstract]

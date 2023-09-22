@@ -5,10 +5,17 @@ using Serilog.Events;
 
 namespace JLib;
 
-
-public interface IInitializedType : ITypeValueType
+/// <summary>
+/// allows a <see cref="ITypeValueType"/> to run code after the navigation has been initialized but before it will be validated
+/// <br/>can be used to set properties which are derived from Attributes on navigated types
+/// </summary>
+public interface IPostNavigationInitializedType : ITypeValueType
 {
-    void Initialize(IExceptionManager exceptions);
+    /// <summary>
+    /// made internal to prevent external calls and enforce explicit implementation
+    /// <br/>the typeCache is not provided to prevent using it to initialize navigation properties which could cause undeterministic behavior during setup
+    /// </summary>
+    internal void Initialize(IExceptionManager exceptions);
 }
 
 public interface IValidatedType : ITypeValueType

@@ -8,14 +8,8 @@ using Serilog.Events;
 
 namespace JLib;
 
-public interface ISubCache<T>
-{
-
-}
-
 public interface ITypeCache
 {
-    public IEnumerable<Type> KnownTypeValueTypes { get; }
     public TTvt Get<TTvt>(Type weakType) where TTvt : class, ITypeValueType;
     public TTvt Get<TTvt, TType>() where TTvt : class, ITypeValueType
         => Get<TTvt>(typeof(TType));
@@ -138,17 +132,6 @@ public class TypeCache : ITypeCache
         }
 
 
-        foreach (var typeValueType in _typeValueTypes.OfType<IInitializedType>())
-        {
-            try
-            {
-                typeValueType.Initialize(exceptions.CreateChild("Initialization failed"));
-            }
-            catch (Exception e)
-            {
-                exceptions.Add(e);
-            }
-        }
 
         foreach (var typeValueType in _typeValueTypes.OfType<NavigatingTypeValueType>())
         {
@@ -177,6 +160,19 @@ public class TypeCache : ITypeCache
                 exceptions.Add(e);
             }
         }
+
+        foreach (var typeValueType in _typeValueTypes.OfType<IPostNavigationInitializedType>())
+        {
+            try
+            {
+                typeValueType.Initialize(exceptions.CreateChild("Initialization failed"));
+            }
+            catch (Exception e)
+            {
+                exceptions.Add(e);
+            }
+        }
+
         foreach (var typeValueType in _typeValueTypes.OfType<IValidatedType>())
         {
             try
