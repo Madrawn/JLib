@@ -202,12 +202,12 @@ public class TypeCache : ITypeCache
 
     public void WriteLog()
     {
-        Log.Information("Initialized TypeCache with a total of {typeCount} types", _typeValueTypes.Length);
+        Log.ForContext<ITypeCache>().ForContext<ITypeCache>().Information("Initialized TypeCache with a total of {typeCount} types", _typeValueTypes.Length);
         WriteDebug();
 
         var missing = KnownTypeValueTypes.Except(_typeValueTypes.Select(x => x.GetType()).Distinct()).ToArray();
         if (missing.Any())
-            Log.Warning("  No types found for: {TypeValueTypeName}", missing);
+            Log.ForContext<ITypeCache>().Warning("  No types found for: {TypeValueTypeName}", missing);
         return;
 
         void WriteDebug()
@@ -222,7 +222,7 @@ public class TypeCache : ITypeCache
 
             foreach (var typesInAssembly in typesByAssembly)
             {
-                Log.Debug("  Found {typeCount} types in Assemlby {assemblyName}", typesInAssembly.Count(), typesInAssembly.Key);
+                Log.ForContext<ITypeCache>().Debug("  Found {typeCount} types in Assemlby {assemblyName}", typesInAssembly.Count(), typesInAssembly.Key);
                 WriteTypes(typesInAssembly);
             }
             //Log.Verbose("  Total Types:");
@@ -237,12 +237,12 @@ public class TypeCache : ITypeCache
                 .ToArray();
             foreach (var group in registeredTypes)
             {
-                Log.Debug("    ValueTypeType     + {TypeValueTypeName}", group.Key);
+                Log.ForContext<ITypeCache>().Debug("    ValueTypeType     + {TypeValueTypeName}", group.Key);
 
                 if (!Log.IsEnabled(LogEventLevel.Verbose))
                     continue;
                 foreach (var tvt in group)
-                    Log.Verbose("      DiscoveredType    - {TypeName}", tvt.Name);
+                    Log.ForContext<ITypeCache>().Verbose("      DiscoveredType    - {TypeName}", tvt.Name);
             }
         }
     }
