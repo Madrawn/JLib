@@ -1,112 +1,42 @@
 ﻿using System.Reflection;
 using JLib.Attributes;
 using JLib.Exceptions;
-using JLib.Helper;
-using Serilog;
 using Serilog.Events;
 
 namespace JLib;
 
-public interface IExceptionProvider
-{
-    Exception? GetException();
-}
-
-public interface IExceptionManager : IExceptionProvider
+/// <summary>
+/// allows a <see cref="ITypeValueType"/> to run code after the navigation has been initialized but before it will be validated
+/// <br/>can be used to set properties which are derived from Attributes on navigated types
+/// </summary>
+public interface IPostNavigationInitializedType : ITypeValueType
 {
     /// <summary>
-    /// wraps the exception in a try catch block and adds the exception on throw.
+    /// made internal to prevent external calls and enforce explicit implementation
+    /// <br/>the typeCache is not provided to prevent using it to initialize navigation properties which could cause undeterministic behavior during setup
     /// </summary>
-    /// <param name="action"></param>
-    void TryExecution(Action action)
-    {
-        try
-        {
-            action();
-        }
-        catch (Exception e)
-        {
-            Add(e);
-        }
-    }
-    /// <summary>
-    /// wraps the exception in a try catch block and adds the exception on throw.
-    /// </summary>
-    void TryExecution(string message, Action<IExceptionManager> action)
-    {
-        try
-        {
-            action(CreateChild(message));
-        }
-        catch (Exception e)
-        {
-            Add(e);
-        }
-    }
-
-    void Add(Exception exception);
-    void Add(IEnumerable<Exception> exceptions);
-    void ThrowIfNotEmpty(LogEventLevel? level = null);
-    IExceptionManager CreateChild(string message);
-    void CreateChild(string message, IEnumerable<Exception> childExceptions);
-    void AddChild(IExceptionProvider exceptionProvider);
+    internal void Initialize(IExceptionManager exceptions);
 }
 
-public class ExceptionManager : IExceptionManager
-{
-    private readonly string _message;
-    private readonly List<Exception> _exceptions = new();
-    private readonly List<IExceptionProvider> _children = new();
-
-    private IEnumerable<Exception?> BuildExceptionList()
-        => _exceptions.Concat(_children.Select(c => c.GetException()));
-    public void Add(Exception exception) => _exceptions.Add(exception);
-
-    public void Add(IEnumerable<Exception> exceptions)
-        => _exceptions.AddRange(exceptions);
-
-    public void ThrowIfNotEmpty(LogEventLevel? level = null)
-    {
-        var ex = JLibAggregateException.ReturnIfNotEmpty(_message, BuildExceptionList().WhereNotNull());
-        if (level is not null && ex is not null)
-            Log.Write(level.Value, ex, "an aggregate exception has been thrown");
-        if (ex is not null)
-            throw ex;
-    }
-
-    public Exception? GetException() => JLibAggregateException.ReturnIfNotEmpty(_message, BuildExceptionList());
-
-    public ExceptionManager(string message)
-    {
-        _message = message;
-    }
-
-    public IExceptionManager CreateChild(string message)
-    {
-        var child = new ExceptionManager(message);
-        _children.Add(child);
-        return child;
-    }
-
-    public void CreateChild(string message, IEnumerable<Exception> childExceptions)
-    {
-        var exceptions = childExceptions.ToArray();
-        if (exceptions.None())
-            return;
-        var child = CreateChild(message);
-        child.Add(exceptions);
-    }
-
-    public void AddChild(IExceptionProvider exceptionProvider)
-        => _children.Add(exceptionProvider);
-}
-
-public interface IValidatedType
+public interface IValidatedType : ITypeValueType
 {
     void Validate(ITypeCache cache, TvtValidator validator);
 }
+
+public interface IMappedDataObjectType : ITypeValueType
+{
+    EntityType SourceEntity { get; }
+    PropertyPrefix? PropertyPrefix { get; }
+    bool ReverseMap { get; }
+}
+public interface ITypeValueType
+{
+    public string Name => Value.Name;
+    Type Value { get; }
+    public bool HasCustomAutoMapperProfile { get; }
+}
 [Unmapped]
-public abstract partial record TypeValueType(Type Value) : ValueType<Type>(Value)
+public abstract partial record TypeValueType(Type Value) : ValueType<Type>(Value), ITypeValueType
 {
     public string Name => Value.Name;
 

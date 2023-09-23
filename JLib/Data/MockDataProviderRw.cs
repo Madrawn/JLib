@@ -18,6 +18,7 @@ public class MockDataProvider<TEntity> : IDataProviderRw<TEntity>
             .GetProperties()
             .Single(x => x.Name == nameof(IEntity.Id) && x.PropertyType.IsAssignableTo<GuidValueType>());
         _idPropertyVtCtor = _idProperty.PropertyType.GetConstructor(new[] { typeof(Guid) }) ?? throw new InvalidSetupException("vtId ctor not found");
+        Log.Verbose("creating {type}",GetType().FullClassName());
     }
     private void AddId(TEntity entity)
     {

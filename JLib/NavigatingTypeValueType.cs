@@ -12,14 +12,16 @@ public abstract record NavigatingTypeValueType(Type Value) : TypeValueType(Value
     internal void SetCache(ITypeCache typeCache)
     {
         if (_navigationManager is not null)
-            throw new InvalidSetupException("you must not set the cache twice");
+            throw new("you must not set the cache twice");
 
         _navigationManager = new(this, typeCache);
     }
+    private string CacheExceptionText([CallerMemberName] string callerMemberName = "")
+        => $"{GetType().Name}.{callerMemberName} ({Value.Name}) cache has not been set yet";
     internal void MaterializeNavigation()
     {
         if (_navigationManager is null)
-            throw new InvalidSetupException("cache has not been set yet");
+            throw new InvalidSetupException(CacheExceptionText());
         _navigationManager.Materialize();
     }
 
@@ -27,7 +29,7 @@ public abstract record NavigatingTypeValueType(Type Value) : TypeValueType(Value
         where T : TypeValueType?
     {
         if (_navigationManager is null)
-            throw new TvtNavigationFailedException("cache has not been set yet");
+            throw new TvtNavigationFailedException(CacheExceptionText());
         try
         {
             return _navigationManager.Navigate(resolver, propertyName);

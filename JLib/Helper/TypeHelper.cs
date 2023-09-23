@@ -30,16 +30,20 @@ public static class TypeHelper
     /// <summary>
     /// checks whether the given type is derived from the other type, ignoring all type parameters
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="type"></param>
-    /// <returns></returns>
     public static bool IsDerivedFromAny<T>(this Type type)
         => type.GetAnyBaseType<T>() is not null;
+    /// <summary>
+    /// <inheritdoc cref="IsDerivedFromAny{T}"/>
+    /// </summary>
+    public static bool IsDerivedFromAny(this Type type, Type baseType)
+        => type.GetAnyBaseType(baseType) is not null;
 
     public static Type? GetAnyBaseType<T>(this Type type)
+        => type.GetAnyBaseType(typeof(T));
+    public static Type? GetAnyBaseType(this Type type, Type baseType)
     {
         var current = type;
-        var compare = typeof(T).TryGetGenericTypeDefinition();
+        var compare = baseType.TryGetGenericTypeDefinition() ?? baseType;
         while (current is not null && current.TryGetGenericTypeDefinition() != compare)
             current = current.BaseType;
         return current == compare
@@ -136,7 +140,7 @@ public static class TypeHelper
                 : throw new InvalidOperationException("the type arguments do not match")
             : type;
 
-    public static Type MakeGenericType(this Type type, params TypeValueType[] genericParams)
+    public static Type MakeGenericType(this Type type, params ITypeValueType[] genericParams)
         => type.MakeGenericType(genericParams.Select(x => x.Value).ToArray());
 
     /// <summary>

@@ -3,36 +3,33 @@
 using JLib.Exceptions;
 using JLib.FactoryAttributes;
 using JLib.Helper;
+using Serilog;
+using Serilog.Events;
 
 namespace JLib;
 
-public interface ISubCache<T>
-{
-
-}
-
 public interface ITypeCache
 {
-    public IEnumerable<Type> KnownTypeValueTypes { get; }
-    public TTvt Get<TTvt>(Type weakType) where TTvt : TypeValueType;
-    public TTvt Get<TTvt, TType>() where TTvt : TypeValueType
+    public TTvt Get<TTvt>(Type weakType) where TTvt : class, ITypeValueType;
+    public TTvt Get<TTvt, TType>() where TTvt : class, ITypeValueType
         => Get<TTvt>(typeof(TType));
-    public TTvt? TryGet<TTvt>(Type weakType) where TTvt : TypeValueType;
-    public TTvt? TryGet<TTvt, TType>() where TTvt : TypeValueType
+    public TTvt? TryGet<TTvt>(Type weakType) where TTvt : class, ITypeValueType;
+    public TTvt? TryGet<TTvt, TType>() where TTvt : class, ITypeValueType
         => TryGet<TTvt>(typeof(TType).TryGetGenericTypeDefinition() ?? typeof(TType));
-    public IEnumerable<TTvt> All<TTvt>() where TTvt : TypeValueType;
-    public IEnumerable<TTvt> All<TTvt>(Func<TTvt, bool> filter) where TTvt : TypeValueType
+    public IEnumerable<TTvt> All<TTvt>() where TTvt : class, ITypeValueType;
+    public IEnumerable<TTvt> All<TTvt>(Func<TTvt, bool> filter) where TTvt : class, ITypeValueType
         => All<TTvt>().Where(filter);
-    public TTvt? SingleOrDefault<TTvt>(Func<TTvt, bool> selector) where TTvt : TypeValueType
+    public TTvt? SingleOrDefault<TTvt>(Func<TTvt, bool> selector) where TTvt : class, ITypeValueType
     {
         var res = All<TTvt>().Where(selector).ToArray();
         if (res.Length > 1)
-            throw new InvalidSetupException($"multiple selectors matched to be cast to {typeof(TTvt).Name}: " + string.Join(", ", res.Select(r => r.Name)));
+            throw new InvalidSetupException($"multiple selectors matched to be cast to {typeof(TTvt).Name}: " + string.Join(", ", res.Select(r => r.Value.Name)));
         return res.FirstOrDefault();
     }
 
     public TTvt Single<TTvt>(Func<TTvt, bool> selector) where TTvt : TypeValueType
         => SingleOrDefault(selector) ?? throw new InvalidSetupException("no selector matched");
+
 }
 
 public class TypeCache : ITypeCache
@@ -154,16 +151,33 @@ public class TypeCache : ITypeCache
             {
                 typeValueType.MaterializeNavigation();
             }
+            catch (TargetInvocationException e) when (e.InnerException is not null)
+            {
+                exceptions.Add(e.InnerException);
+            }
             catch (Exception e)
             {
                 exceptions.Add(e);
             }
         }
+
+        foreach (var typeValueType in _typeValueTypes.OfType<IPostNavigationInitializedType>())
+        {
+            try
+            {
+                typeValueType.Initialize(exceptions.CreateChild("Initialization failed"));
+            }
+            catch (Exception e)
+            {
+                exceptions.Add(e);
+            }
+        }
+
         foreach (var typeValueType in _typeValueTypes.OfType<IValidatedType>())
         {
             try
             {
-                var tvtValidator = new TvtValidator((TypeValueType)typeValueType);
+                var tvtValidator = new TvtValidator(typeValueType);
                 typeValueType.Validate(this, tvtValidator);
                 exceptions.AddChild(tvtValidator);
             }
@@ -173,21 +187,70 @@ public class TypeCache : ITypeCache
             }
         }
         exceptions.ThrowIfNotEmpty();
+
+        WriteLog();
     }
 
 
 
     public T Get<T>(Type weakType)
-        where T : TypeValueType
+        where T : class, ITypeValueType
         => _typeMappings[weakType].CastTo<T>();
 
     public T? TryGet<T>(Type weakType)
-        where T : TypeValueType
+        where T : class, ITypeValueType
         => _typeMappings.TryGetValue(weakType, out var tvt)
             ? tvt.As<T?>()
             : null;
 
     public IEnumerable<T> All<T>()
-        where T : TypeValueType
+        where T : class, ITypeValueType
         => _typeValueTypes.OfType<T>();
+
+    public void WriteLog()
+    {
+        Log.ForContext<ITypeCache>().ForContext<ITypeCache>().Information("Initialized TypeCache with a total of {typeCount} types", _typeValueTypes.Length);
+        WriteDebug();
+
+        var missing = KnownTypeValueTypes.Except(_typeValueTypes.Select(x => x.GetType()).Distinct()).ToArray();
+        if (missing.Any())
+            Log.ForContext<ITypeCache>().Warning("  No types found for: {TypeValueTypeName}", missing);
+        return;
+
+        void WriteDebug()
+        {
+            if (!Log.IsEnabled(LogEventLevel.Debug))
+                return;
+
+            var typesByAssembly = _typeValueTypes
+                .GroupBy(tvt => tvt.Value.Assembly.FullName)
+                .OrderBy(g => g.Key)
+                .ToArray();
+
+            foreach (var typesInAssembly in typesByAssembly)
+            {
+                Log.ForContext<ITypeCache>().Debug("  Found {typeCount} types in Assemlby {assemblyName}", typesInAssembly.Count(), typesInAssembly.Key);
+                WriteTypes(typesInAssembly);
+            }
+            //Log.Verbose("  Total Types:");
+            //WriteTypes(_typeValueTypes);
+        }
+
+        void WriteTypes(IEnumerable<TypeValueType> types)
+        {
+            var registeredTypes = types
+                .GroupBy(tvt => tvt.GetType())
+                .OrderBy(g => g.Key.Name)
+                .ToArray();
+            foreach (var group in registeredTypes)
+            {
+                Log.ForContext<ITypeCache>().Debug("    ValueTypeType     + {TypeValueTypeName}", group.Key);
+
+                if (!Log.IsEnabled(LogEventLevel.Verbose))
+                    continue;
+                foreach (var tvt in group)
+                    Log.ForContext<ITypeCache>().Verbose("      DiscoveredType    - {TypeName}", tvt.Name);
+            }
+        }
+    }
 }

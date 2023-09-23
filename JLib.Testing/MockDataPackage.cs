@@ -5,7 +5,7 @@ namespace JLib.Testing;
 
 public static class ValueTypes
 {
-    [IsDerivedFrom<Testing.MockDataPackage>, NotAbstract]
+    [IsDerivedFrom(typeof(Testing.MockDataPackage)), NotAbstract]
     public record MockDataPackage(Type Value) : TypeValueType(Value);
 }
 
