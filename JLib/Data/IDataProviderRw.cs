@@ -31,11 +31,6 @@ public interface IGraphQlDataObject
 {
 
 }
-public interface IGraphQlDataObject<TEntity> : IGraphQlDataObject
-    where TEntity : IEntity
-{
-
-}
 
 
 public interface IDataProviderR<TData>

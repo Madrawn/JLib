@@ -66,7 +66,7 @@ public sealed record MappedGraphQlDataObjectType(Type Value) : GraphQlDataObject
 
     public bool ReverseMap => false;
 
-    public void Initialize(IExceptionManager exceptions) 
+    public void Initialize(IExceptionManager exceptions)
         => PropertyPrefix = SourceEntity.Value.GetCustomAttribute<PropertyPrefixAttribute>()?.Prefix;
 }
 
@@ -103,7 +103,7 @@ public abstract record DataObjectType(Type Value) : NavigatingTypeValueType(Valu
 [Implements(typeof(IEntity)), IsClass, NotAbstract]
 public record EntityType(Type Value) : DataObjectType(Value), IValidatedType
 {
-    public void Validate(ITypeCache cache, TvtValidator validator)
+    public virtual void Validate(ITypeCache cache, TvtValidator validator)
     {
         if (GetType() == typeof(EntityType))
             validator.Add($"You have to specify which type of entity this is by implementing a derivation of the {nameof(IEntity)} interface");

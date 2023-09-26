@@ -10,6 +10,7 @@ namespace JLib;
 
 public interface ITypeCache
 {
+    public IEnumerable<Type> KnownTypeValueTypes { get; }
     public TTvt Get<TTvt>(Type weakType) where TTvt : class, ITypeValueType;
     public TTvt Get<TTvt, TType>() where TTvt : class, ITypeValueType
         => Get<TTvt>(typeof(TType));

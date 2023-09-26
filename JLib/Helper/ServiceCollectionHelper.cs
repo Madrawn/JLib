@@ -39,7 +39,9 @@ public static class ServiceCollectionHelper
         }).Select(AssemblyName.GetAssemblyName).ToArray();
 
         var assemblies = assemblyNames.Select(Assembly.Load).ToArray();
-        Log.Information("TypeCache initializing using {0} as path while looking for files in {1} and filtering using {2} as prefix. This resulted in {3} Assemblies being loaded which are {4}", assemblySearchDirectory, searchOption, includedPrefixes, assemblyNames.Length, assemblyNames);
+        Log.Information("TypeCache initializing using {0} as path while looking for files in {1} and filtering using {2} as prefix." +
+                        " This resulted in {3} Assemblies being loaded which are {4}",
+            assemblySearchDirectory, searchOption, includedPrefixes, assemblyNames.Length, assemblyNames);
         return services.AddTypeCache(out typeCache, assemblies);
     }
 

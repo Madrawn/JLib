@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="HotChocolate.Data" Version="13.5.1" />
     <PackageReference Include="HotChocolate.Execution" Version="13.5.1" />
     <PackageReference Include="HotChocolate.Execution.Abstractions" Version="13.5.1" />
     <PackageReference Include="HotChocolate.Types" Version="13.5.1" />

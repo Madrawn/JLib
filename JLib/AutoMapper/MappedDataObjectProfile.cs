@@ -33,11 +33,11 @@ public class MappedDataObjectProfile : Profile
                 Log.ForContext<MappedDataObjectProfile>().Verbose("        Skipping {mdo}: it has the Unmapped attribute", mappedDataObject.Value.Name);
                 continue;
             }
-            Log.ForContext<MappedDataObjectProfile>().Verbose("        creating map from {mappedDataObject} to {mappedEntity} ", mappedDataObject.SourceEntity.Name, mappedDataObject.Name);
             var map = base.CreateMap(mappedDataObject.SourceEntity.Value, mappedDataObject.Value);
             var mdoProps = mappedDataObject.Value.GetProperties();
             var srcProps = mappedDataObject.SourceEntity.Value.GetProperties().ToDictionary(x => x.Name);
             var prefix = mappedDataObject.PropertyPrefix?.Value ?? "";
+            Log.ForContext<MappedDataObjectProfile>().Verbose("        creating map from {mappedDataObject} to {mappedEntity} using prefix '{prefix}'", mappedDataObject.SourceEntity.Name, mappedDataObject.Name, prefix);
             foreach (var mdoProp in mdoProps)
             {
                 var srcProp =
@@ -46,8 +46,8 @@ public class MappedDataObjectProfile : Profile
                     ?? srcProps.GetValueOrDefault(mdoProp.Name);
                 if (srcProp is null)
                 {
-                    Log.ForContext<MappedDataObjectProfile>().Error("            could not map property {commandEntity}.{property} to {mappedDataObject} ",
-                        mappedDataObject.Name, mdoProp.Name, mappedDataObject.Name);
+                    Log.ForContext<MappedDataObjectProfile>().Error("            could not map property {mdo}.{mdoProp} from {src}",
+                        mappedDataObject.Name, mdoProp.Name, mappedDataObject.SourceEntity.Name);
                     continue;
                 }
 
