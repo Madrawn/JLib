@@ -52,7 +52,7 @@ public record ValueTypeType(Type Value) : TypeValueType(Value), IValidatedType
     }
 }
 
-[ImplementsAny(typeof(IMappedGraphQlDataObject<>)), NotAbstract, Priority(3_000)]
+[ImplementsAny(typeof(IMappedGraphQlDataObject<>)), NotAbstract, IsClass, Priority(3_000)]
 public sealed record MappedGraphQlDataObjectType(Type Value) : GraphQlDataObjectType(Value), IMappedDataObjectType, IPostNavigationInitializedType
 {
     public EntityType SourceEntity =>

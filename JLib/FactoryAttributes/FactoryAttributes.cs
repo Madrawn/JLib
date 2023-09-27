@@ -48,6 +48,19 @@ public abstract class TvtFactoryAttributes
     }
 
     [AttributeUsage(AttributeTargets.Class)]
+    public class HasAttributeAttribute : Attribute, ITypeValueTypeFilterAttribute
+    {
+        public HasAttributeAttribute(Type attributeType)
+        {
+            AttributeType = attributeType;
+        }
+
+        public Type AttributeType { get; }
+        public bool Filter(Type type) 
+            => type.HasCustomAttribute(AttributeType);
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
     public class IsNotAbstract : Attribute, ITypeValueTypeFilterAttribute
     {
         public bool Filter(Type type)

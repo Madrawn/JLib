@@ -2,12 +2,50 @@
 using System.Security.Cryptography.X509Certificates;
 using JLib.Data;
 using JLib.Exceptions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Serilog;
-
 namespace JLib.Helper;
 public static class ServiceCollectionHelper
 {
+    /// <summary>
+    /// adds <see cref="IOptions{TOptions}"/> for each <see cref="ConfigurationSectionType"/> and makes the value directly injectable
+    /// + <see cref="IOptions{TOptions}"/> for each <see cref="ConfigurationSectionType"/>
+    /// -- a instance of each <see cref="ConfigurationSectionType"/>
+    /// </summary>
+    public static IServiceCollection AddAllConfigSections(this IServiceCollection services,
+        ITypeCache typeCache, IConfiguration config, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+    {
+
+        var configMethod = typeof(OptionsConfigurationServiceCollectionExtensions)
+            .GetMethod(nameof(OptionsConfigurationServiceCollectionExtensions.Configure),
+                new[] { typeof(IServiceCollection), typeof(IConfiguration) })
+            ?? throw new InvalidSetupException("configure method not found");
+
+        foreach (var sectionType in typeCache.All<ConfigurationSectionType>())
+        {
+            var sectionInstance = config.GetRequiredSection(sectionType.SectionName.Value);
+            var specificConfig = configMethod.MakeGenericMethod(sectionType.Value);
+
+            specificConfig.Invoke(null, new object?[]
+            {
+                services,sectionInstance
+            });
+
+            // extract value from options and myke section directly accessible
+            var src = typeof(IOptions<>).MakeGenericType(sectionType);
+            var prop = src.GetProperty(nameof(IOptions<Ignored>.Value)) ?? throw new InvalidSetupException("Value Prop not found on options");
+            services.Add(
+                new ServiceDescriptor(sectionType.Value,
+                    provider => prop.GetValue(provider.GetRequiredService(src))
+                                ?? throw new InvalidSetupException($"options section {sectionType.Name} not found"),
+                    lifetime));
+        }
+
+        return services;
+    }
+
     public static IServiceCollection AddAlias<TImpl, TAlias>(this IServiceCollection serviceCollection, ServiceLifetime lifetime)
         where TImpl : TAlias
         where TAlias : notnull
@@ -62,9 +100,9 @@ public static class ServiceCollectionHelper
         this IServiceCollection services,
         ITypeCache typeCache,
         IExceptionManager? parentExceptionMgr = null)
-        => services.AddMapDataProvider<IMappedDataObjectType>(typeCache, null, 
-            mdo => mdo.SourceEntity, 
-            mdo => !mdo.ReverseMap,parentExceptionMgr);
+        => services.AddMapDataProvider<IMappedDataObjectType>(typeCache, null,
+            mdo => mdo.SourceEntity,
+            mdo => !mdo.ReverseMap, parentExceptionMgr);
 
     /// <summary>
     /// Provides a <see cref="IDataProviderR{TData}"/> for each <typeparamref name="TTvt"/> which takes data from a <see cref="IDataProviderR{TData}"/> of the type retrieved by <see cref="sourcePropertyReader"/> and maps it using AutoMapper Projections

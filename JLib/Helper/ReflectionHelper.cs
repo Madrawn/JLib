@@ -13,9 +13,11 @@ public static class ReflectionHelper
         return Attribute.GetCustomAttributes(type, inherit).Any(t => t.GetType().TryGetGenericTypeDefinition() == compare);
     }
 
+    public static bool HasCustomAttribute(this MemberInfo type, Type attributeType, bool inherit = true)
+        => type.GetCustomAttribute(attributeType, inherit) is not null;
     public static bool HasCustomAttribute<T>(this MemberInfo type, bool inherit = true)
         where T : Attribute =>
-        type.GetCustomAttributes(inherit).Any(x => x is T);
+        type.HasCustomAttribute(typeof(T), inherit);
     public static T[] GetCustomAttributes<T>(this MemberInfo type, bool inherit = true)
         where T : Attribute =>
         Attribute.GetCustomAttributes(type, typeof(T), inherit).Cast<T>().ToArray();
