@@ -1,0 +1,46 @@
+﻿{
+  "Parameters": {
+    "TestName": "NoRepo_ProvIr",
+    "ExpectedBehavior": [
+      "  Provided:                                                                              ",
+      "    DataProvider         : Invalid ReadOnly                                              ",
+      "    Repository           : -                                                             ",
+      "  Expected Exception:                                                                    ",
+      "    An exception which tells the user to implement the ISourceDataProviderR Interface    "
+    ],
+    "includedTypes": [
+      "JLib.Tests.TestCommandEntity",
+      "JLib.Tests.TestInvalidDataProviderR<>"
+    ]
+  },
+  "exception": {
+    "Type": "JLib.Exceptions.JLibAggregateException",
+    "Message": "TypeCacheTests",
+    "InnerExceptions": [
+      {
+        "Type": "JLib.Exceptions.JLibAggregateException",
+        "Message": "Setup",
+        "InnerExceptions": [
+          {
+            "Type": "JLib.Exceptions.JLibAggregateException",
+            "Message": "Cache setup failed",
+            "InnerExceptions": [
+              {
+                "Type": "JLib.Exceptions.JLibAggregateException",
+                "Message": "Type validation failed",
+                "InnerExceptions": [
+                  {
+                    "Type": "JLib.Exceptions.InvalidTypeException",
+                    "Message": "Error while initializing RepositoryDataProviderType with JLib.Tests.TestInvalidDataProviderR<>: Must not be Generic\n\nif you tried to build a generic data provider, you have to implement ISourceDataProviderR or ISourceDataProviderRw\nIf you tried to build a Repository, you have to implement IDataProviderR or IDataProviderRw"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "cache": "disabled",
+  "services": "disabled"
+}

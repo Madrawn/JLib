@@ -151,7 +151,7 @@ public record SourceDataProviderType(Type Value) : DataProviderType(Value), IVal
 {
     public void Validate(ITypeCache cache, TvtValidator value)
     {
-        value.ShouldBeGeneric($" if you tried to build a specific (repository) data provider, you must not implement {nameof(ISourceDataProviderR<IDataObject>)} or {nameof(ISourceDataProviderRw<IEntity>)} but {nameof(IDataProviderR<IDataObject>)} or {nameof(IDataProviderRw<IEntity>)}");
+        value.ShouldBeGeneric($" if you tried to build a repository, you must not implement {nameof(ISourceDataProviderR<IDataObject>)} or {nameof(ISourceDataProviderRw<IEntity>)} but {nameof(IDataProviderR<IDataObject>)} or {nameof(IDataProviderRw<IEntity>)}");
     }
 }
 
@@ -160,6 +160,7 @@ public record RepositoryDataProviderType(Type Value) : DataProviderType(Value), 
 {
     public void Validate(ITypeCache cache, TvtValidator value)
     {
-        value.ShouldNotBeGeneric($" if you tried to build a generic data provider, you have to implement {nameof(ISourceDataProviderR<IDataObject>)} or {nameof(ISourceDataProviderRw<IEntity>)}");
+        value.ShouldNotBeGeneric(Environment.NewLine + $"if you tried to build a generic data provider, you have to implement {nameof(ISourceDataProviderR<IDataObject>)} or {nameof(ISourceDataProviderRw<IEntity>)}"
+            + Environment.NewLine + $"If you tried to build a Repository, you have to implement {nameof(IDataProviderR<IDataObject>)} or {nameof(IDataProviderRw<IEntity>)}");
     }
 }

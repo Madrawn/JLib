@@ -24,10 +24,6 @@ namespace JLib.Tests;
 
 public class TypeCacheTests
 {
-    internal static readonly Type[] EntityTypes = new[]
-    {
-        typeof(TestCommandEntity),
-    };
     internal static object[][] Tests = new List<TestOptions>
     {
         #region Repository: None       DataProvider: ReadOnly
@@ -247,9 +243,97 @@ public class TypeCacheTests
             true,false,false
         ),
         #endregion
+        #region Repository: InvalidRw  DataProvider: ReadWrite
+        new (
+            "RepoIrw_ProvRw",
+            new []
+            {
+                "Provided:",
+                "  DataProvider         : Read Write",
+                "  Repository           : Invalid ReadWrite",
+                "Expected Error:",
+                "  An error which tells you that repositories must not implement the ISourceDataProvider Interface and that you must only implement the IDataProvider Interfaces"
+            },
+            new[]
+            {
+                typeof(TestCommandEntity),
+                typeof(TestDataProviderRw<>),
+                typeof(TestInvalidRepositoryRw)
+            },
+            (services,cache,exceptions)=>
+                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>>(
+                    cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
+        ),
+        #endregion
+        #region Repository: InvalidR   DataProvider: ReadOnly
+        new (
+            "RepoRw_ProvFr",
+            new []
+            {
+                "Provided:",
+                "  DataProvider         : ReadOnly",
+                "  Repository           : Invalid ReadOnly",
+                "Expected Exception:",
+                "  An exception which tells the user to not provide the DataProvider as ReadOnly and informs that it is forced"
+            },
+            new[]
+            {
+                typeof(TestCommandEntity),
+                typeof(TestDataProviderR<>),
+                typeof(TestInvalidRepositoryR)
+            },
+            (services,cache,exceptions)=>
+                services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>>(
+                    cache, null, _=>true, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
+            true,false,false
+        ),
+        #endregion
+        #region Repository: None       DataProvider: InvalidRw
+        new (
+            "NoRepo_ProvIr",
+            new []
+            {
+                "Provided:",
+                "  DataProvider         : Invalid ReadOnly",
+                "  Repository           : -",
+                "Expected Exception:",
+                "  An exception which tells the user to implement the ISourceDataProviderR Interface"
+            },
+            new[]
+            {
+                typeof(TestCommandEntity),
+                typeof(TestInvalidDataProviderR<>),
+            },
+            (services,cache,exceptions)=>
+                services.AddDataProvider<CommandEntityType, TestInvalidDataProviderR<IEntity>>(
+                    cache, null, _=>true, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
+            true,false,false
+        ),
+        #endregion
+        #region Repository: None       DataProvider: InvalidRw
+        new (
+            "NoRepo_ProvIrw",
+            new []
+            {
+                "Provided:",
+                "  DataProvider         : Invalid ReadWrite",
+                "  Repository           : -",
+                "Expected Exception:",
+                "  An exception which tells the user to implement the SourceDataProvider Interfaces"
+            },
+            new[]
+            {
+                typeof(TestCommandEntity),
+                typeof(TestInvalidDataProviderRw<>),
+            },
+            (services,cache,exceptions)=>
+                services.AddDataProvider<CommandEntityType, TestInvalidDataProviderRw<IEntity>>(
+                    cache, null, _=>true, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
+            true,false,false
+        ),
+        #endregion
     }.Select(x => new object[] { x }).ToArray();
-
-
+    
     private readonly IExceptionManager _exceptions;
 
     private void Setup(out IServiceCollection services, out ITypeCache cache, Type[] types)
@@ -357,9 +441,21 @@ public class TestCommandEntity : ICommandEntity
 }
 #endregion
 #region repositories
-public class InvalidRepository<T> : IDataProviderR<T> where T : IDataObject
+
+public class TestInvalidDataProviderR<T> : IDataProviderR<T> where T : IEntity
 {
     public IQueryable<T> Get() => throw new NotImplementedException();
+}
+public class TestInvalidDataProviderRw<T> : IDataProviderRw<T> where T : IEntity
+{
+    public IQueryable<T> Get() => throw new NotImplementedException();
+    public void Add(T item) => throw new NotImplementedException();
+
+    public void Add(IEnumerable<T> items) => throw new NotImplementedException();
+
+    public void Remove(Guid itemId) => throw new NotImplementedException();
+
+    public void Remove(IEnumerable<Guid> itemIds) => throw new NotImplementedException();
 }
 
 public class TestRepositoryR : IDataProviderR<TestCommandEntity>
@@ -391,7 +487,11 @@ public class TestRepositoryRw : IDataProviderRw<TestCommandEntity>
     public void Remove(IEnumerable<Guid> itemIds) => throw new NotImplementedException();
 }
 
-public class TestInvalidRepository : ISourceDataProviderRw<TestCommandEntity>
+public class TestInvalidRepositoryR : ISourceDataProviderR<TestCommandEntity>
+{
+    public IQueryable<TestCommandEntity> Get() => throw new NotImplementedException();
+}
+public class TestInvalidRepositoryRw : ISourceDataProviderRw<TestCommandEntity>
 {
     public IQueryable<TestCommandEntity> Get() => throw new NotImplementedException();
 
