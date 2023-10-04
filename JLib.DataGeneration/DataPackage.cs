@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using JLib.Data;
+using JLib.Exceptions;
 using JLib.Helper;
 using static JLib.FactoryAttributes.TvtFactoryAttributes;
 
@@ -11,6 +12,17 @@ public record DataPackageType(Type Value) : TypeValueType(Value);
 
 public abstract class DataPackage
 {
+    public string GetInfoText(string propertyName)
+    {
+        var property = GetType().GetProperty(propertyName) ??
+                                      throw new InvalidSetupException(
+                                          $"property {propertyName} not found on {GetType().FullClassName()}");
+        var res = $"{property.DeclaringType?.FullClassName()}.{property.Name}";
+        if (property.DeclaringType != property.ReflectedType)
+            res = $"{property.ReflectedType?.FullClassName()}:" + res;
+        return res;
+    }
+
     readonly IDataPackageStore _dataPackages;
     protected DataPackage(IDataPackageStore dataPackages)
     {

@@ -1,11 +1,16 @@
-﻿using AutoMapper;
+﻿using System.ComponentModel.Design;
+using System.Linq.Expressions;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using JLib.Helper;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
 namespace JLib.Data;
 
-public class MapDataProvider<TFrom, TTo> : IDataProviderR<TTo>
+public class MapDataProvider<TFrom, TTo> : ISourceDataProviderR<TTo>
+    where TFrom : IDataObject
+    where TTo : IDataObject
 {
     private readonly IDataProviderR<TFrom> _provider;
     private readonly IConfigurationProvider _config;
@@ -14,8 +19,10 @@ public class MapDataProvider<TFrom, TTo> : IDataProviderR<TTo>
     {
         _provider = provider;
         _config = config;
-        Log.Verbose("creating {type}",GetType().FullClassName());
+        Log.Verbose("creating {type}", GetType().FullClassName());
     }
     public IQueryable<TTo> Get()
-        => _provider.Get().ProjectTo<TTo>(_config);
+    {
+        return _provider.Get().ProjectTo<TTo>(_config);
+    }
 }

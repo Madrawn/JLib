@@ -1,0 +1,22 @@
+﻿{
+  "Parameters": {
+    "TestName": "RepoRw_ProvFr",
+    "ExpectedBehavior": [
+      "  Provided:                                                                                                        ",
+      "    DataProvider         : Forced ReadOnly                                                                         ",
+      "    Repository           : Read Write                                                                              ",
+      "  Expected Exception:                                                                                              ",
+      "    An exception which tells the user to not provide the DataProvider as ReadOnly and informs that it is forced    "
+    ],
+    "includedTypes": [
+      "JLib.Tests.TestCommandEntity",
+      "JLib.Tests.TestDataProviderRw<>",
+      "JLib.Tests.TestRepositoryRw"
+    ]
+  },
+  "exception": {
+    "Message": "Something"
+  },
+  "cache": "disabled",
+  "services": "disabled"
+}

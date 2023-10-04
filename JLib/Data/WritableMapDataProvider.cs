@@ -3,7 +3,7 @@ using AutoMapper.QueryableExtensions;
 
 namespace JLib.Data;
 
-public class WritableMapDataProvider<TFrom, TTo> : IDataProviderRw<TTo>
+public class WritableMapDataProvider<TFrom, TTo> : ISourceDataProviderRw<TTo>
     where TFrom : IEntity
     where TTo : IEntity
 {

@@ -1,0 +1,22 @@
+﻿{
+  "Parameters": {
+    "TestName": "RepoRw_ProvR",
+    "ExpectedBehavior": [
+      "  Provided:                                                                                                           ",
+      "    DataProvider         : Read Only                                                                                  ",
+      "    Repository           : Read Write                                                                                 ",
+      "  Expected Exception:                                                                                                 ",
+      "    an exception, which tells the user to provide the data provider as Read Write or not implement IDataProviderRw    "
+    ],
+    "includedTypes": [
+      "JLib.Tests.TestCommandEntity",
+      "JLib.Tests.TestDataProviderR<>",
+      "JLib.Tests.TestRepositoryRw"
+    ]
+  },
+  "exception": {
+      "Message": "Something"
+  },
+  "cache": "disabled",
+  "services": "disabled"
+}

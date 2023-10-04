@@ -122,6 +122,18 @@ public abstract class TvtFactoryAttributes
         public bool Filter(Type type)
             => type.ImplementsAny(_type);
     }
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    public sealed class ImplementsNone : Attribute, ITypeValueTypeFilterAttribute
+    {
+        private readonly Type _type;
+
+        public ImplementsNone(Type type)
+        {
+            _type = type;
+        }
+        public bool Filter(Type type)
+            => !type.ImplementsAny(_type);
+    }
 #if NET7_0_OR_GREATER
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]

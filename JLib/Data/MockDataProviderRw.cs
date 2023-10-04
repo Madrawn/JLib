@@ -5,7 +5,7 @@ using Serilog;
 
 namespace JLib.Data;
 
-public class MockDataProvider<TEntity> : IDataProviderRw<TEntity>
+public class MockDataProvider<TEntity> : ISourceDataProviderRw<TEntity>
     where TEntity : IEntity
 {
     private readonly PropertyInfo _idProperty;

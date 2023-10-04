@@ -2,6 +2,7 @@
 using AutoMapper;
 using JLib.Attributes;
 using JLib.Data;
+using JLib.FactoryAttributes;
 using JLib.Helper;
 using Microsoft.VisualBasic.CompilerServices;
 using static JLib.FactoryAttributes.TvtFactoryAttributes;
@@ -44,19 +45,21 @@ public record ValueTypeType(Type Value) : TypeValueType(Value), IValidatedType
     }
 
     public bool Mapped => !Value.HasCustomAttribute<UnmappedAttribute>() && !Value.IsAbstract;
-    void IValidatedType.Validate(ITypeCache cache, TvtValidator exceptions)
+    void IValidatedType.Validate(ITypeCache cache, TvtValidator value)
     {
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (NativeType is null)
-            exceptions.Add("the NativeType could not be found");
+            value.Add("the NativeType could not be found");
     }
 }
 
 [ImplementsAny(typeof(IMappedGraphQlDataObject<>)), NotAbstract, IsClass, Priority(3_000)]
 public sealed record MappedGraphQlDataObjectType(Type Value) : GraphQlDataObjectType(Value), IMappedDataObjectType, IPostNavigationInitializedType
 {
-    public EntityType SourceEntity =>
-        Navigate(typeCache => Value.GetAnyInterface<IMappedGraphQlDataObject<IEntity>>()?.GenericTypeArguments.First()
+    public MappedCommandEntityType? CommandEntity
+        => Navigate(typeCache => typeCache.TryGet<MappedCommandEntityType>(cmd => cmd.SourceEntity == SourceEntity));
+    public EntityType SourceEntity
+        => Navigate(typeCache => Value.GetAnyInterface<IMappedGraphQlDataObject<IEntity>>()?.GenericTypeArguments.First()
                                   .CastValueType<EntityType>(typeCache)
                               ?? throw NewInvalidTypeException("SourceEntity could not be found"));
     /// <summary>
@@ -103,10 +106,10 @@ public abstract record DataObjectType(Type Value) : NavigatingTypeValueType(Valu
 [Implements(typeof(IEntity)), IsClass, NotAbstract]
 public record EntityType(Type Value) : DataObjectType(Value), IValidatedType
 {
-    public virtual void Validate(ITypeCache cache, TvtValidator validator)
+    public virtual void Validate(ITypeCache cache, TvtValidator value)
     {
         if (GetType() == typeof(EntityType))
-            validator.Add($"You have to specify which type of entity this is by implementing a derivation of the {nameof(IEntity)} interface");
+            value.Add($"You have to specify which type of entity this is by implementing a derivation of the {nameof(IEntity)} interface");
     }
 }
 
@@ -121,14 +124,14 @@ public record CommandEntityType(Type Value) : EntityType(Value)
 [Implements(typeof(IGraphQlDataObject)), IsClass, NotAbstract]
 public record GraphQlDataObjectType(Type Value) : DataObjectType(Value), IValidatedType
 {
-    public void Validate(ITypeCache cache, TvtValidator validator)
+    public void Validate(ITypeCache cache, TvtValidator value)
     {
         var ctors = Value.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
         if (ctors.Length == 1)
         {
             var ctor = ctors.Single();
             if (ctor.GetParameters().Any())
-                validator.Add("parameters found on the only constructor. A parameterless cosntructor is required");
+                value.Add("parameters found on the only constructor. A parameterless cosntructor is required");
         }
         else
         {
@@ -136,7 +139,27 @@ public record GraphQlDataObjectType(Type Value) : DataObjectType(Value), IValida
                 prop.CanWrite && !prop.IsNullable() && !prop.PropertyType.ImplementsAny<IEnumerable<Ignored>>());
             var hasPublicParameterlessCtor = ctors.Any(ctor => ctor.GetParameters().None() && ctor.IsPublic);
             if (propsToInitialize && hasPublicParameterlessCtor)
-                validator.Add("found a public parameterless ctor despite having non-nullable properties");
+                value.Add("found a public parameterless ctor despite having non-nullable properties");
         }
+    }
+}
+
+public abstract record DataProviderType(Type Value) : TypeValueType(Value);
+
+[ImplementsAny(typeof(ISourceDataProviderR<>)), NotAbstract, IsClass, Priority(7000)]
+public record SourceDataProviderType(Type Value) : DataProviderType(Value), IValidatedType
+{
+    public void Validate(ITypeCache cache, TvtValidator value)
+    {
+        value.ShouldBeGeneric($" if you tried to build a specific (repository) data provider, you must not implement {nameof(ISourceDataProviderR<IDataObject>)} or {nameof(ISourceDataProviderRw<IEntity>)} but {nameof(IDataProviderR<IDataObject>)} or {nameof(IDataProviderRw<IEntity>)}");
+    }
+}
+
+[ImplementsAny(typeof(IDataProviderR<>)), ImplementsNone(typeof(ISourceDataProviderR<>)), NotAbstract, IsClass, Priority(7000)]
+public record RepositoryDataProviderType(Type Value) : DataProviderType(Value), IValidatedType
+{
+    public void Validate(ITypeCache cache, TvtValidator value)
+    {
+        value.ShouldNotBeGeneric($" if you tried to build a generic data provider, you have to implement {nameof(ISourceDataProviderR<IDataObject>)} or {nameof(ISourceDataProviderRw<IEntity>)}");
     }
 }

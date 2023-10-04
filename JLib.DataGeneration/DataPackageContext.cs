@@ -50,11 +50,15 @@ public interface IDataPackager
         where TPackage5 : DataPackage
         => Include<TPackage1, TPackage2, TPackage3>().Include<TPackage4, TPackage5>();
 }
-public class DataPackager : IDataPackager, IDataPackageStore
+/// <summary>
+/// adds mock data to the application
+/// <br/>adds data to te <see cref="IDataProviderRw{TData}"/> using the <see cref="Include{TPackage}"/> method which take <see cref="DataPackage"/> as parameter
+/// </summary>
+public sealed class DataPackageManager : IDataPackager, IDataPackageStore
 {
     public static void ApplyPackages(IServiceProvider serviceProvider, Action<IDataPackager> includeList)
     {
-        var context = new DataPackager(serviceProvider);
+        var context = new DataPackageManager(serviceProvider);
         includeList(context);
         context._idRegistry.SaveToFile();
     }
@@ -63,7 +67,7 @@ public class DataPackager : IDataPackager, IDataPackageStore
     private readonly IServiceProvider _packageProvider;
     private readonly IMapper _mapper;
     private readonly IdRegistry _idRegistry = new();
-    private DataPackager(IServiceProvider dataServices)
+    private DataPackageManager(IServiceProvider dataServices)
     {
         _dataServiceProvider = dataServices;
         _mapper = dataServices.GetRequiredService<IMapper>();

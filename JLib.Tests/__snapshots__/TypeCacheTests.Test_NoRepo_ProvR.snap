@@ -1,0 +1,80 @@
+﻿{
+  "Parameters": {
+    "TestName": "NoRepo_ProvR",
+    "ExpectedBehavior": [
+      "  Provided:                                ",
+      "    DataProvider         : Read Only       ",
+      "    Repository           : -               ",
+      "  Expected Implementations:                ",
+      "    IDataProviderR       : DataProvider    ",
+      "    IDataProviderRw      : -               ",
+      "    ISourceDataProviderR : DataProvider    ",
+      "    ISourceDataProviderRw: -               "
+    ],
+    "includedTypes": [
+      "JLib.Tests.TestCommandEntity",
+      "JLib.Tests.TestDataProviderR<>"
+    ]
+  },
+  "exception": null,
+  "cache": {
+    "JLib.Tests": {
+      "JLib.CommandEntityType": [
+        "JLib.Tests.TestCommandEntity"
+      ],
+      "JLib.SourceDataProviderType": [
+        "JLib.Tests.TestDataProviderR<>"
+      ]
+    }
+  },
+  "services": {
+    "non-generic": [
+      {
+        "Lifetime": "Singleton",
+        "ImplementationSource": "Instance",
+        "ServiceType": "JLib.ITypeCache",
+        "ServiceArguments": [],
+        "ImplementationType": "JLib.TypeCache",
+        "ImplementationTypeArguments": []
+      }
+    ],
+    "JLib.Tests.TestCommandEntity": [
+      {
+        "Lifetime": "Scoped",
+        "ImplementationSource": "Type",
+        "ServiceType": "JLib.Tests.TestDataProviderR<>",
+        "ServiceArguments": [
+          "JLib.Tests.TestCommandEntity"
+        ],
+        "ImplementationType": "JLib.Tests.TestDataProviderR<>",
+        "ImplementationTypeArguments": [
+          "JLib.Tests.TestCommandEntity"
+        ]
+      },
+      {
+        "Lifetime": "Scoped",
+        "ImplementationSource": "Factory",
+        "ServiceType": "JLib.Data.ISourceDataProviderR<>",
+        "ServiceArguments": [
+          "JLib.Tests.TestCommandEntity"
+        ],
+        "ImplementationType": "JLib.Tests.TestDataProviderR<>",
+        "ImplementationTypeArguments": [
+          "JLib.Tests.TestCommandEntity"
+        ]
+      },
+      {
+        "Lifetime": "Scoped",
+        "ImplementationSource": "Factory",
+        "ServiceType": "JLib.Data.IDataProviderR<>",
+        "ServiceArguments": [
+          "JLib.Tests.TestCommandEntity"
+        ],
+        "ImplementationType": "JLib.Tests.TestDataProviderR<>",
+        "ImplementationTypeArguments": [
+          "JLib.Tests.TestCommandEntity"
+        ]
+      }
+    ]
+  }
+}

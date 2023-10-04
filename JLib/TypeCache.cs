@@ -11,12 +11,17 @@ namespace JLib;
 public interface ITypeCache
 {
     public IEnumerable<Type> KnownTypeValueTypes { get; }
+
+    public TTvt Get<TTvt>(Func<TTvt, bool> filter) where TTvt : class, ITypeValueType
+        => All(filter).Single();
     public TTvt Get<TTvt>(Type weakType) where TTvt : class, ITypeValueType;
     public TTvt Get<TTvt, TType>() where TTvt : class, ITypeValueType
         => Get<TTvt>(typeof(TType));
+    public TTvt? TryGet<TTvt>(Func<TTvt, bool> filter) where TTvt : class, ITypeValueType
+        => All(filter).SingleOrDefault();
     public TTvt? TryGet<TTvt>(Type weakType) where TTvt : class, ITypeValueType;
     public TTvt? TryGet<TTvt, TType>() where TTvt : class, ITypeValueType
-        => TryGet<TTvt>(typeof(TType).TryGetGenericTypeDefinition() ?? typeof(TType));
+        => TryGet<TTvt>(typeof(TType).TryGetGenericTypeDefinition());
     public IEnumerable<TTvt> All<TTvt>() where TTvt : class, ITypeValueType;
     public IEnumerable<TTvt> All<TTvt>(Func<TTvt, bool> filter) where TTvt : class, ITypeValueType
         => All<TTvt>().Where(filter);
@@ -69,9 +74,14 @@ public class TypeCache : ITypeCache
     public TypeCache(IEnumerable<Assembly> assemblies) : this(assemblies.SelectMany(a => a.GetTypes())) { }
     public TypeCache(IEnumerable<Type> types) : this(types.ToArray()) { }
 
-    public TypeCache(params Type[] types)
+    public TypeCache(Assembly[] assemblies, Type[] types, IExceptionManager? parentExceptionManager)
+        : this(parentExceptionManager, assemblies.SelectMany(a => a.DefinedTypes).Concat(types).ToArray()) { }
+    public TypeCache(params Type[] types) : this(null, types) { }
+    public TypeCache(IExceptionManager? parentExceptionManager, params Type[] types)
     {
-        IExceptionManager exceptions = new ExceptionManager("Cache setup failed");
+        const string exceptionMessage = "Cache setup failed";
+        var exceptions = parentExceptionManager?.CreateChild(exceptionMessage)
+                         ?? new ExceptionManager(exceptionMessage);
 
         var availableTypeValueTypes = types
             .Where(type => !type.HasCustomAttribute<IgnoreInCache>())
@@ -90,18 +100,18 @@ public class TypeCache : ITypeCache
         try
         {
             _typeValueTypes = types
-                .Where(type => !type.HasCustomAttribute<IgnoreInCache>())
+                .Where(type => !type.HasCustomAttribute<IgnoreInCache>() && !type.IsAssignableTo<TypeValueType>())
                 .Select(type =>
                 {
                     try
                     {
-                        var validTvts = availableTypeValueTypes
+                        var validTvtGroups = availableTypeValueTypes
                             .Where(availableTvtt => availableTvtt.Filter(type))
                             .GroupBy(t =>
                                 t.Value.GetCustomAttribute<TvtFactoryAttributes.Priority>()?.Value
-                                ?? TvtFactoryAttributes.Priority.DefaultPriority)
-                            .MinBy(x => x.Key)?
-                            .ToArray() ?? Array.Empty<ValueTypeForTypeValueTypes>();
+                                ?? TvtFactoryAttributes.Priority.DefaultPriority);
+                        var validTvts = validTvtGroups.MinBy(x => x.Key)?
+                         .ToArray() ?? Array.Empty<ValueTypeForTypeValueTypes>();
                         switch (validTvts.Length)
                         {
                             case > 1:
@@ -187,7 +197,9 @@ public class TypeCache : ITypeCache
                 exceptions.Add(e);
             }
         }
-        exceptions.ThrowIfNotEmpty();
+        
+        if(parentExceptionManager is null)
+            exceptions.ThrowIfNotEmpty();
 
         WriteLog();
     }
@@ -210,17 +222,18 @@ public class TypeCache : ITypeCache
 
     public void WriteLog()
     {
-        Log.ForContext<ITypeCache>().ForContext<ITypeCache>().Information("Initialized TypeCache with a total of {typeCount} types", _typeValueTypes.Length);
+        var log = Log.ForContext<ITypeCache>();
+        log.Information("Initialized TypeCache with a total of {typeCount} types", _typeValueTypes.Length);
         WriteDebug();
 
         var missing = KnownTypeValueTypes.Except(_typeValueTypes.Select(x => x.GetType()).Distinct()).ToArray();
         if (missing.Any())
-            Log.ForContext<ITypeCache>().Warning("  No types found for: {TypeValueTypeName}", missing);
+            log.Warning("  No types found for: {TypeValueTypeName}", missing);
         return;
 
         void WriteDebug()
         {
-            if (!Log.IsEnabled(LogEventLevel.Debug))
+            if (!log.IsEnabled(LogEventLevel.Debug))
                 return;
 
             var typesByAssembly = _typeValueTypes
@@ -230,7 +243,7 @@ public class TypeCache : ITypeCache
 
             foreach (var typesInAssembly in typesByAssembly)
             {
-                Log.ForContext<ITypeCache>().Debug("  Found {typeCount} types in Assemlby {assemblyName}", typesInAssembly.Count(), typesInAssembly.Key);
+                log.Debug("  Found {typeCount} types in Assemlby {assemblyName}", typesInAssembly.Count(), typesInAssembly.Key);
                 WriteTypes(typesInAssembly);
             }
             //Log.Verbose("  Total Types:");
@@ -245,12 +258,12 @@ public class TypeCache : ITypeCache
                 .ToArray();
             foreach (var group in registeredTypes)
             {
-                Log.ForContext<ITypeCache>().Debug("    ValueTypeType     + {TypeValueTypeName}", group.Key);
+                log.Debug("    ValueTypeType     + {TypeValueTypeName}", group.Key);
 
-                if (!Log.IsEnabled(LogEventLevel.Verbose))
+                if (!log.IsEnabled(LogEventLevel.Verbose))
                     continue;
                 foreach (var tvt in group)
-                    Log.ForContext<ITypeCache>().Verbose("      DiscoveredType    - {TypeName}", tvt.Name);
+                    log.Verbose("      DiscoveredType    - {TypeName}", tvt.Name);
             }
         }
     }

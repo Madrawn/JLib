@@ -1,4 +1,6 @@
-﻿namespace JLib.Helper;
+﻿using System.Net.Http.Headers;
+
+namespace JLib.Helper;
 
 public static class TypeHelper
 {
@@ -43,7 +45,7 @@ public static class TypeHelper
     public static Type? GetAnyBaseType(this Type type, Type baseType)
     {
         var current = type;
-        var compare = baseType.TryGetGenericTypeDefinition() ?? baseType;
+        var compare = baseType.TryGetGenericTypeDefinition();
         while (current is not null && current.TryGetGenericTypeDefinition() != compare)
             current = current.BaseType;
         return current == compare
@@ -71,7 +73,7 @@ public static class TypeHelper
     /// <returns></returns>
     public static bool ImplementsAny<T>(this Type type)
         => type.GetInterface(typeof(T).Name) is not null || type.IsInterface &&
-            (type.TryGetGenericTypeDefinition() ?? type) == (typeof(T).TryGetGenericTypeDefinition() ?? typeof(T));
+            (type.TryGetGenericTypeDefinition()) == (typeof(T).TryGetGenericTypeDefinition());
 
     public static bool ImplementsAny(this Type type, Type @interface)
         => type.GetInterface(@interface.Name) is not null;
@@ -141,26 +143,35 @@ public static class TypeHelper
             : type;
 
     public static Type MakeGenericType(this Type type, params ITypeValueType[] genericParams)
-        => type.MakeGenericType(genericParams.Select(x => x.Value).ToArray());
+    {
+        var typeArguments = genericParams.Select(x => x.Value).ToArray();
+        try
+        {
+            return type.MakeGenericType(typeArguments);
+        }
+        catch (Exception e)
+        {
+            throw new InvalidOperationException($"adding <{string.Join(", ", typeArguments.Select(x => x.FullClassName()))}> as typeArguments to type {type.Name} failed: {Environment.NewLine + e.Message}", e);
+        }
+    }
 
     /// <summary>
     /// the name of the class and its declaring type, excluding the namespace
     /// </summary>
-    /// <param name="type"></param>
-    /// <returns></returns>
-    public static string FullClassName(this Type type)
+    public static string FullClassName(this Type type, bool includeNamespace = false)
     {
         var name = (type.FullName ?? type.Name);
-
-        var res = name
+        string res = name
             .Split("[")
-            .First()
-            .Split(".").Last()
+            .First(); ;
+        if (!includeNamespace)
+            res = res.Split(".").Last();
+        res = res
             .Replace("+", ".")
             .Split("`").First();
 
         if (type.IsGenericType)
-            res += $"<{string.Join(", ", type.GenericTypeArguments.Select(a => a.FullClassName()))}>";
+            res += $"<{string.Join(", ", type.GenericTypeArguments.Select(a => a.FullClassName(includeNamespace)))}>";
 
         return res;
     }

@@ -48,9 +48,9 @@ public class ValueTypeProfile : Profile
 
         public static void AddMapping(Profile profile)
         {
-            Log.Verbose("            {tvt}? => {tNative}?", typeof(TValueType).Name, typeof(TNative).Name);
+            Log.ForContext<ValueTypeProfile>().Verbose("            {tvt}? => {tNative}?", typeof(TValueType).Name, typeof(TNative).Name);
             profile.CreateMap<TValueType?, TNative?>().ConvertUsing(vt => vt == null ? null : vt.Value);
-            Log.Verbose("            {tNative}? => {tvt}?", typeof(TNative).Name, typeof(TValueType).Name);
+            Log.ForContext<ValueTypeProfile>().Verbose("            {tNative}? => {tvt}?", typeof(TNative).Name, typeof(TValueType).Name);
             profile.CreateMap<TNative?, TValueType?>().ConvertUsing(
                 new CtorReplacementExpressionVisitor<TValueType?, TNative?>().Visit(
                 v => v == null ? null :
@@ -66,18 +66,18 @@ public class ValueTypeProfile : Profile
 
         public static void AddMapping(Profile profile)
         {
-            Log.Verbose("            {tvt} => {tNative}", typeof(TValueType).Name, typeof(TNative).Name);
+            Log.ForContext<ValueTypeProfile>().Verbose("            {tvt} => {tNative}", typeof(TValueType).Name, typeof(TNative).Name);
             profile.CreateMap<TValueType, TNative>().ConvertUsing(vt => vt.Value);
-            Log.Verbose("            {tNative} => {tvt}", typeof(TNative).Name, typeof(TValueType).Name);
+            Log.ForContext<ValueTypeProfile>().Verbose("            {tNative} => {tvt}", typeof(TNative).Name, typeof(TValueType).Name);
             profile.CreateMap<TNative, TValueType>().ConvertUsing(
                 new CtorReplacementExpressionVisitor<TValueType, TNative>().Visit(
                     v =>
                         CtorReplacementExpressionVisitor<TValueType, TNative>.CtorPlaceholder(v)
                 ));
 
-            Log.Verbose("            {tvt} => {tNative}", typeof(TValueType).Name, typeof(TNative?).FullClassName());
+            Log.ForContext<ValueTypeProfile>().Verbose("            {tvt} => {tNative}", typeof(TValueType).Name, typeof(TNative?).FullClassName());
             profile.CreateMap<TValueType, TNative?>().ConvertUsing(vt => vt == null ? null : vt.Value);
-            Log.Verbose("            {tNative} => {tvt}", typeof(TNative?).FullClassName(), typeof(TValueType).Name);
+            Log.ForContext<ValueTypeProfile>().Verbose("            {tNative} => {tvt}", typeof(TNative?).FullClassName(), typeof(TValueType).Name);
             profile.CreateMap<TNative?, TValueType?>().ConvertUsing(
                 new CtorReplacementExpressionVisitor<TValueType?, TNative?>().Visit(
                     v => v.HasValue
@@ -100,7 +100,7 @@ public class ValueTypeProfile : Profile
         {
             if (valueType.NativeType.IsClass)
             {
-                Log.Debug("        adding map for class-valueType {valueType}", valueType.Name);
+                Log.ForContext<ValueTypeProfile>().Debug("        adding map for class-valueType {valueType}", valueType.Name);
                 var addMapping = typeof(ClassValueTypeConversions<,>).MakeGenericType(valueType.Value, valueType.NativeType)
                         .GetMethod(nameof(ClassValueTypeConversions<ValueType<Ignored>, Ignored>.AddMapping)) ??
                     throw new InvalidSetupException("AddProfileMethodNotFound");
@@ -108,7 +108,7 @@ public class ValueTypeProfile : Profile
             }
             else
             {
-                Log.Debug("        adding map for strct-valueType {valueType}", valueType.Name);
+                Log.ForContext<ValueTypeProfile>().Debug("        adding map for strct-valueType {valueType}", valueType.Name);
                 var addMapping = typeof(StructValueTypeConversions<,>).MakeGenericType(valueType.Value, valueType.NativeType)
                                      .GetMethod(nameof(StructValueTypeConversions<ValueType<int>, int>.AddMapping)) ??
                                  throw new InvalidSetupException("AddProfileMethodNotFound");

@@ -20,7 +20,7 @@ public interface IPostNavigationInitializedType : ITypeValueType
 
 public interface IValidatedType : ITypeValueType
 {
-    void Validate(ITypeCache cache, TvtValidator validator);
+    void Validate(ITypeCache cache, TvtValidator value);
 }
 
 public interface IMappedDataObjectType : ITypeValueType

@@ -25,10 +25,15 @@ public class TvtValidator : IExceptionProvider
             "Type validation failed",
             _messages.Select(msg => new InvalidTypeException(_typeValueType.GetType(), _typeValueType.Value, msg)));
 
-    public void ShouldBeGeneric()
+    public void ShouldBeGeneric(string? hint = null)
     {
         if (!Value.IsGenericType)
-            Add("Must be Generic");
+            Add(string.Join(Environment.NewLine, "Must be Generic", hint));
+    }
+    public void ShouldNotBeGeneric(string? hint = null)
+    {
+        if (Value.IsGenericType)
+            Add(string.Join(Environment.NewLine, "Must not be Generic", hint));
     }
     public void ShouldHaveNTypeArguments(int argumentCount)
     {
@@ -46,5 +51,10 @@ public class TvtValidator : IExceptionProvider
     {
         if (!Value.HasCustomAttribute<TAttribute>())
             Add($"Should have {typeof(TAttribute).Name}", hint);
+    }
+    public void ShouldImplementAny<TInterface>(string? hint = null)
+    {
+        if (!Value.ImplementsAny<TInterface>())
+            Add($"Should implement{typeof(TInterface).Name}", hint);
     }
 }

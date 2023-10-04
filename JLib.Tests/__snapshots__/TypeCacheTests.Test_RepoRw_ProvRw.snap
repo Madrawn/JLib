@@ -1,0 +1,112 @@
+﻿{
+  "Parameters": {
+    "TestName": "RepoRw_ProvRw",
+    "ExpectedBehavior": [
+      "  Provided:                                ",
+      "    DataProvider         : Read Write      ",
+      "    Repository           : Read Write      ",
+      "  Expected Implementations:                ",
+      "    IDataProviderR       : Repository      ",
+      "    IDataProviderRw      : Repository      ",
+      "    ISourceDataProviderR : DataProvider    ",
+      "    ISourceDataProviderRw: DataProvider    "
+    ],
+    "includedTypes": [
+      "JLib.Tests.TestCommandEntity",
+      "JLib.Tests.TestDataProviderRw<>",
+      "JLib.Tests.TestRepositoryRw"
+    ]
+  },
+  "exception": null,
+  "cache": {
+    "JLib.Tests": {
+      "JLib.CommandEntityType": [
+        "JLib.Tests.TestCommandEntity"
+      ],
+      "JLib.SourceDataProviderType": [
+        "JLib.Tests.TestDataProviderRw<>"
+      ],
+      "JLib.RepositoryDataProviderType": [
+        "JLib.Tests.TestRepositoryRw"
+      ]
+    }
+  },
+  "services": {
+    "non-generic": [
+      {
+        "Lifetime": "Singleton",
+        "ImplementationSource": "Instance",
+        "ServiceType": "JLib.ITypeCache",
+        "ServiceArguments": [],
+        "ImplementationType": "JLib.TypeCache",
+        "ImplementationTypeArguments": []
+      },
+      {
+        "Lifetime": "Scoped",
+        "ImplementationSource": "Type",
+        "ServiceType": "JLib.Tests.TestRepositoryRw",
+        "ServiceArguments": [],
+        "ImplementationType": "JLib.Tests.TestRepositoryRw",
+        "ImplementationTypeArguments": []
+      }
+    ],
+    "JLib.Tests.TestCommandEntity": [
+      {
+        "Lifetime": "Scoped",
+        "ImplementationSource": "Type",
+        "ServiceType": "JLib.Tests.TestDataProviderRw<>",
+        "ServiceArguments": [
+          "JLib.Tests.TestCommandEntity"
+        ],
+        "ImplementationType": "JLib.Tests.TestDataProviderRw<>",
+        "ImplementationTypeArguments": [
+          "JLib.Tests.TestCommandEntity"
+        ]
+      },
+      {
+        "Lifetime": "Scoped",
+        "ImplementationSource": "Factory",
+        "ServiceType": "JLib.Data.ISourceDataProviderRw<>",
+        "ServiceArguments": [
+          "JLib.Tests.TestCommandEntity"
+        ],
+        "ImplementationType": "JLib.Tests.TestDataProviderRw<>",
+        "ImplementationTypeArguments": [
+          "JLib.Tests.TestCommandEntity"
+        ]
+      },
+      {
+        "Lifetime": "Scoped",
+        "ImplementationSource": "Factory",
+        "ServiceType": "JLib.Data.ISourceDataProviderR<>",
+        "ServiceArguments": [
+          "JLib.Tests.TestCommandEntity"
+        ],
+        "ImplementationType": "JLib.Tests.TestDataProviderRw<>",
+        "ImplementationTypeArguments": [
+          "JLib.Tests.TestCommandEntity"
+        ]
+      },
+      {
+        "Lifetime": "Scoped",
+        "ImplementationSource": "Factory",
+        "ServiceType": "JLib.Data.IDataProviderRw<>",
+        "ServiceArguments": [
+          "JLib.Tests.TestCommandEntity"
+        ],
+        "ImplementationType": "JLib.Tests.TestRepositoryRw",
+        "ImplementationTypeArguments": []
+      },
+      {
+        "Lifetime": "Scoped",
+        "ImplementationSource": "Factory",
+        "ServiceType": "JLib.Data.IDataProviderR<>",
+        "ServiceArguments": [
+          "JLib.Tests.TestCommandEntity"
+        ],
+        "ImplementationType": "JLib.Tests.TestRepositoryRw",
+        "ImplementationTypeArguments": []
+      }
+    ]
+  }
+}

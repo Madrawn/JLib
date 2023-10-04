@@ -15,12 +15,12 @@ public static class RequestExecutorBuilderHelper
         this IRequestExecutorBuilder builder, ITypeCache typeCache, ServiceKind serviceKind = ServiceKind.Default)
         where TTvt : TypeValueType
     {
-        Log.Information("HotChocolate: Registering DataProvider of type {tvt} as {kind} well known Services",
+        Log.ForContext(typeof(RequestExecutorBuilderHelper)).Information("HotChocolate: Registering DataProvider of type {tvt} as {kind} well known Services",
             typeof(TTvt).Name, serviceKind);
         foreach (var tvt in typeCache.All<TTvt>())
         {
             var service = typeof(IDataProviderR<>).MakeGenericType(tvt.Value);
-            Log.Verbose("    {type,-25}: {service}", tvt.Name, service.FullClassName());
+            Log.ForContext(typeof(RequestExecutorBuilderHelper)).Verbose("    {type,-25}: {service}", tvt.Name, service.FullClassName());
             builder.RegisterService(service, serviceKind);
         }
         return builder;

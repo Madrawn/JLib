@@ -6,12 +6,6 @@ namespace JLib.Helper;
 public record TypeAttributeInfo(Type Type, Attribute Attribute);
 public static class ReflectionHelper
 {
-    public static bool HasAnyCustomAttribute<T>(this Type type, bool inherit = true)
-        where T : Attribute
-    {
-        var compare = type.TryGetGenericTypeDefinition();
-        return Attribute.GetCustomAttributes(type, inherit).Any(t => t.GetType().TryGetGenericTypeDefinition() == compare);
-    }
 
     public static bool HasCustomAttribute(this MemberInfo type, Type attributeType, bool inherit = true)
         => type.GetCustomAttribute(attributeType, inherit) is not null;
@@ -24,8 +18,8 @@ public static class ReflectionHelper
     public static Attribute[] GetCustomAttributes(this MemberInfo type, Type attributeType, bool inherit = true)
         => Attribute.GetCustomAttributes(type, attributeType, inherit).ToArray();
 
-    public static Type? TryGetGenericTypeDefinition(this Type type)
-        => type.IsGenericType ? type.GetGenericTypeDefinition() : null;
+    public static Type TryGetGenericTypeDefinition(this Type type)
+        => type.IsGenericType ? type.GetGenericTypeDefinition() : type;
 
     public static IEnumerable<T> WithAttribute<T, TAttribute>(this IEnumerable<T> src)
         where T : MemberInfo

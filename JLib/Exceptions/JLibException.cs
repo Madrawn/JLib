@@ -31,8 +31,11 @@ public abstract class JLibException : Exception
 /// </summary>
 public class JLibAggregateException : AggregateException
 {
+    public string UserMessage { get; }
+
     public JLibAggregateException(string userMessage, Exception[] content) : base(userMessage, content)
     {
+        UserMessage = userMessage;
         _message = new(() => new StringBuilder()
             .AppendLine(userMessage)
             .Append(" ├─")
