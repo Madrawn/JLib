@@ -16,7 +16,7 @@ public class AddDataProviderTests
     public const string Filter = "";
     public const bool ApplyTestFilter = true;
 
-    internal static object[][] Tests = new List<ReflectionTestOptions>
+    internal static ReflectionTestOptions[] Tests = new List<ReflectionTestOptions>
     {
         #region Repository: None       DataProvider: ReadOnly           NoRepo_ProvR
         new(
@@ -371,7 +371,7 @@ public class AddDataProviderTests
             true,false,false
         ),
         #endregion
-    }.Where(x => string.IsNullOrWhiteSpace(Filter) || x.TestName == Filter || !ApplyTestFilter).Select(x => new object[] { x }).ToArray();
+    }.Where(x => string.IsNullOrWhiteSpace(Filter) || x.TestName == Filter || !ApplyTestFilter).ToArray();
 
     private readonly IExceptionManager _exceptions;
     private readonly ITestOutputHelper _testOutput;
@@ -398,7 +398,7 @@ public class AddDataProviderTests
             .CreateLogger();
     }
 
-    [Theory, ClassData(typeof(TypeCacheTestArguments))]
+    [Theory, ClassData(typeof(TestArguments))]
     public void Test(ReflectionTestOptions options)
     {
         _testOutput.WriteLine("TestName: {0}", options.TestName);
@@ -459,15 +459,9 @@ public class AddDataProviderTests
             }
         }.MatchSnapshot(new SnapshotNameExtension(testName));
     }
-    public class TypeCacheTestArguments : IEnumerable<object[]>
+    public class TestArguments : ReflectionTestArguments
     {
-        private readonly object[][] _src = AddDataProviderTests.Tests;
-
-        public IEnumerator<object[]> GetEnumerator()
-            => _src.Select(x => x.Cast<object>().ToArray()).GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator()
-            => GetEnumerator();
+        protected override IEnumerable<ReflectionTestOptions> Options { get; } = Tests;
     }
 
     #region test classes
