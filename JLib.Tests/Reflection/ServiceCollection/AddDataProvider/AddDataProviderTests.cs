@@ -13,11 +13,10 @@ namespace JLib.Tests.Reflection.ServiceCollection.AddDataProvider;
 
 public class AddDataProviderTests
 {
-    private readonly ITestOutputHelper _testOutput;
     public const string Filter = "";
     public const bool ApplyTestFilter = true;
 
-    internal static object[][] Tests = new List<TestOptions>
+    internal static object[][] Tests = new List<ReflectionTestOptions>
     {
         #region Repository: None       DataProvider: ReadOnly           NoRepo_ProvR
         new(
@@ -375,6 +374,7 @@ public class AddDataProviderTests
     }.Where(x => string.IsNullOrWhiteSpace(Filter) || x.TestName == Filter || !ApplyTestFilter).Select(x => new object[] { x }).ToArray();
 
     private readonly IExceptionManager _exceptions;
+    private readonly ITestOutputHelper _testOutput;
 
     private void Setup(out IServiceCollection services, out ITypeCache cache, Type[] types)
     {
@@ -399,7 +399,7 @@ public class AddDataProviderTests
     }
 
     [Theory, ClassData(typeof(TypeCacheTestArguments))]
-    public void Test(TestOptions options)
+    public void Test(ReflectionTestOptions options)
     {
         _testOutput.WriteLine("TestName: {0}", options.TestName);
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
@@ -458,18 +458,6 @@ public class AddDataProviderTests
                 testServices? serviceValidator:"disabled"
             }
         }.MatchSnapshot(new SnapshotNameExtension(testName));
-    }
-    public record TestOptions(string TestName, string[] ExpectedBehavior, Type[] IncludedTypes,
-        Action<IServiceCollection, ITypeCache, IExceptionManager> ServiceFactory, bool TestException = true,
-        bool TestCache = true,
-        bool TestServices = true)
-    {
-        public TestOptions(string TestName, string[] ExpectedBehavior, IEnumerable<Type> IncludedTypes,
-            Action<IServiceCollection, ITypeCache, IExceptionManager> ServiceFactory, bool TestException = true,
-            bool TestCache = true,
-            bool TestServices = true) :
-            this(TestName, ExpectedBehavior, IncludedTypes.ToArray(), ServiceFactory, TestException, TestCache, TestServices)
-        { }
     }
     public class TypeCacheTestArguments : IEnumerable<object[]>
     {
