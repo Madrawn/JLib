@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using JLib.Data;
 using JLib.Helper;
 using JLib.Testing;
@@ -379,6 +380,10 @@ public class AddDataProviderTests:ReflectionTestBase
     public AddDataProviderTests(ITestOutputHelper testOutput) : base(testOutput)
     {
     }
+
+    public override void AddServices(IServiceCollection services, ITypeCache cache, IExceptionManager exceptions)
+        => services.AddRepositories(cache, exceptions);
+
 
     [Theory, ClassData(typeof(TestArguments))]
     public override void Test(ReflectionTestOptions options, bool skipTest) 

@@ -28,8 +28,17 @@ public record ReflectionTestOptions(string TestName, string[] ExpectedBehavior, 
 
 public abstract class ReflectionTestArguments : IEnumerable<object[]>
 {
+    /// <summary>
+    /// the options to provide to the test method
+    /// </summary>
     protected abstract IEnumerable<ReflectionTestOptions> Options { get; }
+    /// <summary>
+    /// filters for test options with this exact name
+    /// </summary>
     protected virtual string Filter { get; } = "";
+    /// <summary>
+    /// when true, skipped tests will be executed
+    /// </summary>
     protected virtual bool ListSkippedTests { get; } = false;
 
     public IEnumerator<object[]> GetEnumerator()
@@ -66,6 +75,11 @@ public abstract class ReflectionTestBase
             .MinimumLevel.Warning()
             .CreateLogger();
     }
+
+    public virtual void AddServices(IServiceCollection services, ITypeCache cache, IExceptionManager exceptions)
+    {
+
+    }
     public virtual void Test(ReflectionTestOptions options, bool skipTest)
     {
         _testOutput.WriteLine("TestName: {0}", options.TestName);
@@ -88,7 +102,7 @@ public abstract class ReflectionTestBase
             .Where(tvt => tvt.Value.Assembly != typeof(ITypeCache).Assembly)
             .PrepareSnapshot();
 
-        services.AddRepositories(cache, _exceptions);
+        AddServices(services,cache,_exceptions.CreateChild(nameof(AddServices)));
         serviceFactory(services, cache, _exceptions.CreateChild("Service Factory"));
 
         var exceptionValidator = _exceptions.GetException().PrepareSnapshot();
