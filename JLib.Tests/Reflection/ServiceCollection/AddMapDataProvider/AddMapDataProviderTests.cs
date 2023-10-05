@@ -12,6 +12,8 @@ public class AddMapDataProviderTests : ReflectionTestBase
 {
     public class TestArguments : ReflectionTestArguments
     {
+        protected override string Filter { get; } = "";
+
         protected override IEnumerable<ReflectionTestOptions> Options { get; } = new ReflectionTestOptions[]
         {
 
