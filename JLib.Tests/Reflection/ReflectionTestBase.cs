@@ -9,6 +9,7 @@ using Xunit.Abstractions;
 using static JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests;
 using FluentAssertions.Common;
 using JLib.Tests.Reflection.ServiceCollection.AddDataProvider;
+using Serilog;
 
 namespace JLib.Tests.Reflection;
 
@@ -28,9 +29,21 @@ public record ReflectionTestOptions(string TestName, string[] ExpectedBehavior, 
 public abstract class ReflectionTestArguments : IEnumerable<object[]>
 {
     protected abstract IEnumerable<ReflectionTestOptions> Options { get; }
+    protected virtual string Filter { get; } = "";
+    protected virtual bool ListSkippedTests { get; } = false;
 
     public IEnumerator<object[]> GetEnumerator()
-        => Options.Select(x => new[] { x as object }).GetEnumerator();
+        => Options
+            .Select(options =>
+            {
+                var skip = !string.IsNullOrWhiteSpace(Filter) && options.TestName != Filter;
+                return new object[]
+                {
+                    options , skip
+                };
+            })
+            .Where(parameters => /*skip test*/!(bool)parameters[1] || ListSkippedTests)
+            .GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator()
         => GetEnumerator();
@@ -39,18 +52,21 @@ public abstract class ReflectionTestBase
 {
     private readonly ITestOutputHelper _testOutput;
     private readonly IExceptionManager _exceptions;
-    public const string Filter = "";
-    public const bool ApplyTestFilter = true;
 
     protected ReflectionTestBase(ITestOutputHelper testOutput)
     {
         _exceptions = new ExceptionManager(GetType().FullClassName());
         _testOutput = testOutput;
+        Log.Logger = new LoggerConfiguration()
+            .WriteTo.Xunit(testOutput)
+            .Enrich.FromLogContext()
+            .MinimumLevel.Warning()
+            .CreateLogger();
     }
-    public virtual void Test(ReflectionTestOptions options)
+    public virtual void Test(ReflectionTestOptions options, bool skipTest)
     {
         _testOutput.WriteLine("TestName: {0}", options.TestName);
-        if (!string.IsNullOrWhiteSpace(Filter) && options.TestName != Filter)
+        if (skipTest)
         {
             Assert.Fail("skipped");
             return;

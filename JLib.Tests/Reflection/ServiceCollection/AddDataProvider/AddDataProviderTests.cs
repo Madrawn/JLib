@@ -11,14 +11,16 @@ using ServiceCollectionHelper = JLib.Helper.ServiceCollectionHelper;
 
 namespace JLib.Tests.Reflection.ServiceCollection.AddDataProvider;
 
-public class AddDataProviderTests
+public class AddDataProviderTests:ReflectionTestBase
 {
-    public const string Filter = "";
-    public const bool ApplyTestFilter = true;
-
-    internal static ReflectionTestOptions[] Tests = new List<ReflectionTestOptions>
+    public class TestArguments : ReflectionTestArguments
     {
-        #region Repository: None       DataProvider: ReadOnly           NoRepo_ProvR
+        protected override string Filter { get; } = "";
+
+        protected override IEnumerable<ReflectionTestOptions> Options { get; }
+            = new ReflectionTestOptions[]
+        {
+                    #region Repository: None       DataProvider: ReadOnly           NoRepo_ProvR
         new(
             "NoRepo_ProvR",
             new []
@@ -371,98 +373,17 @@ public class AddDataProviderTests
             true,false,false
         ),
         #endregion
-    }.Where(x => string.IsNullOrWhiteSpace(Filter) || x.TestName == Filter || !ApplyTestFilter).ToArray();
+    
+        }; }
 
-    private readonly IExceptionManager _exceptions;
-    private readonly ITestOutputHelper _testOutput;
-
-    private void Setup(out IServiceCollection services, out ITypeCache cache, Type[] types)
+    public AddDataProviderTests(ITestOutputHelper testOutput) : base(testOutput)
     {
-        services = new Microsoft.Extensions.DependencyInjection.ServiceCollection()
-            .AddTypeCache(
-                new[]
-                {
-                    typeof(ITypeCache).Assembly
-                },
-                types, out cache, _exceptions.CreateChild(nameof(Setup)));
-    }
-
-    public AddDataProviderTests(ITestOutputHelper testOutput)
-    {
-        _testOutput = testOutput;
-        _exceptions = new ExceptionManager(nameof(AddDataProviderTests));
-        Log.Logger = new LoggerConfiguration()
-            .WriteTo.Xunit(testOutput)
-            .Enrich.FromLogContext()
-            .MinimumLevel.Warning()
-            .CreateLogger();
     }
 
     [Theory, ClassData(typeof(TestArguments))]
-    public void Test(ReflectionTestOptions options)
-    {
-        _testOutput.WriteLine("TestName: {0}", options.TestName);
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-#pragma warning disable CS8519 // The given expression never matches the provided pattern.
-        if (!string.IsNullOrWhiteSpace(Filter) && options.TestName != Filter)
-        {
-            Assert.Fail("skipped");
-            return;
-        }
-#pragma warning restore CS8519 // The given expression never matches the provided pattern.
-        var (testName, expectedBehavior, content, serviceFactory, testExceptions, testCache, testServices) = options;
-        Setup(out var services, out var cache, content);
-        // group by namespace, then by typeValueType and use json objects for the grouping
-        var cacheValidator = cache.All<ITypeValueType>()
-            .Where(tvt => tvt.Value.Assembly != typeof(ITypeCache).Assembly)
-            .PrepareSnapshot();
+    public override void Test(ReflectionTestOptions options, bool skipTest) 
+        => base.Test(options, skipTest);
 
-        services.AddRepositories(cache, _exceptions);
-        serviceFactory(services, cache, _exceptions.CreateChild("Service Factory"));
-
-        var exceptionValidator = _exceptions.GetException().PrepareSnapshot();
-
-        var serviceValidator = services.PrepareSnapshot();
-
-        var maxDescriptionLength = expectedBehavior.Max(x => x.Length);
-        new Dictionary<string, object?>
-        {
-            {
-                "Parameters",
-                new Dictionary<string,object>()
-                {
-                    {
-                        "TestName",
-                        testName
-                    },
-                    {
-                        "ExpectedBehavior",
-                        expectedBehavior.Select(d=>"  "+d.PadRight(maxDescriptionLength+4))
-                    },
-                    {
-                        "includedTypes",
-                        content.Select(c=>c.FullClassName(true))
-                    }
-                }
-            },
-            {
-                "exception",
-                 testExceptions? exceptionValidator:"disabled"
-            },
-            {
-                "cache",
-                testCache? cacheValidator:"disabled"
-            },
-            {
-                "services",
-                testServices? serviceValidator:"disabled"
-            }
-        }.MatchSnapshot(new SnapshotNameExtension(testName));
-    }
-    public class TestArguments : ReflectionTestArguments
-    {
-        protected override IEnumerable<ReflectionTestOptions> Options { get; } = Tests;
-    }
 
     #region test classes
     #region entities
@@ -565,4 +486,5 @@ public class AddDataProviderTests
     }
     #endregion
     #endregion
+
 }

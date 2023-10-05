@@ -19,21 +19,15 @@
     "InnerExceptions": [
       {
         "Type": "JLib.Exceptions.JLibAggregateException",
-        "Message": "Setup",
+        "Message": "Cache setup failed",
         "InnerExceptions": [
           {
             "Type": "JLib.Exceptions.JLibAggregateException",
-            "Message": "Cache setup failed",
+            "Message": "Type validation failed",
             "InnerExceptions": [
               {
-                "Type": "JLib.Exceptions.JLibAggregateException",
-                "Message": "Type validation failed",
-                "InnerExceptions": [
-                  {
-                    "Type": "JLib.Exceptions.InvalidTypeException",
-                    "Message": "Error while initializing SourceDataProviderType with JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestInvalidDataProviderRw<>: Should implement JLib.Data.ISourceDataProviderRw<>"
-                  }
-                ]
+                "Type": "JLib.Exceptions.InvalidTypeException",
+                "Message": "Error while initializing SourceDataProviderType with JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestInvalidDataProviderRw<>: Should implement JLib.Data.ISourceDataProviderRw<>"
               }
             ]
           }
