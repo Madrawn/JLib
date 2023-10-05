@@ -459,129 +459,128 @@ public class AddDataProviderTests
             }
         }.MatchSnapshot(new SnapshotNameExtension(testName));
     }
-}
-
-public record TestOptions(string TestName, string[] ExpectedBehavior, Type[] IncludedTypes,
-    Action<IServiceCollection, ITypeCache, IExceptionManager> ServiceFactory, bool TestException = true,
-    bool TestCache = true,
-    bool TestServices = true)
-{
-    public TestOptions(string TestName, string[] ExpectedBehavior, IEnumerable<Type> IncludedTypes,
+    public record TestOptions(string TestName, string[] ExpectedBehavior, Type[] IncludedTypes,
         Action<IServiceCollection, ITypeCache, IExceptionManager> ServiceFactory, bool TestException = true,
         bool TestCache = true,
-        bool TestServices = true) :
-        this(TestName, ExpectedBehavior, IncludedTypes.ToArray(), ServiceFactory, TestException, TestCache, TestServices)
-    { }
-}
-public class TypeCacheTestArguments : IEnumerable<object[]>
-{
-    private readonly object[][] _src = AddDataProviderTests.Tests;
-
-    public IEnumerator<object[]> GetEnumerator()
-        => _src.Select(x => x.Cast<object>().ToArray()).GetEnumerator();
-
-    IEnumerator IEnumerable.GetEnumerator()
-        => GetEnumerator();
-}
-
-#region test classes
-#region entities
-public class TestCommandEntity : ICommandEntity
-{
-    public Guid Id { get; } = Guid.NewGuid();
-}
-#endregion
-#region repositories
-
-public class TestInvalidDataProviderR<T> : IDataProviderR<T> where T : IEntity
-{
-    public IQueryable<T> Get() => throw new NotImplementedException();
-}
-public class TestInvalidDataProviderRw<T> : IDataProviderRw<T> where T : IEntity
-{
-    public IQueryable<T> Get() => throw new NotImplementedException();
-    public void Add(T item) => throw new NotImplementedException();
-
-    public void Add(IEnumerable<T> items) => throw new NotImplementedException();
-
-    public void Remove(Guid itemId) => throw new NotImplementedException();
-
-    public void Remove(IEnumerable<Guid> itemIds) => throw new NotImplementedException();
-}
-
-public class TestRepositoryR : IDataProviderR<TestCommandEntity>
-{
-    public TestRepositoryR(ISourceDataProviderR<TestCommandEntity> sourceProvider)
+        bool TestServices = true)
     {
-
+        public TestOptions(string TestName, string[] ExpectedBehavior, IEnumerable<Type> IncludedTypes,
+            Action<IServiceCollection, ITypeCache, IExceptionManager> ServiceFactory, bool TestException = true,
+            bool TestCache = true,
+            bool TestServices = true) :
+            this(TestName, ExpectedBehavior, IncludedTypes.ToArray(), ServiceFactory, TestException, TestCache, TestServices)
+        { }
     }
-    public IQueryable<TestCommandEntity> Get()
-        => throw new NotImplementedException();
-}
-public class TestRepositoryRw : IDataProviderRw<TestCommandEntity>
-{
-    public TestRepositoryRw()
+    public class TypeCacheTestArguments : IEnumerable<object[]>
     {
+        private readonly object[][] _src = AddDataProviderTests.Tests;
 
+        public IEnumerator<object[]> GetEnumerator()
+            => _src.Select(x => x.Cast<object>().ToArray()).GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator()
+            => GetEnumerator();
     }
-    public IQueryable<TestCommandEntity> Get()
-        => throw new NotImplementedException();
 
-    public void Add(TestCommandEntity item) => throw new NotImplementedException();
+    #region test classes
+    #region entities
+    public class TestCommandEntity : ICommandEntity
+    {
+        public Guid Id { get; } = Guid.NewGuid();
+    }
+    #endregion
+    #region repositories
 
-    public void Add(IEnumerable<TestCommandEntity> items) => throw new NotImplementedException();
+    public class TestInvalidDataProviderR<T> : IDataProviderR<T> where T : IEntity
+    {
+        public IQueryable<T> Get() => throw new NotImplementedException();
+    }
+    public class TestInvalidDataProviderRw<T> : IDataProviderRw<T> where T : IEntity
+    {
+        public IQueryable<T> Get() => throw new NotImplementedException();
+        public void Add(T item) => throw new NotImplementedException();
 
-    public void Remove(Guid itemId) => throw new NotImplementedException();
+        public void Add(IEnumerable<T> items) => throw new NotImplementedException();
 
-    public void Remove(IEnumerable<Guid> itemIds) => throw new NotImplementedException();
+        public void Remove(Guid itemId) => throw new NotImplementedException();
+
+        public void Remove(IEnumerable<Guid> itemIds) => throw new NotImplementedException();
+    }
+
+    public class TestRepositoryR : IDataProviderR<TestCommandEntity>
+    {
+        public TestRepositoryR(ISourceDataProviderR<TestCommandEntity> sourceProvider)
+        {
+
+        }
+        public IQueryable<TestCommandEntity> Get()
+            => throw new NotImplementedException();
+    }
+    public class TestRepositoryRw : IDataProviderRw<TestCommandEntity>
+    {
+        public TestRepositoryRw()
+        {
+
+        }
+        public IQueryable<TestCommandEntity> Get()
+            => throw new NotImplementedException();
+
+        public void Add(TestCommandEntity item) => throw new NotImplementedException();
+
+        public void Add(IEnumerable<TestCommandEntity> items) => throw new NotImplementedException();
+
+        public void Remove(Guid itemId) => throw new NotImplementedException();
+
+        public void Remove(IEnumerable<Guid> itemIds) => throw new NotImplementedException();
+    }
+
+    public class TestInvalidRepositoryR : ISourceDataProviderR<TestCommandEntity>
+    {
+        public IQueryable<TestCommandEntity> Get() => throw new NotImplementedException();
+    }
+    public class TestInvalidRepositoryRw : ISourceDataProviderRw<TestCommandEntity>
+    {
+        public IQueryable<TestCommandEntity> Get() => throw new NotImplementedException();
+
+        public void Add(TestCommandEntity item) => throw new NotImplementedException();
+
+        public void Add(IEnumerable<TestCommandEntity> items) => throw new NotImplementedException();
+
+        public void Remove(Guid itemId) => throw new NotImplementedException();
+
+        public void Remove(IEnumerable<Guid> itemIds) => throw new NotImplementedException();
+    }
+    #endregion
+    #region DataProvider
+    public class TestDataProviderRw<T> : ISourceDataProviderRw<T> where T : IEntity
+    {
+        public IQueryable<T> Get() => throw new NotImplementedException();
+
+        public void Add(T item) => throw new NotImplementedException();
+
+        public void Add(IEnumerable<T> items) => throw new NotImplementedException();
+
+        public void Remove(Guid itemId) => throw new NotImplementedException();
+
+        public void Remove(IEnumerable<Guid> itemIds) => throw new NotImplementedException();
+    }
+    public class TestDataProviderR<T> : ISourceDataProviderR<T> where T : IEntity
+    {
+        public IQueryable<T> Get() => throw new NotImplementedException();
+    }
+
+    public class TestInvalidInterfaceDataProvider<T> : ISourceDataProviderR<T>, IDataProviderRw<T>
+        where T : IEntity
+    {
+        public IQueryable<T> Get() => throw new NotImplementedException();
+        public void Add(T item) => throw new NotImplementedException();
+
+        public void Add(IEnumerable<T> items) => throw new NotImplementedException();
+
+        public void Remove(Guid itemId) => throw new NotImplementedException();
+
+        public void Remove(IEnumerable<Guid> itemIds) => throw new NotImplementedException();
+    }
+    #endregion
+    #endregion
 }
-
-public class TestInvalidRepositoryR : ISourceDataProviderR<TestCommandEntity>
-{
-    public IQueryable<TestCommandEntity> Get() => throw new NotImplementedException();
-}
-public class TestInvalidRepositoryRw : ISourceDataProviderRw<TestCommandEntity>
-{
-    public IQueryable<TestCommandEntity> Get() => throw new NotImplementedException();
-
-    public void Add(TestCommandEntity item) => throw new NotImplementedException();
-
-    public void Add(IEnumerable<TestCommandEntity> items) => throw new NotImplementedException();
-
-    public void Remove(Guid itemId) => throw new NotImplementedException();
-
-    public void Remove(IEnumerable<Guid> itemIds) => throw new NotImplementedException();
-}
-#endregion
-#region DataProvider
-public class TestDataProviderRw<T> : ISourceDataProviderRw<T> where T : IEntity
-{
-    public IQueryable<T> Get() => throw new NotImplementedException();
-
-    public void Add(T item) => throw new NotImplementedException();
-
-    public void Add(IEnumerable<T> items) => throw new NotImplementedException();
-
-    public void Remove(Guid itemId) => throw new NotImplementedException();
-
-    public void Remove(IEnumerable<Guid> itemIds) => throw new NotImplementedException();
-}
-public class TestDataProviderR<T> : ISourceDataProviderR<T> where T : IEntity
-{
-    public IQueryable<T> Get() => throw new NotImplementedException();
-}
-
-public class TestInvalidInterfaceDataProvider<T> : ISourceDataProviderR<T>, IDataProviderRw<T>
-    where T : IEntity
-{
-    public IQueryable<T> Get() => throw new NotImplementedException();
-    public void Add(T item) => throw new NotImplementedException();
-
-    public void Add(IEnumerable<T> items) => throw new NotImplementedException();
-
-    public void Remove(Guid itemId) => throw new NotImplementedException();
-
-    public void Remove(IEnumerable<Guid> itemIds) => throw new NotImplementedException();
-}
-#endregion
-#endregion

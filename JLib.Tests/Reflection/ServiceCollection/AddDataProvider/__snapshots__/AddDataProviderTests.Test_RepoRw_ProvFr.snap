@@ -9,9 +9,9 @@
       "    An exception which tells the user to not provide the DataProvider as ReadOnly and informs that it is forced    "
     ],
     "includedTypes": [
-      "JLib.Tests.TestCommandEntity",
-      "JLib.Tests.TestDataProviderRw<>",
-      "JLib.Tests.TestRepositoryRw"
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity",
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestDataProviderRw<>",
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestRepositoryRw"
     ]
   },
   "exception": {
@@ -32,7 +32,7 @@
                 "InnerExceptions": [
                   {
                     "Type": "JLib.Exceptions.InvalidSetupException",
-                    "Message": "The data provider Implementation JLib.Tests.TestDataProviderRw<JLib.Tests.TestCommandEntity> is forced read only but the Repository JLib.Tests.TestRepositoryRw can write data. \nNot forcing the DataProvider to be read only or implementing IDataProviderRw will solve this issue"
+                    "Message": "The data provider Implementation JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestDataProviderRw<JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity> is forced read only but the Repository JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestRepositoryRw can write data. \nNot forcing the DataProvider to be read only or implementing IDataProviderRw will solve this issue"
                   }
                 ]
               }

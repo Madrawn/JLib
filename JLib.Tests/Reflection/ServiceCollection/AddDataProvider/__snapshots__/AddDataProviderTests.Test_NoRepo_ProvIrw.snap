@@ -9,8 +9,8 @@
       "    An exception which tells the user to implement the SourceDataProvider Interfaces    "
     ],
     "includedTypes": [
-      "JLib.Tests.TestCommandEntity",
-      "JLib.Tests.TestInvalidDataProviderRw<>"
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity",
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestInvalidDataProviderRw<>"
     ]
   },
   "exception": {
@@ -31,7 +31,7 @@
                 "InnerExceptions": [
                   {
                     "Type": "JLib.Exceptions.InvalidTypeException",
-                    "Message": "Error while initializing SourceDataProviderType with JLib.Tests.TestInvalidDataProviderRw<>: Should implement JLib.Data.ISourceDataProviderRw<>"
+                    "Message": "Error while initializing SourceDataProviderType with JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestInvalidDataProviderRw<>: Should implement JLib.Data.ISourceDataProviderRw<>"
                   }
                 ]
               }

@@ -9,9 +9,9 @@
       "    An error which tells you that repositories must not implement the ISourceDataProvider Interface and that you must only implement the IDataProvider Interfaces    "
     ],
     "includedTypes": [
-      "JLib.Tests.TestCommandEntity",
-      "JLib.Tests.TestDataProviderRw<>",
-      "JLib.Tests.TestInvalidRepositoryRw"
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity",
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestDataProviderRw<>",
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestInvalidRepositoryRw"
     ]
   },
   "exception": {
@@ -32,7 +32,7 @@
                 "InnerExceptions": [
                   {
                     "Type": "JLib.Exceptions.InvalidTypeException",
-                    "Message": "Error while initializing RepositoryType with JLib.Tests.TestInvalidRepositoryRw: Should not implement JLib.Data.ISourceDataProviderR<>"
+                    "Message": "Error while initializing RepositoryType with JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestInvalidRepositoryRw: Should not implement JLib.Data.ISourceDataProviderR<>"
                   }
                 ]
               }

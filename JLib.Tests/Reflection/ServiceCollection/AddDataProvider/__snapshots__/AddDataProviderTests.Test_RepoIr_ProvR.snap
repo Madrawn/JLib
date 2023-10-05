@@ -9,9 +9,9 @@
       "    An exception which tells the user to not provide the DataProvider as ReadOnly and informs that it is forced    "
     ],
     "includedTypes": [
-      "JLib.Tests.TestCommandEntity",
-      "JLib.Tests.TestDataProviderR<>",
-      "JLib.Tests.TestInvalidRepositoryR"
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity",
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestDataProviderR<>",
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestInvalidRepositoryR"
     ]
   },
   "exception": {
@@ -32,7 +32,7 @@
                 "InnerExceptions": [
                   {
                     "Type": "JLib.Exceptions.InvalidTypeException",
-                    "Message": "Error while initializing RepositoryType with JLib.Tests.TestInvalidRepositoryR: Should not implement JLib.Data.ISourceDataProviderR<>"
+                    "Message": "Error while initializing RepositoryType with JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestInvalidRepositoryR: Should not implement JLib.Data.ISourceDataProviderR<>"
                   }
                 ]
               }
