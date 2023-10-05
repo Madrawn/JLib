@@ -9,12 +9,15 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace JLib.DataGeneration;
 
-public interface IDataPackageStore
+public interface IDataPackageRetriever
+{
+    TPackage GetPackage<TPackage>()
+        where TPackage : DataPackage;
+}
+public interface IDataPackageStore : IDataPackageRetriever
 {
     TEntity[] AddEntities<TEntity>(IEnumerable<TEntity> entities)
         where TEntity : IEntity;
-    TPackage GetPackage<TPackage>()
-        where TPackage : DataPackage;
     internal GuidValueType RetrieveId(PropertyInfo property);
     TId? DeriveId<TId>(GuidValueType? id, Type dataPackage)
         where TId : GuidValueType;
@@ -56,11 +59,12 @@ public interface IDataPackager
 /// </summary>
 public sealed class DataPackageManager : IDataPackager, IDataPackageStore
 {
-    public static void ApplyPackages(IServiceProvider serviceProvider, Action<IDataPackager> includeList)
+    public static IDataPackageRetriever ApplyPackages(IServiceProvider serviceProvider, Action<IDataPackager> includeList)
     {
         var context = new DataPackageManager(serviceProvider);
         includeList(context);
         context._idRegistry.SaveToFile();
+        return context;
     }
 
     private readonly IServiceProvider _dataServiceProvider;

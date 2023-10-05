@@ -32,59 +32,69 @@
     }
   },
   "services": {
-    "non-generic": [
-      {
-        "Lifetime": "Singleton",
-        "ImplementationSource": "Instance",
-        "ServiceType": "JLib.ITypeCache",
-        "ServiceArguments": [],
-        "ImplementationType": "JLib.TypeCache",
-        "ImplementationTypeArguments": []
-      },
-      {
-        "Lifetime": "Scoped",
-        "ImplementationSource": "Type",
-        "ServiceType": "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestRepositoryR",
-        "ServiceArguments": [],
-        "ImplementationType": "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestRepositoryR",
-        "ImplementationTypeArguments": []
-      }
-    ],
-    "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity": [
-      {
-        "Lifetime": "Scoped",
-        "ImplementationSource": "Factory",
-        "ServiceType": "JLib.Data.IDataProviderR<>",
-        "ServiceArguments": [
-          "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity"
-        ],
-        "ImplementationType": "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestRepositoryR",
-        "ImplementationTypeArguments": []
-      },
-      {
-        "Lifetime": "Scoped",
-        "ImplementationSource": "Type",
-        "ServiceType": "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestDataProviderR<>",
-        "ServiceArguments": [
-          "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity"
-        ],
-        "ImplementationType": "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestDataProviderR<>",
-        "ImplementationTypeArguments": [
-          "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity"
-        ]
-      },
-      {
-        "Lifetime": "Scoped",
-        "ImplementationSource": "Factory",
-        "ServiceType": "JLib.Data.ISourceDataProviderR<>",
-        "ServiceArguments": [
-          "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity"
-        ],
-        "ImplementationType": "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestDataProviderR<>",
-        "ImplementationTypeArguments": [
-          "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity"
-        ]
-      }
-    ]
+    "non-generic": {
+      "JLib.ITypeCache": [
+        {
+          "Lifetime": "Singleton",
+          "ImplementationSource": "Instance",
+          "ServiceType": "JLib.ITypeCache",
+          "ServiceArguments": [],
+          "ImplementationType": "JLib.TypeCache",
+          "ImplementationTypeArguments": []
+        }
+      ],
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestRepositoryR": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Type",
+          "ServiceType": "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestRepositoryR",
+          "ServiceArguments": [],
+          "ImplementationType": "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestRepositoryR",
+          "ImplementationTypeArguments": []
+        }
+      ]
+    },
+    "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity": {
+      "JLib.Data.IDataProviderR<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Factory",
+          "ServiceType": "JLib.Data.IDataProviderR<>",
+          "ServiceArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity"
+          ],
+          "ImplementationType": "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestRepositoryR",
+          "ImplementationTypeArguments": []
+        }
+      ],
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestDataProviderR<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Type",
+          "ServiceType": "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestDataProviderR<>",
+          "ServiceArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity"
+          ],
+          "ImplementationType": "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestDataProviderR<>",
+          "ImplementationTypeArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity"
+          ]
+        }
+      ],
+      "JLib.Data.ISourceDataProviderR<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Factory",
+          "ServiceType": "JLib.Data.ISourceDataProviderR<>",
+          "ServiceArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity"
+          ],
+          "ImplementationType": "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestDataProviderR<>",
+          "ImplementationTypeArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity"
+          ]
+        }
+      ]
+    }
   }
 }

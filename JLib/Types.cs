@@ -65,7 +65,7 @@ public sealed record MappedGraphQlDataObjectType(Type Value) : GraphQlDataObject
                               ?? throw NewInvalidTypeException("SourceEntity could not be found"));
     /// <summary>
     /// add the <see cref="PropertyPrefixAttribute"/> to the <see cref="SourceEntity"/> type
-    /// </summary>
+    /// </summary>//
     public PropertyPrefix? PropertyPrefix { get; private set; }
 
     public bool ReverseMap => false;
@@ -75,14 +75,14 @@ public sealed record MappedGraphQlDataObjectType(Type Value) : GraphQlDataObject
 }
 
 [ImplementsAny(typeof(IMappedCommandEntity<>)), NotAbstract, Priority(3_000)]
-public sealed record MappedCommandEntityType(Type Value) : CommandEntityType(Value), IMappedDataObjectType, IPostNavigationInitializedType
+public record MappedCommandEntityType(Type Value) : CommandEntityType(Value), IMappedDataObjectType, IPostNavigationInitializedType
 {
     public EntityType SourceEntity =>
         Navigate(typeCache => Value.GetAnyInterface<IMappedCommandEntity<IEntity>>()?.GenericTypeArguments.First()
                                   .CastValueType<EntityType>(typeCache)
                               ?? throw NewInvalidTypeException("SourceEntity could not be found"));
     public PropertyPrefix? PropertyPrefix { get; private set; }
-    public bool ReverseMap => true;
+    public virtual bool ReverseMap => true;
     void IPostNavigationInitializedType.Initialize(IExceptionManager exceptions)
         => PropertyPrefix = SourceEntity.Value.GetCustomAttribute<PropertyPrefixAttribute>()?.Prefix;
 }

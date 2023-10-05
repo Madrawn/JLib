@@ -152,7 +152,7 @@ public static class TypeHelper
         }
         catch (Exception e)
         {
-            throw new InvalidOperationException($"adding <{string.Join(", ", typeArguments.Select(x => x.FullClassName(true)))}> as typeArguments to type {type.FullClassName(true)} failed: {Environment.NewLine + e.Message}", e);
+            throw new InvalidOperationException($"adding <{string.Join(", ", typeArguments.Select(x => x.FullClassName(true)))}> as typeArguments to type {type.FullClassName(true)} failed: {Environment.NewLine}{e.Message}", e);
         }
     }
 

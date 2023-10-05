@@ -53,7 +53,7 @@ public abstract class ReflectionTestArguments : IEnumerable<object[]>
             })
             //adding the first 2 tests to make sure that even if the test have been filtered, at least one test fails when a filter is applied
             // this guarantees that no tests are skipped unintentionally in the test pipeline
-            .Where((parameters, i) 
+            .Where((parameters, i)
                 => !(bool)parameters[1] || ListSkippedTests
 #if RELEASE
                                         || i == 0 || i == 1
@@ -101,17 +101,34 @@ public abstract class ReflectionTestBase
                     typeof(ITypeCache).Assembly
                 },
                 content, out var cache, _exceptions);
-        // group by namespace, then by typeValueType and use json objects for the grouping
-        var cacheValidator = cache.All<ITypeValueType>()
-            .Where(tvt => tvt.Value.Assembly != typeof(ITypeCache).Assembly)
-            .PrepareSnapshot();
 
-        AddServices(services,cache,_exceptions.CreateChild(nameof(AddServices)));
+        // group by namespace, then by typeValueType and use json objects for the grouping
+        object cacheValidator;
+        try
+        {
+            cacheValidator = cache.All<ITypeValueType>()
+                .Where(tvt => tvt.Value.Assembly != typeof(ITypeCache).Assembly)
+                .PrepareSnapshot();
+        }
+        catch (Exception e)
+        {
+            cacheValidator = e.PrepareSnapshot() ?? "evaluation failed";
+        }
+
+        AddServices(services, cache, _exceptions.CreateChild(nameof(AddServices)));
         serviceFactory(services, cache, _exceptions.CreateChild("Service Factory"));
 
         var exceptionValidator = _exceptions.GetException().PrepareSnapshot();
 
-        var serviceValidator = services.PrepareSnapshot();
+        object serviceValidator;
+        try
+        {
+            serviceValidator = services.PrepareSnapshot();
+        }
+        catch (Exception e)
+        {
+            serviceValidator = e.PrepareSnapshot() ?? "evaluation failed";
+        }
 
         var maxDescriptionLength = expectedBehavior.Max(x => x.Length);
         new Dictionary<string, object?>

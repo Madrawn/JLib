@@ -207,11 +207,12 @@ public static class ServiceCollectionHelper
         Func<TTvt, bool>? filter,
         Func<TTvt, bool>? forceReadOnly,
         Func<TTvt, ITypeValueType>[]? implementationTypeArgumentResolver,
-        IExceptionManager parentExceptionMgr)
+        IExceptionManager parentExceptionMgr,
+        ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TTvt : class, IDataObjectType
         where TImplementation : IDataProviderR<IEntity>
         => services.AddDataProvider<TTvt, TImplementation, IEntity>(typeCache, filter, forceReadOnly,
-            implementationTypeArgumentResolver, parentExceptionMgr);
+            implementationTypeArgumentResolver, parentExceptionMgr, lifetime);
     /// <summary>
     /// Provides the following services for each <typeparamref name="TTvt"/> under the stated conditions:
     /// <br/>new Services:
@@ -228,7 +229,8 @@ public static class ServiceCollectionHelper
     Func<TTvt, bool>? filter,
     Func<TTvt, bool>? forceReadOnly,
     Func<TTvt, ITypeValueType>[]? implementationTypeArgumentResolver,
-    IExceptionManager parentExceptionMgr)
+    IExceptionManager parentExceptionMgr,
+    ServiceLifetime lifetime = ServiceLifetime.Scoped)
     where TTvt : class, IDataObjectType
     where TImplementation : IDataProviderR<TIgnoredEntity>
     where TIgnoredEntity : IEntity
@@ -240,7 +242,7 @@ public static class ServiceCollectionHelper
         IExceptionManager exceptions = parentExceptionMgr?.CreateChild(msg) ?? new ExceptionManager(msg);
 
         services.AddGenericServices(typeCache, implementation, implementation,
-            ServiceLifetime.Scoped, exceptions, filter, implementationTypeArgumentResolver,
+            lifetime, exceptions, filter, implementationTypeArgumentResolver,
             implementationTypeArgumentResolver);
 
         #region read/write mode mismatch check
@@ -249,12 +251,21 @@ public static class ServiceCollectionHelper
         foreach (var repo in repos)
         {
             var repoIsReadOnly = repo.Value.ImplementsAny<IDataProviderRw<IEntity>>() is false;
-            if (repo.ProvidedDataObject is not TTvt tvt)
+            if (repo.ProvidedDataObject is not TTvt tvt || !filter(tvt))
                 continue;
             var readOnlyForced = forceReadOnly(tvt);
             var dataProviderIsReadOnly = !implementationCanWrite || readOnlyForced;
             var args = implementationTypeArgumentResolver?.Select(x => x(tvt)).ToArray() ?? new[] { tvt };
-            var impl = implementation.MakeGenericType(args);
+            Type impl;
+            try
+            {
+                impl = implementation.MakeGenericType(args);
+            }
+            // thrown, when the typeConstraints are violated. Doing this manually is not really a good idea
+            catch (Exception e) when (e.InnerException is ArgumentException { HResult: -2147024809 })
+            {
+                continue;
+            }
 
             if (dataProviderIsReadOnly == repoIsReadOnly)
                 continue;
@@ -273,7 +284,7 @@ public static class ServiceCollectionHelper
         #endregion
         foreach (var serviceType in new[] { typeof(IDataProviderR<>), typeof(IDataProviderRw<>), typeof(ISourceDataProviderR<>), typeof(ISourceDataProviderRw<>) })
             services.AddGenericAlias(typeCache, serviceType, implementation,
-                ServiceLifetime.Scoped, exceptions, FilterIt(implementation, serviceType, repos),
+                lifetime, exceptions, FilterIt(implementation, serviceType, repos),
                 null, implementationTypeArgumentResolver);
 
         return services;
@@ -308,7 +319,7 @@ public static class ServiceCollectionHelper
         var msg = $"{nameof(AddMockDataProvider)} failed for valueType {typeof(TTvt).Name}";
         IExceptionManager exceptions = parentExceptionMgr?.CreateChild(msg) ?? new ExceptionManager(msg);
 
-        services.AddDataProvider<TTvt, MockDataProvider<IEntity>>(typeCache, null, null, null, exceptions);
+        services.AddDataProvider<TTvt, MockDataProvider<IEntity>>(typeCache, null, null, null, exceptions, ServiceLifetime.Singleton);
 
         return services;
     }
@@ -335,7 +346,7 @@ public static class ServiceCollectionHelper
         => services.AddGenericAlias(typeCache, typeof(TAlias).TryGetGenericTypeDefinition(), typeof(TProvided), lifetime, parentExceptionMgr, filter,
             serviceTypeArgumentResolver, implementationTypeArgumentResolver);
     /// <summary>
-    /// adds a descriptor which provides <paramref name="aliasType"/> as <paramref name="providedType"/> for each instance of <typeparamref name="TTvt"/> which match the <paramref name="filter"/> using the <paramref name="serviceTypeArgumentResolver"/> and <paramref name="implementationTypeArgumentResolver"/> to get the type parameters
+    /// adds a descriptor which provides <paramref name="aliasType"/> as <paramref name="providedType"/> for each instance of <typeparamref name="TTvt"/> which match the <paramref name="filter"/> using the <paramref name="aliasTypeArgumentResolver"/> and <paramref name="providedTypeArgumentResolver"/> to get the type parameters
     /// <br/>rethrows parentExceptionMgr after execution as <see cref="JLibAggregateException"/> if no <paramref name="parentExceptionMgr"/> has been provided
     /// <br/>exceptions are added as child to the <see cref="parentExceptionMgr"/> or thrown as a <see cref="JLibAggregateException"/> when it was not provided
     /// </summary>
@@ -347,12 +358,12 @@ public static class ServiceCollectionHelper
         ServiceLifetime lifetime,
         IExceptionManager? parentExceptionMgr = null,
         Func<TTvt, bool>? filter = null,
-        Func<TTvt, ITypeValueType>[]? serviceTypeArgumentResolver = null,
-        Func<TTvt, ITypeValueType>[]? implementationTypeArgumentResolver = null)
+        Func<TTvt, ITypeValueType>[]? aliasTypeArgumentResolver = null,
+        Func<TTvt, ITypeValueType>[]? providedTypeArgumentResolver = null)
         where TTvt : class, ITypeValueType
     {
-        serviceTypeArgumentResolver ??= new Func<TTvt, ITypeValueType>[] { e => e };
-        implementationTypeArgumentResolver ??= new Func<TTvt, ITypeValueType>[] { e => e };
+        aliasTypeArgumentResolver ??= new Func<TTvt, ITypeValueType>[] { e => e };
+        providedTypeArgumentResolver ??= new Func<TTvt, ITypeValueType>[] { e => e };
         filter ??= _ => true;
 
         var alias = aliasType.GetGenericTypeDefinition();
@@ -367,17 +378,21 @@ public static class ServiceCollectionHelper
 
         foreach (var valueType in typeCache.All(filter))
         {
-            exceptions.TryExecution(() =>
+            try
             {
-                var explicitAlias = GetGenericService(alias, valueType, implementationTypeArgumentResolver);
-                var explicitService = GetGenericService(provided, valueType, serviceTypeArgumentResolver);
+                var explicitAlias = GetGenericService(alias, valueType, aliasTypeArgumentResolver);
+                var explicitService = GetGenericService(provided, valueType, providedTypeArgumentResolver);
 
                 services.Add(new(explicitAlias, provider => provider.GetRequiredService(explicitService), lifetime));
 
                 Log.ForContext(typeof(ServiceCollectionHelper)).Verbose(
                     "    {valueType,-25}: {alias,-65} as {service,-20}",
                     valueType.Name, explicitAlias.FullClassName(), explicitService.FullClassName());
-            });
+            }
+            catch (Exception e)
+            {
+                exceptions.Add(e);
+            }
         }
 
         if (parentExceptionMgr is null)

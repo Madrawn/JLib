@@ -50,7 +50,7 @@ public static class EnumerableHelper
             return s.ServiceProvider;
         });
         var res = services.ToLookup(
-                x => x.ServiceType.GenericTypeArguments.FirstOrDefault()?.FullClassName(true)
+                x => x.ServiceType.GenericTypeArguments.LastOrDefault()?.FullClassName(true)
                      ?? "non-generic",
                 serviceDescriptor =>
                 {
@@ -73,13 +73,16 @@ public static class EnumerableHelper
                         ServiceArguments = GetTypeArgs(serviceDescriptor.ServiceType),
                         ImplementationType = implementation?.TryGetGenericTypeDefinition().FullClassName(true),
                         ImplementationTypeArguments = GetTypeArgs(implementation),
-                    } as object;
+                    };
 
                     static string[] GetTypeArgs(Type? t)
                         => t?.GenericTypeArguments.Select(t => t.FullClassName(true)).ToArray() ??
                            Array.Empty<string>();
                 })
-            .ToDictionary(x => x.Key);
+            .ToDictionary(x => x.Key, descriptorInfos
+                => descriptorInfos
+                    .ToLookup(service => service.ServiceType)
+                    .ToDictionary(serviceImplementations => serviceImplementations.Key));
         disposables.ForEach(d => d.Dispose());
         return res;
     }
@@ -92,19 +95,19 @@ public static class EnumerableHelper
             JLibAggregateException jLibAggregateException => new
             {
                 Type = exception.GetType().FullClassName(true),
-                Message = jLibAggregateException.UserMessage,
+                Message = jLibAggregateException.UserMessage.Split(Environment.NewLine),
                 InnerExceptions = jLibAggregateException.InnerExceptions.Select(PrepareSnapshot)
             },
             AggregateException aggregateException => new
             {
                 Type = exception.GetType().FullClassName(true),
-                aggregateException.Message,
+                Message = aggregateException.Message.Split(Environment.NewLine),
                 InnerExceptions = aggregateException.InnerExceptions.Select(PrepareSnapshot)
             },
             _ => new
             {
                 Type = exception.GetType().FullClassName(true),
-                exception.Message,
+                message = exception.Message.Split(Environment.NewLine),
             }
         };
     }

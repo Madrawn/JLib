@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Runtime.InteropServices;
 using JLib.Data;
 using JLib.Helper;
 using JLib.Testing;
@@ -150,6 +151,39 @@ public class AddDataProviderTests : ReflectionTestBase
                     cache, tvt=>tvt.Value == typeof(TestCommandEntity2), null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
         ),
         #endregion
+        #region Repository: None       DataProvider: ReadOnly           NoRepo_ProvR_FilteredInv
+        new (
+            "NoRepo_ProvR_FilteredInv",
+            new[]
+            {
+                "Provided:",
+                "  DataProvider         : Read Only",
+                "  Repository           : -",
+                "  Filter               : only Ce2",
+                "Expected Implementations:",
+                $"  {nameof(TestCommandEntity)}",
+                "  IDataProviderR       : -",
+                "  IDataProviderRw      : -",
+                "  ISourceDataProviderR : -",
+                "  ISourceDataProviderRw: -",
+                $"  {nameof(TestCommandEntity2)}",
+                "  IDataProviderR       : DataProvider",
+                "  IDataProviderRw      : -",
+                "  ISourceDataProviderR : DataProvider",
+                "  ISourceDataProviderRw: -",
+            },
+            new[]
+            {
+                typeof(TestCommandEntity),
+                typeof(TestCommandEntity2),
+                typeof(TestRepositoryRw),
+                typeof(TestDataProviderR<>)
+            },
+            (services,cache,exceptions)=>
+                services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>>(
+                    cache, tvt=>tvt.Value == typeof(TestCommandEntity2), null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
+        ),
+        #endregion
         #region Repository: None       DataProvider: ReadOnly           NoRepo_ProvR_2Ce
         new (
             "NoRepo_ProvR_2Ce",
@@ -179,6 +213,44 @@ public class AddDataProviderTests : ReflectionTestBase
             (services,cache,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>>(
                     cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
+        ),
+        #endregion
+        #region Repository: None       DataProvider: ReadOnly           NoRepo_Prov`2_Ce2
+        new (
+            "NoRepo_Prov`2_Ce2",
+            new[]
+            {
+                "Provided:",
+                "  DataProvider           : Read Only",
+                "  Repository             : -",
+                "Expected Implementations:",
+                $"  {nameof(TestCommandEntity)}",
+                "    IDataProviderR       : -",
+                "    IDataProviderRw      : -",
+                "    ISourceDataProviderR : -",
+                "    ISourceDataProviderRw: -",
+                $"  {nameof(TestCommandEntity2)}",
+                "    DataProvider         : DataProvider<Ce,Ce2>",
+                "    IDataProviderR       : DataProvider",
+                "    IDataProviderRw      : -",
+                "    ISourceDataProviderR : DataProvider",
+                "    ISourceDataProviderRw: -",
+            },
+            new[]
+            {
+                typeof(TestCommandEntity),
+                typeof(TestCommandEntity2),
+                typeof(TestDataProviderR<,>)
+            },
+            (services,cache,exceptions)=>
+                services.AddDataProvider<CommandEntityType, TestDataProviderR<ITestEntity1,ITestEntity2>, ITestEntity2>(
+                    cache, ce=>ce.Value == typeof(TestCommandEntity), null,
+                    new Func<CommandEntityType,ITypeValueType>[]
+                    {
+                        ce=>ce,
+                        _=>cache.Get<CommandEntityType>(typeof(TestCommandEntity2)),
+                    },
+                    exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
         ),
         #endregion
         #region Repository: None       DataProvider: Ce R, Ce2 Rw       NoRepo_ProvCeR_provCe2Rw
@@ -488,14 +560,16 @@ public class AddDataProviderTests : ReflectionTestBase
 
     #region test classes
     #region entities
-    public class TestCommandEntity : ICommandEntity
+    public class TestCommandEntity : ITestEntity1
     {
         public Guid Id { get; } = Guid.NewGuid();
     }
-    public class TestCommandEntity2 : ICommandEntity
+    public class TestCommandEntity2 : ITestEntity2
     {
         public Guid Id { get; } = Guid.NewGuid();
     }
+    public interface ITestEntity1 : ICommandEntity { }
+    public interface ITestEntity2 : ICommandEntity { }
     #endregion
     #region repositories
 
@@ -571,6 +645,12 @@ public class AddDataProviderTests : ReflectionTestBase
         public void Remove(Guid itemId) => throw new NotImplementedException();
 
         public void Remove(IEnumerable<Guid> itemIds) => throw new NotImplementedException();
+    }
+    public class TestDataProviderR<T1, T2> : ISourceDataProviderR<T2>
+        where T1 : ITestEntity1
+        where T2 : ITestEntity2
+    {
+        public IQueryable<T2> Get() => throw new NotImplementedException();
     }
     public class TestDataProviderR<T> : ISourceDataProviderR<T> where T : IEntity
     {
