@@ -29,10 +29,4 @@
     <ProjectReference Include="..\JLib.Testing\JLib.Testing.csproj" />
     <ProjectReference Include="..\JLib\JLib.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="__snapshots__\" />
-    <Folder Include="__snapshots__\__mismatch__\" />
-  </ItemGroup>
-
 </Project>

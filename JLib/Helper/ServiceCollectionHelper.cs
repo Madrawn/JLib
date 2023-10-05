@@ -185,8 +185,14 @@ public static class ServiceCollectionHelper
         return services;
     }
     /// <summary>
-    /// Provides a <see cref="IDataProviderR{TData}"/> for each <typeparamref name="TTvt"/> which takes data from a <see cref="IDataProviderR{TData}"/> of the type retrieved by <see cref="sourcePropertyReader"/> and maps it using AutoMapper Projections
-    /// <br/>exceptions are added as child to the <see cref="parentExceptionMgr"/> or thrown as a <see cref="JLibAggregateException"/> when it was not provided
+    /// Provides the following services for each <typeparamref name="TTvt"/> under the stated conditions:
+    /// <br/>new Services:
+    /// <br/>ㅤAlways - <typeparamref name="TImplementation"/> as using <paramref name="implementationTypeArgumentResolver"/> to resolve the type arguments
+    /// <br/>Alias for <typeparamref name="TImplementation"/>
+    /// <br/>ㅤAlways - <see cref="ISourceDataProviderR{TData}"/> as Alias 
+    /// <br/>ㅤ<typeparamref name="TImplementation"/> implements <see cref="ISourceDataProviderRw{TData}"/> - <see cref="ISourceDataProviderRw{TData}"/>
+    /// <br/>ㅤno <see cref="RepositoryType"/> for the given <typeparamref name="TTvt"/> - <see cref="IDataProviderR{TData}"/>
+    /// <br/>ㅤno <see cref="RepositoryType"/> for the given <typeparamref name="TTvt"/> and <typeparamref name="TImplementation"/> implements <see cref="IDataProviderRw{TData}"/> - <see cref="IDataProviderRw{TData}"/>
     /// </summary>
     public static IServiceCollection AddDataProvider<TTvt, TImplementation>(
     this IServiceCollection services,
@@ -208,7 +214,8 @@ public static class ServiceCollectionHelper
             ServiceLifetime.Scoped, exceptions, filter, implementationTypeArgumentResolver,
             implementationTypeArgumentResolver);
 
-        var repos = typeCache.All<RepositoryType>().ToArray();
+        #region read/write mode mismatch check
+        var repos = typeCache.All<RepositoryType>(repo => repo.ProvidedDataObject is TTvt).ToArray();
         var implementationCanWrite = implementation.ImplementsAny<IDataProviderRw<IEntity>>();
         foreach (var repo in repos)
         {
@@ -234,24 +241,17 @@ public static class ServiceCollectionHelper
                     $"Force the dataProvider to be ReadOnly or Implement {nameof(IDataProviderRw<IEntity>)} with the repository.";
             exceptions.Add(new InvalidSetupException(errorText));
         }
-
-        services.AddGenericAlias(typeCache, typeof(IDataProviderR<>), implementation,
-            ServiceLifetime.Scoped, exceptions, FilterIt(implementation, typeof(IDataProviderR<>), repos),
-            null, implementationTypeArgumentResolver);
-        services.AddGenericAlias(typeCache, typeof(IDataProviderRw<>), implementation,
-            ServiceLifetime.Scoped, exceptions, FilterIt(implementation, typeof(IDataProviderRw<>), repos),
-            null, implementationTypeArgumentResolver);
-        services.AddGenericAlias(typeCache, typeof(ISourceDataProviderR<>), implementation,
-            ServiceLifetime.Scoped, exceptions, FilterIt(implementation, typeof(ISourceDataProviderR<>), repos),
-            null, implementationTypeArgumentResolver);
-        services.AddGenericAlias(typeCache, typeof(ISourceDataProviderRw<>), implementation,
-            ServiceLifetime.Scoped, exceptions, FilterIt(implementation, typeof(ISourceDataProviderRw<>), repos),
-            null, implementationTypeArgumentResolver);
+        #endregion
+        foreach (var serviceType in new[] { typeof(IDataProviderR<>), typeof(IDataProviderRw<>), typeof(ISourceDataProviderR<>), typeof(ISourceDataProviderRw<>) })
+            services.AddGenericAlias(typeCache, serviceType, implementation,
+                ServiceLifetime.Scoped, exceptions, FilterIt(implementation, serviceType, repos),
+                null, implementationTypeArgumentResolver);
 
         return services;
+        // Warning: thw following code governs the entire behavior for which service alias is provided when. All Updates which modify the current behavior are breaking changes.
+        // run the TypeCacheTests before pushing any changes
         Func<TTvt, bool> FilterIt(Type myImplementation, Type serviceType, RepositoryType[] repositories)
-        {
-            return tvt =>
+            => tvt =>
             {
                 var filterResult = filter!.Invoke(tvt);
                 var interfaceImplemented = myImplementation.ImplementsAny(serviceType);
@@ -259,8 +259,8 @@ public static class ServiceCollectionHelper
                 var excludeRepos = serviceType.ImplementsAny<ISourceDataProviderR<IDataObject>>() || repositories.None(repo => repo.ProvidedDataObject as IDataObjectType == tvt);
                 return filterResult && interfaceImplemented && excludeWritable && excludeRepos;
             };
-        }
     }
+
     /// <summary>
     /// adds a <see cref="IDataProviderR{TData}"/> and <see cref="IDataProviderRw{TData}"/> with the <see cref="MockDataProvider{TEntity}"/> as implementation for each <typeparamref name="TTvt"/> as scoped
     /// <br/>exceptions are added as child to the <see cref="parentExceptionMgr"/> or thrown as a <see cref="JLibAggregateException"/> when it was not provided
