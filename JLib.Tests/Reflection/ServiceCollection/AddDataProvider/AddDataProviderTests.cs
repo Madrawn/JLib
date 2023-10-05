@@ -1,27 +1,15 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Metadata;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using FluentAssertions;
-using FluentAssertions.Common;
+﻿using System.Collections;
 using JLib.Data;
 using JLib.Helper;
 using JLib.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using Serilog.Core;
 using Snapshooter;
 using Snapshooter.Xunit;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 using ServiceCollectionHelper = JLib.Helper.ServiceCollectionHelper;
 
-namespace JLib.Tests;
+namespace JLib.Tests.Reflection.ServiceCollection.AddDataProvider;
 
 public class AddDataProviderTests
 {
@@ -390,7 +378,7 @@ public class AddDataProviderTests
 
     private void Setup(out IServiceCollection services, out ITypeCache cache, Type[] types)
     {
-        services = new ServiceCollection()
+        services = new Microsoft.Extensions.DependencyInjection.ServiceCollection()
             .AddTypeCache(
                 new[]
                 {
