@@ -54,7 +54,11 @@ public abstract class ReflectionTestArguments : IEnumerable<object[]>
             //adding the first 2 tests to make sure that even if the test have been filtered, at least one test fails when a filter is applied
             // this guarantees that no tests are skipped unintentionally in the test pipeline
             .Where((parameters, i) 
-                => !(bool)parameters[1] || ListSkippedTests || i == 0 || i == 1)
+                => !(bool)parameters[1] || ListSkippedTests
+#if RELEASE
+                                        || i == 0 || i == 1
+#endif
+            )
             .GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator()

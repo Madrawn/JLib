@@ -129,18 +129,19 @@ public static class TypeHelper
 
     /// <summary>
     /// applies the given type parameters if they are applicable for the type
-    /// if the type is not generic, the type is returned
-    /// id the type arguments do not match but the type is generic, an exception will be thrown
+    /// <br/>if the type is not generic, the type is returned
+    /// <br/>if the type arguments do not match but the type is generic, an exception will be thrown
+    /// <br/>if the type is generic but the arguments are already filled, the arguments will be replaced
     /// </summary>
-    /// <param name="type"></param>
-    /// <param name="genericParams"></param>
-    /// <returns></returns>
     public static Type TryMakeGenericType(this Type type, params Type[] genericParams)
-        => type.IsGenericTypeDefinition
+    {
+        type = type.TryGetGenericTypeDefinition();
+        return type.IsGenericTypeDefinition
             ? type.GenericTypeArguments.SequenceEqual(genericParams)
                 ? type.MakeGenericType(genericParams)
                 : throw new InvalidOperationException("the type arguments do not match")
             : type;
+    }
 
     public static Type MakeGenericType(this Type type, params ITypeValueType[] genericParams)
     {
@@ -151,7 +152,7 @@ public static class TypeHelper
         }
         catch (Exception e)
         {
-            throw new InvalidOperationException($"adding <{string.Join(", ", typeArguments.Select(x => x.FullClassName()))}> as typeArguments to type {type.Name} failed: {Environment.NewLine + e.Message}", e);
+            throw new InvalidOperationException($"adding <{string.Join(", ", typeArguments.Select(x => x.FullClassName(true)))}> as typeArguments to type {type.FullClassName(true)} failed: {Environment.NewLine + e.Message}", e);
         }
     }
 
