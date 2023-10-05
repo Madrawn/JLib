@@ -26,7 +26,7 @@
       "JLib.SourceDataProviderType": [
         "JLib.Tests.TestDataProviderRw<>"
       ],
-      "JLib.RepositoryDataProviderType": [
+      "JLib.RepositoryType": [
         "JLib.Tests.TestRepositoryRw"
       ]
     }
@@ -53,20 +53,28 @@
     "JLib.Tests.TestCommandEntity": [
       {
         "Lifetime": "Scoped",
-        "ImplementationSource": "Type",
-        "ServiceType": "JLib.Tests.TestDataProviderRw<>",
+        "ImplementationSource": "Factory",
+        "ServiceType": "JLib.Data.IDataProviderR<>",
         "ServiceArguments": [
           "JLib.Tests.TestCommandEntity"
         ],
-        "ImplementationType": "JLib.Tests.TestDataProviderRw<>",
-        "ImplementationTypeArguments": [
-          "JLib.Tests.TestCommandEntity"
-        ]
+        "ImplementationType": "JLib.Tests.TestRepositoryRw",
+        "ImplementationTypeArguments": []
       },
       {
         "Lifetime": "Scoped",
         "ImplementationSource": "Factory",
-        "ServiceType": "JLib.Data.ISourceDataProviderRw<>",
+        "ServiceType": "JLib.Data.IDataProviderRw<>",
+        "ServiceArguments": [
+          "JLib.Tests.TestCommandEntity"
+        ],
+        "ImplementationType": "JLib.Tests.TestRepositoryRw",
+        "ImplementationTypeArguments": []
+      },
+      {
+        "Lifetime": "Scoped",
+        "ImplementationSource": "Type",
+        "ServiceType": "JLib.Tests.TestDataProviderRw<>",
         "ServiceArguments": [
           "JLib.Tests.TestCommandEntity"
         ],
@@ -90,22 +98,14 @@
       {
         "Lifetime": "Scoped",
         "ImplementationSource": "Factory",
-        "ServiceType": "JLib.Data.IDataProviderRw<>",
+        "ServiceType": "JLib.Data.ISourceDataProviderRw<>",
         "ServiceArguments": [
           "JLib.Tests.TestCommandEntity"
         ],
-        "ImplementationType": "JLib.Tests.TestRepositoryRw",
-        "ImplementationTypeArguments": []
-      },
-      {
-        "Lifetime": "Scoped",
-        "ImplementationSource": "Factory",
-        "ServiceType": "JLib.Data.IDataProviderR<>",
-        "ServiceArguments": [
+        "ImplementationType": "JLib.Tests.TestDataProviderRw<>",
+        "ImplementationTypeArguments": [
           "JLib.Tests.TestCommandEntity"
-        ],
-        "ImplementationType": "JLib.Tests.TestRepositoryRw",
-        "ImplementationTypeArguments": []
+        ]
       }
     ]
   }

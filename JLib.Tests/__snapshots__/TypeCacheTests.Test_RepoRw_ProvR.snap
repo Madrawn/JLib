@@ -15,7 +15,32 @@
     ]
   },
   "exception": {
-      "Message": "Something"
+    "Type": "JLib.Exceptions.JLibAggregateException",
+    "Message": "TypeCacheTests",
+    "InnerExceptions": [
+      {
+        "Type": "JLib.Exceptions.JLibAggregateException",
+        "Message": "Service Factory",
+        "InnerExceptions": [
+          {
+            "Type": "JLib.Exceptions.JLibAggregateException",
+            "Message": "AddDataProvider",
+            "InnerExceptions": [
+              {
+                "Type": "JLib.Exceptions.JLibAggregateException",
+                "Message": "AddMapDataProvider failed for valueType CommandEntityType",
+                "InnerExceptions": [
+                  {
+                    "Type": "JLib.Exceptions.InvalidSetupException",
+                    "Message": "The data provider Implementation JLib.Tests.TestDataProviderR<JLib.Tests.TestCommandEntity> is read only but the Repository JLib.Tests.TestRepositoryRw can write data. \nYou can resolve this issue by not implementing IDataProviderRw with the Repository or using a data provider which implements ISourceDataProviderRw"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "cache": "disabled",
   "services": "disabled"

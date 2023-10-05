@@ -56,15 +56,8 @@ public abstract class TvtFactoryAttributes
         }
 
         public Type AttributeType { get; }
-        public bool Filter(Type type) 
-            => type.HasCustomAttribute(AttributeType);
-    }
-
-    [AttributeUsage(AttributeTargets.Class)]
-    public class IsNotAbstract : Attribute, ITypeValueTypeFilterAttribute
-    {
         public bool Filter(Type type)
-            => !type.IsAbstract;
+            => type.HasCustomAttribute(AttributeType);
     }
 
     [AttributeUsage(AttributeTargets.Class)]
@@ -72,6 +65,18 @@ public abstract class TvtFactoryAttributes
     {
         public bool Filter(Type type)
             => !type.IsAbstract;
+    }
+    [AttributeUsage(AttributeTargets.Class)]
+    public class BeGeneric : Attribute, ITypeValueTypeFilterAttribute
+    {
+        public bool Filter(Type type)
+            => type.IsGenericType;
+    }
+    [AttributeUsage(AttributeTargets.Class)]
+    public class NotBeGeneric : Attribute, ITypeValueTypeFilterAttribute
+    {
+        public bool Filter(Type type)
+            => !type.IsGenericType;
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]

@@ -31,7 +31,7 @@
                 "InnerExceptions": [
                   {
                     "Type": "JLib.Exceptions.InvalidTypeException",
-                    "Message": "Error while initializing RepositoryDataProviderType with JLib.Tests.TestInvalidDataProviderRw<>: Must not be Generic\n\nif you tried to build a generic data provider, you have to implement ISourceDataProviderR or ISourceDataProviderRw\nIf you tried to build a Repository, you have to implement IDataProviderR or IDataProviderRw"
+                    "Message": "Error while initializing SourceDataProviderType with JLib.Tests.TestInvalidDataProviderRw<>: Should implement JLib.Data.ISourceDataProviderRw<>"
                   }
                 ]
               }

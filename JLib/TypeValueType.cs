@@ -22,8 +22,8 @@ public interface IValidatedType : ITypeValueType
 {
     void Validate(ITypeCache cache, TvtValidator value);
 }
-
-public interface IMappedDataObjectType : ITypeValueType
+public interface IDataObjectType : ITypeValueType { }
+public interface IMappedDataObjectType : IDataObjectType
 {
     EntityType SourceEntity { get; }
     PropertyPrefix? PropertyPrefix { get; }

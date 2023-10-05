@@ -54,19 +54,7 @@
       {
         "Lifetime": "Scoped",
         "ImplementationSource": "Factory",
-        "ServiceType": "JLib.Data.ISourceDataProviderRw<>",
-        "ServiceArguments": [
-          "JLib.Tests.TestCommandEntity"
-        ],
-        "ImplementationType": "JLib.Tests.TestDataProviderRw<>",
-        "ImplementationTypeArguments": [
-          "JLib.Tests.TestCommandEntity"
-        ]
-      },
-      {
-        "Lifetime": "Scoped",
-        "ImplementationSource": "Factory",
-        "ServiceType": "JLib.Data.ISourceDataProviderR<>",
+        "ServiceType": "JLib.Data.IDataProviderR<>",
         "ServiceArguments": [
           "JLib.Tests.TestCommandEntity"
         ],
@@ -90,7 +78,19 @@
       {
         "Lifetime": "Scoped",
         "ImplementationSource": "Factory",
-        "ServiceType": "JLib.Data.IDataProviderR<>",
+        "ServiceType": "JLib.Data.ISourceDataProviderR<>",
+        "ServiceArguments": [
+          "JLib.Tests.TestCommandEntity"
+        ],
+        "ImplementationType": "JLib.Tests.TestDataProviderRw<>",
+        "ImplementationTypeArguments": [
+          "JLib.Tests.TestCommandEntity"
+        ]
+      },
+      {
+        "Lifetime": "Scoped",
+        "ImplementationSource": "Factory",
+        "ServiceType": "JLib.Data.ISourceDataProviderRw<>",
         "ServiceArguments": [
           "JLib.Tests.TestCommandEntity"
         ],

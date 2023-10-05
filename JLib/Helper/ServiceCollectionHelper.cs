@@ -6,6 +6,7 @@ using JLib.Data;
 using JLib.Exceptions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Serilog;
 namespace JLib.Helper;
@@ -117,7 +118,7 @@ public static class ServiceCollectionHelper
     Func<TTvt, ITypeValueType?> sourcePropertyReader,
     Func<TTvt, bool>? isReadOnly = null,
     IExceptionManager? parentExceptionMgr = null)
-    where TTvt : class, ITypeValueType
+    where TTvt : class, IDataObjectType
     {
         filter ??= _ => true;
         isReadOnly ??= e => !e.Value.Implements<IEntity>() && e.Value.Implements<IDataObject>();
@@ -148,14 +149,41 @@ public static class ServiceCollectionHelper
         );
         return services;
     }
-
-    private static readonly Type[] DataProviderInterfaces = new[]
+    /// <summary>
+    /// adds all repositories to the service provider
+    /// </summary>
+    public static IServiceCollection AddRepositories(
+        this IServiceCollection services, ITypeCache typeCache, IExceptionManager exceptions)
     {
-        typeof(ISourceDataProviderRw<>),
-        typeof(ISourceDataProviderR<>),
-        typeof(IDataProviderRw<>),
-        typeof(IDataProviderR<>)
-    };
+        // making sure that no two repos are provided for the same DataObject
+        var groupedRepos = typeCache.All<RepositoryType>()
+            .GroupBy(x => x.ProvidedDataObject)
+            .ToDictionary(x => x.Key, x => x.AsEnumerable());
+
+        var invalidRepos = groupedRepos
+            .Where(x => x.Value.Count() > 1)
+            .Select(group => new InvalidSetupException(
+                $"multiple repos have been provided for data object {group.Key.Value.FullClassName(true)}: {string.Join(", ", group.Value.Select(repo => repo.Value.FullClassName(true)))}"))
+            .ToArray();
+
+        if (invalidRepos.Any())
+        {
+            exceptions.CreateChild(nameof(AddRepositories)).Add(invalidRepos);
+            return services;
+        }
+
+        foreach (var repo in groupedRepos.Select(x => x.Value.Single()))
+        {
+            services.AddScoped(repo.Value);
+            services.AddAlias(repo.Value, typeof(IDataProviderR<>).MakeGenericType(repo.ProvidedDataObject.Value),
+                ServiceLifetime.Scoped);
+
+            if (repo.CanWrite)
+                services.AddAlias(repo.Value, typeof(IDataProviderRw<>).MakeGenericType(repo.ProvidedDataObject.Value),
+                    ServiceLifetime.Scoped);
+        }
+        return services;
+    }
     /// <summary>
     /// Provides a <see cref="IDataProviderR{TData}"/> for each <typeparamref name="TTvt"/> which takes data from a <see cref="IDataProviderR{TData}"/> of the type retrieved by <see cref="sourcePropertyReader"/> and maps it using AutoMapper Projections
     /// <br/>exceptions are added as child to the <see cref="parentExceptionMgr"/> or thrown as a <see cref="JLibAggregateException"/> when it was not provided
@@ -167,12 +195,12 @@ public static class ServiceCollectionHelper
     Func<TTvt, bool>? forceReadOnly,
     Func<TTvt, ITypeValueType>[]? implementationTypeArgumentResolver,
     IExceptionManager parentExceptionMgr)
-    where TTvt : class, ITypeValueType
+    where TTvt : class, IDataObjectType
     where TImplementation : IDataProviderR<IEntity>
     {
         filter ??= _ => true;
         forceReadOnly ??= _ => false;
-        var implementation = typeof(TImplementation);
+        var implementation = typeof(TImplementation).TryGetGenericTypeDefinition();
         var msg = $"{nameof(AddMapDataProvider)} failed for valueType {typeof(TTvt).Name}";
         IExceptionManager exceptions = parentExceptionMgr?.CreateChild(msg) ?? new ExceptionManager(msg);
 
@@ -180,21 +208,56 @@ public static class ServiceCollectionHelper
             ServiceLifetime.Scoped, exceptions, filter, implementationTypeArgumentResolver,
             implementationTypeArgumentResolver);
 
-        foreach (var serviceType in DataProviderInterfaces)
+        var repos = typeCache.All<RepositoryType>().ToArray();
+        var implementationCanWrite = implementation.ImplementsAny<IDataProviderRw<IEntity>>();
+        foreach (var repo in repos)
         {
-            services.AddGenericAlias(typeCache, serviceType, implementation,
-                ServiceLifetime.Scoped, exceptions, FilterIt(implementation, serviceType),
-                null, implementationTypeArgumentResolver);
+            var repoIsReadOnly = repo.Value.ImplementsAny<IDataProviderRw<IEntity>>() is false;
+            if (repo.ProvidedDataObject is not TTvt tvt)
+                continue;
+            var readOnlyForced = forceReadOnly(tvt);
+            var dataProviderIsReadOnly = !implementationCanWrite || readOnlyForced;
+            var args = implementationTypeArgumentResolver?.Select(x => x(tvt)).ToArray() ?? new[] { tvt };
+            var impl = implementation.MakeGenericType(args);
+
+            if (dataProviderIsReadOnly == repoIsReadOnly)
+                continue;
+
+            string errorText =
+                dataProviderIsReadOnly
+                ? readOnlyForced
+                    ? $"The data provider Implementation {impl.FullClassName(true)} is forced read only but the Repository {repo.Value.FullClassName(true)} can write data. {Environment.NewLine}" +
+                        $"Not forcing the DataProvider to be read only or implementing {nameof(IDataProviderRw<IEntity>)} will solve this issue"
+                    : $"The data provider Implementation {impl.FullClassName(true)} is read only but the Repository {repo.Value.FullClassName(true)} can write data. {Environment.NewLine}" +
+                        $"You can resolve this issue by not implementing {nameof(IDataProviderRw<IEntity>)} with the Repository or using a data provider which implements {nameof(ISourceDataProviderRw<IEntity>)}"
+                : $"The data provider Implementation {impl.FullClassName(true)} can write data but the Repository {repo.Value.FullClassName(true)} can not. {Environment.NewLine}" +
+                    $"Force the dataProvider to be ReadOnly or Implement {nameof(IDataProviderRw<IEntity>)} with the repository.";
+            exceptions.Add(new InvalidSetupException(errorText));
         }
+
+        services.AddGenericAlias(typeCache, typeof(IDataProviderR<>), implementation,
+            ServiceLifetime.Scoped, exceptions, FilterIt(implementation, typeof(IDataProviderR<>), repos),
+            null, implementationTypeArgumentResolver);
+        services.AddGenericAlias(typeCache, typeof(IDataProviderRw<>), implementation,
+            ServiceLifetime.Scoped, exceptions, FilterIt(implementation, typeof(IDataProviderRw<>), repos),
+            null, implementationTypeArgumentResolver);
+        services.AddGenericAlias(typeCache, typeof(ISourceDataProviderR<>), implementation,
+            ServiceLifetime.Scoped, exceptions, FilterIt(implementation, typeof(ISourceDataProviderR<>), repos),
+            null, implementationTypeArgumentResolver);
+        services.AddGenericAlias(typeCache, typeof(ISourceDataProviderRw<>), implementation,
+            ServiceLifetime.Scoped, exceptions, FilterIt(implementation, typeof(ISourceDataProviderRw<>), repos),
+            null, implementationTypeArgumentResolver);
+
         return services;
-        Func<TTvt, bool> FilterIt(Type myImplementation, Type serviceType)
+        Func<TTvt, bool> FilterIt(Type myImplementation, Type serviceType, RepositoryType[] repositories)
         {
             return tvt =>
             {
                 var filterResult = filter!.Invoke(tvt);
                 var interfaceImplemented = myImplementation.ImplementsAny(serviceType);
                 var excludeWritable = !(serviceType.ImplementsAny<IDataProviderRw<IEntity>>() && forceReadOnly(tvt));
-                return filterResult && interfaceImplemented && excludeWritable;
+                var excludeRepos = serviceType.ImplementsAny<ISourceDataProviderR<IDataObject>>() || repositories.None(repo => repo.ProvidedDataObject as IDataObjectType == tvt);
+                return filterResult && interfaceImplemented && excludeWritable && excludeRepos;
             };
         }
     }
@@ -206,14 +269,14 @@ public static class ServiceCollectionHelper
         this IServiceCollection services,
         ITypeCache typeCache,
         IExceptionManager parentExceptionMgr)
-        where TTvt : TypeValueType
+        where TTvt : class, IDataObjectType
     {
         Log.ForContext(typeof(ServiceCollectionHelper)).ForContext(typeof(ServiceCollectionHelper)).Warning("Providing MockDataProvider");
         var msg = $"{nameof(AddMockDataProvider)} failed for valueType {typeof(TTvt).Name}";
         IExceptionManager exceptions = parentExceptionMgr?.CreateChild(msg) ?? new ExceptionManager(msg);
 
         services.AddDataProvider<TTvt, MockDataProvider<IEntity>>(typeCache, null, null, null, exceptions);
-        
+
         return services;
     }
 

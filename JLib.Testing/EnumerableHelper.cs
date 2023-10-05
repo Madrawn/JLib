@@ -17,9 +17,9 @@ public static class EnumerableHelper
     /// <br/>used to call <see cref="SnapshotExtension.MatchSnapshot(object,Func{MatchOptions,MatchOptions})"/> afterwards (prevents having to provide a <see cref="SnapshotNameExtension"/>)
     /// </summary>
     public static object PrepareSnapshot(this IEnumerable<ITypeValueType> source)
-        => source.GroupBy(tvt => tvt.Value.Namespace ?? "")
+        => source.ToLookup(tvt => tvt.Value.Namespace ?? "")
             .ToDictionary(tvtGroup1 => tvtGroup1.Key, tvt => tvt
-                .GroupBy(tvt1 => tvt1.GetType().FullClassName(true))
+                .ToLookup(tvt1 => tvt1.GetType().FullClassName(true))
                 .ToDictionary(
                     tvtGroup2 => tvtGroup2.Key,
                     tvtGroup2 => tvtGroup2.Select(tvt2 => tvt2.Value.FullClassName(true))
@@ -49,7 +49,7 @@ public static class EnumerableHelper
             disposables.Add(s);
             return s.ServiceProvider;
         });
-        var res = services.GroupBy(
+        var res = services.ToLookup(
                 x => x.ServiceType.GenericTypeArguments.FirstOrDefault()?.FullClassName(true)
                      ?? "non-generic",
                 serviceDescriptor =>

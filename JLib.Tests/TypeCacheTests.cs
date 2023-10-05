@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -24,9 +25,13 @@ namespace JLib.Tests;
 
 public class TypeCacheTests
 {
+    private readonly ITestOutputHelper _testOutput;
+    public const string Filter = "";
+    public const bool ApplyTestFilter = true;
+
     internal static object[][] Tests = new List<TestOptions>
     {
-        #region Repository: None       DataProvider: ReadOnly
+        #region Repository: None       DataProvider: ReadOnly           NoRepo_ProvR
         new(
             "NoRepo_ProvR",
             new []
@@ -50,7 +55,7 @@ public class TypeCacheTests
                     cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
             ),
         #endregion
-        #region Repository: None       DataProvider: ReadWrite
+        #region Repository: None       DataProvider: ReadWrite          NoRepo_ProvRw
         new (
             "NoRepo_ProvRw",
             new []
@@ -74,7 +79,7 @@ public class TypeCacheTests
                     cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
         ),
         #endregion
-        #region Repository: None       DataProvider: Forced ReadOnly
+        #region Repository: None       DataProvider: Forced ReadOnly    NoRepo_ProvFr
         new
         (
             "NoRepo_ProvFr",
@@ -98,7 +103,7 @@ public class TypeCacheTests
                     cache, null, _=>true, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
         ),
         #endregion
-        #region Repository: ReadOnly   DataProvider: ReadOnly
+        #region Repository: ReadOnly   DataProvider: ReadOnly           RepoR_ProvR
         new (
             "RepoR_ProvR",
             new[]
@@ -123,7 +128,7 @@ public class TypeCacheTests
                     cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
         ),
         #endregion
-        #region Repository: ReadOnly   DataProvider: ReadWrite
+        #region Repository: ReadOnly   DataProvider: ReadWrite          RepoR_ProvRw
         new
         (
             "RepoR_ProvRw",
@@ -147,7 +152,7 @@ public class TypeCacheTests
             true,false,false
         ),
         #endregion
-        #region Repository: ReadOnly   DataProvider: Forced ReadOnly
+        #region Repository: ReadOnly   DataProvider: Forced ReadOnly    RepoR_ProvFr
         new
         (
             "RepoR_ProvFr",
@@ -172,7 +177,7 @@ public class TypeCacheTests
                     cache, null, _=>true, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
         ),
         #endregion
-        #region Repository: ReadWrite  DataProvider: ReadOnly
+        #region Repository: ReadWrite  DataProvider: ReadOnly           RepoRw_ProvR
         new (
             "RepoRw_ProvR",
             new []
@@ -195,7 +200,7 @@ public class TypeCacheTests
             true,false,false
         ),
         #endregion
-        #region Repository: ReadWrite  DataProvider: ReadWrite
+        #region Repository: ReadWrite  DataProvider: ReadWrite          RepoRw_ProvRw
         new (
             "RepoRw_ProvRw",
             new []
@@ -220,7 +225,7 @@ public class TypeCacheTests
                     cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
         ),
         #endregion
-        #region Repository: ReadWrite  DataProvider: Forced ReadOnly
+        #region Repository: ReadWrite  DataProvider: Forced ReadOnly    RepoRw_ProvFr
         new (
             "RepoRw_ProvFr",
             new []
@@ -243,7 +248,7 @@ public class TypeCacheTests
             true,false,false
         ),
         #endregion
-        #region Repository: InvalidRw  DataProvider: ReadWrite
+        #region Repository: InvalidRw  DataProvider: ReadWrite          RepoIrw_ProvRw
         new (
             "RepoIrw_ProvRw",
             new []
@@ -262,12 +267,13 @@ public class TypeCacheTests
             },
             (services,cache,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>>(
-                    cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
+                    cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
+            true,false,false
         ),
         #endregion
-        #region Repository: InvalidR   DataProvider: ReadOnly
+        #region Repository: InvalidR   DataProvider: ReadOnly               RepoIr_ProvR
         new (
-            "RepoRw_ProvFr",
+            "RepoIr_ProvR",
             new []
             {
                 "Provided:",
@@ -288,7 +294,7 @@ public class TypeCacheTests
             true,false,false
         ),
         #endregion
-        #region Repository: None       DataProvider: InvalidRw
+        #region Repository: None       DataProvider: InvalidR               NoRepo_ProvIr
         new (
             "NoRepo_ProvIr",
             new []
@@ -310,7 +316,7 @@ public class TypeCacheTests
             true,false,false
         ),
         #endregion
-        #region Repository: None       DataProvider: InvalidRw
+        #region Repository: None       DataProvider: InvalidRw                          NoRepo_ProvIrw
         new (
             "NoRepo_ProvIrw",
             new []
@@ -332,8 +338,54 @@ public class TypeCacheTests
             true,false,false
         ),
         #endregion
-    }.Select(x => new object[] { x }).ToArray();
-    
+        #region Repository: Multiple       DataProvider: InvalidRw      MultiRepo_ProvIrw
+        new (
+            "MultiRepo_ProvIrw",
+            new []
+            {
+                "Provided:",
+                "  DataProvider         : ReadWrite",
+                "  Repository           : R, Rw",
+                "Expected Error:",
+                "  An error which tells the user that multiple repositories for the same dataObject have been found"
+            },
+            new[]
+            {
+                typeof(TestCommandEntity),
+                typeof(TestDataProviderRw<>),
+                typeof(TestRepositoryR),
+                typeof(TestRepositoryRw)
+            },
+            (services,cache,exceptions)=>
+                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>>(
+                    cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
+            true,false,false
+        ),
+        #endregion
+        #region Repository: None       DataProvider: Invalid Interfaces NoRepo_ProvInvInt
+        new (
+            "NoRepo_ProvInvInt",
+            new []
+            {
+                "Provided:",
+                "  DataProvider         : Invalid Interfaces",
+                "  Repository           : None",
+                "Expected Error:",
+                "  An error which tells the user that this combination of interfaces is not supported"
+            },
+            new[]
+            {
+                typeof(TestCommandEntity),
+                typeof(TestInvalidInterfaceDataProvider<>),
+            },
+            (services,cache,exceptions)=>
+                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>>(
+                    cache, null, _=>true, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
+            true,false,false
+        ),
+        #endregion
+    }.Where(x => string.IsNullOrWhiteSpace(Filter) || x.TestName == Filter || !ApplyTestFilter).Select(x => new object[] { x }).ToArray();
+
     private readonly IExceptionManager _exceptions;
 
     private void Setup(out IServiceCollection services, out ITypeCache cache, Type[] types)
@@ -349,6 +401,7 @@ public class TypeCacheTests
 
     public TypeCacheTests(ITestOutputHelper testOutput)
     {
+        _testOutput = testOutput;
         _exceptions = new ExceptionManager(nameof(TypeCacheTests));
         Log.Logger = new LoggerConfiguration()
             .WriteTo.Xunit(testOutput)
@@ -360,6 +413,15 @@ public class TypeCacheTests
     [Theory, ClassData(typeof(TypeCacheTestArguments))]
     public void Test(TestOptions options)
     {
+        _testOutput.WriteLine("TestName: {0}", options.TestName);
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+#pragma warning disable CS8519 // The given expression never matches the provided pattern.
+        if (!string.IsNullOrWhiteSpace(Filter) && options.TestName != Filter)
+        {
+            Assert.Fail("skipped");
+            return;
+        }
+#pragma warning restore CS8519 // The given expression never matches the provided pattern.
         var (testName, expectedBehavior, content, serviceFactory, testExceptions, testCache, testServices) = options;
         Setup(out var services, out var cache, content);
         // group by namespace, then by typeValueType and use json objects for the grouping
@@ -367,6 +429,7 @@ public class TypeCacheTests
             .Where(tvt => tvt.Value.Assembly != typeof(ITypeCache).Assembly)
             .PrepareSnapshot();
 
+        services.AddRepositories(cache, _exceptions);
         serviceFactory(services, cache, _exceptions.CreateChild("Service Factory"));
 
         var exceptionValidator = _exceptions.GetException().PrepareSnapshot();
@@ -460,9 +523,7 @@ public class TestInvalidDataProviderRw<T> : IDataProviderRw<T> where T : IEntity
 
 public class TestRepositoryR : IDataProviderR<TestCommandEntity>
 {
-    public TestRepositoryR(
-        ISourceDataProviderR<TestCommandEntity> sourceProvider,
-        IDataProviderR<TestCommandEntity> permissionProvider)
+    public TestRepositoryR(ISourceDataProviderR<TestCommandEntity> sourceProvider)
     {
 
     }
@@ -522,9 +583,17 @@ public class TestDataProviderR<T> : ISourceDataProviderR<T> where T : IEntity
     public IQueryable<T> Get() => throw new NotImplementedException();
 }
 
-public class TestInvalidSourceDataProvider<T> : IDataProviderR<T> where T : IDataObject
+public class TestInvalidInterfaceDataProvider<T> : ISourceDataProviderR<T>, IDataProviderRw<T>
+    where T : IEntity
 {
     public IQueryable<T> Get() => throw new NotImplementedException();
+    public void Add(T item) => throw new NotImplementedException();
+
+    public void Add(IEnumerable<T> items) => throw new NotImplementedException();
+
+    public void Remove(Guid itemId) => throw new NotImplementedException();
+
+    public void Remove(IEnumerable<Guid> itemIds) => throw new NotImplementedException();
 }
 #endregion
 #endregion

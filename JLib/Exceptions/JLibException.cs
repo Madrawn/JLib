@@ -41,7 +41,7 @@ public class JLibAggregateException : AggregateException
             .Append(" ├─")
             .AppendJoin(Environment.NewLine + " ├─",
                 content
-                    .GroupBy(ex => ex.GetType())
+                    .ToLookup(ex => ex.GetType())
                     .OrderBy(group => group.Key.Name)
                     .Select(group =>
                     (

@@ -107,7 +107,7 @@ public class TypeCache : ITypeCache
                     {
                         var validTvtGroups = availableTypeValueTypes
                             .Where(availableTvtt => availableTvtt.Filter(type))
-                            .GroupBy(t =>
+                            .ToLookup(t =>
                                 t.Value.GetCustomAttribute<TvtFactoryAttributes.Priority>()?.Value
                                 ?? TvtFactoryAttributes.Priority.DefaultPriority);
                         var validTvts = validTvtGroups.MinBy(x => x.Key)?
@@ -237,7 +237,7 @@ public class TypeCache : ITypeCache
                 return;
 
             var typesByAssembly = _typeValueTypes
-                .GroupBy(tvt => tvt.Value.Assembly.FullName)
+                .ToLookup(tvt => tvt.Value.Assembly.FullName)
                 .OrderBy(g => g.Key)
                 .ToArray();
 
@@ -253,7 +253,7 @@ public class TypeCache : ITypeCache
         void WriteTypes(IEnumerable<TypeValueType> types)
         {
             var registeredTypes = types
-                .GroupBy(tvt => tvt.GetType())
+                .ToLookup(tvt => tvt.GetType())
                 .OrderBy(g => g.Key.Name)
                 .ToArray();
             foreach (var group in registeredTypes)

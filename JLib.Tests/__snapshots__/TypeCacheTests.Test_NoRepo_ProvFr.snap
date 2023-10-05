@@ -54,7 +54,7 @@
       {
         "Lifetime": "Scoped",
         "ImplementationSource": "Factory",
-        "ServiceType": "JLib.Data.ISourceDataProviderR<>",
+        "ServiceType": "JLib.Data.IDataProviderR<>",
         "ServiceArguments": [
           "JLib.Tests.TestCommandEntity"
         ],
@@ -66,7 +66,7 @@
       {
         "Lifetime": "Scoped",
         "ImplementationSource": "Factory",
-        "ServiceType": "JLib.Data.IDataProviderR<>",
+        "ServiceType": "JLib.Data.ISourceDataProviderR<>",
         "ServiceArguments": [
           "JLib.Tests.TestCommandEntity"
         ],

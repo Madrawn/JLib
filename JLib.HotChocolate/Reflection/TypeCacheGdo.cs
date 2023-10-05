@@ -27,7 +27,7 @@ public class TypeCacheGdo
 
     [UseFiltering]
     public AssemblyTypeGroupGdo[] ByAssembly
-        => _typeCache.All<TypeValueType>().GroupBy(x => x.Value.Assembly)
+        => _typeCache.All<TypeValueType>().ToLookup(x => x.Value.Assembly)
             .Select(g => new AssemblyTypeGroupGdo(g.Key, g.ToArray()))
             .ToArray();
 

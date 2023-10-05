@@ -1,16 +1,17 @@
 ﻿{
   "Parameters": {
-    "TestName": "NoRepo_ProvIr",
+    "TestName": "RepoIr_ProvR",
     "ExpectedBehavior": [
-      "  Provided:                                                                              ",
-      "    DataProvider         : Invalid ReadOnly                                              ",
-      "    Repository           : -                                                             ",
-      "  Expected Exception:                                                                    ",
-      "    An exception which tells the user to implement the ISourceDataProviderR Interface    "
+      "  Provided:                                                                                                        ",
+      "    DataProvider         : ReadOnly                                                                                ",
+      "    Repository           : Invalid ReadOnly                                                                        ",
+      "  Expected Exception:                                                                                              ",
+      "    An exception which tells the user to not provide the DataProvider as ReadOnly and informs that it is forced    "
     ],
     "includedTypes": [
       "JLib.Tests.TestCommandEntity",
-      "JLib.Tests.TestInvalidDataProviderR<>"
+      "JLib.Tests.TestDataProviderR<>",
+      "JLib.Tests.TestInvalidRepositoryR"
     ]
   },
   "exception": {
@@ -31,7 +32,7 @@
                 "InnerExceptions": [
                   {
                     "Type": "JLib.Exceptions.InvalidTypeException",
-                    "Message": "Error while initializing SourceDataProviderType with JLib.Tests.TestInvalidDataProviderR<>: Should implement JLib.Data.ISourceDataProviderR<>"
+                    "Message": "Error while initializing RepositoryType with JLib.Tests.TestInvalidRepositoryR: Should not implement JLib.Data.ISourceDataProviderR<>"
                   }
                 ]
               }

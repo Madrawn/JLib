@@ -13,7 +13,7 @@ public class TvtValidator : IExceptionProvider
     {
         _typeValueType = typeValueType;
     }
-    public void Add(string message, string? hint = null)
+    public void AddError(string message, string? hint = null)
     {
         if (hint != null)
             message += $" this might be resolved by {hint}";
@@ -28,21 +28,21 @@ public class TvtValidator : IExceptionProvider
     public void ShouldBeGeneric(string? hint = null)
     {
         if (!Value.IsGenericType)
-            Add(string.Join(Environment.NewLine, "Must be Generic", hint));
+            AddError(string.Join(Environment.NewLine, "Must be Generic", hint));
     }
     public void ShouldNotBeGeneric(string? hint = null)
     {
         if (Value.IsGenericType)
-            Add(string.Join(Environment.NewLine, "Must not be Generic", hint));
+            AddError(string.Join(Environment.NewLine, "Must not be Generic", hint));
     }
     public void ShouldHaveNTypeArguments(int argumentCount)
     {
         ShouldBeGeneric();
 
         if (!Value.IsGenericType)
-            Add("Must be Generic");
+            AddError("Must be Generic");
         if (Value.GenericTypeArguments.Length != argumentCount)
-            Add($"It must have exactly {argumentCount} type arguments but got {Value.GenericTypeArguments.Length}");
+            AddError($"It must have exactly {argumentCount} type arguments but got {Value.GenericTypeArguments.Length}");
 
     }
 
@@ -50,11 +50,16 @@ public class TvtValidator : IExceptionProvider
         where TAttribute : Attribute
     {
         if (!Value.HasCustomAttribute<TAttribute>())
-            Add($"Should have {typeof(TAttribute).Name}", hint);
+            AddError($"Should have {typeof(TAttribute).FullClassName(true)}", hint);
     }
     public void ShouldImplementAny<TInterface>(string? hint = null)
     {
         if (!Value.ImplementsAny<TInterface>())
-            Add($"Should implement{typeof(TInterface).Name}", hint);
+            AddError($"Should implement {typeof(TInterface).TryGetGenericTypeDefinition().FullClassName(true)}", hint);
+    }
+    public void ShouldNotImplementAny<TInterface>(string? hint = null)
+    {
+        if (Value.ImplementsAny<TInterface>())
+            AddError($"Should not implement {typeof(TInterface).TryGetGenericTypeDefinition().FullClassName(true)}", hint);
     }
 }
