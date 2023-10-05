@@ -1,38 +1,38 @@
 ﻿{
   "Parameters": {
-    "TestName": "RepoRw_ProvFr",
+    "TestName": "RepoIr_ProvR",
     "ExpectedBehavior": [
       "  Provided:                                                                                                        ",
-      "    DataProvider         : Forced ReadOnly                                                                         ",
-      "    Repository           : Read Write                                                                              ",
+      "    DataProvider         : ReadOnly                                                                                ",
+      "    Repository           : Invalid ReadOnly                                                                        ",
       "  Expected Exception:                                                                                              ",
       "    An exception which tells the user to not provide the DataProvider as ReadOnly and informs that it is forced    "
     ],
     "includedTypes": [
       "JLib.Tests.TestCommandEntity",
-      "JLib.Tests.TestDataProviderRw<>",
-      "JLib.Tests.TestRepositoryRw"
+      "JLib.Tests.TestDataProviderR<>",
+      "JLib.Tests.TestInvalidRepositoryR"
     ]
   },
   "exception": {
     "Type": "JLib.Exceptions.JLibAggregateException",
-    "Message": "TypeCacheTests",
+    "Message": "AddDataProviderTests",
     "InnerExceptions": [
       {
         "Type": "JLib.Exceptions.JLibAggregateException",
-        "Message": "Service Factory",
+        "Message": "Setup",
         "InnerExceptions": [
           {
             "Type": "JLib.Exceptions.JLibAggregateException",
-            "Message": "AddDataProvider",
+            "Message": "Cache setup failed",
             "InnerExceptions": [
               {
                 "Type": "JLib.Exceptions.JLibAggregateException",
-                "Message": "AddMapDataProvider failed for valueType CommandEntityType",
+                "Message": "Type validation failed",
                 "InnerExceptions": [
                   {
-                    "Type": "JLib.Exceptions.InvalidSetupException",
-                    "Message": "The data provider Implementation JLib.Tests.TestDataProviderRw<JLib.Tests.TestCommandEntity> is forced read only but the Repository JLib.Tests.TestRepositoryRw can write data. \nNot forcing the DataProvider to be read only or implementing IDataProviderRw will solve this issue"
+                    "Type": "JLib.Exceptions.InvalidTypeException",
+                    "Message": "Error while initializing RepositoryType with JLib.Tests.TestInvalidRepositoryR: Should not implement JLib.Data.ISourceDataProviderR<>"
                   }
                 ]
               }

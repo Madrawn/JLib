@@ -15,7 +15,7 @@
   },
   "exception": {
     "Type": "JLib.Exceptions.JLibAggregateException",
-    "Message": "TypeCacheTests",
+    "Message": "AddDataProviderTests",
     "InnerExceptions": [
       {
         "Type": "JLib.Exceptions.JLibAggregateException",

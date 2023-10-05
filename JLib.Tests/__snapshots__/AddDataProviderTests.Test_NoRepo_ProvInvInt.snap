@@ -1,21 +1,21 @@
 ﻿{
   "Parameters": {
-    "TestName": "NoRepo_ProvIr",
+    "TestName": "NoRepo_ProvInvInt",
     "ExpectedBehavior": [
-      "  Provided:                                                                              ",
-      "    DataProvider         : Invalid ReadOnly                                              ",
-      "    Repository           : -                                                             ",
-      "  Expected Exception:                                                                    ",
-      "    An exception which tells the user to implement the ISourceDataProviderR Interface    "
+      "  Provided:                                                                               ",
+      "    DataProvider         : Invalid Interfaces                                             ",
+      "    Repository           : None                                                           ",
+      "  Expected Error:                                                                         ",
+      "    An error which tells the user that this combination of interfaces is not supported    "
     ],
     "includedTypes": [
       "JLib.Tests.TestCommandEntity",
-      "JLib.Tests.TestInvalidDataProviderR<>"
+      "JLib.Tests.TestInvalidInterfaceDataProvider<>"
     ]
   },
   "exception": {
     "Type": "JLib.Exceptions.JLibAggregateException",
-    "Message": "TypeCacheTests",
+    "Message": "AddDataProviderTests",
     "InnerExceptions": [
       {
         "Type": "JLib.Exceptions.JLibAggregateException",
@@ -31,7 +31,7 @@
                 "InnerExceptions": [
                   {
                     "Type": "JLib.Exceptions.InvalidTypeException",
-                    "Message": "Error while initializing SourceDataProviderType with JLib.Tests.TestInvalidDataProviderR<>: Should implement JLib.Data.ISourceDataProviderR<>"
+                    "Message": "Error while initializing SourceDataProviderType with JLib.Tests.TestInvalidInterfaceDataProvider<>: Should implement JLib.Data.ISourceDataProviderRw<>"
                   }
                 ]
               }

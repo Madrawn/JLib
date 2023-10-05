@@ -23,7 +23,7 @@ using ServiceCollectionHelper = JLib.Helper.ServiceCollectionHelper;
 
 namespace JLib.Tests;
 
-public class TypeCacheTests
+public class AddDataProviderTests
 {
     private readonly ITestOutputHelper _testOutput;
     public const string Filter = "";
@@ -399,10 +399,10 @@ public class TypeCacheTests
                 types, out cache, _exceptions.CreateChild(nameof(Setup)));
     }
 
-    public TypeCacheTests(ITestOutputHelper testOutput)
+    public AddDataProviderTests(ITestOutputHelper testOutput)
     {
         _testOutput = testOutput;
-        _exceptions = new ExceptionManager(nameof(TypeCacheTests));
+        _exceptions = new ExceptionManager(nameof(AddDataProviderTests));
         Log.Logger = new LoggerConfiguration()
             .WriteTo.Xunit(testOutput)
             .Enrich.FromLogContext()
@@ -487,7 +487,7 @@ public record TestOptions(string TestName, string[] ExpectedBehavior, Type[] Inc
 }
 public class TypeCacheTestArguments : IEnumerable<object[]>
 {
-    private readonly object[][] _src = TypeCacheTests.Tests;
+    private readonly object[][] _src = AddDataProviderTests.Tests;
 
     public IEnumerator<object[]> GetEnumerator()
         => _src.Select(x => x.Cast<object>().ToArray()).GetEnumerator();
