@@ -111,10 +111,10 @@ public static class TypeHelper
 
     public static Type? GetAnyInterface<TInterface>(this Type type)
     {
-        var tInt = typeof(TInterface);
-        if (tInt.IsGenericType)
-            tInt = tInt.GetGenericTypeDefinition();
-        return type.GetInterfaces().FirstOrDefault(i => (i.IsGenericType ? i.GetGenericTypeDefinition() : i) == tInt);
+        var @interface = typeof(TInterface).TryGetGenericTypeDefinition();
+        return type.TryGetGenericTypeDefinition() == @interface && type.IsInterface
+            ? type
+            : type.GetInterfaces().FirstOrDefault(i => i.TryGetGenericTypeDefinition() == @interface);
     }
 
     public static bool HasSameGenericTypeDefinition<T>(this Type type)
