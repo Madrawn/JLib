@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
@@ -10,12 +11,60 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Serilog;
 namespace JLib.Helper;
+
+public static class ConfigurationSections
+{
+    /// <summary>
+    /// the key under which environments can be specified.
+    /// </summary>
+    public const string Environment = "Environment";
+}
 public static class ServiceCollectionHelper
 {
     /// <summary>
     /// adds <see cref="IOptions{TOptions}"/> for each <see cref="ConfigurationSectionType"/> and makes the value directly injectable
+    /// supports multiple environments. The environment key is found under <see cref="ConfigurationSections.Environment"/>.
+    /// There can be a top level environment and one per section.
     /// + <see cref="IOptions{TOptions}"/> for each <see cref="ConfigurationSectionType"/>
     /// -- a instance of each <see cref="ConfigurationSectionType"/>
+    /// <br/>
+    /// <example>
+    /// Behavior:
+    /// <code>
+    /// {
+    ///     Environment: "Dev1",
+    ///     SectionA:{
+    ///         Environment: "Dev2",
+    ///         Dev1:{
+    ///             MyValue:"Ignored"
+    ///         },
+    ///         Dev2:{
+    ///             MyValue:"Used"
+    ///         },
+    ///         MyValue:"Ignored"
+    ///     },
+    ///     SectionB:{
+    ///         Dev1:{
+    ///             MyValue:"Used"
+    ///         },
+    ///         Dev2:{
+    ///             MyValue:"Ignored"
+    ///         },
+    ///         MyValue:"Ignored"
+    ///     },
+    ///     SectionC:{
+    ///         Environment: "",
+    ///         Dev1:{
+    ///             MyValue:"Ignored"
+    ///         },
+    ///         Dev2:{
+    ///             MyValue:"Ignored"
+    ///         },
+    ///         MyValue:"Used"
+    ///     }
+    /// }
+    /// </code>
+    /// </example>
     /// </summary>
     public static IServiceCollection AddAllConfigSections(this IServiceCollection services,
         ITypeCache typeCache, IConfiguration config, ServiceLifetime lifetime = ServiceLifetime.Scoped)
@@ -26,9 +75,27 @@ public static class ServiceCollectionHelper
                 new[] { typeof(IServiceCollection), typeof(IConfiguration) })
             ?? throw new InvalidSetupException("configure method not found");
 
+        var topLevelEnvironment = config[ConfigurationSections.Environment];
+        if (topLevelEnvironment != null)
+            Log.Information("Loading config for top level environment {environment}", topLevelEnvironment);
+
         foreach (var sectionType in typeCache.All<ConfigurationSectionType>())
         {
-            var sectionInstance = config.GetRequiredSection(sectionType.SectionName.Value);
+            var sectionInstance = config.GetSection(sectionType.SectionName.Value);
+
+            var sectionEnvironment = sectionInstance[ConfigurationSections.Environment];
+
+            var environment = sectionEnvironment ?? topLevelEnvironment;
+            if (environment is not null)
+            {
+                var environmentType = sectionEnvironment is not null ? "override" : "topLevel";
+                Log.Information("Loading section {environment}.{section} ({sectionType}). Environment is defined in {environmentType}",
+                    environment, sectionType.SectionName, sectionType.Value.FullClassName(true), environmentType);
+                sectionInstance = sectionInstance.GetSection(environment);
+            }
+            else
+                Log.Information("Loading section {section} ({sectionType})", sectionType.SectionName, sectionType.Value.FullClassName(true));
+
             var specificConfig = configMethod.MakeGenericMethod(sectionType.Value);
 
             specificConfig.Invoke(null, new object?[]
