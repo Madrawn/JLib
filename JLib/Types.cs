@@ -54,29 +54,10 @@ public record ValueTypeType(Type Value) : TypeValueType(Value), IValidatedType
     }
 }
 
-[ImplementsAny(typeof(IMappedGraphQlDataObject<>)), NotAbstract, IsClass, Priority(3_000)]
-public sealed record MappedGraphQlDataObjectType(Type Value) : GraphQlDataObjectType(Value), IMappedDataObjectType, IPostNavigationInitializedType
-{
-    public MappedCommandEntityType? CommandEntity
-        => Navigate(typeCache => typeCache.TryGet<MappedCommandEntityType>(cmd => cmd.SourceEntity == SourceEntity));
-    public EntityType SourceEntity
-        => Navigate(typeCache => Value.GetAnyInterface<IMappedGraphQlDataObject<IEntity>>()?.GenericTypeArguments.First()
-                                  .CastValueType<EntityType>(typeCache)
-                              ?? throw NewInvalidTypeException("SourceEntity could not be found"));
-    /// <summary>
-    /// add the <see cref="PropertyPrefixAttribute"/> to the <see cref="SourceEntity"/> type
-    /// </summary>//
-    public PropertyPrefix? PropertyPrefix { get; private set; }
-
-    public bool ReverseMap => false;
-
-    public void Initialize(IExceptionManager exceptions)
-        => PropertyPrefix = SourceEntity.Value.GetCustomAttribute<PropertyPrefixAttribute>()?.Prefix;
-}
-
-[ImplementsAny(typeof(IMappedCommandEntity<>)), NotAbstract, Priority(3_000)]
+[ImplementsAny(typeof(IMappedCommandEntity<>)), NotAbstract, Priority(CommandEntityType.NextPriority)]
 public record MappedCommandEntityType(Type Value) : CommandEntityType(Value), IMappedDataObjectType, IPostNavigationInitializedType
 {
+    public new const int NextPriority = CommandEntityType.NextPriority - 1_000;
     public EntityType SourceEntity =>
         Navigate(typeCache => Value.GetAnyInterface<IMappedCommandEntity<IEntity>>()?.GenericTypeArguments.First()
                                   .CastValueType<EntityType>(typeCache)
@@ -101,12 +82,14 @@ public record AutoMapperProfileType(Type Value) : TypeValueType(Value)
 
 public abstract record DataObjectType(Type Value) : NavigatingTypeValueType(Value), IDataObjectType
 {
+    public new const int NextPriority = 10_000;
 }
 
 
 [Implements(typeof(IEntity)), IsClass, NotAbstract]
 public record EntityType(Type Value) : DataObjectType(Value), IValidatedType
 {
+    public new const int NextPriority = DataObjectType.NextPriority - 1_000;
     public virtual void Validate(ITypeCache cache, TvtValidator value)
     {
         if (GetType() == typeof(EntityType))
@@ -117,34 +100,12 @@ public record EntityType(Type Value) : DataObjectType(Value), IValidatedType
 /// <summary>
 /// An entity which uses ValueTypes to ensure data validity
 /// </summary>
-[Implements(typeof(ICommandEntity)), IsClass, NotAbstract, Priority(5_000)]
+[Implements(typeof(ICommandEntity)), IsClass, NotAbstract, Priority(EntityType.NextPriority)]
 public record CommandEntityType(Type Value) : EntityType(Value)
 {
+    public new const int NextPriority = EntityType.NextPriority - 1_000;
 
 }
-[Implements(typeof(IGraphQlDataObject)), IsClass, NotAbstract]
-public record GraphQlDataObjectType(Type Value) : DataObjectType(Value), IValidatedType
-{
-    public void Validate(ITypeCache cache, TvtValidator value)
-    {
-        var ctors = Value.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-        if (ctors.Length == 1)
-        {
-            var ctor = ctors.Single();
-            if (ctor.GetParameters().Any())
-                value.AddError("parameters found on the only constructor. A parameterless cosntructor is required");
-        }
-        else
-        {
-            var propsToInitialize = Value.GetProperties().Any(prop =>
-                prop.CanWrite && !prop.IsNullable() && !prop.PropertyType.ImplementsAny<IEnumerable<Ignored>>());
-            var hasPublicParameterlessCtor = ctors.Any(ctor => ctor.GetParameters().None() && ctor.IsPublic);
-            if (propsToInitialize && hasPublicParameterlessCtor)
-                value.AddError("found a public parameterless ctor despite having non-nullable properties");
-        }
-    }
-}
-
 public abstract record DataProviderType(Type Value) : NavigatingTypeValueType(Value), IPostNavigationInitializedType, IValidatedType
 {
     public bool CanWrite { get; private set; }
@@ -157,8 +118,8 @@ public abstract record DataProviderType(Type Value) : NavigatingTypeValueType(Va
     public virtual void Validate(ITypeCache cache, TvtValidator value) { }
 }
 
-[ImplementsAny(typeof(IDataProviderR<>)), BeGeneric, NotAbstract, IsClass, Priority(7000)]
-public record SourceDataProviderType(Type Value) : DataProviderType(Value), IValidatedType
+[ImplementsAny(typeof(IDataProviderR<>)), BeGeneric, NotAbstract, IsClass]
+public record SourceDataProviderType(Type Value) : DataProviderType(Value)
 {
     public override void Validate(ITypeCache cache, TvtValidator value)
     {
@@ -170,8 +131,8 @@ public record SourceDataProviderType(Type Value) : DataProviderType(Value), IVal
     }
 }
 
-[ImplementsAny(typeof(IDataProviderR<>)), NotBeGeneric, NotAbstract, IsClass, Priority(7000)]
-public record RepositoryType(Type Value) : DataProviderType(Value), IValidatedType
+[ImplementsAny(typeof(IDataProviderR<>)), NotBeGeneric, NotAbstract, IsClass]
+public record RepositoryType(Type Value) : DataProviderType(Value)
 {
     public DataObjectType ProvidedDataObject
         => Navigate(cache => Value.GetAnyInterface<IDataProviderR<IDataObject>>()?.GenericTypeArguments.First()

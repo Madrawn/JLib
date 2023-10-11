@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\JLib.HotChocolate\JLib.HotChocolate.csproj" />
     <ProjectReference Include="..\JLib.Testing\JLib.Testing.csproj" />
     <ProjectReference Include="..\JLib\JLib.csproj" />
   </ItemGroup>

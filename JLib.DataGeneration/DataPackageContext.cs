@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Security.Cryptography;
 using AutoMapper;
@@ -120,7 +121,6 @@ public sealed class DataPackageManager : IDataPackager, IDataPackageStore
             return null;
         return _mapper.Map<TId?>(CombineGuid(id.Value, GetModifier<TId>(dataPackage)));
     }
-
     public TId? DeriveId<TId>(GuidValueType? idN, GuidValueType? idM, Type dataPackage)
         where TId : GuidValueType
     {

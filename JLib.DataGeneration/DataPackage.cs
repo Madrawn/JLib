@@ -44,11 +44,14 @@ public abstract class DataPackage
         }
     }
 
+    protected TEntity AddEntity<TEntity>(TEntity entity)
+        where TEntity : IEntity
+        => _dataPackages.AddEntities(new[] { entity }).First();
     protected TEntity[] AddEntities<TEntity>(IEnumerable<TEntity> entities)
         where TEntity : IEntity
         => _dataPackages.AddEntities(entities);
 
-
+    [return: NotNullIfNotNull("id")]
     protected TId? DeriveId<TId>(GuidValueType? id)
         where TId : GuidValueType
         => _dataPackages.DeriveId<TId>(id, GetType());

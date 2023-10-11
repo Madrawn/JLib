@@ -8,6 +8,7 @@ using AutoMapper;
 using JLib.Data;
 using JLib.FactoryAttributes;
 using JLib.Helper;
+using JLib.HotChocolate;
 using JLib.Tests.Reflection.ServiceCollection.AddDataProvider;
 using Moq;
 using Xunit.Abstractions;
