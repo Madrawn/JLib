@@ -21,7 +21,7 @@ public sealed record MappedGraphQlDataObjectType(Type Value) : GraphQlDataObject
 
     public bool ReverseMap => false;
 
-    public void Initialize(IExceptionManager exceptions)
+    void IPostNavigationInitializedType.Initialize(IExceptionManager exceptions)
         => PropertyPrefix = SourceEntity.Value.GetCustomAttribute<PropertyPrefixAttribute>()?.Prefix;
 }
 

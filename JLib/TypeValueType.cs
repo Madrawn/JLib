@@ -11,11 +11,7 @@ namespace JLib;
 /// </summary>
 public interface IPostNavigationInitializedType : ITypeValueType
 {
-    /// <summary>
-    /// made internal to prevent external calls and enforce explicit implementation
-    /// <br/>the typeCache is not provided to prevent using it to initialize navigation properties which could cause undeterministic behavior during setup
-    /// </summary>
-    internal void Initialize(IExceptionManager exceptions);
+    void Initialize(IExceptionManager exceptions);
 }
 
 public interface IValidatedType : ITypeValueType

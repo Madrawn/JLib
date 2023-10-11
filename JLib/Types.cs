@@ -82,7 +82,7 @@ public record AutoMapperProfileType(Type Value) : TypeValueType(Value)
 
 public abstract record DataObjectType(Type Value) : NavigatingTypeValueType(Value), IDataObjectType
 {
-    public new const int NextPriority = 10_000;
+    public const int NextPriority = 10_000;
 }
 
 
