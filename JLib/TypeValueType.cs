@@ -35,7 +35,7 @@ public interface ITypeValueType
     public bool HasCustomAutoMapperProfile { get; }
 }
 [Unmapped]
-public abstract partial record TypeValueType(Type Value) : ValueType<Type>(Value), ITypeValueType
+public abstract record TypeValueType(Type Value) : ValueType<Type>(Value), ITypeValueType
 {
     public string Name => Value.Name;
 
