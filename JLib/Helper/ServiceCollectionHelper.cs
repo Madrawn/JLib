@@ -117,7 +117,10 @@ public static class ServiceCollectionHelper
     }
 
     #region AddAlias
-    public static IServiceCollection AddAlias<TImpl, TAlias>(this IServiceCollection serviceCollection, ServiceLifetime lifetime)
+    /// <summary>
+    /// adds <typeparamref name="TAlias"/> as Service of <typeparamref name="TImpl"/>
+    /// </summary>
+    public static IServiceCollection AddAlias<TAlias, TImpl>(this IServiceCollection serviceCollection, ServiceLifetime lifetime)
         where TImpl : TAlias
         where TAlias : notnull
     {
@@ -128,7 +131,7 @@ public static class ServiceCollectionHelper
     /// <summary>
     /// provides the alias as existing service
     /// </summary>
-    public static IServiceCollection AddAlias(this IServiceCollection services, Type existing, Type alias, ServiceLifetime lifetime)
+    public static IServiceCollection AddAlias(this IServiceCollection services, Type alias, Type existing,  ServiceLifetime lifetime)
     {
         services.Add(new(alias, provider => provider.GetRequiredService(existing), lifetime));
         return services;
@@ -202,7 +205,7 @@ public static class ServiceCollectionHelper
                 destination => destination
             };
         Log.ForContext(typeof(ServiceCollectionHelper)).ForContext<IDataProviderR<IDataObject>>().Verbose("ReadOnly MapDataProvider");
-        services.AddDataProvider<TTvt, MapDataProvider<IEntity, IEntity>>(
+        services.AddDataProvider<TTvt, MapDataProviderR<IEntity, IEntity>>(
             typeCache,
             tvt => filter(tvt) && isReadOnly(tvt),
             null,
@@ -250,11 +253,15 @@ public static class ServiceCollectionHelper
         foreach (var repo in groupedRepos.Select(x => x.Value.Single()))
         {
             services.AddScoped(repo.Value);
-            services.AddAlias(repo.Value, typeof(IDataProviderR<>).MakeGenericType(repo.ProvidedDataObject.Value),
+            services.AddAlias(
+                typeof(IDataProviderR<>).MakeGenericType(repo.ProvidedDataObject.Value),
+                repo.Value,
                 ServiceLifetime.Scoped);
 
             if (repo.CanWrite)
-                services.AddAlias(repo.Value, typeof(IDataProviderRw<>).MakeGenericType(repo.ProvidedDataObject.Value),
+                services.AddAlias(
+                    typeof(IDataProviderRw<>).MakeGenericType(repo.ProvidedDataObject.Value),
+                    repo.Value,
                     ServiceLifetime.Scoped);
         }
         return services;
