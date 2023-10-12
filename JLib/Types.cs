@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using AutoMapper;
 using JLib.Attributes;
 using JLib.Data;
@@ -10,20 +11,6 @@ using static JLib.FactoryAttributes.TvtFactoryAttributes;
 
 namespace JLib;
 
-/// <summary>
-/// used for entity mapping in conjunction with any <see cref="IMappedDataObjectType"/>.
-/// <br/>Enables the Profile to ignore the prefix when resolving the correlated properties.
-/// </summary>
-[AttributeUsage(AttributeTargets.Class)]
-public class PropertyPrefixAttribute : Attribute
-{
-    public string Prefix { get; }
-
-    public PropertyPrefixAttribute(string prefix)
-    {
-        Prefix = prefix;
-    }
-}
 
 [IsDerivedFromAny(typeof(ValueType<>))]
 public record ValueTypeType(Type Value) : TypeValueType(Value), IValidatedType
@@ -54,19 +41,6 @@ public record ValueTypeType(Type Value) : TypeValueType(Value), IValidatedType
     }
 }
 
-[ImplementsAny(typeof(IMappedCommandEntity<>)), NotAbstract, Priority(CommandEntityType.NextPriority)]
-public record MappedCommandEntityType(Type Value) : CommandEntityType(Value), IMappedDataObjectType, IPostNavigationInitializedType
-{
-    public new const int NextPriority = CommandEntityType.NextPriority - 1_000;
-    public EntityType SourceEntity =>
-        Navigate(typeCache => Value.GetAnyInterface<IMappedCommandEntity<IEntity>>()?.GenericTypeArguments.First()
-                                  .CastValueType<EntityType>(typeCache)
-                              ?? throw NewInvalidTypeException("SourceEntity could not be found"));
-    public PropertyPrefix? PropertyPrefix { get; private set; }
-    public virtual bool ReverseMap => true;
-    void IPostNavigationInitializedType.Initialize(IExceptionManager exceptions)
-        => PropertyPrefix = SourceEntity.Value.GetCustomAttribute<PropertyPrefixAttribute>()?.Prefix;
-}
 [IsDerivedFrom(typeof(Profile)), NotAbstract]
 public record AutoMapperProfileType(Type Value) : TypeValueType(Value)
 {
@@ -110,7 +84,7 @@ public abstract record DataProviderType(Type Value) : NavigatingTypeValueType(Va
 {
     public bool CanWrite { get; private set; }
 
-    void IPostNavigationInitializedType.Initialize(IExceptionManager exceptions)
+    void IPostNavigationInitializedType.Initialize(ITypeCache _, IExceptionManager exceptions)
     {
         CanWrite = Value.ImplementsAny<IDataProviderRw<IEntity>>();
     }

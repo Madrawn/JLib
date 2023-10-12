@@ -20,45 +20,46 @@ public class MappedDataObjectProfile : Profile
     public MappedDataObjectProfile(ITypeCache cache)
     {
         Log.ForContext<MappedDataObjectProfile>().Debug("        Creating DataObjectMaps");
-        foreach (var mappedDataObject in cache.All<IMappedDataObjectType>()
-                     .Where(mdo => mdo is { SourceEntity: not null, HasCustomAutoMapperProfile: false }))
+        foreach (var mapInfo in cache.All<IMappedDataObjectType>()
+                     .SelectMany(tvt => tvt.MappingInfo.SelectMany(map => map.GetMappingInfosFor(tvt))
+                     ).ToArray()
+                 )
         {
-            if (mappedDataObject.HasCustomAutoMapperProfile)
+            var (source, destination, _, propertyResolvers) = mapInfo;
+            var map = base.CreateMap(source.Value, destination.Value);
+            var srcProps = source.Value.GetProperties();
+            var dstProps = destination.Value.GetProperties();
+            Log.ForContext<MappedDataObjectProfile>().Debug("          {Source} => {Destination}", source, destination);
+            foreach (var dstProp in dstProps)
             {
-                Log.ForContext<MappedDataObjectProfile>().Verbose("        Skipping {mdo}: it has a custom profile", mappedDataObject.Value.Name);
-                continue;
-            }
-            if (mappedDataObject.Value.HasCustomAttribute<UnmappedAttribute>())
-            {
-                Log.ForContext<MappedDataObjectProfile>().Verbose("        Skipping {mdo}: it has the Unmapped attribute", mappedDataObject.Value.Name);
-                continue;
-            }
-            var map = base.CreateMap(mappedDataObject.SourceEntity.Value, mappedDataObject.Value);
-            var mdoProps = mappedDataObject.Value.GetProperties();
-            var srcProps = mappedDataObject.SourceEntity.Value.GetProperties().ToDictionary(x => x.Name);
-            var prefix = mappedDataObject.PropertyPrefix?.Value ?? "";
-            Log.ForContext<MappedDataObjectProfile>().Verbose("        creating map from {mappedDataObject} to {mappedEntity} using prefix '{prefix}'", mappedDataObject.SourceEntity.Name, mappedDataObject.Name, prefix);
-            foreach (var mdoProp in mdoProps)
-            {
-                var srcProp =
-                    srcProps.GetValueOrDefault(mdoProp.GetCustomAttribute<SourceMemberAttribute>()?.Name ?? "")
-                    ?? srcProps.GetValueOrDefault(prefix + mdoProp.Name)
-                    ?? srcProps.GetValueOrDefault(mdoProp.Name);
-                if (srcProp is null)
+                var matchingProps = srcProps.Where(srcProp => propertyResolvers.All(matcher => matcher.MapProperty(srcProp, dstProp))).ToArray();
+                switch (matchingProps.Count())
                 {
-                    Log.ForContext<MappedDataObjectProfile>().Error("            could not map property {mdo}.{mdoProp} from {src}",
-                        mappedDataObject.Name, mdoProp.Name, mappedDataObject.SourceEntity.Name);
-                    continue;
+                    case 0:
+                        Log.Warning(
+                            "{DestinationType}.{DestinationProperty} has no matching property on {SourceType} using the following resolvers: {resolver}",
+                            destination.Value.FullClassName(true),
+                            dstProp.Name, source.Value.FullClassName(true),
+                            propertyResolvers
+                            );
+                        continue;
+                    case > 1:
+                        Log.Warning(
+                            "{DestinationType}.{DestinationProperty} has multiple matching properties on {SourceType}: {sourceProperties} using the following resolvers: {resolver}",
+                            destination.Value.FullClassName(true),
+                            dstProp.Name, source.Value.FullClassName(true),
+                            matchingProps.Select(p => p.Name).ToArray(),
+                            propertyResolvers
+                        );
+                        continue;
                 }
 
-                Log.ForContext<MappedDataObjectProfile>().Verbose("            mapping from Property {cmdProp,-20} to {xrmProp} ",
-                    mdoProp.Name, srcProp.Name);
-
-                map.ForMember(mdoProp.Name, o => o.MapFrom(srcProp.Name));
+                var srcProp = matchingProps.Single();
+                Log.ForContext<MappedDataObjectProfile>().Debug("            {SourcePropertyType} {SourceProperty} => {DestinationPropertyType} {DestinationProperty}",
+                    srcProp.PropertyType.FullClassName(), srcProp.Name,
+                    dstProp.PropertyType.FullClassName(), dstProp.Name);
+                map.ForMember(dstProp.Name, b => b.MapFrom(srcProp.Name));
             }
-
-            if (mappedDataObject.ReverseMap)
-                map.ReverseMap();
         }
     }
 }

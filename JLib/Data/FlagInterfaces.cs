@@ -18,11 +18,3 @@ public interface ICommandEntity : IEntity
 {
 
 }
-/// <summary>
-/// flag for the <see cref="MappedCommandEntityType"/>.
-/// <br/>generates a 
-/// </summary>
-/// <typeparam name="TEntity"></typeparam>
-public interface IMappedCommandEntity<TEntity> : ICommandEntity
-    where TEntity : IEntity
-{ }

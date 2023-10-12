@@ -55,7 +55,12 @@ public class TvtValidator : IExceptionProvider
     public void ShouldImplementAny<TInterface>(string? hint = null)
     {
         if (!Value.ImplementsAny<TInterface>())
-            AddError($"Should implement {typeof(TInterface).TryGetGenericTypeDefinition().FullClassName(true)}", hint);
+            AddError($"Should implement any {typeof(TInterface).TryGetGenericTypeDefinition().FullClassName(true)}", hint);
+    }
+    public void ShouldImplement<TInterface>(string? hint = null)
+    {
+        if (!Value.ImplementsAny<TInterface>())
+            AddError($"Should implement {typeof(TInterface).FullClassName(true)}", hint);
     }
     public void ShouldNotImplementAny<TInterface>(string? hint = null)
     {

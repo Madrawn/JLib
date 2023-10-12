@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using JLib.Exceptions;
+﻿using System.Reflection;
 using static JLib.FactoryAttributes.TvtFactoryAttributes;
 
 namespace JLib;
@@ -29,7 +23,7 @@ public sealed record ConfigurationSectionType(Type Value) : TypeValueType(Value)
 {
     public ConfigSectionName SectionName { get; private set; } = null!;
 
-    public void Initialize(IExceptionManager exceptions)
+    public void Initialize(ITypeCache cache, IExceptionManager exceptions)
         => SectionName = Value.GetCustomAttribute<ConfigSectionNameAttribute>()?.SectionName
         ?? throw NewInvalidTypeException("sectionName not found");
 }

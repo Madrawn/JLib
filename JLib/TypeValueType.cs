@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using JLib.Attributes;
+using JLib.AutoMapper;
 using JLib.Exceptions;
 using Serilog.Events;
 
@@ -11,7 +12,7 @@ namespace JLib;
 /// </summary>
 public interface IPostNavigationInitializedType : ITypeValueType
 {
-    void Initialize(IExceptionManager exceptions);
+    void Initialize(ITypeCache cache, IExceptionManager exceptions);
 }
 
 public interface IValidatedType : ITypeValueType
@@ -19,11 +20,13 @@ public interface IValidatedType : ITypeValueType
     void Validate(ITypeCache cache, TvtValidator value);
 }
 public interface IDataObjectType : ITypeValueType { }
-public interface IMappedDataObjectType : IDataObjectType
+
+/// <summary>
+/// the <see cref="MappedDataObjectProfile"/> will create a map for each <see cref="MappingInfo"/>
+/// </summary>
+public interface IMappedDataObjectType : IDataObjectType, IPostNavigationInitializedType
 {
-    EntityType SourceEntity { get; }
-    PropertyPrefix? PropertyPrefix { get; }
-    bool ReverseMap { get; }
+    TypeMappingInfo[] MappingInfo { get; }
 }
 public interface ITypeValueType
 {

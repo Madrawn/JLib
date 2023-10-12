@@ -5,26 +5,6 @@ using static JLib.FactoryAttributes.TvtFactoryAttributes;
 
 namespace JLib.HotChocolate;
 
-[ImplementsAny(typeof(IMappedGraphQlDataObject<>)), NotAbstract, IsClass, Priority(GraphQlDataObjectType.NextPriority)]
-public sealed record MappedGraphQlDataObjectType(Type Value) : GraphQlDataObjectType(Value), IMappedDataObjectType, IPostNavigationInitializedType
-{
-    public MappedCommandEntityType? CommandEntity
-        => Navigate(typeCache => typeCache.TryGet<MappedCommandEntityType>(cmd => cmd.SourceEntity == SourceEntity));
-    public EntityType SourceEntity
-        => Navigate(typeCache => Value.GetAnyInterface<IMappedGraphQlDataObject<IEntity>>()?.GenericTypeArguments.First()
-                                     .CastValueType<EntityType>(typeCache)
-                                 ?? throw NewInvalidTypeException("SourceEntity could not be found"));
-    /// <summary>
-    /// add the <see cref="PropertyPrefixAttribute"/> to the <see cref="SourceEntity"/> type
-    /// </summary>//
-    public PropertyPrefix? PropertyPrefix { get; private set; }
-
-    public bool ReverseMap => false;
-
-    void IPostNavigationInitializedType.Initialize(IExceptionManager exceptions)
-        => PropertyPrefix = SourceEntity.Value.GetCustomAttribute<PropertyPrefixAttribute>()?.Prefix;
-}
-
 [Implements(typeof(IGraphQlDataObject)), IsClass, NotAbstract]
 public record GraphQlDataObjectType(Type Value) : DataObjectType(Value), IValidatedType
 {

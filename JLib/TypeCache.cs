@@ -176,7 +176,7 @@ public class TypeCache : ITypeCache
         {
             try
             {
-                typeValueType.Initialize(exceptions.CreateChild("Initialization failed"));
+                typeValueType.Initialize(this, exceptions.CreateChild("Initialization failed"));
             }
             catch (Exception e)
             {
@@ -197,8 +197,8 @@ public class TypeCache : ITypeCache
                 exceptions.Add(e);
             }
         }
-        
-        if(parentExceptionManager is null)
+
+        if (parentExceptionManager is null)
             exceptions.ThrowIfNotEmpty();
 
         WriteLog();

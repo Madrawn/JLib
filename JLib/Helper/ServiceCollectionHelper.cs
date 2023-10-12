@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
+﻿using System.Reflection;
 using JLib.Data;
 using JLib.Exceptions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Serilog;
 namespace JLib.Helper;
@@ -131,7 +126,7 @@ public static class ServiceCollectionHelper
     /// <summary>
     /// provides the alias as existing service
     /// </summary>
-    public static IServiceCollection AddAlias(this IServiceCollection services, Type alias, Type existing,  ServiceLifetime lifetime)
+    public static IServiceCollection AddAlias(this IServiceCollection services, Type alias, Type existing, ServiceLifetime lifetime)
     {
         services.Add(new(alias, provider => provider.GetRequiredService(existing), lifetime));
         return services;
@@ -169,6 +164,7 @@ public static class ServiceCollectionHelper
     #endregion
 
     #region AddMapDataprovider
+
     /// <summary>
     /// adds map data providers for each <see cref="IMappedDataObjectType"/>.
     /// <br/>generates a <see cref="IDataProviderR{TData}"/> if <see cref="IMappedDataObjectType.ReverseMap"/> is false
@@ -178,9 +174,71 @@ public static class ServiceCollectionHelper
         this IServiceCollection services,
         ITypeCache typeCache,
         IExceptionManager exceptions)
-        => services.AddMapDataProvider<IMappedDataObjectType>(typeCache, null,
-            mdo => mdo.SourceEntity,
-            mdo => !mdo.ReverseMap, exceptions);
+    {
+        exceptions = exceptions.CreateChild(nameof(AddMapDataProvider));
+        foreach (var mappedDataObjectType in typeCache.All<IMappedDataObjectType>())
+        {
+            foreach (var typeMappingInfo in mappedDataObjectType.MappingInfo)
+            {
+                foreach (var typeMappingInfoEx in typeMappingInfo.GetMappingInfosFor(mappedDataObjectType))
+                {
+                    var (sourceType, destinationType, providerMode, _) =
+                        typeMappingInfoEx;
+
+                    var repo = typeCache.TryGet<RepositoryType>(
+                        r => r.ProvidedDataObject.Value == destinationType.Value);
+
+                    switch (providerMode)
+                    {
+                        case MappingDataProviderMode.Disabled:
+                            continue;
+                        case MappingDataProviderMode.Read:
+                            {
+                                if (repo is { CanWrite: true })
+                                {
+                                    exceptions.Add(new InvalidSetupException(
+                                        $"Repository {repo.Value.FullClassName()} for Entity {destinationType.Value.FullClassName()} can write data but the mapping is configured to provide a {nameof(IDataProviderR<IDataObject>)}." + Environment.NewLine +
+                                        $"To fix this issue either set the mapping to ReadWrite or don't implement {nameof(IDataProviderRw<IEntity>)} on the repository"));
+                                    continue;
+                                }
+
+                                var implementation = typeof(MapDataProviderR<,>).MakeGenericType(sourceType, destinationType);
+                                services.AddScoped(implementation);
+                                services.AddScoped(typeof(ISourceDataProviderR<>).MakeGenericType(destinationType), implementation);
+                                if (repo is null)
+                                    services.AddScoped(typeof(IDataProviderR<>).MakeGenericType(destinationType), implementation);
+                            }
+                            break;
+                        case MappingDataProviderMode.ReadWrite:
+                            {
+                                if (repo is { CanWrite: false })
+                                {
+                                    exceptions.Add(new InvalidSetupException(
+                                        $"Repository {repo.Value.FullClassName()} for Entity {destinationType.Value.FullClassName()} can not write data but the mapping is configured to provide a {nameof(IDataProviderRw<IEntity>)}." + Environment.NewLine +
+                                        $"To fix this issue either set the mapping to ReadOnly or don implement {nameof(IDataProviderRw<IEntity>)} on the repository"));
+                                    continue;
+                                }
+                                var implementation = typeof(MapDataProviderRw<,>).MakeGenericType(sourceType, destinationType);
+                                services.AddScoped(implementation);
+                                services.AddScoped(typeof(ISourceDataProviderR<>).MakeGenericType(destinationType), implementation);
+                                services.AddScoped(typeof(ISourceDataProviderRw<>).MakeGenericType(destinationType), implementation);
+                                if (repo is null)
+                                {
+                                    services.AddScoped(typeof(IDataProviderR<>).MakeGenericType(destinationType), implementation);
+                                    services.AddScoped(typeof(IDataProviderRw<>).MakeGenericType(destinationType), implementation);
+                                }
+                            }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+            }
+        }
+
+        return services;
+
+    }
 
     /// <summary>
     /// Provides a <see cref="IDataProviderR{TData}"/> for each <typeparamref name="TTvt"/> which takes data from a <see cref="IDataProviderR{TData}"/> of the type retrieved by <see cref="sourcePropertyReader"/> and maps it using AutoMapper Projections
@@ -205,7 +263,7 @@ public static class ServiceCollectionHelper
                 destination => destination
             };
         Log.ForContext(typeof(ServiceCollectionHelper)).ForContext<IDataProviderR<IDataObject>>().Verbose("ReadOnly MapDataProvider");
-        services.AddDataProvider<TTvt, MapDataProviderR<IEntity, IEntity>>(
+        services.AddDataProvider<TTvt, MapDataProviderR<IEntity, IEntity>, IEntity>(
             typeCache,
             tvt => filter(tvt) && isReadOnly(tvt),
             null,
@@ -213,7 +271,7 @@ public static class ServiceCollectionHelper
             exceptions
         );
         Log.ForContext(typeof(ServiceCollectionHelper)).ForContext<IDataProviderR<IDataObject>>().Verbose("WritableMapDataProvider");
-        services.AddDataProvider<TTvt, WritableMapDataProvider<IEntity, IEntity>>(
+        services.AddDataProvider<TTvt, WritableMapDataProvider<IEntity, IEntity>, IEntity>(
             typeCache,
             tvt => filter(tvt) && !isReadOnly(tvt),
             null,
@@ -283,8 +341,8 @@ public static class ServiceCollectionHelper
         IExceptionManager exceptions,
         ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TTvt : class, IDataObjectType
-        where TImplementation : IDataProviderR<IEntity>
-        => services.AddDataProvider<TTvt, TImplementation, IEntity>(typeCache, filter, forceReadOnly,
+        where TImplementation : IDataProviderR<IDataObject>
+        => services.AddDataProvider<TTvt, TImplementation, IDataObject>(typeCache, filter, forceReadOnly,
             implementationTypeArgumentResolver, exceptions, lifetime);
     /// <summary>
     /// Provides the following services for each <typeparamref name="TTvt"/> under the stated conditions:
@@ -296,7 +354,7 @@ public static class ServiceCollectionHelper
     /// <br/>ㅤno <see cref="RepositoryType"/> for the given <typeparamref name="TTvt"/> - <see cref="IDataProviderR{TData}"/>
     /// <br/>ㅤno <see cref="RepositoryType"/> for the given <typeparamref name="TTvt"/> and <typeparamref name="TImplementation"/> implements <see cref="IDataProviderRw{TData}"/> - <see cref="IDataProviderRw{TData}"/>
     /// </summary>
-    public static IServiceCollection AddDataProvider<TTvt, TImplementation, TIgnoredEntity>(
+    public static IServiceCollection AddDataProvider<TTvt, TImplementation, TIgnoredDataObject>(
     this IServiceCollection services,
     ITypeCache typeCache,
     Func<TTvt, bool>? filter,
@@ -305,8 +363,8 @@ public static class ServiceCollectionHelper
     IExceptionManager exceptions,
     ServiceLifetime lifetime = ServiceLifetime.Scoped)
     where TTvt : class, IDataObjectType
-    where TImplementation : IDataProviderR<TIgnoredEntity>
-    where TIgnoredEntity : IEntity
+    where TImplementation : IDataProviderR<TIgnoredDataObject>
+    where TIgnoredDataObject : IDataObject
     {
         filter ??= _ => true;
         forceReadOnly ??= _ => false;
@@ -391,7 +449,7 @@ public static class ServiceCollectionHelper
         var msg = $"{nameof(AddMockDataProvider)} failed for valueType {typeof(TTvt).Name}";
         exceptions = exceptions.CreateChild(msg);
 
-        services.AddDataProvider<TTvt, MockDataProvider<IEntity>>(typeCache, null, null, null, exceptions, ServiceLifetime.Singleton);
+        services.AddDataProvider<TTvt, MockDataProvider<IEntity>, IEntity>(typeCache, null, null, null, exceptions, ServiceLifetime.Singleton);
 
         return services;
     }
