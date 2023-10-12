@@ -26,7 +26,7 @@ public interface IDataObjectType : ITypeValueType { }
 /// </summary>
 public interface IMappedDataObjectType : IDataObjectType, IPostNavigationInitializedType
 {
-    TypeMappingInfo[] MappingInfo { get; }
+    ExplicitTypeMappingInfo[] MappingInfo { get; }
 }
 public interface ITypeValueType
 {

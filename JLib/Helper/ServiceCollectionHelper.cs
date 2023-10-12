@@ -178,66 +178,62 @@ public static class ServiceCollectionHelper
         exceptions = exceptions.CreateChild(nameof(AddMapDataProvider));
         foreach (var mappedDataObjectType in typeCache.All<IMappedDataObjectType>())
         {
-            foreach (var typeMappingInfo in mappedDataObjectType.MappingInfo)
+            foreach (var typeMappingInfoEx in mappedDataObjectType.MappingInfo)
             {
-                foreach (var typeMappingInfoEx in typeMappingInfo.GetMappingInfosFor(mappedDataObjectType))
+                var (sourceType, destinationType, providerMode, _) =
+                    typeMappingInfoEx;
+
+                var repo = typeCache.TryGet<RepositoryType>(
+                    r => r.ProvidedDataObject.Value == destinationType.Value);
+
+                switch (providerMode)
                 {
-                    var (sourceType, destinationType, providerMode, _) =
-                        typeMappingInfoEx;
-
-                    var repo = typeCache.TryGet<RepositoryType>(
-                        r => r.ProvidedDataObject.Value == destinationType.Value);
-
-                    switch (providerMode)
-                    {
-                        case MappingDataProviderMode.Disabled:
-                            continue;
-                        case MappingDataProviderMode.Read:
+                    case MappingDataProviderMode.Disabled:
+                        continue;
+                    case MappingDataProviderMode.Read:
+                        {
+                            if (repo is { CanWrite: true })
                             {
-                                if (repo is { CanWrite: true })
-                                {
-                                    exceptions.Add(new InvalidSetupException(
-                                        $"Repository {repo.Value.FullClassName()} for Entity {destinationType.Value.FullClassName()} can write data but the mapping is configured to provide a {nameof(IDataProviderR<IDataObject>)}." + Environment.NewLine +
-                                        $"To fix this issue either set the mapping to ReadWrite or don't implement {nameof(IDataProviderRw<IEntity>)} on the repository"));
-                                    continue;
-                                }
+                                exceptions.Add(new InvalidSetupException(
+                                    $"Repository {repo.Value.FullClassName()} for Entity {destinationType.Value.FullClassName()} can write data but the mapping is configured to provide a {nameof(IDataProviderR<IDataObject>)}." + Environment.NewLine +
+                                    $"To fix this issue either set the mapping to ReadWrite or don't implement {nameof(IDataProviderRw<IEntity>)} on the repository"));
+                                continue;
+                            }
 
-                                var implementation = typeof(MapDataProviderR<,>).MakeGenericType(sourceType, destinationType);
-                                services.AddScoped(implementation);
-                                services.AddScoped(typeof(ISourceDataProviderR<>).MakeGenericType(destinationType), implementation);
-                                if (repo is null)
-                                    services.AddScoped(typeof(IDataProviderR<>).MakeGenericType(destinationType), implementation);
-                            }
-                            break;
-                        case MappingDataProviderMode.ReadWrite:
+                            var implementation = typeof(MapDataProviderR<,>).MakeGenericType(sourceType, destinationType);
+                            services.AddScoped(implementation);
+                            services.AddScoped(typeof(ISourceDataProviderR<>).MakeGenericType(destinationType), implementation);
+                            if (repo is null)
+                                services.AddScoped(typeof(IDataProviderR<>).MakeGenericType(destinationType), implementation);
+                        }
+                        break;
+                    case MappingDataProviderMode.ReadWrite:
+                        {
+                            if (repo is { CanWrite: false })
                             {
-                                if (repo is { CanWrite: false })
-                                {
-                                    exceptions.Add(new InvalidSetupException(
-                                        $"Repository {repo.Value.FullClassName()} for Entity {destinationType.Value.FullClassName()} can not write data but the mapping is configured to provide a {nameof(IDataProviderRw<IEntity>)}." + Environment.NewLine +
-                                        $"To fix this issue either set the mapping to ReadOnly or don implement {nameof(IDataProviderRw<IEntity>)} on the repository"));
-                                    continue;
-                                }
-                                var implementation = typeof(MapDataProviderRw<,>).MakeGenericType(sourceType, destinationType);
-                                services.AddScoped(implementation);
-                                services.AddScoped(typeof(ISourceDataProviderR<>).MakeGenericType(destinationType), implementation);
-                                services.AddScoped(typeof(ISourceDataProviderRw<>).MakeGenericType(destinationType), implementation);
-                                if (repo is null)
-                                {
-                                    services.AddScoped(typeof(IDataProviderR<>).MakeGenericType(destinationType), implementation);
-                                    services.AddScoped(typeof(IDataProviderRw<>).MakeGenericType(destinationType), implementation);
-                                }
+                                exceptions.Add(new InvalidSetupException(
+                                    $"Repository {repo.Value.FullClassName()} for Entity {destinationType.Value.FullClassName()} can not write data but the mapping is configured to provide a {nameof(IDataProviderRw<IEntity>)}." + Environment.NewLine +
+                                    $"To fix this issue either set the mapping to ReadOnly or don implement {nameof(IDataProviderRw<IEntity>)} on the repository"));
+                                continue;
                             }
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
+                            var implementation = typeof(MapDataProviderRw<,>).MakeGenericType(sourceType, destinationType);
+                            services.AddScoped(implementation);
+                            services.AddScoped(typeof(ISourceDataProviderR<>).MakeGenericType(destinationType), implementation);
+                            services.AddScoped(typeof(ISourceDataProviderRw<>).MakeGenericType(destinationType), implementation);
+                            if (repo is null)
+                            {
+                                services.AddScoped(typeof(IDataProviderR<>).MakeGenericType(destinationType), implementation);
+                                services.AddScoped(typeof(IDataProviderRw<>).MakeGenericType(destinationType), implementation);
+                            }
+                        }
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
         }
 
         return services;
-
     }
 
     /// <summary>

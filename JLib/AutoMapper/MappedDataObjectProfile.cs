@@ -21,8 +21,8 @@ public class MappedDataObjectProfile : Profile
     {
         Log.ForContext<MappedDataObjectProfile>().Debug("        Creating DataObjectMaps");
         foreach (var mapInfo in cache.All<IMappedDataObjectType>()
-                     .SelectMany(tvt => tvt.MappingInfo.SelectMany(map => map.GetMappingInfosFor(tvt))
-                     ).ToArray()
+                     .SelectMany(tvt => tvt.MappingInfo)
+                     .ToArray()
                  )
         {
             var (source, destination, _, propertyResolvers) = mapInfo;
