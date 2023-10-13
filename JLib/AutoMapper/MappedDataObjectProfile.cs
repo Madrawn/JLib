@@ -32,7 +32,9 @@ public class MappedDataObjectProfile : Profile
             Log.ForContext<MappedDataObjectProfile>().Debug("          {Source} => {Destination}", source, destination);
             foreach (var dstProp in dstProps)
             {
-                var matchingProps = srcProps.Where(srcProp => propertyResolvers.All(matcher => matcher.MapProperty(srcProp, dstProp))).ToArray();
+                var matchingProps = srcProps
+                    .Where(srcProp => propertyResolvers
+                        .Any(matcher => matcher.MapProperty(srcProp, dstProp))).ToArray();
                 switch (matchingProps.Count())
                 {
                     case 0:
