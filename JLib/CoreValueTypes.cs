@@ -26,6 +26,16 @@ public record PropertyPrefixSeparator(string Value) : StringValueType(Value), IP
     public static implicit operator PropertyPrefixSeparator?(string? value)
         => value is null ? null : new(value);
 
-    public bool MapProperty(PropertyInfo sourceProperty, PropertyInfo destinationProperty) => throw new NotImplementedException();
+    public bool MapProperty(PropertyInfo sourceProperty, PropertyInfo destinationProperty)
+    {
+        return RemovePrefix(sourceProperty.Name) == RemovePrefix(destinationProperty.Name);
+        string RemovePrefix(string propName)
+        {
+            var i = propName.IndexOf(Value, StringComparison.Ordinal);
+            return i == -1
+                ? propName
+                : propName[..i];
+        }
+    }
 }
 public record ClassPrefix(string Value) : Prefix(Value);
