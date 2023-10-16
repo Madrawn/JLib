@@ -12,11 +12,22 @@ public enum MappingDirection
     Bidirectional = ThatToThis | ThisToThat
 }
 
+public static class PropertyResolver
+{
+    public static SameNamePropertyResolver CaseSensitive = new();
+    public static CaseInsensitivePropertyResolver IgnoreCase = new();
+
+}
+
 public class SameNamePropertyResolver : IPropertyResolver
 {
-    public static SameNamePropertyResolver Instance = new();
-    public bool MapProperty(PropertyInfo sourceProperty, PropertyInfo destinationProperty)
-        => sourceProperty.Name == destinationProperty.Name;
+    public string GetComparisonString(string propertyName)
+        => propertyName;
+}
+public class CaseInsensitivePropertyResolver : IPropertyResolver
+{
+    public string GetComparisonString(string propertyName)
+        => propertyName.ToLower();
 }
 
 /// <summary>
@@ -24,45 +35,16 @@ public class SameNamePropertyResolver : IPropertyResolver
 /// </summary>
 public interface IPropertyResolver
 {
-    bool MapProperty(PropertyInfo sourceProperty, PropertyInfo destinationProperty);
+    string GetComparisonString(string propertyName);
 }
-
-/// <summary>
-/// generated from <see cref="TypeMappingInfo"/>
-/// </summary>
-/// <param name="Source"></param>
-/// <param name="Destination"></param>
-/// <param name="PropertyMatcher"></param>
 public record ExplicitTypeMappingInfo(ITypeValueType Source, ITypeValueType Destination,
     MappingDataProviderMode DataProviderMode,
-    IPropertyResolver[] PropertyMatcher);
+    IPropertyResolver[] SourcePropertyResolver,
+    IPropertyResolver[] DestinationPropertyResolver);
 
 public enum MappingDataProviderMode
 {
     Disabled,
     Read,
     ReadWrite,
-}
-/// <summary>
-/// used by the <see cref="MappedDataObjectProfile"/> to  create maps
-/// </summary>
-public record TypeMappingInfo(DataObjectType OtherObject, MappingDirection Direction,
-    MappingDataProviderMode ThisDataProviderMode, MappingDataProviderMode OtherDataProviderMode, IPropertyResolver[] PropertyMatcher)
-{
-    public IEnumerable<ExplicitTypeMappingInfo> GetMappingInfosFor(ITypeValueType tvt)
-    {
-        var res = new List<ExplicitTypeMappingInfo>();
-        if (tvt.HasCustomAutoMapperProfile
-            || OtherObject.HasCustomAutoMapperProfile
-            || tvt.Value.HasCustomAttribute<UnmappedAttribute>()
-            || OtherObject.Value.HasCustomAttribute<UnmappedAttribute>())
-            return res;
-
-        if (Direction.HasFlag(MappingDirection.ThatToThis))
-            res.Add(new(OtherObject, tvt, ThisDataProviderMode, PropertyMatcher));
-        if (Direction.HasFlag(MappingDirection.ThisToThat))
-            res.Add(new(tvt, OtherObject, OtherDataProviderMode, PropertyMatcher));
-        return res;
-
-    }
 }

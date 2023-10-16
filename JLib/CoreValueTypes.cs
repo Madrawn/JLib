@@ -14,8 +14,28 @@ public record PropertyPrefix(string Value) : Prefix(Value), IPropertyResolver
     public static implicit operator PropertyPrefix?(string? value)
         => value is null ? null : new(value);
 
-    public bool MapProperty(PropertyInfo sourceProperty, PropertyInfo destinationProperty)
-        => sourceProperty.Name.Replace(Value, "") == destinationProperty.Name.Replace(Value, "");
+    public string GetComparisonString(string propertyName)
+    {
+        var i = propertyName.IndexOf(propertyName, StringComparison.Ordinal);
+        return i == -1 
+            ? propertyName 
+            : propertyName[(i + 1)..];
+    }
+}
+public record PropertySuffix(string Value) : Prefix(Value), IPropertyResolver
+{
+    public static implicit operator PropertySuffix?(string? value)
+        => value is null ? null : new(value);
+
+    public string GetComparisonString(string propertyName)
+    {
+
+        var i = propertyName.LastIndexOf(propertyName, StringComparison.Ordinal);
+        return
+            i == -1 
+                ? propertyName 
+                : propertyName[..(i + 1)];
+    }
 }
 /// <summary>
 /// the string that separates a prefix from the rest of the propertyName
@@ -26,16 +46,13 @@ public record PropertyPrefixSeparator(string Value) : StringValueType(Value), IP
     public static implicit operator PropertyPrefixSeparator?(string? value)
         => value is null ? null : new(value);
 
-    public bool MapProperty(PropertyInfo sourceProperty, PropertyInfo destinationProperty)
+    public string GetComparisonString(string propertyName)
     {
-        return RemovePrefix(sourceProperty.Name) == RemovePrefix(destinationProperty.Name);
-        string RemovePrefix(string propName)
-        {
-            var i = propName.IndexOf(Value, StringComparison.Ordinal);
-            return i == -1
-                ? propName
-                : propName[..i];
-        }
+        var i = propertyName.IndexOf(Value, StringComparison.Ordinal);
+        var result = i == -1
+            ? propertyName
+            : propertyName[(i + 1)..];
+        return result;
     }
 }
 public record ClassPrefix(string Value) : Prefix(Value);
