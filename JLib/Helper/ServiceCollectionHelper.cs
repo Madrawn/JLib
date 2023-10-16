@@ -180,7 +180,7 @@ public static class ServiceCollectionHelper
         {
             foreach (var typeMappingInfoEx in mappedDataObjectType.MappingInfo)
             {
-                var (sourceType, destinationType, providerMode, _) =
+                var (sourceType, destinationType, providerMode, _, _) =
                     typeMappingInfoEx;
 
                 var repo = typeCache.TryGet<RepositoryType>(
