@@ -11,6 +11,7 @@
     <PackageReference Include="HotChocolate.Execution" Version="13.5.1" />
     <PackageReference Include="HotChocolate.Execution.Abstractions" Version="13.5.1" />
     <PackageReference Include="HotChocolate.Types" Version="13.5.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>

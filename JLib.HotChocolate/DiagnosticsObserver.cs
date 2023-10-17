@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DiagnosticAdapter;
-using Microsoft.Extensions.Logging;
-using ILogger = Serilog.ILogger;
-using HotChocolate.Diagnostics;
 using HotChocolate.Execution.Instrumentation;
 using HotChocolate.Execution;
 using HotChocolate.Execution.Processing;
+using Microsoft.Extensions.Logging;
 using Serilog;
 
 namespace JLib.HotChocolate;
