@@ -10,19 +10,11 @@ public class UnmappedAttribute : Attribute
 }
 
 
-public interface ICustomProfileAttribute
+public interface IDisableAutoProfileAttribute
 {
-    public Type CustomProfile { get; }
 }
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-public class CustomProfileAttribute : Attribute, ICustomProfileAttribute
-{
-    public CustomProfileAttribute(Type customProfile)
-    {
-        CustomProfile = customProfile;
-    }
-    public Type CustomProfile { get; }
-}
+public class DisableAutoProfileAttribute : Attribute, IDisableAutoProfileAttribute { }
 
 #if NET7_0_OR_GREATER
 /// <summary>
@@ -30,7 +22,7 @@ public class CustomProfileAttribute : Attribute, ICustomProfileAttribute
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-public class CustomProfileAttribute<T> : Attribute, ICustomProfileAttribute
+public class DisableAutoProfileAttribute<T> : Attribute, IDisableAutoProfileAttribute
     where T : Profile
 {
     public Type CustomProfile => typeof(T);

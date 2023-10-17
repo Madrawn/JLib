@@ -4,8 +4,8 @@ using static JLib.FactoryAttributes.TvtFactoryAttributes;
 
 namespace JLib.HotChocolate;
 
-[Implements(typeof(IGraphQlDataObject)), IsClass, NotAbstract]
-public record GraphQlDataObjectType(Type Value) : DataObjectType(Value), IValidatedType
+[Implements(typeof(IQueryDataObject)), IsClass, NotAbstract]
+public record QueryDataObjectType(Type Value) : DataObjectType(Value), IValidatedType
 {
     public void Validate(ITypeCache cache, TvtValidator value)
     {
