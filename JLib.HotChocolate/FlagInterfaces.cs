@@ -8,7 +8,11 @@ public sealed class IgnoredGdo : IGraphQlDataObject
     public Guid Id { get; }
 }
 
-public interface IGraphQlDataObject : IDataObject
+public interface IQueryDataObject : IDataObject
+{
+
+}
+public interface IGraphQlDataObject : IQueryDataObject
 {
 
 }

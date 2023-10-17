@@ -42,6 +42,6 @@ public abstract record TypeValueType(Type Value) : ValueType<Type>(Value), IType
     protected InvalidTypeException NewInvalidTypeException(string message)
         => new(GetType(), Value, message);
 
-    public bool HasCustomAutoMapperProfile => Value.GetCustomAttributes().Any(a => a is ICustomProfileAttribute);
+    public bool HasCustomAutoMapperProfile => Value.GetCustomAttributes().Any(a => a is IDisableAutoProfileAttribute);
 
 }
