@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-
 using JLib.Exceptions;
 using JLib.Helper;
 

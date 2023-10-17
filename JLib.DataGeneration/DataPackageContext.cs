@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using System.Security.Cryptography;
+﻿using System.Reflection;
 using AutoMapper;
 using JLib.Data;
 using JLib.Helper;

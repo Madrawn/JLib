@@ -1,5 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
-
 using JLib.Exceptions;
 
 namespace JLib;

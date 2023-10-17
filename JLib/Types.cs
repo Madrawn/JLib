@@ -1,12 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using AutoMapper;
+﻿using AutoMapper;
 using JLib.Attributes;
 using JLib.Data;
-using JLib.FactoryAttributes;
 using JLib.Helper;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.VisualBasic.CompilerServices;
 using static JLib.FactoryAttributes.TvtFactoryAttributes;
 
 namespace JLib;

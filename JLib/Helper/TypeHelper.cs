@@ -1,6 +1,4 @@
-﻿using System.Net.Http.Headers;
-
-namespace JLib.Helper;
+﻿namespace JLib.Helper;
 
 public static class TypeHelper
 {

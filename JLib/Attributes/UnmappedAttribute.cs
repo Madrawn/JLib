@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using JLib.AutoMapper;
+﻿using JLib.AutoMapper;
 
 namespace JLib.Attributes;
 /// <summary>

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace JLib.HotChocolate.Reflection;
+﻿namespace JLib.HotChocolate.Reflection;
 public class TypeGdo
 {
     public string Name => _src.Name;

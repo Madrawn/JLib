@@ -5,7 +5,6 @@ using JLib.Data;
 using JLib.Exceptions;
 using JLib.Helper;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
 
 namespace JLib.HotChocolate.Helper;
 

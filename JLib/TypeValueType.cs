@@ -2,7 +2,6 @@
 using JLib.Attributes;
 using JLib.AutoMapper;
 using JLib.Exceptions;
-using Serilog.Events;
 
 namespace JLib;
 

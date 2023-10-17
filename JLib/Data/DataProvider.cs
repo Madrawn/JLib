@@ -1,9 +1,4 @@
-﻿using System.Linq.Expressions;
-using JLib.AutoMapper;
-using JLib.Helper;
-using static JLib.FactoryAttributes.TvtFactoryAttributes;
-
-namespace JLib.Data;
+﻿namespace JLib.Data;
 
 
 public interface IDataProviderR<TData>
