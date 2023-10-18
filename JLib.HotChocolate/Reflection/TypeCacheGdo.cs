@@ -1,4 +1,9 @@
 ﻿using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+using HotChocolate;
+using HotChocolate.Data;
+using JLib.Helper;
 
 namespace JLib.HotChocolate.Reflection;
 public class TypeCacheGdo
@@ -15,22 +20,27 @@ public class TypeCacheGdo
     public TypeValueTypeGdo[] All { get; }
 
     [UseFiltering]
-    public TypeValueTypeGroupGdo[] ByTypeValueType
-        => _typeCache.All<TypeValueType>().GroupBy(x => x.GetType(), tvtt => new TypeGdo(tvtt.Value))
-            .Select(g => new TypeValueTypeGroupGdo(new(g.Key), g.ToArray())).ToArray();
+    public TypeValueTypeGroupGdo[] ByTypeValueType([Service] IGraphQlReflectionEndpointCache gdoCache)
+        => _typeCache.All<TypeValueType>().GroupBy(x => x.GetType(), gdoCache.ToGdo)
+            .Select(g => new TypeValueTypeGroupGdo(new(g.Key), g.WhereNotNull().ToArray())).ToArray();
 
     [UseFiltering]
-    public AssemblyTypeGroupGdo[] ByAssembly
+    public AssemblyTypeGroupGdo[] ByAssembly([Service] IGraphQlReflectionEndpointCache gdoCache)
         => _typeCache.All<TypeValueType>().ToLookup(x => x.Value.Assembly)
-            .Select(g => new AssemblyTypeGroupGdo(g.Key, g.ToArray()))
+            .Select(g => new AssemblyTypeGroupGdo(g.Key, g.ToArray(), gdoCache))
             .ToArray();
 
     [UseFiltering]
-    public TypeGdo[] KnownTypeValueTypes => _typeCache.KnownTypeValueTypes.Select(t => new TypeGdo(t)).ToArray();
+    public TypeGdo[] KnownTypeValueTypes([Service] IGraphQlReflectionEndpointCache gdoCache)
+        => _typeCache.KnownTypeValueTypes.Select(gdoCache.ToGdo).WhereNotNull().ToArray();
 
     [UseFiltering]
     public AssemblyGdo[] IncludedAssemblies
-        => _typeCache.All<TypeValueType>().Select(x => x.Value.Assembly).ToHashSet().Select(a => new AssemblyGdo(a)).ToArray();
+        => _typeCache.All<TypeValueType>()
+            .Select(x => x.Value.Assembly)
+            .ToHashSet()
+            .Select(a => new AssemblyGdo(a))
+            .ToArray();
 }
 
 public class AssemblyTypeGroupGdo
@@ -39,11 +49,12 @@ public class AssemblyTypeGroupGdo
     [UseFiltering]
     public TypeValueTypeGroupGdo[] Types { get; }
 
-    public AssemblyTypeGroupGdo(Assembly assembly, TypeValueType[] types)
+    public AssemblyTypeGroupGdo(Assembly assembly, TypeValueType[] types, IGraphQlReflectionEndpointCache gdoCache)
     {
         Assembly = new(assembly);
         Types = types.GroupBy(t => t.GetType())
-            .Select(g => new TypeValueTypeGroupGdo(new(g.Key), g.Select(t => new TypeGdo(t.Value)).ToArray()))
+            .Select(g => new TypeValueTypeGroupGdo(
+                new(g.Key), g.Select(gdoCache.ToGdo).WhereNotNull().ToArray()))
             .ToArray();
     }
 }
