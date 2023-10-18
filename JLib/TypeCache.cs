@@ -19,7 +19,7 @@ public interface ITypeCache
         => Get<TTvt>(typeof(TType));
     public TTvt? TryGet<TTvt>(Func<TTvt, bool> filter) where TTvt : class, ITypeValueType
         => All(filter).SingleOrDefault();
-    public TTvt? TryGet<TTvt>(Type weakType) where TTvt : class, ITypeValueType;
+    public TTvt? TryGet<TTvt>(Type? weakType) where TTvt : class, ITypeValueType;
     public TTvt? TryGet<TTvt, TType>() where TTvt : class, ITypeValueType
         => TryGet<TTvt>(typeof(TType).TryGetGenericTypeDefinition());
     public IEnumerable<TTvt> All<TTvt>() where TTvt : class, ITypeValueType;
@@ -210,9 +210,11 @@ public class TypeCache : ITypeCache
         where T : class, ITypeValueType
         => _typeMappings[weakType].CastTo<T>();
 
-    public T? TryGet<T>(Type weakType)
+    public T? TryGet<T>(Type? weakType)
         where T : class, ITypeValueType
-        => _typeMappings.TryGetValue(weakType, out var tvt)
+        => weakType is null
+            ? null
+            : _typeMappings.TryGetValue(weakType, out var tvt)
             ? tvt.As<T?>()
             : null;
 
