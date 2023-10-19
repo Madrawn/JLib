@@ -15,6 +15,8 @@ public interface IDataProviderR<TData>
         => Get().Single(x => x.Id == id);
     public TData? TryGet(Guid? id)
         => id.HasValue ? Get().SingleOrDefault(x => x.Id == id.Value) : default;
+    public bool Contains(Guid? id)
+        => id.HasValue && Get().Any(x => x.Id == id.Value);
 }
 
 public interface ISourceDataProviderR<TData> : IDataProviderR<TData>
