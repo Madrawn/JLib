@@ -1,4 +1,5 @@
-﻿using HotChocolate.Resolvers;
+﻿using System.Diagnostics.CodeAnalysis;
+using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using JLib.Data;
 using Microsoft.EntityFrameworkCore;
@@ -14,15 +15,21 @@ public static class ResolverContextHelper
     /// <br/>creates a new scope to prevent the disposed exception of circular batchDataLoader calls
     /// </summary>
     public static async Task<TDo> BatchDataObjectAsync<TDo>(this IResolverContext context, Guid id)
-        where TDo : IDataObject
-        => await context.BatchAsync<Guid, TDo>(
-            async (ids, token)
-                =>
-            {
-                using var scope = context.Services.CreateScope();
-                return await scope.ServiceProvider.GetRequiredService<IDataProviderR<TDo>>()
-                    .Get().Where(dataObject => ids.Contains(dataObject.Id))
-                    .ToDictionaryAsync(gdo => gdo.Id, token);
-            }, 
-            id);
+        where TDo : class, IDataObject 
+        => (await context.BatchDataObjectAsync<TDo>((Guid?)id))!;
+
+    public static async Task<TDo?> BatchDataObjectAsync<TDo>(this IResolverContext context, Guid? id)
+        where TDo : class, IDataObject
+        => id.HasValue
+            ? await context.BatchAsync<Guid, TDo>(
+                async (ids, token)
+                    =>
+                {
+                    using var scope = context.Services.CreateScope();
+                    return await scope.ServiceProvider.GetRequiredService<IDataProviderR<TDo>>()
+                        .Get().Where(dataObject => ids.Contains(dataObject.Id))
+                        .ToDictionaryAsync(gdo => gdo.Id, token);
+                },
+                id.Value)
+            : null;
 }
