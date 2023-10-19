@@ -10,6 +10,11 @@ public interface IDataProviderR<TData>
     where TData : IDataObject
 {
     public IQueryable<TData> Get();
+
+    public TData Get(Guid id)
+        => Get().Single(x => x.Id == id);
+    public TData? TryGet(Guid? id)
+        => id.HasValue ? Get().SingleOrDefault(x => x.Id == id.Value) : default;
 }
 
 public interface ISourceDataProviderR<TData> : IDataProviderR<TData>
