@@ -3,12 +3,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace JLib.EfCore;
 
-public class EfCoreDataProvider<TEntity> : ISourceDataProviderRw<TEntity>
+public class EfCoreDataProviderR<TEntity> : ISourceDataProviderR<TEntity>
     where TEntity : class, IEntity
 {
     private readonly DbContext _dbContext;
 
-    public EfCoreDataProvider(DbContext dbContext)
+    public EfCoreDataProviderR(DbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public IQueryable<TEntity> Get() => _dbContext.Set<TEntity>().AsNoTracking();
+}
+
+public class EfCoreDataProviderRw<TEntity> : ISourceDataProviderRw<TEntity>
+    where TEntity : class, IEntity
+{
+    private readonly DbContext _dbContext;
+
+    public EfCoreDataProviderRw(DbContext dbContext)
     {
         _dbContext = dbContext;
     }
