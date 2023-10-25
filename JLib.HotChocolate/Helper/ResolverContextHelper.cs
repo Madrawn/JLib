@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using HotChocolate.Resolvers;
+﻿using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using JLib.Data;
 using Microsoft.EntityFrameworkCore;

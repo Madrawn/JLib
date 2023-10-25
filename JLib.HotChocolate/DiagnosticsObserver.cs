@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DiagnosticAdapter;
+﻿using HotChocolate.Execution;
 using HotChocolate.Execution.Instrumentation;
-using HotChocolate.Execution;
 using HotChocolate.Execution.Processing;
 using Microsoft.Extensions.Logging;
-using Serilog;
 
 namespace JLib.HotChocolate;
 public class LoggingEventListener : ExecutionDiagnosticEventListener
