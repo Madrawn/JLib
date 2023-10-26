@@ -597,7 +597,7 @@ public static class ServiceCollectionHelper
     /// <summary>
     /// provides scoped a <see cref="IServiceScope"/> which returns the current service provider.
     /// <br/>can be used to detect if the provider is scoped or to enforce a given <see cref="IServiceProvider"/> being scoped
-    /// <br/>the injected scope can not be disposed of. doing so will result in a <see cref="InvalidOperationException"/>
+    /// <br/>the injected scope can not be disposed of. doing so will result in nothing being done
     /// </summary>
     public static IServiceCollection AddScopeProvider(this IServiceCollection services)
         => services.AddScoped<IServiceScope, ServiceScopeProxy>();
@@ -610,8 +610,7 @@ public static class ServiceCollectionHelper
             ServiceProvider = provider;
         }
 
-        public void Dispose()
-            => throw new InvalidOperationException("you can not dispose an injected scope");
+        public void Dispose() { }
     }
 
 }
