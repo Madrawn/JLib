@@ -31,7 +31,7 @@ public class EfCoreDataProviderRw<TEntity> : ISourceDataProviderRw<TEntity>
     public void Add(TEntity item)
         => _dbContext.Set<TEntity>().Add(item);
 
-    public void Add(IEnumerable<TEntity> items)
+    public void Add(IReadOnlyCollection<TEntity> items)
         => _dbContext.Set<TEntity>().AddRange(items);
 
     public void Remove(Guid itemId)
@@ -41,7 +41,7 @@ public class EfCoreDataProviderRw<TEntity> : ISourceDataProviderRw<TEntity>
         _dbContext.Set<TEntity>().Remove(item);
     }
 
-    public void Remove(IEnumerable<Guid> itemIds)
+    public void Remove(IReadOnlyCollection<Guid> itemIds)
     {
         var set = _dbContext.Set<TEntity>();
         var items = set.Where(x => itemIds.Contains(x.Id));

@@ -16,7 +16,7 @@ public class MockDataProvider<TEntity> : ISourceDataProviderRw<TEntity>
 
     public MockDataProvider(IAuthorizationInfo<TEntity> authorizationInfo)
     {
-        _authInfo = authorizationInfo;
+        _authorize = authorizationInfo;
         // reflection to support vt ids
         _idProperty = typeof(TEntity)
             .GetProperties()
@@ -38,25 +38,25 @@ public class MockDataProvider<TEntity> : ISourceDataProviderRw<TEntity>
         _idProperty.SetValue(entity, _idGenerator?.Invoke(Guid.NewGuid()));
     }
     private readonly List<TEntity> _items = new();
-    private readonly IAuthorizationInfo<TEntity> _authInfo;
+    private readonly IAuthorizationInfo<TEntity> _authorize;
 
     public IQueryable<TEntity> Get()
     {
-        Log.Verbose("MockDataProvider Query for {0}", typeof(TEntity).Name);
-        return _items.AsQueryable().Where(_authInfo.AuthorizeQuery());
+        Log.Verbose("MockDataProvider Expression for {0}", typeof(TEntity).Name);
+        return _items.AsQueryable().Where(_authorize.Expression());
     }
 
     public void Add(TEntity item)
     {
-        _authInfo.RaiseExceptionIfUnauthorized(item);
+        _authorize.AndRaiseException(item);
         _items.Add(item);
         AddId(item);
     }
 
-    public void Add(IEnumerable<TEntity> items)
+    public void Add(IReadOnlyCollection<TEntity> items)
     {
         var itemArray = items.ToArray();
-        _authInfo.RaiseExceptionIfUnauthorized(itemArray);
+        _authorize.AndRaiseException(itemArray);
         var newEntities = itemArray;
         _items.AddRange(newEntities);
         foreach (var entity in newEntities)
@@ -69,7 +69,7 @@ public class MockDataProvider<TEntity> : ISourceDataProviderRw<TEntity>
         _items.Remove(item);
     }
 
-    public void Remove(IEnumerable<Guid> itemIds)
+    public void Remove(IReadOnlyCollection<Guid> itemIds)
     {
         var items = this.CastTo<IDataProviderR<TEntity>>().Get(itemIds).Select(x => x.Value);
         _items.Remove(items);

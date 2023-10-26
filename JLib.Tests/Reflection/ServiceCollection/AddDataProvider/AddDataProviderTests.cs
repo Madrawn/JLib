@@ -582,11 +582,11 @@ public class AddDataProviderTests : ReflectionTestBase
         public IQueryable<T> Get() => throw new NotImplementedException();
         public void Add(T item) => throw new NotImplementedException();
 
-        public void Add(IEnumerable<T> items) => throw new NotImplementedException();
+        public void Add(IReadOnlyCollection<T> items) => throw new NotImplementedException();
 
         public void Remove(Guid itemId) => throw new NotImplementedException();
 
-        public void Remove(IEnumerable<Guid> itemIds) => throw new NotImplementedException();
+        public void Remove(IReadOnlyCollection<Guid> itemIds) => throw new NotImplementedException();
     }
 
     public class TestRepositoryR : IDataProviderR<TestCommandEntity>
@@ -609,11 +609,11 @@ public class AddDataProviderTests : ReflectionTestBase
 
         public void Add(TestCommandEntity item) => throw new NotImplementedException();
 
-        public void Add(IEnumerable<TestCommandEntity> items) => throw new NotImplementedException();
+        public void Add(IReadOnlyCollection<TestCommandEntity> items) => throw new NotImplementedException();
 
         public void Remove(Guid itemId) => throw new NotImplementedException();
 
-        public void Remove(IEnumerable<Guid> itemIds) => throw new NotImplementedException();
+        public void Remove(IReadOnlyCollection<Guid> itemIds) => throw new NotImplementedException();
     }
 
     public class TestInvalidRepositoryR : ISourceDataProviderR<TestCommandEntity>
@@ -626,11 +626,11 @@ public class AddDataProviderTests : ReflectionTestBase
 
         public void Add(TestCommandEntity item) => throw new NotImplementedException();
 
-        public void Add(IEnumerable<TestCommandEntity> items) => throw new NotImplementedException();
+        public void Add(IReadOnlyCollection<TestCommandEntity> items) => throw new NotImplementedException();
 
         public void Remove(Guid itemId) => throw new NotImplementedException();
 
-        public void Remove(IEnumerable<Guid> itemIds) => throw new NotImplementedException();
+        public void Remove(IReadOnlyCollection<Guid> itemIds) => throw new NotImplementedException();
     }
     #endregion
     #region DataProvider
@@ -640,11 +640,11 @@ public class AddDataProviderTests : ReflectionTestBase
 
         public void Add(T item) => throw new NotImplementedException();
 
-        public void Add(IEnumerable<T> items) => throw new NotImplementedException();
+        public void Add(IReadOnlyCollection<T> items) => throw new NotImplementedException();
 
         public void Remove(Guid itemId) => throw new NotImplementedException();
 
-        public void Remove(IEnumerable<Guid> itemIds) => throw new NotImplementedException();
+        public void Remove(IReadOnlyCollection<Guid> itemIds) => throw new NotImplementedException();
     }
     public class TestDataProviderR<T1, T2> : ISourceDataProviderR<T2>
         where T1 : ITestEntity1
@@ -663,11 +663,11 @@ public class AddDataProviderTests : ReflectionTestBase
         public IQueryable<T> Get() => throw new NotImplementedException();
         public void Add(T item) => throw new NotImplementedException();
 
-        public void Add(IEnumerable<T> items) => throw new NotImplementedException();
+        public void Add(IReadOnlyCollection<T> items) => throw new NotImplementedException();
 
         public void Remove(Guid itemId) => throw new NotImplementedException();
 
-        public void Remove(IEnumerable<Guid> itemIds) => throw new NotImplementedException();
+        public void Remove(IReadOnlyCollection<Guid> itemIds) => throw new NotImplementedException();
     }
     #endregion
     #endregion

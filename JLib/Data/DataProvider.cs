@@ -11,7 +11,7 @@ public interface IDataProviderR<TDataObject>
     public TDataObject Get(Guid id)
         => Get().Single(x => x.Id == id);
 
-    public IReadOnlyDictionary<Guid, TDataObject> Get(IEnumerable<Guid> ids)
+    public IReadOnlyDictionary<Guid, TDataObject> Get(IReadOnlyCollection<Guid> ids)
     {
         var res = Get().Where(x => ids.Contains(x.Id)).ToDictionary(x => x.Id);
         ids.Except(res.Keys)
@@ -37,9 +37,9 @@ public interface IDataProviderRw<TData> : IDataProviderR<TData>
     where TData : IEntity
 {
     public void Add(TData item);
-    public void Add(IEnumerable<TData> items);
+    public void Add(IReadOnlyCollection<TData> items);
     public void Remove(Guid itemId);
-    public void Remove(IEnumerable<Guid> itemIds);
+    public void Remove(IReadOnlyCollection<Guid> itemIds);
 }
 
 public interface ISourceDataProviderRw<TData> : IDataProviderRw<TData>, ISourceDataProviderR<TData>

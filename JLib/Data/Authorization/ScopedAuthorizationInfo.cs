@@ -10,27 +10,27 @@ namespace JLib.Data.Authorization;
 public interface IAuthorizationInfo<TDataObject> : IAuthorizationInfo
     where TDataObject : class, IDataObject
 {
-    public Expression<Func<TDataObject, bool>> AuthorizeQuery();
-    public bool AuthorizeDataObject(TDataObject dataObject);
+    public Expression<Func<TDataObject, bool>> Expression();
+    public bool DataObject(TDataObject dataObject);
 
-    IReadOnlyCollection<TDataObject> RaiseExceptionIfUnauthorized(IReadOnlyCollection<TDataObject> dataObjects)
+    IReadOnlyCollection<TDataObject> AndRaiseException(IReadOnlyCollection<TDataObject> dataObjects)
     {
         dataObjects
-            .Select(GetExceptionIfUnauthorized)
+            .Select(AndGetException)
             .WhereNotNull()
             .RaiseExceptionIfNotEmpty("some Data Objects are not Authorized");
         return dataObjects;
     }
-    TDataObject RaiseExceptionIfUnauthorized(TDataObject dataObject)
+    TDataObject AndRaiseException(TDataObject dataObject)
     {
-        var ex = GetExceptionIfUnauthorized(dataObject);
+        var ex = AndGetException(dataObject);
         if (ex is not null)
             throw ex;
         return dataObject;
     }
-    Exception? GetExceptionIfUnauthorized(TDataObject dataObject)
+    Exception? AndGetException(TDataObject dataObject)
     {
-        if (AuthorizeDataObject(dataObject))
+        if (DataObject(dataObject))
             return null;
         throw new UnauthorizedAccessException(
             $"you are not allowed to access the DataObject {typeof(TDataObject).FullClassName()}: {dataObject.Id}");
@@ -59,9 +59,9 @@ internal class AuthorizationInfo<TDataObject, TS1> : IAuthorizationInfo<TDataObj
         Target = target;
     }
 
-    public Expression<Func<TDataObject, bool>> AuthorizeQuery()
+    public Expression<Func<TDataObject, bool>> Expression()
         => _authorizeQueryable(_scope.ServiceProvider.GetRequiredService<TS1>());
 
-    public bool AuthorizeDataObject(TDataObject dataObject)
+    public bool DataObject(TDataObject dataObject)
         => _authorizeDataObject(_scope.ServiceProvider.GetRequiredService<TS1>(), dataObject);
 }

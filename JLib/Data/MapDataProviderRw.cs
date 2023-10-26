@@ -23,12 +23,12 @@ public class MapDataProviderRw<TFrom, TTo> : ISourceDataProviderRw<TTo>
     public void Add(TTo item) 
         => _provider.Add(_mapper.Map<TFrom>(item));
 
-    public void Add(IEnumerable<TTo> items) 
+    public void Add(IReadOnlyCollection<TTo> items) 
         => _provider.Add(_mapper.Map<TFrom[]>(items));
 
     public void Remove(Guid itemId) 
         => _provider.Remove(itemId);
 
-    public void Remove(IEnumerable<Guid> itemIds) 
+    public void Remove(IReadOnlyCollection<Guid> itemIds) 
         => _provider.Remove(itemIds);
 }
