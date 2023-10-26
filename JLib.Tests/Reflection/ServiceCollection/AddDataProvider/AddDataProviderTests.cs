@@ -42,7 +42,7 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestDataProviderR<>),
             },
             (services,cache,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>>(
+                services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
                     cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
             ),
         #endregion
@@ -66,7 +66,7 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestDataProviderRw<>),
             },
             (services,cache,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>>(
+                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
                     cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
         ),
         #endregion
@@ -90,7 +90,7 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestDataProviderRw<>),
             },
             (services,cache,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>>(
+                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
                     cache, null, _=>true, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
         ),
         #endregion
@@ -115,7 +115,7 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestRepositoryR)
             },
             (services,cache,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>>(
+                services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
                     cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
         ),
         #endregion
@@ -147,7 +147,7 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestDataProviderR<>)
             },
             (services,cache,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>>(
+                services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
                     cache, tvt=>tvt.Value == typeof(TestCommandEntity2), null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
         ),
         #endregion
@@ -180,7 +180,7 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestDataProviderR<>)
             },
             (services,cache,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>>(
+                services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
                     cache, tvt=>tvt.Value == typeof(TestCommandEntity2), null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
         ),
         #endregion
@@ -211,7 +211,7 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestDataProviderR<>)
             },
             (services,cache,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>>(
+                services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
                     cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
         ),
         #endregion
@@ -281,7 +281,7 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestDataProviderRw<>)
             },
             (services,cache,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>>(
+                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
                     cache, null, tvt=>tvt.Value == typeof(TestCommandEntity), null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
         ),
         #endregion
@@ -304,7 +304,7 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestRepositoryR)
             },
             (services,cache,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>>(
+                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
                         cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
             true,false,false
         ),
@@ -330,7 +330,7 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestRepositoryR)
             },
             (services,cache,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>>(
+                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
                     cache, null, _=>true, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
         ),
         #endregion
@@ -352,7 +352,7 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestRepositoryRw)
             },
             (services,cache,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>>(
+                services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
                     cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
             true,false,false
         ),
@@ -378,7 +378,7 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestRepositoryRw)
             },
             (services,cache,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>>(
+                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
                     cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
         ),
         #endregion
@@ -400,7 +400,7 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestRepositoryRw)
             },
             (services,cache,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>>(
+                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
                     cache, null, _=>true, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
             true,false,false
         ),
@@ -423,7 +423,7 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestInvalidRepositoryRw)
             },
             (services,cache,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>>(
+                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
                     cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
             true,false,false
         ),
@@ -446,7 +446,7 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestInvalidRepositoryR)
             },
             (services,cache,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>>(
+                services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
                     cache, null, _=>true, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
             true,false,false
         ),
@@ -468,7 +468,7 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestInvalidDataProviderR<>),
             },
             (services,cache,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestInvalidDataProviderR<IEntity>>(
+                services.AddDataProvider<CommandEntityType, TestInvalidDataProviderR<IEntity>, IEntity>(
                     cache, null, _=>true, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
             true,false,false
         ),
@@ -490,7 +490,7 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestInvalidDataProviderRw<>),
             },
             (services,cache,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestInvalidDataProviderRw<IEntity>>(
+                services.AddDataProvider<CommandEntityType, TestInvalidDataProviderRw<IEntity>, IEntity>(
                     cache, null, _=>true, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
             true,false,false
         ),
@@ -514,7 +514,7 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestRepositoryRw)
             },
             (services,cache,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>>(
+                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
                     cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
             true,false,false
         ),
@@ -536,7 +536,7 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestInvalidInterfaceDataProvider<>),
             },
             (services,cache,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>>(
+                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
                     cache, null, _=>true, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
             true,false,false
         ),

@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Concurrent;
+using System.Collections.Immutable;
 
 namespace JLib.Helper;
 
@@ -43,4 +44,9 @@ public static class EnumerableHelper
         foreach (var i in toRemove)
             col.Remove(i);
     }
+
+    public static ConcurrentDictionary<TKey, TValue> ToConcurrentDictionary<TKey, TValue>(
+        this IEnumerable<TValue> col, Func<TValue, TKey> keySelector)
+        where TKey : notnull
+        => new(col.ToDictionary(keySelector));
 }

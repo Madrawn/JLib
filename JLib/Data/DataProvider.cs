@@ -1,14 +1,27 @@
-﻿namespace JLib.Data;
+﻿using JLib.Helper;
+
+namespace JLib.Data;
 
 
-public interface IDataProviderR<TData>
-    where TData : IDataObject
+public interface IDataProviderR<TDataObject>
+    where TDataObject : IDataObject
 {
-    public IQueryable<TData> Get();
+    public IQueryable<TDataObject> Get();
 
-    public TData Get(Guid id)
+    public TDataObject Get(Guid id)
         => Get().Single(x => x.Id == id);
-    public TData? TryGet(Guid? id)
+
+    public IReadOnlyDictionary<Guid, TDataObject> Get(IEnumerable<Guid> ids)
+    {
+        var res = Get().Where(x => ids.Contains(x.Id)).ToDictionary(x => x.Id);
+        ids.Except(res.Keys)
+            .Select(id => new KeyNotFoundException(
+                "could not find " + typeof(TDataObject).FullClassName() + ": " + id))
+            .RaiseExceptionIfNotEmpty("Some Keys could not be found");
+        return res;
+    }
+
+    public TDataObject? TryGet(Guid? id)
         => id.HasValue ? Get().SingleOrDefault(x => x.Id == id.Value) : default;
     public bool Contains(Guid? id)
         => id.HasValue && Get().Any(x => x.Id == id.Value);

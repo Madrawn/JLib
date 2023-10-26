@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using JLib.Data;
+using JLib.Data.Authorization;
 using JLib.Exceptions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -592,4 +593,25 @@ public static class ServiceCollectionHelper
         return genericClass.MakeGenericType(typeArguments);
     }
     #endregion
+
+    /// <summary>
+    /// provides scoped a <see cref="IServiceScope"/> which returns the current service provider.
+    /// <br/>can be used to detect if the provider is scoped or to enforce a given <see cref="IServiceProvider"/> being scoped
+    /// <br/>the injected scope can not be disposed of. doing so will result in a <see cref="InvalidOperationException"/>
+    /// </summary>
+    public static IServiceCollection AddScopeProvider(this IServiceCollection services)
+        => services.AddScoped<IServiceScope, ServiceScopeProxy>();
+    private class ServiceScopeProxy : IServiceScope
+    {
+        public IServiceProvider ServiceProvider { get; }
+
+        public ServiceScopeProxy(IServiceProvider provider)
+        {
+            ServiceProvider = provider;
+        }
+
+        public void Dispose()
+            => throw new InvalidOperationException("you can not dispose an injected scope");
+    }
+
 }
