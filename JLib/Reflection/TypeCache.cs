@@ -11,13 +11,13 @@ namespace JLib.Reflection;
 /// <summary>
 /// groups <see cref="Type"/>s by <see cref="TypeValueType"/>, validates them and initializes Navigation
 /// <br/> Service interface for the <see cref="TypeCache"/>.
-/// - <seealso cref="TypeValueType"/>
-/// - <seealso cref="NavigatingTypeValueType"/>
-/// - <seealso cref="IValidatedType"/>
-/// - <seealso cref="IPostNavigationInitializedType"/>
-/// - <seealso cref=""/>
-/// - <seealso cref="TvtFactoryAttributes"/>
-/// - <seealso cref="IgnoreInCache"/>
+/// <br/>- <seealso cref="TypeValueType"/>
+/// <br/>- <seealso cref="NavigatingTypeValueType"/>
+/// <br/>- <seealso cref="IValidatedType"/>
+/// <br/>- <seealso cref="IPostNavigationInitializedType"/>
+/// <br/>- <seealso cref=""/>
+/// <br/>- <seealso cref="TvtFactoryAttributes"/>
+/// <br/>- <seealso cref="IgnoreInCache"/>
 /// </summary>
 public interface ITypeCache
 {

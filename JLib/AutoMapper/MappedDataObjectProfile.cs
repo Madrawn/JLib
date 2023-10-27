@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AutoMapper;
+using JLib.Data;
 using JLib.Helper;
 using JLib.Reflection;
 using Serilog;

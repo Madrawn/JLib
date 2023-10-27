@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using JLib.AutoMapper;
 using JLib.Reflection;
 using Serilog;
 

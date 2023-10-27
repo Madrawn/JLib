@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using JLib.Attributes;
-using JLib.AutoMapper;
 using JLib.Exceptions;
 using JLib.ValueTypes;
 
@@ -19,15 +18,7 @@ public interface IValidatedType : ITypeValueType
 {
     void Validate(ITypeCache cache, TvtValidator value);
 }
-public interface IDataObjectType : ITypeValueType { }
 
-/// <summary>
-/// the <see cref="MappedDataObjectProfile"/> will create a map for each <see cref="MappingInfo"/>
-/// </summary>
-public interface IMappedDataObjectType : IDataObjectType, IPostNavigationInitializedType
-{
-    ExplicitTypeMappingInfo[] MappingInfo { get; }
-}
 public interface ITypeValueType
 {
     public string Name => Value.Name;
