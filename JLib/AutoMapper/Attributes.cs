@@ -1,4 +1,7 @@
-﻿namespace JLib;
+﻿using JLib.Reflection;
+using JLib.ValueTypes;
+
+namespace JLib.AutoMapper;
 /// <summary>
 /// used for entity mapping in conjunction with any <see cref="IMappedDataObjectType"/>.
 /// <br/>Enables the Profile to ignore the separator when resolving the correlated properties.

@@ -1,7 +1,10 @@
 ﻿using System.Reflection;
+using JLib.Exceptions;
+using JLib.Reflection;
+using JLib.ValueTypes;
 using static JLib.FactoryAttributes.TvtFactoryAttributes;
 
-namespace JLib;
+namespace JLib.Configuration;
 
 public record ConfigSectionName(string Value) : StringValueType(Value)
 {

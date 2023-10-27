@@ -1,9 +1,8 @@
-﻿using JLib.Exceptions;
-using JLib.Helper;
+﻿using JLib.Helper;
 using Serilog;
 using Serilog.Events;
 
-namespace JLib;
+namespace JLib.Exceptions;
 
 public interface IExceptionProvider
 {

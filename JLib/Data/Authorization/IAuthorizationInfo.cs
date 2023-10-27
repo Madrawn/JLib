@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Runtime.InteropServices.ComTypes;
-using System.Text;
-using System.Threading.Tasks;
-using JLib.Helper;
-using Microsoft.Extensions.DependencyInjection;
+﻿using JLib.Reflection;
 
 namespace JLib.Data.Authorization;
 

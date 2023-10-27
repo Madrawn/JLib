@@ -2,7 +2,7 @@
 using JLib.Exceptions;
 using JLib.Helper;
 
-namespace JLib;
+namespace JLib.Reflection;
 
 internal class TvtNavigationManager
 {

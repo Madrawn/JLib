@@ -1,10 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using JLib.Helper;
+﻿using JLib.Helper;
+using JLib.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace JLib.Data.Authorization;
 public static class AuthorizationExtensions

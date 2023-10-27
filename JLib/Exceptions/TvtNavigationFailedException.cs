@@ -1,4 +1,6 @@
-﻿namespace JLib.Exceptions;
+﻿using JLib.Reflection;
+
+namespace JLib.Exceptions;
 
 public class TvtNavigationFailedException : InvalidSetupException
 {

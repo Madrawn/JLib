@@ -2,8 +2,9 @@
 using JLib.Attributes;
 using JLib.AutoMapper;
 using JLib.Exceptions;
+using JLib.ValueTypes;
 
-namespace JLib;
+namespace JLib.Reflection;
 
 /// <summary>
 /// allows a <see cref="ITypeValueType"/> to run code after the navigation has been initialized but before it will be validated

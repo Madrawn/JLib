@@ -1,4 +1,6 @@
-﻿namespace JLib.HotChocolate.Reflection;
+﻿using JLib.Reflection;
+
+namespace JLib.HotChocolate.Reflection;
 public class TypeValueTypeGdo
 {
     private readonly TypeValueType _src;

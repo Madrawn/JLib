@@ -2,11 +2,23 @@
 using JLib.Exceptions;
 using JLib.FactoryAttributes;
 using JLib.Helper;
+using JLib.ValueTypes;
 using Serilog;
 using Serilog.Events;
 
-namespace JLib;
+namespace JLib.Reflection;
 
+/// <summary>
+/// groups <see cref="Type"/>s by <see cref="TypeValueType"/>, validates them and initializes Navigation
+/// <br/> Service interface for the <see cref="TypeCache"/>.
+/// - <seealso cref="TypeValueType"/>
+/// - <seealso cref="NavigatingTypeValueType"/>
+/// - <seealso cref="IValidatedType"/>
+/// - <seealso cref="IPostNavigationInitializedType"/>
+/// - <seealso cref=""/>
+/// - <seealso cref="TvtFactoryAttributes"/>
+/// - <seealso cref="IgnoreInCache"/>
+/// </summary>
 public interface ITypeCache
 {
     public IEnumerable<Type> KnownTypeValueTypes { get; }
@@ -37,6 +49,13 @@ public interface ITypeCache
 
 }
 
+/// <summary>
+/// provides a easy to use way to group types by kind, i.e. entities
+/// <br/>searches the Application for <see cref="TypeValueType"/> instances with <see cref="TvtFactoryAttributes.ITypeValueTypeFilterAttribute"/> attributes
+/// and populates them with the types provided via constructor.
+/// <br/> all reflection is done in the constructor
+/// <br/> should be used as singleton
+/// </summary>
 public class TypeCache : ITypeCache
 {
     private record ValueTypeForTypeValueTypes : ValueType<Type>
@@ -68,6 +87,8 @@ public class TypeCache : ITypeCache
     private readonly TypeValueType[] _typeValueTypes;
     private readonly IReadOnlyDictionary<Type, TypeValueType> _typeMappings;
     public IEnumerable<Type> KnownTypeValueTypes { get; }
+
+    #region constructor
 
     public TypeCache(params Assembly[] assemblies) : this(assemblies.AsEnumerable()) { }
     public TypeCache(IEnumerable<Assembly> assemblies) : this(assemblies.SelectMany(a => a.GetTypes())) { }
@@ -203,7 +224,7 @@ public class TypeCache : ITypeCache
         WriteLog();
     }
 
-
+    #endregion
 
     public T Get<T>(Type weakType)
         where T : class, ITypeValueType

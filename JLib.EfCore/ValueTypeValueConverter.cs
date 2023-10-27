@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using JLib.ValueTypes;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace JLib.EfCore;

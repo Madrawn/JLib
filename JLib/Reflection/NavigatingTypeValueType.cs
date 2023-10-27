@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using JLib.Exceptions;
 
-namespace JLib;
+namespace JLib.Reflection;
 
 public abstract record NavigatingTypeValueType(Type Value) : TypeValueType(Value)
 {

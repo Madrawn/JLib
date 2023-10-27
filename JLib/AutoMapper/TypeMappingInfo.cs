@@ -1,6 +1,6 @@
-﻿using JLib.AutoMapper;
+﻿using JLib.Reflection;
 
-namespace JLib;
+namespace JLib.AutoMapper;
 
 public enum MappingDirection
 {

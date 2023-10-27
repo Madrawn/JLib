@@ -1,7 +1,9 @@
 ﻿using System.Reflection;
+using JLib.AutoMapper;
+using JLib.Configuration;
 using JLib.Data;
-using JLib.Data.Authorization;
 using JLib.Exceptions;
+using JLib.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -136,6 +138,14 @@ public static class ServiceCollectionHelper
     #endregion
 
     #region AddTypeCache
+    /// <summary>
+    /// Adds the <see cref="ITypeCache"/> to your services, executes its Initialization and returns the ready-to-use instance.
+    /// <br/>
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="typeCache"></param>
+    /// <param name="includedPrefixes"></param>
+    /// <returns></returns>
     public static IServiceCollection AddTypeCache(this IServiceCollection services, out ITypeCache typeCache,
         params string[] includedPrefixes)
         => services.AddTypeCache(out typeCache, null, SearchOption.TopDirectoryOnly, includedPrefixes);

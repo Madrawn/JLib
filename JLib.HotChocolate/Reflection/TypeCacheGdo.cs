@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using HotChocolate;
 using JLib.Helper;
+using JLib.Reflection;
 
 namespace JLib.HotChocolate.Reflection;
 public class TypeCacheGdo

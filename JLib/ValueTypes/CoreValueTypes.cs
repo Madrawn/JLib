@@ -1,4 +1,6 @@
-﻿namespace JLib;
+﻿using JLib.AutoMapper;
+
+namespace JLib.ValueTypes;
 
 public abstract record StringValueType(string Value) : ValueType<string>(Value);
 
@@ -15,8 +17,8 @@ public record PropertyPrefix(string Value) : Prefix(Value), IPropertyResolver
     public string GetComparisonString(string propertyName)
     {
         var i = propertyName.IndexOf(propertyName, StringComparison.Ordinal);
-        return i == -1 
-            ? propertyName 
+        return i == -1
+            ? propertyName
             : propertyName[(i + 1)..];
     }
 }
@@ -30,8 +32,8 @@ public record PropertySuffix(string Value) : Prefix(Value), IPropertyResolver
 
         var i = propertyName.LastIndexOf(propertyName, StringComparison.Ordinal);
         return
-            i == -1 
-                ? propertyName 
+            i == -1
+                ? propertyName
                 : propertyName[..(i + 1)];
     }
 }

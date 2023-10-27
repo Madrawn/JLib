@@ -1,7 +1,7 @@
 ﻿using JLib.Exceptions;
 using JLib.Helper;
 
-namespace JLib;
+namespace JLib.Reflection;
 
 public class TvtValidator : IExceptionProvider
 {

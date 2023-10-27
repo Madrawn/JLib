@@ -1,4 +1,6 @@
-﻿namespace JLib.Helper;
+﻿using JLib.Reflection;
+
+namespace JLib.Helper;
 
 public static class TypeHelper
 {
