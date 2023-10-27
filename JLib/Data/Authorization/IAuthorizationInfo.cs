@@ -1,6 +1,4 @@
-﻿using JLib.Reflection;
-
-namespace JLib.Data.Authorization;
+﻿namespace JLib.Data.Authorization;
 
 public interface IAuthorizationInfo
 {
