@@ -10,6 +10,7 @@ using JLib.ValueTypes;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace JLib.Tests.Data.Authorization;
+
 public class AuthorizationTests
 {
     private readonly IServiceProvider _serviceProvider;
@@ -22,16 +23,11 @@ public class AuthorizationTests
         var exceptions = new ExceptionManager("test");
         var services = new ServiceCollection()
             .AddTypeCache(
-                new[]
-                {
-                    typeof(TypeCache).Assembly,
-                    typeof(DataPackage).Assembly
-                }, new[]
-                {
-                    typeof(TestDataObject),
-                    typeof(TestObjectDataPackage),
-                    typeof(TestAuthProfile),
-                }, out var typeCache, exceptions)
+                out var typeCache, exceptions,
+                JLibTypePackage.Instance,
+                JLibDataGenerationTypePackage.Instance,
+                TypePackage.GetNested<AuthorizationTests>()
+                )
             .AddSingleton<TestAuthorizationCondition>()
             .AddScopeProvider()
             .AddDataAuthorization(typeCache)

@@ -90,15 +90,10 @@ public class TypeCache : ITypeCache
 
     #region constructor
 
-    public TypeCache(params Assembly[] assemblies) : this(assemblies.AsEnumerable()) { }
-    public TypeCache(IEnumerable<Assembly> assemblies) : this(assemblies.SelectMany(a => a.GetTypes())) { }
-    public TypeCache(IEnumerable<Type> types) : this(types.ToArray()) { }
 
-    public TypeCache(Assembly[] assemblies, Type[] types, IExceptionManager? parentExceptionManager)
-        : this(parentExceptionManager, assemblies.SelectMany(a => a.DefinedTypes).Concat(types).ToArray()) { }
-    public TypeCache(params Type[] types) : this(null, types) { }
-    public TypeCache(IExceptionManager? parentExceptionManager, params Type[] types)
+    public TypeCache(ITypePackage typePackage, IExceptionManager? parentExceptionManager)
     {
+        var types = typePackage.Content.ToArray();
         const string exceptionMessage = "Cache setup failed";
         var exceptions = parentExceptionManager?.CreateChild(exceptionMessage)
                          ?? new ExceptionManager(exceptionMessage);

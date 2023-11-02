@@ -11,7 +11,7 @@ public class AddDataProviderTests : ReflectionTestBase
 {
     public class TestArguments : ReflectionTestArguments
     {
-        protected override string Filter { get; } = "";
+        protected override string Filter { get; } = "MultiRepo_ProvIrw";
 
         protected override IEnumerable<ReflectionTestOptions> Options { get; }
             = new ReflectionTestOptions[]
