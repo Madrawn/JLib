@@ -20,26 +20,26 @@
   "exception": null,
   "cache": {
     "JLib.Tests.Reflection.ServiceCollection.AddDataProvider": {
-      "JLib.CommandEntityType": [
+      "JLib.Data.CommandEntityType": [
         "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity"
       ],
-      "JLib.SourceDataProviderType": [
+      "JLib.Reflection.SourceDataProviderType": [
         "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestDataProviderR<>"
       ],
-      "JLib.RepositoryType": [
+      "JLib.Reflection.RepositoryType": [
         "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestRepositoryR"
       ]
     }
   },
   "services": {
     "non-generic": {
-      "JLib.ITypeCache": [
+      "JLib.Reflection.ITypeCache": [
         {
           "Lifetime": "Singleton",
           "ImplementationSource": "Instance",
-          "ServiceType": "JLib.ITypeCache",
+          "ServiceType": "JLib.Reflection.ITypeCache",
           "ServiceArguments": [],
-          "ImplementationType": "JLib.TypeCache",
+          "ImplementationType": "JLib.Reflection.TypeCache",
           "ImplementationTypeArguments": []
         }
       ],
