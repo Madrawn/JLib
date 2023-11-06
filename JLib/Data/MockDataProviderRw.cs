@@ -69,9 +69,14 @@ public class MockDataProvider<TEntity> : ISourceDataProviderRw<TEntity>
         _items.Remove(item);
     }
 
+    public void Remove(TEntity item) => _items.Remove(item);
+
     public void Remove(IReadOnlyCollection<Guid> itemIds)
     {
         var items = this.CastTo<IDataProviderR<TEntity>>().Get(itemIds).Select(x => x.Value);
         _items.Remove(items);
     }
+
+    public void Remove(IReadOnlyCollection<TEntity> items) 
+        => _items.Remove(items);
 }

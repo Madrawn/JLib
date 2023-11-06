@@ -47,6 +47,9 @@ public class EfCoreDataProviderRw<TEntity> : ISourceDataProviderRw<TEntity>
         _dbContext.Set<TEntity>().Remove(item);
     }
 
+    public void Remove(TEntity item)
+        => _dbContext.Remove(item);
+
     public void Remove(IReadOnlyCollection<Guid> itemIds)
     {
         var set = _dbContext.Set<TEntity>();
@@ -54,4 +57,7 @@ public class EfCoreDataProviderRw<TEntity> : ISourceDataProviderRw<TEntity>
         _authorize.AndRaiseException(items);
         _dbContext.Set<TEntity>().RemoveRange(items);
     }
+
+    public void Remove(IReadOnlyCollection<TEntity> items)
+        => _dbContext.RemoveRange(items);
 }
