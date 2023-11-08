@@ -1,6 +1,6 @@
 ﻿namespace JLib.Data;
 
-public class CastDataProviderR<TFrom, TTo> : ISourceDataProviderR<TTo>
+public class CastDataProviderR<TFrom, TTo> : DataProviderRBase<TTo>, ISourceDataProviderR<TTo>
     where TFrom : TTo, IDataObject
     where TTo : IDataObject
 {
@@ -10,5 +10,5 @@ public class CastDataProviderR<TFrom, TTo> : ISourceDataProviderR<TTo>
     {
         _srcProvider = srcProvider;
     }
-    public IQueryable<TTo> Get() => _srcProvider.Get().Cast<TTo>();
+    public override IQueryable<TTo> Get() => _srcProvider.Get().Cast<TTo>();
 }

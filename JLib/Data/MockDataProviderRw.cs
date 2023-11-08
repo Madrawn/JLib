@@ -7,12 +7,12 @@ using Serilog;
 
 namespace JLib.Data;
 
-public class MockDataProvider<TEntity> : ISourceDataProviderRw<TEntity>
+public class MockDataProvider<TEntity> : DataProviderRBase<TEntity>, ISourceDataProviderRw<TEntity>
     where TEntity : class, IEntity
 {
     private readonly PropertyInfo _idProperty;
 
-    private Func<Guid, object> _idGenerator;
+    private readonly Func<Guid, object> _idGenerator;
 
     public MockDataProvider(IAuthorizationInfo<TEntity> authorizationInfo)
     {
@@ -40,7 +40,7 @@ public class MockDataProvider<TEntity> : ISourceDataProviderRw<TEntity>
     private readonly List<TEntity> _items = new();
     private readonly IAuthorizationInfo<TEntity> _authorize;
 
-    public IQueryable<TEntity> Get()
+    public override IQueryable<TEntity> Get()
     {
         Log.Verbose("MockDataProvider Expression for {0}", typeof(TEntity).Name);
         return _items.AsQueryable().Where(_authorize.Expression());

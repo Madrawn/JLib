@@ -49,4 +49,7 @@ public static class EnumerableHelper
         this IEnumerable<TValue> col, Func<TValue, TKey> keySelector)
         where TKey : notnull
         => new(col.ToDictionary(keySelector));
+
+    public static IEnumerable<ValueTuple<T,int>> AddIndex<T>(this IEnumerable<T> src)
+        => src.Select((item, index) => (item, index));
 }

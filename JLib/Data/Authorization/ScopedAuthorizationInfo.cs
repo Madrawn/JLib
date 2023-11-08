@@ -62,6 +62,9 @@ internal class AuthorizationInfo<TDataObject, TDependency1> : IAuthorizationInfo
     public Expression<Func<TDataObject, bool>> Expression()
         => _authorizeQueryable(_scope.ServiceProvider.GetRequiredService<TDependency1>());
 
+    /// <summary>
+    /// returns true if the user is authorized to access the given entity
+    /// </summary>
     public bool DataObject(TDataObject dataObject)
         => _authorizeDataObject(_scope.ServiceProvider.GetRequiredService<TDependency1>(), dataObject);
 }
