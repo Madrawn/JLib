@@ -27,4 +27,14 @@ public static class ExceptionHelper
             masterExceptionList.Add(new JLibAggregateException(message, mat));
         }
     }
+
+    /// <summary>
+    /// throws the <paramref name="exception"/> if it is not null
+    /// </summary>
+    /// <param name="exception"></param>
+    public static void Throw(this Exception? exception)
+    {
+        if(exception is not null)
+            throw exception;
+    }
 }
