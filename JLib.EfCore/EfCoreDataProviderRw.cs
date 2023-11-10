@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace JLib.EfCore;
 
-public class EfCoreDataProviderR<TEntity> : ISourceDataProviderR<TEntity>
+public class EfCoreDataProviderR<TEntity> : DataProviderRBase<TEntity>, ISourceDataProviderR<TEntity>
     where TEntity : class, IEntity
 {
     private readonly DbContext _dbContext;
@@ -16,10 +16,10 @@ public class EfCoreDataProviderR<TEntity> : ISourceDataProviderR<TEntity>
         _authorize = authorize;
     }
 
-    public IQueryable<TEntity> Get() => _dbContext.Set<TEntity>().Where(_authorize.Expression()).AsNoTracking();
+    public override IQueryable<TEntity> Get() => _dbContext.Set<TEntity>().Where(_authorize.Expression()).AsNoTracking();
 }
 
-public class EfCoreDataProviderRw<TEntity> : ISourceDataProviderRw<TEntity>
+public class EfCoreDataProviderRw<TEntity> : DataProviderRBase<TEntity>, ISourceDataProviderRw<TEntity>
     where TEntity : class, IEntity
 {
     private readonly DbContext _dbContext;
@@ -30,7 +30,7 @@ public class EfCoreDataProviderRw<TEntity> : ISourceDataProviderRw<TEntity>
         _dbContext = dbContext;
         _authorize = authorize;
     }
-    public IQueryable<TEntity> Get()
+    public override IQueryable<TEntity> Get()
         => _dbContext.Set<TEntity>().Where(_authorize.Expression());
 
     public void Add(TEntity item)
@@ -47,6 +47,9 @@ public class EfCoreDataProviderRw<TEntity> : ISourceDataProviderRw<TEntity>
         _dbContext.Set<TEntity>().Remove(item);
     }
 
+    public void Remove(TEntity item)
+        => _dbContext.Remove(item);
+
     public void Remove(IReadOnlyCollection<Guid> itemIds)
     {
         var set = _dbContext.Set<TEntity>();
@@ -54,4 +57,7 @@ public class EfCoreDataProviderRw<TEntity> : ISourceDataProviderRw<TEntity>
         _authorize.AndRaiseException(items);
         _dbContext.Set<TEntity>().RemoveRange(items);
     }
+
+    public void Remove(IReadOnlyCollection<TEntity> items)
+        => _dbContext.RemoveRange(items);
 }

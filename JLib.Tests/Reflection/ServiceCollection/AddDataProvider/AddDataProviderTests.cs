@@ -543,7 +543,7 @@ public class AddDataProviderTests : ReflectionTestBase
     {
     }
 
-    public override void AddServices(IServiceCollection services, ITypeCache cache, IExceptionManager exceptions)
+    protected override void AddServices(IServiceCollection services, ITypeCache cache, IExceptionManager exceptions)
         => services.AddRepositories(cache, exceptions);
 
 
@@ -567,38 +567,40 @@ public class AddDataProviderTests : ReflectionTestBase
     #endregion
     #region repositories
 
-    public class TestInvalidDataProviderR<T> : IDataProviderR<T> where T : IEntity
+    public class TestInvalidDataProviderR<T> : DataProviderRBase<T>, IDataProviderR<T> where T : IEntity
     {
-        public IQueryable<T> Get() => throw new NotImplementedException();
+        public override IQueryable<T> Get() => throw new NotImplementedException();
     }
-    public class TestInvalidDataProviderRw<T> : IDataProviderRw<T> where T : IEntity
+    public class TestInvalidDataProviderRw<T> : DataProviderRBase<T>, IDataProviderRw<T> where T : IEntity
     {
-        public IQueryable<T> Get() => throw new NotImplementedException();
+        public override IQueryable<T> Get() => throw new NotImplementedException();
         public void Add(T item) => throw new NotImplementedException();
 
         public void Add(IReadOnlyCollection<T> items) => throw new NotImplementedException();
 
         public void Remove(Guid itemId) => throw new NotImplementedException();
+        public void Remove(T item) => throw new NotImplementedException();
 
         public void Remove(IReadOnlyCollection<Guid> itemIds) => throw new NotImplementedException();
+        public void Remove(IReadOnlyCollection<T> items) => throw new NotImplementedException();
     }
 
-    public class TestRepositoryR : IDataProviderR<TestCommandEntity>
+    public class TestRepositoryR : DataProviderRBase<TestCommandEntity>, IDataProviderR<TestCommandEntity>
     {
         public TestRepositoryR(ISourceDataProviderR<TestCommandEntity> sourceProvider)
         {
 
         }
-        public IQueryable<TestCommandEntity> Get()
+        public override IQueryable<TestCommandEntity> Get()
             => throw new NotImplementedException();
     }
-    public class TestRepositoryRw : IDataProviderRw<TestCommandEntity>
+    public class TestRepositoryRw : DataProviderRBase<TestCommandEntity>, IDataProviderRw<TestCommandEntity>
     {
         public TestRepositoryRw()
         {
 
         }
-        public IQueryable<TestCommandEntity> Get()
+        public override IQueryable<TestCommandEntity> Get()
             => throw new NotImplementedException();
 
         public void Add(TestCommandEntity item) => throw new NotImplementedException();
@@ -606,62 +608,70 @@ public class AddDataProviderTests : ReflectionTestBase
         public void Add(IReadOnlyCollection<TestCommandEntity> items) => throw new NotImplementedException();
 
         public void Remove(Guid itemId) => throw new NotImplementedException();
+        public void Remove(TestCommandEntity item) => throw new NotImplementedException();
 
         public void Remove(IReadOnlyCollection<Guid> itemIds) => throw new NotImplementedException();
+        public void Remove(IReadOnlyCollection<TestCommandEntity> items) => throw new NotImplementedException();
     }
 
-    public class TestInvalidRepositoryR : ISourceDataProviderR<TestCommandEntity>
+    public class TestInvalidRepositoryR : DataProviderRBase<TestCommandEntity>, ISourceDataProviderR<TestCommandEntity>
     {
-        public IQueryable<TestCommandEntity> Get() => throw new NotImplementedException();
+        public override IQueryable<TestCommandEntity> Get() => throw new NotImplementedException();
     }
-    public class TestInvalidRepositoryRw : ISourceDataProviderRw<TestCommandEntity>
+    public class TestInvalidRepositoryRw : DataProviderRBase<TestCommandEntity>, ISourceDataProviderRw<TestCommandEntity>
     {
-        public IQueryable<TestCommandEntity> Get() => throw new NotImplementedException();
+        public override IQueryable<TestCommandEntity> Get() => throw new NotImplementedException();
 
         public void Add(TestCommandEntity item) => throw new NotImplementedException();
 
         public void Add(IReadOnlyCollection<TestCommandEntity> items) => throw new NotImplementedException();
 
         public void Remove(Guid itemId) => throw new NotImplementedException();
+        public void Remove(TestCommandEntity item) => throw new NotImplementedException();
 
         public void Remove(IReadOnlyCollection<Guid> itemIds) => throw new NotImplementedException();
+        public void Remove(IReadOnlyCollection<TestCommandEntity> items) => throw new NotImplementedException();
     }
     #endregion
     #region DataProvider
-    public class TestDataProviderRw<T> : ISourceDataProviderRw<T> where T : IEntity
+    public class TestDataProviderRw<T> : DataProviderRBase<T>, ISourceDataProviderRw<T> where T : IEntity
     {
-        public IQueryable<T> Get() => throw new NotImplementedException();
+        public override IQueryable<T> Get() => throw new NotImplementedException();
 
         public void Add(T item) => throw new NotImplementedException();
 
         public void Add(IReadOnlyCollection<T> items) => throw new NotImplementedException();
 
         public void Remove(Guid itemId) => throw new NotImplementedException();
+        public void Remove(T item) => throw new NotImplementedException();
 
         public void Remove(IReadOnlyCollection<Guid> itemIds) => throw new NotImplementedException();
+        public void Remove(IReadOnlyCollection<T> items) => throw new NotImplementedException();
     }
-    public class TestDataProviderR<T1, T2> : ISourceDataProviderR<T2>
+    public class TestDataProviderR<T1, T2> : DataProviderRBase<T2>, ISourceDataProviderR<T2>
         where T1 : ITestEntity1
         where T2 : ITestEntity2
     {
-        public IQueryable<T2> Get() => throw new NotImplementedException();
+        public override IQueryable<T2> Get() => throw new NotImplementedException();
     }
-    public class TestDataProviderR<T> : ISourceDataProviderR<T> where T : IEntity
+    public class TestDataProviderR<T> : DataProviderRBase<T>, ISourceDataProviderR<T> where T : IEntity
     {
-        public IQueryable<T> Get() => throw new NotImplementedException();
+        public override IQueryable<T> Get() => throw new NotImplementedException();
     }
 
-    public class TestInvalidInterfaceDataProvider<T> : ISourceDataProviderR<T>, IDataProviderRw<T>
+    public class TestInvalidInterfaceDataProvider<T> :DataProviderRBase<T>, ISourceDataProviderR<T>, IDataProviderRw<T>
         where T : IEntity
     {
-        public IQueryable<T> Get() => throw new NotImplementedException();
+        public override IQueryable<T> Get() => throw new NotImplementedException();
         public void Add(T item) => throw new NotImplementedException();
 
         public void Add(IReadOnlyCollection<T> items) => throw new NotImplementedException();
 
         public void Remove(Guid itemId) => throw new NotImplementedException();
+        public void Remove(T item) => throw new NotImplementedException();
 
         public void Remove(IReadOnlyCollection<Guid> itemIds) => throw new NotImplementedException();
+        public void Remove(IReadOnlyCollection<T> items) => throw new NotImplementedException();
     }
     #endregion
     #endregion

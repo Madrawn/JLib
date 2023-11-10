@@ -78,7 +78,7 @@ public abstract class ReflectionTestBase
             .CreateLogger();
     }
 
-    public virtual void AddServices(IServiceCollection services, ITypeCache cache, IExceptionManager exceptions)
+    protected virtual void AddServices(IServiceCollection services, ITypeCache cache, IExceptionManager exceptions)
     {
 
     }

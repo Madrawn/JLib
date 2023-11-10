@@ -1,15 +1,33 @@
 ﻿using System.Reflection;
 using HotChocolate;
 using HotChocolate.Execution.Configuration;
+using HotChocolate.Types;
 using JLib.Data;
 using JLib.Exceptions;
 using JLib.Helper;
+using JLib.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using static JLib.FactoryAttributes.TvtFactoryAttributes;
 
 namespace JLib.HotChocolate.Helper;
 
+[IsClass, HasAttribute(typeof(ExtendObjectTypeAttribute))]
+public record TypeExtensionType(Type Value) : TypeValueType(Value);
+
 public static class RequestExecutorBuilderHelper
 {
+
+    /// <summary>
+    /// <b>WARNING!</b> This method must be called after <b>ALL</b> DataProvider have been registered!
+    /// </summary>
+    public static IRequestExecutorBuilder AddTypeExtensions(
+        this IRequestExecutorBuilder builder, ITypeCache typeCache)
+    {
+        foreach (var type in typeCache.All<TypeExtensionType>())
+            builder.AddTypeExtension(type.Value);
+        return builder;
+    }
+
     /// <summary>
     /// <b>WARNING!</b> This method must be called after <b>ALL</b> DataProvider have been registered!
     /// </summary>
