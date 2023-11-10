@@ -1,28 +1,19 @@
 ﻿using JLib.Exceptions;
 using JLib.Helper;
+using JLib.ValueTypes;
 
 namespace JLib.Reflection;
 
-public class TvtValidator : IExceptionProvider
+public class TvtValidator : ValueTypeValidator<TypeValueType, Type>
 {
-    private readonly ITypeValueType _typeValueType;
-    private Type Value => _typeValueType.Value;
-    private readonly List<string> _messages = new();
-    public TvtValidator(ITypeValueType typeValueType)
+    public TvtValidator(TypeValueType valueType) : base(valueType)
     {
-        _typeValueType = typeValueType;
-    }
-    public void AddError(string message, string? hint = null)
-    {
-        if (hint != null)
-            message += $" this might be resolved by {hint}";
-        _messages.Add(message);
     }
 
-    Exception? IExceptionProvider.GetException()
+    protected override Exception? BuildException(IReadOnlyCollection<string> messages)
         => JLibAggregateException.ReturnIfNotEmpty(
             "Type validation failed",
-            _messages.Select(msg => new InvalidTypeException(_typeValueType.GetType(), _typeValueType.Value, msg)));
+            messages.Select(msg => new InvalidTypeException(ValueType.GetType(), ValueType.Value, msg)));
 
     public void ShouldBeGeneric(string? hint = null)
     {
@@ -66,4 +57,5 @@ public class TvtValidator : IExceptionProvider
         if (Value.ImplementsAny<TInterface>())
             AddError($"Should not implement {typeof(TInterface).TryGetGenericTypeDefinition().FullClassName(true)}", hint);
     }
+
 }
