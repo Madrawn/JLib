@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using JLib.Configuration;
 using JLib.Exceptions;
+using JLib.Reflection;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 
@@ -8,10 +9,7 @@ namespace JLib.Helper;
 public static class ConfigurationHelper
 {
     /// <summary>
-    /// returns a new instance of the section <typeparamref name="T"/> under the given <paramref name="configSectionName"/>
-    /// <br/>supports environments using the following behavior:
-    /// <example>
-    /// Behavior:
+    /// <para>supports environments using the following behavior:</para>
     /// <code>
     /// {
     ///     Environment: "Dev1",
@@ -46,7 +44,17 @@ public static class ConfigurationHelper
     ///     }
     /// }
     /// </code>
-    /// </example>
+    /// </summary>
+    // ReSharper disable once UnusedMember.Local
+    // only used to hold the summary above
+    private static Ignored BehaviorSummaryHolder => throw new InvalidOperationException("you should not call this property");
+
+
+    /// <summary>
+    /// returns a new instance of the section <typeparamref name="T"/> under the given <paramref name="configSectionName"/>
+    /// <br/>does not validate
+    /// <br/>does not check whether the section is actually present
+    /// <inheritdoc cref="BehaviorSummaryHolder"/>
     /// </summary>
 
     public static T GetSection<T>(this IConfiguration config, string configSectionName)
@@ -76,8 +84,11 @@ public static class ConfigurationHelper
         sectionInstance.Bind(obj);
         return obj;
     }
-
-    public static T GetSection<T>(this IConfiguration config) 
+    /// <summary>
+    /// extracts the sectionName from the <see cref="ConfigSectionNameAttribute"/> of <typeparamref name="T"/>. if it is not found, a <see cref="InvalidSetupException"/> will be thrown<br/>
+    /// <inheritdoc cref="GetSection{T}(IConfiguration,string)"/>
+    /// </summary>
+    public static T GetSection<T>(this IConfiguration config)
         where T : class, new()
     {
         var sectionName = typeof(T).GetCustomAttribute<ConfigSectionNameAttribute>()?.SectionName

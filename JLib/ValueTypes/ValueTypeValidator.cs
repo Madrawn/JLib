@@ -4,15 +4,13 @@ using JLib.Helper;
 
 namespace JLib.ValueTypes;
 
-public abstract class ValueTypeValidator<TValueType, TValue> : IExceptionProvider
-    where TValueType : ValueType<TValue>
+public abstract class ValueTypeValidator<TValue> : IExceptionProvider
 {
-    protected readonly TValueType ValueType;
-    protected TValue Value => ValueType.Value;
+    protected TValue Value { get; }
     protected readonly List<string> Messages = new();
-    protected ValueTypeValidator(TValueType valueType)
+    protected ValueTypeValidator(TValue value)
     {
-        ValueType = valueType;
+        Value = value;
     }
     public void AddError(string message, string? hint = null)
     {
@@ -27,5 +25,5 @@ public abstract class ValueTypeValidator<TValueType, TValue> : IExceptionProvide
     protected virtual Exception? BuildException(IReadOnlyCollection<string> messages)
         => JLibAggregateException.ReturnIfNotEmpty(
             $"{typeof(TValue).FullClassName()} validation failed: {Value} is not a valid Value.",
-            Messages.Select(msg => new ValidationException(msg)));
+            Messages.Distinct().Select(msg => new ValidationException(msg)));
 }

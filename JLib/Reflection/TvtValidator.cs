@@ -4,16 +4,18 @@ using JLib.ValueTypes;
 
 namespace JLib.Reflection;
 
-public class TvtValidator : ValueTypeValidator<TypeValueType, Type>
+public class TvtValidator : ValueTypeValidator<Type>
 {
-    public TvtValidator(TypeValueType valueType) : base(valueType)
+    private readonly TypeValueType _valueType;
+    public TvtValidator(TypeValueType valueType) : base(valueType.Value)
     {
+        _valueType = valueType;
     }
 
     protected override Exception? BuildException(IReadOnlyCollection<string> messages)
         => JLibAggregateException.ReturnIfNotEmpty(
             "Type validation failed",
-            messages.Select(msg => new InvalidTypeException(ValueType.GetType(), ValueType.Value, msg)));
+            messages.Select(msg => new InvalidTypeException(_valueType.GetType(), _valueType.Value, msg)));
 
     public void ShouldBeGeneric(string? hint = null)
     {
