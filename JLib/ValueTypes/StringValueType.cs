@@ -11,26 +11,8 @@ public abstract record StringValueType(string Value) : ValueType<string>(Value)
         validate?.Invoke(validator);
         validator.CastTo<IExceptionProvider>().GetException()?.Throw();
     }
-    /// <summary>
-    /// Helper to create a tryGet for a derived valueMethod
-    /// </summary>
-    /// <typeparam name="TVt">the type of the derived valueType</typeparam>
-    /// <param name="value">the value of the new valueType instance</param>
-    /// <param name="tvtFactory">a method which creates a instance of an already validated value. Value validation can be skipped when creating the new Vt by using the "base(value,false)" constructor overload</param>
-    /// <param name="validator">the same validator which is used to validate tge vt</param>
-    /// <returns>the valueType if the value is valid, otherwise null</returns>
-    protected static TVt? TryGet<TVt>(string value, Func<string, TVt> tvtFactory, Action<StringValidator> validator)
-        where TVt : StringValueType
-    {
-        var val = new StringValidator(value);
-        validator.Invoke(val);
-        IExceptionProvider exProv = val;
-        return exProv.GetException() is null
-            ? tvtFactory(value)
-            : null;
-    }
 }
-public class StringValidator : ValueTypeValidator<string?>
+public class StringValidator : ValueValidator<string?>
 {
     public StringValidator(string? value) : base(value) { }
 

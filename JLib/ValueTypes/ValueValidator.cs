@@ -4,11 +4,11 @@ using JLib.Helper;
 
 namespace JLib.ValueTypes;
 
-public abstract class ValueTypeValidator<TValue> : IExceptionProvider
+public abstract class ValueValidator<TValue> : IExceptionProvider
 {
     protected TValue Value { get; }
     protected readonly List<string> Messages = new();
-    protected ValueTypeValidator(TValue value)
+    protected ValueValidator(TValue value)
     {
         Value = value;
     }

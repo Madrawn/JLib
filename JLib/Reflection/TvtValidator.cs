@@ -4,7 +4,7 @@ using JLib.ValueTypes;
 
 namespace JLib.Reflection;
 
-public class TvtValidator : ValueTypeValidator<Type>
+public class TvtValidator : ValueValidator<Type>
 {
     private readonly TypeValueType _valueType;
     public TvtValidator(TypeValueType valueType) : base(valueType.Value)
