@@ -208,7 +208,7 @@ public class TypeCache : ITypeCache
         {
             try
             {
-                var tvtValidator = new TvtValidator(typeValueType.CastTo<TypeValueType>());
+                var tvtValidator = new TvtValidator(typeValueType.CastTo<TypeValueType>(), typeValueType.GetType().FullClassName());
                 typeValueType.Validate(this, tvtValidator);
                 exceptions.AddChild(tvtValidator);
             }

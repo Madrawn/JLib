@@ -6,10 +6,12 @@ namespace JLib.ValueTypes;
 
 public abstract class ValueValidator<TValue> : IExceptionProvider
 {
+    private readonly string _valueTypeName;
     protected TValue Value { get; }
     protected readonly List<string> Messages = new();
-    protected ValueValidator(TValue value)
+    protected ValueValidator(TValue value, string valueTypeName)
     {
+        _valueTypeName = valueTypeName;
         Value = value;
     }
     public void AddError(string message, string? hint = null)
@@ -21,9 +23,9 @@ public abstract class ValueValidator<TValue> : IExceptionProvider
 
     Exception? IExceptionProvider.GetException()
         => BuildException(Messages);
-    
+
     protected virtual Exception? BuildException(IReadOnlyCollection<string> messages)
         => JLibAggregateException.ReturnIfNotEmpty(
-            $"{typeof(TValue).FullClassName()} validation failed: {Value} is not a valid Value.",
+            $"{_valueTypeName} validation failed: '{Value}' is not a valid Value.",
             Messages.Distinct().Select(msg => new ValidationException(msg)));
 }

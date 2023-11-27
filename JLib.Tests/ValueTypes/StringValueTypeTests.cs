@@ -100,7 +100,7 @@ public class StringValueTypeTests
     [MemberData(nameof(Arguments))]
     public void Test(TestArgument argument)
     {
-        var val = new StringValidator(argument.TestString!);
+        var val = new StringValidator(argument.TestString!, "Test");
         argument.Validator(val);
         var exProv = val.CastTo<IExceptionProvider>();
         var ex = exProv.GetException();

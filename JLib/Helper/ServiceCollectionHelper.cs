@@ -77,7 +77,7 @@ public static class ServiceCollectionHelper
         var topLevelEnvironment = config[ConfigurationSections.Environment];
         if (topLevelEnvironment != null)
             Log.Information("Loading config for top level environment {environment}", topLevelEnvironment);
-        // code duplicated in ConfigSectionHelper.GetSection
+        // code duplicated in ConfigSectionHelper.GetSectionObject
         foreach (var sectionType in typeCache.All<ConfigurationSectionType>())
         {
             var sectionInstance = config.GetSection(sectionType.SectionName.Value);

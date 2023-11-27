@@ -10,7 +10,7 @@ public record IntValueType(int Value) : ValueType<int>(Value)
 
 public class IntValidator : ValueValidator<int>
 {
-    public IntValidator(int value) : base(value)
+    public IntValidator(int value, string valueTypeName) : base(value, valueTypeName)
     {
     }
 

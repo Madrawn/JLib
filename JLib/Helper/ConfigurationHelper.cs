@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Reflection.Metadata.Ecma335;
 using JLib.Configuration;
 using JLib.Exceptions;
 using JLib.Reflection;
@@ -57,7 +58,7 @@ public static class ConfigurationHelper
     /// <inheritdoc cref="BehaviorSummaryHolder"/>
     /// </summary>
 
-    public static T GetSection<T>(this IConfiguration config, string configSectionName)
+    public static IConfigurationSection GetSection<T>(this IConfiguration config, string configSectionName)
     where T : class, new()
     {
         // code duplicated in ServiceCollectionHelper.AddAllConfigSections
@@ -80,20 +81,30 @@ public static class ConfigurationHelper
         else
             Log.Information("Loading section {section} ({sectionType})", configSectionName, typeof(T).FullClassName(true));
 
-        var obj = new T();
-        sectionInstance.Bind(obj);
-        return obj;
+        return sectionInstance;
     }
     /// <summary>
     /// extracts the sectionName from the <see cref="ConfigSectionNameAttribute"/> of <typeparamref name="T"/>. if it is not found, a <see cref="InvalidSetupException"/> will be thrown<br/>
     /// <inheritdoc cref="GetSection{T}(IConfiguration,string)"/>
     /// </summary>
-    public static T GetSection<T>(this IConfiguration config)
+    public static IConfigurationSection GetSection<T>(this IConfiguration config)
         where T : class, new()
     {
         var sectionName = typeof(T).GetCustomAttribute<ConfigSectionNameAttribute>()?.SectionName
-            ?? throw new InvalidSetupException(
-                $"missing {nameof(ConfigSectionNameAttribute)} on class {typeof(T).FullClassName()}");
+                          ?? throw new InvalidSetupException(
+                              $"missing {nameof(ConfigSectionNameAttribute)} on class {typeof(T).FullClassName()}");
         return config.GetSection<T>(sectionName.Value);
+    }
+    /// <summary>
+    /// extracts the sectionName from the <see cref="ConfigSectionNameAttribute"/> of <typeparamref name="T"/>. if it is not found, a <see cref="InvalidSetupException"/> will be thrown<br/>
+    /// <inheritdoc cref="GetSection{T}(IConfiguration,string)"/>
+    /// </summary>
+    public static T GetSectionObject<T>(this IConfiguration config)
+        where T : class, new()
+    {
+        var instance = new T();
+        var section = config.GetSection<T>();
+        section.Bind(instance);
+        return instance;
     }
 }

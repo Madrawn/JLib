@@ -7,14 +7,14 @@ public abstract record StringValueType(string Value) : ValueType<string>(Value)
 {
     protected StringValueType(string value, Action<StringValidator>? validate) : this(value)
     {
-        var validator = new StringValidator(Value);
+        var validator = new StringValidator(Value, GetType().FullClassName());
         validate?.Invoke(validator);
         validator.CastTo<IExceptionProvider>().GetException()?.Throw();
     }
 }
 public class StringValidator : ValueValidator<string?>
 {
-    public StringValidator(string? value) : base(value) { }
+    public StringValidator(string? value, string valueTypeName) : base(value, valueTypeName) { }
 
     public StringValidator NotBeNull()
     {
@@ -147,6 +147,13 @@ public class StringValidator : ValueValidator<string?>
         NotBeNull();
         if (Value?.Length != length)
             AddError($"the value has to be exactly {length} characters long but got length {Value?.Length}");
+        return this;
+    }
+
+    public StringValidator EndWith(string value)
+    {
+        if (Value?.EndsWith(value) != true)
+            AddError($"the value has to end with '{value}'");
         return this;
     }
 }

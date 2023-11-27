@@ -23,15 +23,15 @@ public abstract record ValueType<T>(T Value)
     /// <returns>the valueType if the value is valid, otherwise null</returns>
     /// <returns></returns>
     protected static TVt? TryGet<TVt, TValidator>(
-        T value, Func<T, TValidator> validatorFactory, Action<TValidator> validator, Func<T, TVt> tvtFactory)
+        T? value, Func<T, TValidator> validatorFactory, Action<TValidator> validator, Func<T, TVt> tvtFactory)
         where TVt : StringValueType
         where TValidator : IExceptionProvider
     {
-        var val = validatorFactory(value);
+        var val = validatorFactory(value!);
         validator(val);
         IExceptionProvider exProv = val;
         return exProv.GetException() is null
-            ? tvtFactory(value)
+            ? tvtFactory(value!)
             : null;
     }
 }
