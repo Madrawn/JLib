@@ -6,4 +6,5 @@
 public sealed class Ignored
 {
     private Ignored() { }
+    public static Ignored Instance { get; } = new ();
 }
