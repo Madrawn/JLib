@@ -1,4 +1,5 @@
-﻿using JLib.Helper;
+﻿using System.Collections.Concurrent;
+using JLib.Helper;
 using Serilog;
 using Serilog.Events;
 
@@ -51,15 +52,18 @@ public interface IExceptionManager : IExceptionProvider
 public class ExceptionManager : IExceptionManager
 {
     private readonly string _message;
-    private readonly List<Exception> _exceptions = new();
-    private readonly List<IExceptionProvider> _children = new();
+    private readonly ConcurrentBag<Exception> _exceptions = new();
+    private readonly ConcurrentBag<IExceptionProvider> _children = new();
 
     private IEnumerable<Exception?> BuildExceptionList()
         => _exceptions.Concat(_children.Select(c => c.GetException()));
     public void Add(Exception exception) => _exceptions.Add(exception);
 
     public void Add(IEnumerable<Exception> exceptions)
-        => _exceptions.AddRange(exceptions);
+    {
+        foreach (var exception in exceptions)
+            Add(exception);
+    }
 
     public void ThrowIfNotEmpty(LogEventLevel? level = null)
     {

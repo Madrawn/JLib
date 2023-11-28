@@ -77,7 +77,7 @@ public static class ServiceCollectionHelper
         var topLevelEnvironment = config[ConfigurationSections.Environment];
         if (topLevelEnvironment != null)
             Log.Information("Loading config for top level environment {environment}", topLevelEnvironment);
-        // code duplicated in ConfigSectionHelper.GetSection
+        // code duplicated in ConfigSectionHelper.GetSectionObject
         foreach (var sectionType in typeCache.All<ConfigurationSectionType>())
         {
             var sectionInstance = config.GetSection(sectionType.SectionName.Value);
@@ -102,7 +102,7 @@ public static class ServiceCollectionHelper
                 services,sectionInstance
             });
 
-            // extract value from options and myke section directly accessible
+            // extract value from options and make the section directly accessible
             var src = typeof(IOptions<>).MakeGenericType(sectionType);
             var prop = src.GetProperty(nameof(IOptions<Ignored>.Value)) ?? throw new InvalidSetupException("Value Prop not found on options");
             services.Add(

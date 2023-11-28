@@ -1,10 +1,5 @@
 ﻿namespace JLib.ValueTypes;
 
-public abstract record StringValueType(string Value) : ValueType<string>(Value);
-
-public abstract record GuidValueType(Guid Value) : ValueType<Guid>(Value);
-
-
 public record Prefix(string Value) : StringValueType(Value);
 
 public record PropertyPrefix(string Value) : Prefix(Value)
