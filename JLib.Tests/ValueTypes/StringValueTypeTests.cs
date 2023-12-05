@@ -94,6 +94,16 @@ public class StringValueTypeTests
         new("a",nameof(StringValidator.BeAlphanumeric),v=>v.BeAlphanumeric(),false),
         new("1",nameof(StringValidator.BeAlphanumeric),v=>v.BeAlphanumeric(),false),
         new("#",nameof(StringValidator.BeAlphanumeric),v=>v.BeAlphanumeric(),true),
+
+        new("",nameof(StringValidator.BeAlphanumeric),v=>v.BeOneOf(new[]{"a","b"}),true),
+        new(null,nameof(StringValidator.BeAlphanumeric),v=>v.BeOneOf(new[]{"a","b"}),true),
+        new("a",nameof(StringValidator.BeAlphanumeric),v=>v.BeOneOf(new[]{"a","b"}),false),
+        new("b",nameof(StringValidator.BeAlphanumeric),v=>v.BeOneOf(new[]{"a","b"}),false),
+        new("1",nameof(StringValidator.BeAlphanumeric),v=>v.BeOneOf(new[]{"a","b"}),true),
+        new("#",nameof(StringValidator.BeAlphanumeric),v=>v.BeOneOf(new[]{"a","b"}),true),
+        new("A",nameof(StringValidator.BeAlphanumeric),v=>v.BeOneOf(new[]{"a","b"}),true),
+        new("ab",nameof(StringValidator.BeAlphanumeric),v=>v.BeOneOf(new[]{"a","b"}),true),
+        new("ba",nameof(StringValidator.BeAlphanumeric),v=>v.BeOneOf(new[]{"a","b"}),true),
     }.Select(x => new object[] { x });
 
     [Theory]
