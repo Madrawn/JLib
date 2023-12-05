@@ -30,6 +30,12 @@ public class StringValidator : ValueValidator<string?>
         return this;
     }
 
+    public StringValidator BeOneOf(IReadOnlyCollection<string> validValues)
+    {
+        if (!validValues.Contains(Value))
+            AddError("Value is not one of the following: " + string.Join(", ", validValues));
+        return this;
+    }
     public StringValidator BeAlphanumeric()
         => SatisfyCondition(char.IsLetterOrDigit, nameof(BeAlphanumeric));
     public StringValidator SatisfyCondition(Func<char, bool> validator, string name)
