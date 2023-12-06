@@ -91,6 +91,30 @@ public abstract class TvtFactoryAttributes
             => type.IsDerivedFromAny(_type);
     }
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    public sealed class SatisfiesCondition : Attribute, ITypeValueTypeFilterAttribute
+    {
+        private readonly Func<Type, bool> _predicate;
+
+        public SatisfiesCondition(Func<Type, bool> predicate)
+        {
+            _predicate = predicate;
+        }
+        public bool Filter(Type type)
+            => _predicate(type);
+    }
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    public sealed class IsAssignableTo : Attribute, ITypeValueTypeFilterAttribute
+    {
+        private readonly Type _type;
+
+        public IsAssignableTo(Type type)
+        {
+            _type = type;
+        }
+        public bool Filter(Type type)
+            => type.IsAssignableTo(_type);
+    }
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public sealed class IsDerivedFrom : Attribute, ITypeValueTypeFilterAttribute
     {
         private readonly Type _type;

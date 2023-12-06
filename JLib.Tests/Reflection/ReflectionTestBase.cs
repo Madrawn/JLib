@@ -53,7 +53,7 @@ public abstract class ReflectionTestArguments : IEnumerable<object[]>
             // this guarantees that no tests are skipped unintentionally in the test pipeline
             .Where((parameters, i)
                 => !(bool)parameters[1] || ListSkippedTests
-#if RELEASE
+#if RELEASE // guarantees, that when running the test in release mode at least one test fails when a test is focused
                                         || i == 0 || i == 1
 #endif
             )
@@ -94,11 +94,7 @@ public abstract class ReflectionTestBase
 
         IServiceCollection services = new Microsoft.Extensions.DependencyInjection.ServiceCollection()
             .AddTypeCache(
-                new[]
-                {
-                    typeof(ITypeCache).Assembly
-                },
-                content, out var cache, _exceptions);
+                out var cache, _exceptions, TypePackage.Get(content), JLibTypePackage.Instance);
 
         // group by namespace, then by typeValueType and use json objects for the grouping
         object cacheValidator;

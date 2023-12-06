@@ -6,7 +6,7 @@ namespace JLib.Data;
 
 /// <summary>
 /// a class which contains Data.
-/// <br/>might be a entity or a class which maps from an entity
+/// <br/>might be an entity or a class which maps from an entity
 /// </summary>
 public interface IDataObject
 {
