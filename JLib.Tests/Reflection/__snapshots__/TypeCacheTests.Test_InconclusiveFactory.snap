@@ -1,0 +1,50 @@
+﻿{
+  "TestName": "InconclusiveFactory",
+  "Environment": {
+    "Types": {
+      "IDemoTypeA": {
+        "Kind": "Interface",
+        "Attributes": [],
+        "ImplementedInterfaces": []
+      },
+      "IDemoTypeB": {
+        "Kind": "Interface",
+        "Attributes": [],
+        "ImplementedInterfaces": []
+      },
+      "DemoTypeValueTypeA": {
+        "Kind": "Class",
+        "Attributes": [
+          "NullableContextAttribute",
+          "NullableAttribute",
+          "TvtFactoryAttributes.Implements"
+        ],
+        "ImplementedInterfaces": [
+          "IEquatable<TypeCacheTests.InconclusiveFactory.DemoTypeValueTypeA>"
+        ]
+      },
+      "DemoTypeValueTypeB": {
+        "Kind": "Class",
+        "Attributes": [
+          "NullableContextAttribute",
+          "NullableAttribute",
+          "TvtFactoryAttributes.Implements"
+        ],
+        "ImplementedInterfaces": [
+          "IEquatable<TypeCacheTests.InconclusiveFactory.DemoTypeValueTypeB>"
+        ]
+      },
+      "InconclusiveType": {
+        "Kind": "Class",
+        "Attributes": [],
+        "ImplementedInterfaces": [
+          "TypeCacheTests.InconclusiveFactory.IDemoTypeA",
+          "TypeCacheTests.InconclusiveFactory.IDemoTypeB"
+        ]
+      }
+    }
+  },
+  "Exceptions": "something",
+  "CachedTypes": {},
+  "KnownTypeValueTypes": []
+}
