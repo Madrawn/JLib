@@ -1,0 +1,12 @@
+﻿┐2 Assemblies and 3 types
+├ Types:3
+├ Types Total:9
+├ Children:
+  ┐JLib.Tests.Reflection.DemoAssembly, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  ├ Types:3
+  ├ Types Total:3
+  ├ Children:
+  ┐JLib.Tests.Reflection.DemoAssembly2, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  ├ Types:3
+  ├ Types Total:3
+  ├ Children:

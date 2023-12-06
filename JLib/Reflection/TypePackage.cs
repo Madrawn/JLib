@@ -10,11 +10,27 @@ namespace JLib.Reflection;
 /// </summary>
 public interface ITypePackage
 {
+    /// <summary>
+    /// The <see cref="Types"/> of this package and all its <see cref="Children"/>
+    /// </summary>
     public IEnumerable<Type> Content { get; }
+    /// <summary>
+    /// other nested packages, this could be peer dependencies, the assemblies of a directory or any other group of packages
+    /// </summary>
     public IEnumerable<ITypePackage> Children { get; }
+    /// <summary>
+    /// The types which are directly defined in this package.
+    /// </summary>
     public IEnumerable<Type> Types { get; }
-    public string NameTemplate { get; }
-
+    /// <summary>
+    /// a short description of the contents of the type package.<br/>
+    /// {0} is replaced by the number of <see cref="Children"/><br/>
+    /// {1} is replaced by the number of <see cref="Types"/>
+    /// </summary>
+    public string DescriptionTemplate { get; }
+    /// <summary>
+    /// returns a type package which is a combination of the given packages
+    /// </summary>
     public ITypePackage Combine(params ITypePackage[] packages);
 }
 /// <summary>
@@ -22,17 +38,20 @@ public interface ITypePackage
 /// </summary>
 public class TypePackage : ITypePackage
 {
-    public static ITypePackage Get(Assembly assembly, string? name)
+    public static ITypePackage Get(Assembly assembly, string? name = null)
         => new TypePackage(assembly.GetTypes(), null, name ?? assembly.FullName ?? "Nameless Assembly with {0} Types");
 
-    public static ITypePackage Get(Assembly assembly)
-        => Get(assembly, (string?)null);
     public static ITypePackage Get(params Assembly[] assemblies)
-        => new TypePackage(null,assemblies.Select(Get),"{1} Assemblies");
+        => Get(assemblies.CastTo<IReadOnlyCollection<Assembly>>());
+    public static ITypePackage Get(IReadOnlyCollection<Assembly> assemblies)
+        => new TypePackage(null, assemblies.Select(a => Get(a)), "{1} Assemblies");
     public static ITypePackage Get(params Type[] types)
+        => Get(types.CastTo<IReadOnlyCollection<Type>>());
+    public static ITypePackage Get(IReadOnlyCollection<Type> types)
         => new TypePackage(types, null, "{1} Types");
     /// <summary>
-    /// creates a <see cref="ITypePackage"/> which contains all types nested in the given types, but not the types themselves.
+    /// creates a <see cref="ITypePackage"/> which contains all types nested in the given types, but not the types themselves.<br/>
+    /// this can be usefull for testing purposes
     /// </summary>
     public static ITypePackage GetNested(params Type[] types)
         => new TypePackage(types.SelectMany(x => x.GetNestedTypes()), null, "nested types of " + string.Join(", ", types.Select(x => x.FullClassName())));
@@ -83,13 +102,13 @@ public class TypePackage : ITypePackage
     {
         Types = types ?? Enumerable.Empty<Type>();
         Children = children ?? Array.Empty<ITypePackage>();
-        NameTemplate = nameTemplate;
+        DescriptionTemplate = nameTemplate;
     }
 
 
     public IEnumerable<ITypePackage> Children { get; }
     public IEnumerable<Type> Types { get; }
-    public string NameTemplate { get; }
+    public string DescriptionTemplate { get; }
     public IEnumerable<Type> Content => Children.SelectMany(x => x.Content).Concat(Types);
     public ITypePackage Combine(params ITypePackage[] packages)
         => Get(packages.Append(this));
@@ -104,7 +123,7 @@ public class TypePackage : ITypePackage
     static void ToString(ITypePackage package, int indent, StringBuilder sb)
     {
         var indentStr = new string(' ', indent * 2);
-        sb.Append(indentStr).Append('┐').AppendLine(string.Format(package.NameTemplate, package.Children.Count(), package.Types.Count()));
+        sb.Append(indentStr).Append('┐').AppendLine(string.Format(package.DescriptionTemplate, package.Children.Count(), package.Types.Count()));
         sb.Append(indentStr).Append("├ Types:").AppendLine(package.Types.Count().ToString());
         sb.Append(indentStr).Append("├ Types Total:").AppendLine(package.Content.Count().ToString());
         sb.Append(indentStr).AppendLine("├ Children:");
