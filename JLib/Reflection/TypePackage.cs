@@ -125,6 +125,11 @@ public class TypePackage : ITypePackage
         var indentStr = new string(' ', indent * 2);
         sb.Append(indentStr).Append('┐').AppendLine(string.Format(package.DescriptionTemplate, package.Children.Count(), package.Types.Count()));
         sb.Append(indentStr).Append("├ Types:").AppendLine(package.Types.Count().ToString());
+        if(package.Types.Count() <= 10)
+        {
+            foreach(var type in package.Types)
+                sb.Append(indentStr).Append("│   ").AppendLine(type.FullClassName());
+        }
         sb.Append(indentStr).Append("├ Types Total:").AppendLine(package.Content.Count().ToString());
         sb.Append(indentStr).AppendLine("├ Children:");
         foreach (var child in package.Children)
