@@ -1,4 +1,7 @@
 ﻿┐nested types of TypePackageTests.NestingDemoClass
 ├ Types:3
+│   TypePackageTests.NestingDemoClass.NestedDemoClassA
+│   TypePackageTests.NestingDemoClass.NestedDemoClassB
+│   TypePackageTests.NestingDemoClass.NestedDemoClassC
 ├ Types Total:3
 ├ Children:

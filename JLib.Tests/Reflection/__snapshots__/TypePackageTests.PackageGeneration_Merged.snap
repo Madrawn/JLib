@@ -4,9 +4,12 @@
 ├ Children:
   ┐1 Types
   ├ Types:1
+  │   TypePackageTests.DemoClassA
   ├ Types Total:1
   ├ Children:
   ┐2 Types
   ├ Types:2
+  │   TypePackageTests.DemoClassB
+  │   TypePackageTests.DemoClassC
   ├ Types Total:2
   ├ Children:
