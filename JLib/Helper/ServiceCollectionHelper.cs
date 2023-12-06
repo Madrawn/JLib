@@ -77,7 +77,7 @@ public static class ServiceCollectionHelper
         var topLevelEnvironment = config[ConfigurationSections.Environment];
         if (topLevelEnvironment != null)
             Log.Information("Loading config for top level environment {environment}", topLevelEnvironment);
-
+        // code duplicated in ConfigSectionHelper.GetSectionObject
         foreach (var sectionType in typeCache.All<ConfigurationSectionType>())
         {
             var sectionInstance = config.GetSection(sectionType.SectionName.Value);
@@ -102,7 +102,7 @@ public static class ServiceCollectionHelper
                 services,sectionInstance
             });
 
-            // extract value from options and myke section directly accessible
+            // extract value from options and make the section directly accessible
             var src = typeof(IOptions<>).MakeGenericType(sectionType);
             var prop = src.GetProperty(nameof(IOptions<Ignored>.Value)) ?? throw new InvalidSetupException("Value Prop not found on options");
             services.Add(
@@ -181,8 +181,7 @@ public static class ServiceCollectionHelper
         {
             foreach (var typeMappingInfoEx in mappedDataObjectType.MappingInfo)
             {
-                var (sourceType, destinationType, providerMode, _, _) =
-                    typeMappingInfoEx;
+                var (sourceType, destinationType, providerMode) = typeMappingInfoEx;
 
                 var repo = typeCache.TryGet<RepositoryType>(
                     r => r.ProvidedDataObject.Value == destinationType.Value);
@@ -206,26 +205,6 @@ public static class ServiceCollectionHelper
                             services.AddScoped(typeof(ISourceDataProviderR<>).MakeGenericType(destinationType), implementation);
                             if (repo is null)
                                 services.AddScoped(typeof(IDataProviderR<>).MakeGenericType(destinationType), implementation);
-                        }
-                        break;
-                    case MappingDataProviderMode.ReadWrite:
-                        {
-                            if (repo is { CanWrite: false })
-                            {
-                                exceptions.Add(new InvalidSetupException(
-                                    $"Repository {repo.Value.FullClassName()} for Entity {destinationType.Value.FullClassName()} can not write data but the mapping is configured to provide a {nameof(IDataProviderRw<IEntity>)}." + Environment.NewLine +
-                                    $"To fix this issue either set the mapping to ReadOnly or don implement {nameof(IDataProviderRw<IEntity>)} on the repository"));
-                                continue;
-                            }
-                            var implementation = typeof(MapDataProviderRw<,>).MakeGenericType(sourceType, destinationType);
-                            services.AddScoped(implementation);
-                            services.AddScoped(typeof(ISourceDataProviderR<>).MakeGenericType(destinationType), implementation);
-                            services.AddScoped(typeof(ISourceDataProviderRw<>).MakeGenericType(destinationType), implementation);
-                            if (repo is null)
-                            {
-                                services.AddScoped(typeof(IDataProviderR<>).MakeGenericType(destinationType), implementation);
-                                services.AddScoped(typeof(IDataProviderRw<>).MakeGenericType(destinationType), implementation);
-                            }
                         }
                         break;
                     default:
@@ -267,14 +246,14 @@ public static class ServiceCollectionHelper
             typeArguments,
             exceptions
         );
-        Log.ForContext(typeof(ServiceCollectionHelper)).ForContext<IDataProviderR<IDataObject>>().Verbose("WritableMapDataProvider");
-        services.AddDataProvider<TTvt, WritableMapDataProvider<IEntity, IEntity>, IEntity>(
-            typeCache,
-            tvt => filter(tvt) && !isReadOnly(tvt),
-            null,
-            typeArguments,
-            exceptions
-        );
+        //Log.ForContext(typeof(ServiceCollectionHelper)).ForContext<IDataProviderR<IDataObject>>().Verbose("WritableMapDataProvider");
+        //services.AddDataProvider<TTvt, WritableMapDataProvider<IEntity, IEntity>, IEntity>(
+        //    typeCache,
+        //    tvt => filter(tvt) && !isReadOnly(tvt),
+        //    null,
+        //    typeArguments,
+        //    exceptions
+        //);
         return services;
     }
 

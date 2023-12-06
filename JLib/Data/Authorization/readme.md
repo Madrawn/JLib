@@ -21,9 +21,9 @@
 
 ## How it works
 - the manager reads all profiles
-- then it creates a map from the entity to the authInfo contained in the profile
-- when the profile is accessed, a scopedAuthInfo is created to make the check scope relative.
-- the scopedAuthInfo resolves on authorization the requested services and forwards them to the configured methods
+- then it creates a Dictionary from the entity to the authInfo contained in the profile (Dictionary<Type,GlobalAuthorizationInfo>)
+- when the profile is accessed, a ScopedAuthorizationInfo is created to make the check relative to the current scope/user.
+- the ScopedAuthorizationInfo resolves the requested services during authorization and forwards them to the configured methods
 
 ## How to add more AuthorizationProfile.AddAuthorization Overloads:
 - you either have to add one overload and
