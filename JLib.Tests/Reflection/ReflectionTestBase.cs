@@ -94,7 +94,7 @@ public abstract class ReflectionTestBase
 
         IServiceCollection services = new Microsoft.Extensions.DependencyInjection.ServiceCollection()
             .AddTypeCache(
-                out var cache, _exceptions, TypePackage.Get(content));
+                out var cache, _exceptions, TypePackage.Get(content), JLibTypePackage.Instance);
 
         // group by namespace, then by typeValueType and use json objects for the grouping
         object cacheValidator;

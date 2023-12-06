@@ -17,9 +17,13 @@
         "Attributes": [
           "NullableContextAttribute",
           "NullableAttribute",
-          "TvtFactoryAttributes.Implements"
+          "TvtFactoryAttributes.Implements",
+          "UnmappedAttribute"
         ],
         "ImplementedInterfaces": [
+          "IEquatable<ValueType<Type>>",
+          "ITypeValueType",
+          "IEquatable<TypeValueType>",
           "IEquatable<TypeCacheTests.InconclusiveFactory.DemoTypeValueTypeA>"
         ]
       },
@@ -28,9 +32,13 @@
         "Attributes": [
           "NullableContextAttribute",
           "NullableAttribute",
-          "TvtFactoryAttributes.Implements"
+          "TvtFactoryAttributes.Implements",
+          "UnmappedAttribute"
         ],
         "ImplementedInterfaces": [
+          "IEquatable<ValueType<Type>>",
+          "ITypeValueType",
+          "IEquatable<TypeValueType>",
           "IEquatable<TypeCacheTests.InconclusiveFactory.DemoTypeValueTypeB>"
         ]
       },
@@ -44,7 +52,39 @@
       }
     }
   },
-  "Exceptions": "something",
+  "Exceptions": {
+    "Type": "JLib.Exceptions.JLibAggregateException",
+    "Message": [
+      "InconclusiveFactory"
+    ],
+    "InnerExceptions": [
+      {
+        "Type": "JLib.Exceptions.JLibAggregateException",
+        "Message": [
+          "Cache setup failed"
+        ],
+        "InnerExceptions": [
+          {
+            "Type": "JLib.Exceptions.JLibAggregateException",
+            "Message": [
+              "type discovery failed"
+            ],
+            "InnerExceptions": [
+              {
+                "Type": "JLib.Exceptions.InvalidSetupException",
+                "message": [
+                  "multiple tvt candidates found for type InconclusiveType : [ DemoTypeValueTypeA(priority 10000), DemoTypeValueTypeB(priority 10000) ]"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
   "CachedTypes": {},
-  "KnownTypeValueTypes": []
+  "KnownTypeValueTypes": [
+    "DemoTypeValueTypeA",
+    "DemoTypeValueTypeB"
+  ]
 }
