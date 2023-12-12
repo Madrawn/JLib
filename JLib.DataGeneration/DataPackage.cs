@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using JLib.Data;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
@@ -24,10 +23,12 @@ public abstract class DataPackage
         return res;
     }
 
-    readonly IDataPackageStore _dataPackages;
-    protected DataPackage(IDataPackageStore dataPackages)
+    readonly IDataPackageStore _packageStore;
+    protected DataPackage(IDataPackageStore packageStore)
     {
-        _dataPackages = dataPackages;
+        _packageStore = packageStore;
+        // todo: create another interface from bind and work from there, 
+        _packageStore.Bind(this);
         foreach (var propertyInfo in GetType().GetProperties())
         {
             if (!propertyInfo.PropertyType.IsAssignableTo<GuidValueType>())
@@ -40,24 +41,7 @@ public abstract class DataPackage
             if (propertyInfo.SetMethod?.IsPublic is true)
                 throw new(propertyInfo.DeclaringType?.FullClassName() + "." + propertyInfo.Name +
                           " set method must be protected");
-            var id = _dataPackages.RetrieveId(propertyInfo);
-            propertyInfo.SetValue(this, id);
+            _packageStore.SetIdPropertyValue(propertyInfo);
         }
     }
-
-    protected TEntity AddEntity<TEntity>(TEntity entity)
-        where TEntity : IEntity
-        => _dataPackages.AddEntities(new[] { entity }).First();
-    protected TEntity[] AddEntities<TEntity>(IEnumerable<TEntity> entities)
-        where TEntity : IEntity
-        => _dataPackages.AddEntities(entities);
-
-    [return: NotNullIfNotNull("id")]
-    protected TId? DeriveId<TId>(GuidValueType? id)
-        where TId : GuidValueType
-        => _dataPackages.DeriveId<TId>(id, GetType());
-
-    protected TId? DeriveId<TId>(GuidValueType? idN, GuidValueType? idM)
-        where TId : GuidValueType
-        => _dataPackages.DeriveId<TId>(idN, idM, GetType());
 }
