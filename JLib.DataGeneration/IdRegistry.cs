@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using JLib.Helper;
 using static JLib.DataGeneration.DataPackageValues;
@@ -7,17 +8,18 @@ namespace JLib.DataGeneration;
 
 internal class IdRegistry
 {
+    private static readonly IdIdentifier IncrementIdentifier = new(new("__registry__"), new("IdIncrement"));
 
 
     private readonly string _fileLocation;
     private readonly Dictionary<IdIdentifier, object> _dictionary;
     private bool _isDirty;
-    // todo: save & load
-    private int _idIncrement = 1;
+    private int _idIncrement;
     public IdRegistry(string? fileLocation = null)
     {
         _fileLocation = fileLocation ?? GetFileName();
         _dictionary = LoadFromFile();
+        _idIncrement = _dictionary.GetValueOrDefault(IncrementIdentifier) as int? ?? 1;
     }
 
     private string GetFileName()
@@ -27,11 +29,16 @@ internal class IdRegistry
         var file = Path.Combine(targetDir, "DataPackageStore.json");
         return file;
 
-        string Parent(string dir)
+        static string Parent(string dir)
         {
-            return Directory.GetFiles(dir, "*.csproj").Any()
-                    ? dir
-                    : Parent(Directory.GetParent(dir)?.FullName!);
+            while (Directory.GetFiles(dir, "*.csproj").None())
+            {
+                dir = Directory.GetParent(dir)?.FullName!;
+                if (dir is null)
+                    throw new InvalidOperationException("no directory with csproj file found");
+            }
+
+            return dir;
         }
     }
     /// <summary>
@@ -55,6 +62,7 @@ internal class IdRegistry
 
     public void SaveToFile()
     {
+        _dictionary[IncrementIdentifier] = _idIncrement;
         if (_isDirty)
             File.WriteAllText(_fileLocation, JsonSerializer.Serialize(_dictionary));
     }
