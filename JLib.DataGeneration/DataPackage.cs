@@ -23,12 +23,8 @@ public abstract class DataPackage
         return res;
     }
 
-    readonly IDataPackageStore _packageStore;
     protected DataPackage(IDataPackageStore packageStore)
     {
-        _packageStore = packageStore;
-        // todo: create another interface from bind and work from there, 
-        _packageStore.Bind(this);
         foreach (var propertyInfo in GetType().GetProperties())
         {
             if (!propertyInfo.PropertyType.IsAssignableTo<GuidValueType>())
@@ -41,7 +37,7 @@ public abstract class DataPackage
             if (propertyInfo.SetMethod?.IsPublic is true)
                 throw new(propertyInfo.DeclaringType?.FullClassName() + "." + propertyInfo.Name +
                           " set method must be protected");
-            _packageStore.SetIdPropertyValue(propertyInfo);
+            packageStore.SetIdPropertyValue(propertyInfo);
         }
     }
 }

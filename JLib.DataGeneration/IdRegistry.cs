@@ -22,7 +22,7 @@ internal class IdRegistry
         _idIncrement = _dictionary.GetValueOrDefault(IncrementIdentifier) as int? ?? 1;
     }
 
-    private string GetFileName()
+    private static string GetFileName()
     {
         var currentDir = AppDomain.CurrentDomain.BaseDirectory;
         var targetDir = Parent(currentDir);
