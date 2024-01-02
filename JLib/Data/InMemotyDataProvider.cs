@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Concurrent;
+using System.Reflection;
 using JLib.Data.Authorization;
 using JLib.Exceptions;
 using JLib.Helper;
@@ -7,14 +8,19 @@ using Serilog;
 
 namespace JLib.Data;
 
-public class MockDataProvider<TEntity> : DataProviderRBase<TEntity>, ISourceDataProviderRw<TEntity>
+/// <summary>
+/// hold all data in memory and does not save it to anywhere. should be primarily used for testing only.<br/>
+/// should be provided as singleton
+/// </summary>
+/// <typeparam name="TEntity"></typeparam>
+public class InMemoryDataProvider<TEntity> : DataProviderRBase<TEntity>, ISourceDataProviderRw<TEntity>
     where TEntity : class, IEntity
 {
     private readonly PropertyInfo _idProperty;
 
     private readonly Func<Guid, object> _idGenerator;
 
-    public MockDataProvider(IAuthorizationInfo<TEntity> authorizationInfo)
+    public InMemoryDataProvider(IAuthorizationInfo<TEntity> authorizationInfo)
     {
         _authorize = authorizationInfo;
         // reflection to support vt ids
@@ -31,52 +37,52 @@ public class MockDataProvider<TEntity> : DataProviderRBase<TEntity>, ISourceData
             _idGenerator = id => id;
         Log.Verbose("creating {type}", GetType().FullClassName());
     }
-    private void AddId(TEntity entity)
+    private void CreateAndSetId(TEntity entity)
     {
         if (_idProperty.GetValue(entity) is not null)
             return;
         _idProperty.SetValue(entity, _idGenerator?.Invoke(Guid.NewGuid()));
     }
-    private readonly List<TEntity> _items = new();
+    private readonly ConcurrentDictionary<Guid, TEntity> _items = new();
     private readonly IAuthorizationInfo<TEntity> _authorize;
 
     public override IQueryable<TEntity> Get()
     {
-        Log.Verbose("MockDataProvider Expression for {0}", typeof(TEntity).Name);
-        return _items.AsQueryable().Where(_authorize.Expression());
+        Log.Verbose("InMemoryDataProvider Expression for {0}", typeof(TEntity).Name);
+        return _items.Values.AsQueryable().Where(_authorize.Expression());
     }
 
     public void Add(TEntity item)
     {
         _authorize.AndRaiseException(item);
-        _items.Add(item);
-        AddId(item);
+        CreateAndSetId(item);
+        if (!_items.TryAdd(item.Id, item))
+            throw new InvalidOperationException("item could not be added");
     }
 
     public void Add(IReadOnlyCollection<TEntity> items)
     {
-        var itemArray = items.ToArray();
-        _authorize.AndRaiseException(itemArray);
-        var newEntities = itemArray;
-        _items.AddRange(newEntities);
-        foreach (var entity in newEntities)
-            AddId(entity);
+        foreach (var entity in items)
+            Add(entity);
     }
 
     public void Remove(Guid itemId)
     {
-        var item = this.CastTo<IDataProviderR<TEntity>>().Get(itemId);
-        _items.Remove(item);
+        if (!_items.TryRemove(itemId, out _))
+            throw new Exception("item could not be removed");
     }
 
-    public void Remove(TEntity item) => _items.Remove(item);
+    public void Remove(TEntity item) => Remove(item.Id);
 
     public void Remove(IReadOnlyCollection<Guid> itemIds)
     {
-        var items = this.CastTo<IDataProviderR<TEntity>>().Get(itemIds).Select(x => x.Value);
-        _items.Remove(items);
+        foreach (var id in itemIds)
+            Remove(id);
     }
 
-    public void Remove(IReadOnlyCollection<TEntity> items) 
-        => _items.Remove(items);
+    public void Remove(IReadOnlyCollection<TEntity> items)
+    {
+        foreach (var item in items)
+            Remove(item);
+    }
 }

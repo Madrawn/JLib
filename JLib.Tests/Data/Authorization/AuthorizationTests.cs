@@ -32,7 +32,7 @@ public class AuthorizationTests
             .AddScopeProvider()
             .AddDataAuthorization(typeCache)
             .AddAutoMapper(b => { b.CreateMap<Guid, Guid>(); })
-            .AddDataProvider<CommandEntityType, MockDataProvider<IEntity>, IEntity>(
+            .AddDataProvider<CommandEntityType, InMemoryDataProvider<IEntity>, IEntity>(
                 typeCache, null, null, null, exceptions)
             ;
         _serviceProvider = services.BuildServiceProvider();
