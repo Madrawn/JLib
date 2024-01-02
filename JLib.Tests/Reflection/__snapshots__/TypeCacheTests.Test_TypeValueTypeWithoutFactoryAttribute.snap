@@ -1,0 +1,55 @@
+﻿{
+  "TestName": "TypeValueTypeWithoutFactoryAttribute",
+  "Environment": {
+    "Types": {
+      "InvalidTypeValueType": {
+        "Kind": "Class",
+        "Attributes": [
+          "NullableContextAttribute",
+          "NullableAttribute",
+          "UnmappedAttribute"
+        ],
+        "ImplementedInterfaces": [
+          "IEquatable<ValueType<Type>>",
+          "ITypeValueType",
+          "IEquatable<TypeValueType>",
+          "IEquatable<TypeCacheTests.TypeValueTypeWithoutFactoryAttribute.InvalidTypeValueType>"
+        ]
+      }
+    }
+  },
+  "Exceptions": {
+    "Type": "JLib.Exceptions.JLibAggregateException",
+    "Message": [
+      "TypeValueTypeWithoutFactoryAttribute"
+    ],
+    "InnerExceptions": [
+      {
+        "Type": "JLib.Exceptions.JLibAggregateException",
+        "Message": [
+          "Cache setup failed"
+        ],
+        "InnerExceptions": [
+          {
+            "Type": "JLib.Exceptions.JLibAggregateException",
+            "Message": [
+              "some Types have no filter attributes"
+            ],
+            "InnerExceptions": [
+              {
+                "Type": "JLib.Exceptions.InvalidTypeException",
+                "message": [
+                  "Error while initializing ValueTypeForTypeValueTypes with JLib.Tests.Reflection.TypeCacheTests.TypeValueTypeWithoutFactoryAttribute.InvalidTypeValueType: InvalidTypeValueType does not have any filter attribute added"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "CachedTypes": {},
+  "KnownTypeValueTypes": [
+    "InvalidTypeValueType"
+  ]
+}

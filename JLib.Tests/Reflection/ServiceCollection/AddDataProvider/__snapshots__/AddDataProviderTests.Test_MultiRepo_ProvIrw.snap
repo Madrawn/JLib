@@ -24,28 +24,6 @@
       {
         "Type": "JLib.Exceptions.JLibAggregateException",
         "Message": [
-          "AddServices"
-        ],
-        "InnerExceptions": [
-          {
-            "Type": "JLib.Exceptions.JLibAggregateException",
-            "Message": [
-              "AddRepositories"
-            ],
-            "InnerExceptions": [
-              {
-                "Type": "JLib.Exceptions.InvalidSetupException",
-                "message": [
-                  "multiple repos have been provided for data object JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity: JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestRepositoryR, JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestRepositoryRw"
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "Type": "JLib.Exceptions.JLibAggregateException",
-        "Message": [
           "Service Factory"
         ],
         "InnerExceptions": [
@@ -68,6 +46,28 @@
                       "Force the dataProvider to be ReadOnly or Implement IDataProviderRw with the repository."
                     ]
                   }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "Type": "JLib.Exceptions.JLibAggregateException",
+        "Message": [
+          "AddServices"
+        ],
+        "InnerExceptions": [
+          {
+            "Type": "JLib.Exceptions.JLibAggregateException",
+            "Message": [
+              "AddRepositories"
+            ],
+            "InnerExceptions": [
+              {
+                "Type": "JLib.Exceptions.InvalidSetupException",
+                "message": [
+                  "multiple repos have been provided for data object JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity: JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestRepositoryR, JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestRepositoryRw"
                 ]
               }
             ]

@@ -140,37 +140,26 @@ public static class ServiceCollectionHelper
     #region AddTypeCache
     /// <summary>
     /// Adds the <see cref="ITypeCache"/> to your services, executes its Initialization and returns the ready-to-use instance.
-    /// <br/>
     /// </summary>
-    /// <param name="services"></param>
-    /// <param name="typeCache"></param>
-    /// <param name="includedPrefixes"></param>
-    /// <returns></returns>
     public static IServiceCollection AddTypeCache(this IServiceCollection services, out ITypeCache typeCache,
+        IExceptionManager exceptions,
         params string[] includedPrefixes)
-        => services.AddTypeCache(out typeCache, null, SearchOption.TopDirectoryOnly, includedPrefixes);
-    public static IServiceCollection AddTypeCache(this IServiceCollection services, out ITypeCache typeCache,
-        string? assemblySearchDirectory = null, SearchOption searchOption = SearchOption.TopDirectoryOnly, params string[] includedPrefixes)
-    {
-        assemblySearchDirectory ??= AppDomain.CurrentDomain.BaseDirectory;
-        var assemblyNames = Directory.EnumerateFiles(assemblySearchDirectory, "*.dll", searchOption).Where(file =>
-        {
-            var filename = Path.GetFileName(file);
-            return includedPrefixes.Any(p => filename.StartsWith(p));
-        }).Select(AssemblyName.GetAssemblyName).ToArray();
+        => services.AddTypeCache(out typeCache, exceptions, null, SearchOption.TopDirectoryOnly, includedPrefixes);
+    public static IServiceCollection AddTypeCache(
+        this IServiceCollection services,
+        out ITypeCache typeCache,
+        IExceptionManager exceptions,
+        string? assemblySearchDirectory = null,
+        SearchOption searchOption = SearchOption.TopDirectoryOnly,
+        params string[] includedPrefixes) 
+        => services.AddTypeCache(out typeCache, exceptions, TypePackage.Get(assemblySearchDirectory, includedPrefixes, searchOption));
 
-        var assemblies = assemblyNames.Select(Assembly.Load).ToArray();
-        Log.ForContext(typeof(ServiceCollectionHelper)).Information("TypeCache initializing using {searchDirectory} as path while looking for files in {searchOption} and filtering using {prefixes} as prefix." +
-                        " This resulted in {assemblyCount} Assemblies being loaded which are {assemblyList}",
-            assemblySearchDirectory, searchOption, includedPrefixes, assemblyNames.Length, assemblyNames);
-        return services.AddTypeCache(out typeCache, assemblies);
-    }
-
-    public static IServiceCollection AddTypeCache(this IServiceCollection services, out ITypeCache typeCache,
-        params Assembly[] assemblies)
+    public static IServiceCollection AddTypeCache(
+        this IServiceCollection services,
+        out ITypeCache typeCache,
+         IExceptionManager exceptionManager, params ITypePackage[] typePackages)
     {
-        Log.ForContext(typeof(ServiceCollectionHelper)).Information("initializing typeCache for assemblies {assemblies}", assemblies);
-        typeCache = new TypeCache(assemblies);
+        typeCache = new TypeCache(TypePackage.Get(typePackages), exceptionManager);
         return services.AddSingleton(typeCache);
     }
     #endregion

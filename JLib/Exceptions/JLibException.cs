@@ -35,22 +35,22 @@ public class JLibAggregateException : AggregateException
     {
         UserMessage = userMessage;
         _message = new(() => new StringBuilder()
+            .Append("│  ")
             .AppendLine(userMessage)
-            .Append(" ├─")
-            .AppendJoin(Environment.NewLine + " ├─",
+            .Append("├─")
+            .AppendJoin(Environment.NewLine + "├─",
                 content
                     .ToLookup(ex => ex.GetType())
                     .OrderBy(group => group.Key.Name)
                     .Select(group =>
-                    (
                         " " + group.Count() + " " + group.Key.Name + Environment.NewLine +
                         string.Join(Environment.NewLine,
                             group.OrderBy(ex => ex.Message)
                                 .Select(ex =>
-                                " " + (ex is NullReferenceException ? ex.ToString() : ex.Message.Replace(Environment.NewLine, Environment.NewLine + " │ "))
+                                (ex is NullReferenceException ? ex.ToString() : ex.Message.Replace(Environment.NewLine, Environment.NewLine + "│  "))
                             )
                         ) + Environment.NewLine
-                    ).Replace(Environment.NewLine, $"{Environment.NewLine} │ "))
+                    )
             )
             .ToString());
     }
