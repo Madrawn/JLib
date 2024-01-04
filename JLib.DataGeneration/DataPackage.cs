@@ -23,7 +23,7 @@ public abstract class DataPackage
         return res;
     }
 
-    protected DataPackage(IDataPackageStore packageStore)
+    protected DataPackage(IIdRegistry idRegistry)
     {
         foreach (var propertyInfo in GetType().GetProperties())
         {
@@ -37,7 +37,7 @@ public abstract class DataPackage
             if (propertyInfo.SetMethod?.IsPublic is true)
                 throw new(propertyInfo.DeclaringType?.FullClassName() + "." + propertyInfo.Name +
                           " set method must be protected");
-            packageStore.SetIdPropertyValue(propertyInfo);
+            idRegistry.SetIdPropertyValue(propertyInfo);
         }
     }
 }

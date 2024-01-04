@@ -6,7 +6,7 @@ using JLib.Helper;
 namespace JLib.Reflection;
 
 /// <summary>
-/// Contains Content to be used by the <see cref="TypeCache"/>
+/// Contains types to be used by the <see cref="TypeCache"/>
 /// </summary>
 public interface ITypePackage
 {
