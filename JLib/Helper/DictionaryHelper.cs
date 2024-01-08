@@ -28,4 +28,12 @@ public static class DictionaryHelper
 
         return value;
     }
+
+    public static TValue? TryGetValue<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key)
+    {
+        return dict.TryGetValue(key, out var value) 
+            ? value 
+            : default;
+    }
+
 }
