@@ -3,11 +3,14 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using AutoMapper;
+using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
 using JLib.ValueTypes;
 using Microsoft.Extensions.DependencyInjection;
 using static JLib.DataGeneration.DataPackageValues;
+
+using SaveFileType = System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, System.Text.Json.JsonElement>>;
 
 namespace JLib.DataGeneration;
 
@@ -99,6 +102,7 @@ internal class DataPackageManager : IDataPackageManager
         foreach (var dataPackageType in packages)
             _provider.GetRequiredService(dataPackageType.Value);
         InitState = DataPackageInitState.Initialized;
+        _idRegistry.SaveToFile();
     }
 
     public void SetIdPropertyValue(object packageInstance, PropertyInfo property)
@@ -154,7 +158,11 @@ internal class IdRegistry : IIdRegistry
     /// returns a deterministic <see cref="Guid"/> value for the given <paramref name="identifier"/>
     /// </summary>
     public string GetStringId(IdIdentifier identifier)
-        => $"{identifier.IdGroupName.Value}.{identifier.IdName.Value}:{GetIntId(identifier)}";
+    {
+        _isDirty = true;
+        return $"{identifier.IdGroupName.Value}.{identifier.IdName.Value}:{GetIntId(identifier)}";
+    }
+
     public Guid GetGuidId(IdIdentifier identifier)
         => _dictionary.GetValueOrAdd(identifier, () =>
         {
@@ -203,7 +211,7 @@ internal class IdRegistry : IIdRegistry
         if (idType.IsAssignableTo(typeof(GuidValueType)))
         {
             var nativeId = GetGuidId(identifier);
-            return _mapper.Value.Map(nativeId,nativeId.GetType(), idType);
+            return _mapper.Value.Map(nativeId, nativeId.GetType(), idType);
         }
         if (idType == typeof(string))
             return GetStringId(identifier);
@@ -219,16 +227,51 @@ internal class IdRegistry : IIdRegistry
     public void SaveToFile()
     {
         _dictionary[IncrementIdentifier] = _idIncrement;
-        if (_isDirty)
-            File.WriteAllText(_fileLocation, JsonSerializer.Serialize(_dictionary));
+
+        if (!_isDirty)
+            return;
+
+        var obj = _dictionary.GroupBy(kv => kv.Key.IdGroupName.Value)
+            .ToDictionary(g => g.Key,
+                g => g.ToDictionary(kv => kv.Key.IdName.Value,
+                    kv => kv.Value));
+        File.WriteAllText(_fileLocation, JsonSerializer.Serialize(obj, new JsonSerializerOptions()
+        {
+            WriteIndented = true
+        }));
     }
 
+
+    private object DeserializeId(JsonElement value)
+    {
+        switch (value.ValueKind)
+        {
+            case JsonValueKind.Number:
+                return value.GetInt32();
+            case JsonValueKind.String:
+                {
+                    var raw = value.GetString() ?? throw new InvalidSetupException("read empty id from file");
+                    return Guid.TryParse(raw, out var guid)
+                        ? guid
+                        : raw;
+                }
+            default:
+                throw new IndexOutOfRangeException(nameof(value.ValueKind));
+        }
+    }
     public Dictionary<IdIdentifier, object> LoadFromFile()
     {
         if (File.Exists(_fileLocation) is false)
             return new();
-        return JsonSerializer.Deserialize<Dictionary<IdIdentifier, object>>(
-            File.ReadAllText(_fileLocation)) ?? new();
+        var str = File.ReadAllText(_fileLocation);
+        var raw1 = JsonSerializer.Deserialize<SaveFileType>(str) ?? new();
+        var raw2 = raw1.SelectMany(groupName => groupName.Value
+            .ToDictionary(
+                name => new IdIdentifier(new(groupName.Key), new(name.Key)),
+                x => DeserializeId(x.Value)
+            ))
+            .ToDictionary(x => x.Key, x => x.Value);
+        return raw2;
     }
 
 }

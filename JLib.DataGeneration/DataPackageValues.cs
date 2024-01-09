@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.ComponentModel;
+using System.Reflection;
 using JLib.Helper;
 using JLib.ValueTypes;
 
