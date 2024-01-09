@@ -6,5 +6,7 @@ namespace JLib.DataGeneration;
 /// </summary>
 public static class JLibDataGenerationTypePackage
 {
-    public static ITypePackage Instance { get; } = TypePackage.Get(typeof(JLibDataGenerationTypePackage).Assembly).Combine(JLibTypePackage.Instance);
+    public static ITypePackage Instance { get; } = 
+        TypePackage.Get(typeof(JLibDataGenerationTypePackage).Assembly)
+            .Combine(JLibTypePackage.Instance);
 }

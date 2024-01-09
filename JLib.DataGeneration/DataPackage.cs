@@ -23,21 +23,34 @@ public abstract class DataPackage
         return res;
     }
 
-    protected DataPackage(IIdRegistry idRegistry)
+    protected DataPackage(IDataPackageManager packageManager)
     {
+        switch (packageManager.InitState)
+        {
+            case DataPackageInitState.Uninitialized:
+                throw new InvalidOperationException(
+                    "invalid injection. inject directly after provider build using 'JLib.DataGeneration.DataPackageExtensions.IncludeDataPackages'.");
+            case DataPackageInitState.Initialized:
+                throw new InvalidOperationException(
+                    "invalid injection: this type package has not been include when calling 'JLib.DataGeneration.DataPackageExtensions.IncludeDataPackages'.");
+            case DataPackageInitState.Initializing:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(packageManager.InitState));
+        }
+
+
         foreach (var propertyInfo in GetType().GetProperties())
         {
-            if (!propertyInfo.PropertyType.IsAssignableTo<GuidValueType>())
-                continue;
             if (propertyInfo.GetMethod?.IsPublic is not true)
                 continue;
             if (propertyInfo.CanWrite is false)
                 throw new(propertyInfo.DeclaringType?.FullClassName() + "." + propertyInfo.Name +
                           " can not be written");
-            if (propertyInfo.SetMethod?.IsPublic is true)
+            if (!propertyInfo.IsInit())
                 throw new(propertyInfo.DeclaringType?.FullClassName() + "." + propertyInfo.Name +
                           " set method must be protected");
-            idRegistry.SetIdPropertyValue(propertyInfo);
+            packageManager.SetIdPropertyValue(this, propertyInfo);
         }
     }
 }
