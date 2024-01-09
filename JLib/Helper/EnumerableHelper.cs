@@ -63,7 +63,11 @@ public static class EnumerableHelper
         this IEnumerable<TValue> col, Func<TValue, TKey> keySelector)
         where TKey : notnull
         => new(col.ToDictionary(keySelector));
+    public static ConcurrentDictionary<TKey, TValue> ToConcurrentDictionary<TIn, TKey, TValue>(
+        this IEnumerable<TIn> col, Func<TIn, TKey> keySelector, Func<TIn, TValue> valueSelector)
+        where TKey : notnull
+        => new(col.ToDictionary(keySelector, valueSelector));
 
-    public static IEnumerable<ValueTuple<T,int>> AddIndex<T>(this IEnumerable<T> src)
+    public static IEnumerable<ValueTuple<T, int>> AddIndex<T>(this IEnumerable<T> src)
         => src.Select((item, index) => (item, index));
 }

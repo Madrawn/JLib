@@ -8,7 +8,8 @@ namespace JLib.Reflection;
 
 
 
-public abstract record DataProviderType(Type Value) : NavigatingTypeValueType(Value), IPostNavigationInitializedType, IValidatedType
+public abstract record DataProviderType(Type Value) : NavigatingTypeValueType(Value),
+    IPostNavigationInitializedType, IValidatedType
 {
     public bool CanWrite { get; private set; }
 
