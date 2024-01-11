@@ -21,20 +21,29 @@ public static class DataPackageValues
     /// </summary>
     public record IdGroupName(string Value) : StringValueType(Value)
     {
-        public IdGroupName(Type dataPackage)
-            : this(dataPackage.FullClassName())
+        public IdGroupName(Type type)
+            : this(type.FullClassName())
         { }
-        public IdGroupName(DataPackage dataPackage)
+        internal IdGroupName(DataPackage dataPackage)
             : this(dataPackage.GetType())
         { }
-        public IdGroupName(PropertyInfo property)
-            : this(property.ReflectedType ?? throw new Exception("reflected type is null"))
+
+        internal IdGroupName(PropertyInfo property)
+            : this(
+                (property.DeclaringType != property.ReflectedType
+                    ? property.ReflectedType?.FullClassName() + ":"
+                    : "")
+                + property.DeclaringType?.FullClassName()
+            )
         { }
+
     }
 
     public record IdIdentifier(IdGroupName IdGroupName, IdName IdName)
     {
         public IdIdentifier(PropertyInfo property) : this(new(property), new(property))
         { }
+        public override string ToString() => IdGroupName.Value + "." + IdName.Value;
+
     }
 }

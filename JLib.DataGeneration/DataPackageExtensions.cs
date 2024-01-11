@@ -1,0 +1,56 @@
+﻿using JLib.Reflection;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace JLib.DataGeneration;
+
+public static class DataPackageExtensions
+{
+    public static IServiceCollection AddDataPackages(this IServiceCollection services, ITypeCache typeCache)
+    {
+        services.AddSingleton<IIdRegistry, IdRegistry>();
+        services.AddSingleton<IDataPackageManager, DataPackageManager>();
+        foreach (var package in typeCache.All<DataPackageType>())
+            services.AddSingleton(package.Value);
+        return services;
+    }
+
+    public static IServiceProvider IncludeDataPackages(this IServiceProvider provider, params DataPackageType[] packages)
+    {
+        provider.GetRequiredService<IDataPackageManager>().IncludeDataPackages(packages);
+        return provider;
+    }
+    #region overloads
+    private static IServiceProvider IncludeDataPackages(this IServiceProvider provider, params Type[] packages)
+    {
+        var typeCache = provider.GetRequiredService<ITypeCache>();
+        return provider.IncludeDataPackages(packages
+            .Select(package => typeCache.Get<DataPackageType>(package))
+            .ToArray());
+    }
+    public static IServiceProvider IncludeDataPackages<T>(this IServiceProvider provider)
+        where T : DataPackage
+        => provider.IncludeDataPackages(typeof(T));
+    public static IServiceProvider IncludeDataPackages<T1, T2>(this IServiceProvider provider)
+        where T1 : DataPackage
+        where T2 : DataPackage
+        => provider.IncludeDataPackages(typeof(T1), typeof(T2));
+    public static IServiceProvider IncludeDataPackages<T1, T2, T3>(this IServiceProvider provider)
+        where T1 : DataPackage
+        where T2 : DataPackage
+        where T3 : DataPackage
+        => provider.IncludeDataPackages(typeof(T1), typeof(T2), typeof(T3));
+    public static IServiceProvider IncludeDataPackages<T1, T2, T3, T4>(this IServiceProvider provider)
+        where T1 : DataPackage
+        where T2 : DataPackage
+        where T3 : DataPackage
+        where T4 : DataPackage
+        => provider.IncludeDataPackages(typeof(T1), typeof(T2), typeof(T3), typeof(T4));
+    public static IServiceProvider IncludeDataPackages<T1, T2, T3, T4, T5>(this IServiceProvider provider)
+        where T1 : DataPackage
+        where T2 : DataPackage
+        where T3 : DataPackage
+        where T4 : DataPackage
+        where T5 : DataPackage
+        => provider.IncludeDataPackages(typeof(T1), typeof(T2), typeof(T3), typeof(T5));
+    #endregion
+}

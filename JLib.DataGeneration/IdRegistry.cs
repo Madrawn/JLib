@@ -1,70 +1,20 @@
-﻿using System.IO;
+﻿using System.Collections.Concurrent;
+using System.Collections.Immutable;
+using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using AutoMapper;
 using JLib.Exceptions;
 using JLib.Helper;
-using JLib.Reflection;
 using JLib.ValueTypes;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using static JLib.DataGeneration.DataPackageValues;
-
+using JsonSerializer = System.Text.Json.JsonSerializer;
 using SaveFileType = System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, System.Text.Json.JsonElement>>;
 
 namespace JLib.DataGeneration;
-
-public static class DataPackageExtensions
-{
-    public static IServiceCollection AddDataPackages(this IServiceCollection services, ITypeCache typeCache)
-    {
-        services.AddSingleton<IIdRegistry, IdRegistry>();
-        services.AddSingleton<IDataPackageManager, DataPackageManager>();
-        foreach (var package in typeCache.All<DataPackageType>())
-            services.AddSingleton(package.Value);
-        return services;
-    }
-
-    public static IServiceProvider IncludeDataPackages(this IServiceProvider provider, params DataPackageType[] packages)
-    {
-        provider.GetRequiredService<IDataPackageManager>().IncludeDataPackages(packages);
-        return provider;
-    }
-    #region overloads
-    private static IServiceProvider IncludeDataPackages(this IServiceProvider provider, params Type[] packages)
-    {
-        var typeCache = provider.GetRequiredService<ITypeCache>();
-        return provider.IncludeDataPackages(packages
-            .Select(package => typeCache.Get<DataPackageType>(package))
-            .ToArray());
-    }
-    public static IServiceProvider IncludeDataPackages<T>(this IServiceProvider provider)
-        where T : DataPackage
-        => provider.IncludeDataPackages(typeof(T));
-    public static IServiceProvider IncludeDataPackages<T1, T2>(this IServiceProvider provider)
-        where T1 : DataPackage
-        where T2 : DataPackage
-        => provider.IncludeDataPackages(typeof(T1), typeof(T2));
-    public static IServiceProvider IncludeDataPackages<T1, T2, T3>(this IServiceProvider provider)
-        where T1 : DataPackage
-        where T2 : DataPackage
-        where T3 : DataPackage
-        => provider.IncludeDataPackages(typeof(T1), typeof(T2), typeof(T3));
-    public static IServiceProvider IncludeDataPackages<T1, T2, T3, T4>(this IServiceProvider provider)
-        where T1 : DataPackage
-        where T2 : DataPackage
-        where T3 : DataPackage
-        where T4 : DataPackage
-        => provider.IncludeDataPackages(typeof(T1), typeof(T2), typeof(T3), typeof(T4));
-    public static IServiceProvider IncludeDataPackages<T1, T2, T3, T4, T5>(this IServiceProvider provider)
-        where T1 : DataPackage
-        where T2 : DataPackage
-        where T3 : DataPackage
-        where T4 : DataPackage
-        where T5 : DataPackage
-        => provider.IncludeDataPackages(typeof(T1), typeof(T2), typeof(T3), typeof(T5));
-    #endregion
-}
 
 internal enum DataPackageInitState
 {
@@ -73,72 +23,41 @@ internal enum DataPackageInitState
     Initialized
 }
 
-public interface IDataPackageManager
-{
-    internal DataPackageInitState InitState { get; }
-
-    internal void IncludeDataPackages(DataPackageType[] packages);
-    internal void SetIdPropertyValue(object packageInstance, PropertyInfo property);
-}
-
-internal class DataPackageManager : IDataPackageManager
-{
-    private readonly IIdRegistry _idRegistry;
-    private readonly IServiceProvider _provider;
-
-    public DataPackageManager(IIdRegistry idRegistry, IServiceProvider provider)
-    {
-        _idRegistry = idRegistry;
-        _provider = provider;
-    }
-    public DataPackageInitState InitState { get; private set; }
-    public void IncludeDataPackages(DataPackageType[] packages)
-    {
-        if (InitState != DataPackageInitState.Uninitialized)
-            throw new InvalidOperationException($"dataPackages are {InitState} and cannot be loaded again.");
-
-        InitState = DataPackageInitState.Initializing;
-
-        foreach (var dataPackageType in packages)
-            _provider.GetRequiredService(dataPackageType.Value);
-        InitState = DataPackageInitState.Initialized;
-        _idRegistry.SaveToFile();
-    }
-
-    public void SetIdPropertyValue(object packageInstance, PropertyInfo property)
-        => _idRegistry.SetIdPropertyValue(packageInstance, property);
-}
 
 public interface IIdRegistry
 {
+    public string GetStringId(IdIdentifier identifier);
+    public Guid GetGuidId(IdIdentifier identifier);
+    public int GetIntId(IdIdentifier identifier);
     internal void SetIdPropertyValue(object packageInstance, PropertyInfo property);
     internal void SaveToFile();
 }
 
-internal class IdRegistry : IIdRegistry
+internal class IdRegistry : IIdRegistry, IDisposable
 {
-    private readonly IServiceProvider _serviceProvider;
+
     private static readonly IdIdentifier IncrementIdentifier = new(new("__registry__"), new("IdIncrement"));
 
     private readonly Lazy<IMapper> _mapper;
     private readonly string _fileLocation;
-    private readonly Dictionary<IdIdentifier, object> _dictionary;
+    private readonly ConcurrentDictionary<IdIdentifier, object> _dictionary;
     private bool _isDirty;
     private int _idIncrement;
     public IdRegistry(IServiceProvider serviceProvider)
     {
-        _serviceProvider = serviceProvider;
         _fileLocation = GetFileName();
-        _dictionary = LoadFromFile();
-        _idIncrement = _dictionary.GetValueOrDefault(IncrementIdentifier) as int? ?? 1;
-        _mapper = new Lazy<IMapper>(() => _serviceProvider.GetRequiredService<IMapper>());
+        _dictionary = LoadFromFile().ToConcurrentDictionary();
+        _idIncrement = _dictionary.GetValueOrDefault(IncrementIdentifier) as int? ?? 0;
+        _dictionary.Remove(IncrementIdentifier, out _);
+        _mapper = new(serviceProvider.GetRequiredService<IMapper>);
+        IdDebug.Register(_dictionary);
     }
 
     private static string GetFileName()
     {
         var currentDir = AppDomain.CurrentDomain.BaseDirectory;
         var targetDir = Parent(currentDir);
-        var file = Path.Combine(targetDir, "DataPackageStore.json");
+        var file = Path.Combine(targetDir, "IdRegistry.json");
         return file;
 
         static string Parent(string dir)
@@ -160,7 +79,11 @@ internal class IdRegistry : IIdRegistry
     public string GetStringId(IdIdentifier identifier)
     {
         _isDirty = true;
-        return $"{identifier.IdGroupName.Value}.{identifier.IdName.Value}:{GetIntId(identifier)}";
+        return _dictionary.GetValueOrAdd(identifier, () =>
+        {
+            _isDirty = true;
+            return $"{identifier.IdGroupName.Value}.{identifier.IdName.Value}:{Interlocked.Increment(ref _idIncrement)}";
+        }).CastTo<string>();
     }
 
     public Guid GetGuidId(IdIdentifier identifier)
@@ -176,7 +99,7 @@ internal class IdRegistry : IIdRegistry
         => _dictionary.GetValueOrAdd(identifier, () =>
         {
             _isDirty = true;
-            return _idIncrement++;
+            return Interlocked.Increment(ref _idIncrement);
         }).CastTo<int>();
 
     /// <summary>
@@ -226,14 +149,14 @@ internal class IdRegistry : IIdRegistry
 
     public void SaveToFile()
     {
-        _dictionary[IncrementIdentifier] = _idIncrement;
-
         if (!_isDirty)
             return;
 
-        var obj = _dictionary.GroupBy(kv => kv.Key.IdGroupName.Value)
-            .ToDictionary(g => g.Key,
-                g => g.ToDictionary(kv => kv.Key.IdName.Value,
+        var obj = _dictionary
+            .Append(new(IncrementIdentifier, _idIncrement))
+            .GroupBy(kv => kv.Key.IdGroupName.Value)
+            .ToImmutableSortedDictionary(g => g.Key,
+                g => g.ToImmutableSortedDictionary(kv => kv.Key.IdName.Value,
                     kv => kv.Value));
         File.WriteAllText(_fileLocation, JsonSerializer.Serialize(obj, new JsonSerializerOptions()
         {
@@ -265,7 +188,8 @@ internal class IdRegistry : IIdRegistry
             return new();
         var str = File.ReadAllText(_fileLocation);
         var raw1 = JsonSerializer.Deserialize<SaveFileType>(str) ?? new();
-        var raw2 = raw1.SelectMany(groupName => groupName.Value
+        var raw2 = raw1
+            .SelectMany(groupName => groupName.Value
             .ToDictionary(
                 name => new IdIdentifier(new(groupName.Key), new(name.Key)),
                 x => DeserializeId(x.Value)
@@ -274,4 +198,10 @@ internal class IdRegistry : IIdRegistry
         return raw2;
     }
 
+    public void Dispose()
+    {
+        // otherwise at runtime generated ids won't be persisted
+        SaveToFile();
+        IdDebug.UnRegister(_dictionary);
+    }
 }

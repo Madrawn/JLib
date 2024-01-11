@@ -17,10 +17,7 @@ public abstract class DataPackage
         var property = GetType().GetProperty(propertyName) ??
                                       throw new InvalidSetupException(
                                           $"property {propertyName} not found on {GetType().FullClassName()}");
-        var res = $"{property.DeclaringType?.FullClassName()}.{property.Name}";
-        if (property.DeclaringType != property.ReflectedType)
-            res = $"{property.ReflectedType?.FullClassName()}:" + res;
-        return res;
+        return new DataPackageValues.IdGroupName(property).Value + "." + property.Name;
     }
 
     protected DataPackage(IDataPackageManager packageManager)
@@ -49,7 +46,7 @@ public abstract class DataPackage
                           " can not be written");
             if (!propertyInfo.IsInit())
                 throw new(propertyInfo.DeclaringType?.FullClassName() + "." + propertyInfo.Name +
-                          " set method must be protected");
+                          " set method must be init");
             packageManager.SetIdPropertyValue(this, propertyInfo);
         }
     }
