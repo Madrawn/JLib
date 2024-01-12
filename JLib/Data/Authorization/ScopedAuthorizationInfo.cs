@@ -18,7 +18,7 @@ public interface IAuthorizationInfo<TDataObject> : IAuthorizationInfo
         dataObjects
             .Select(AndGetException)
             .WhereNotNull()
-            .RaiseExceptionIfNotEmpty("some Data Objects are not Authorized");
+            .ThrowExceptionIfNotEmpty("some Data Objects are not Authorized");
         return dataObjects;
     }
     TDataObject AndRaiseException(TDataObject dataObject)

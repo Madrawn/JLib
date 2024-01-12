@@ -14,19 +14,16 @@ public static class DataPackageExtensions
         return services;
     }
 
-    public static IServiceProvider IncludeDataPackages(this IServiceProvider provider, params DataPackageType[] packages)
+    public static IServiceProvider IncludeDataPackages(this IServiceProvider provider, params DataPackageType[] packages) 
+        => provider.IncludeDataPackages(packages.Select(p=>p.Value).ToArray());
+
+    #region overloads
+    public static IServiceProvider IncludeDataPackages(this IServiceProvider provider, params Type[] packages)
     {
         provider.GetRequiredService<IDataPackageManager>().IncludeDataPackages(packages);
         return provider;
     }
-    #region overloads
-    private static IServiceProvider IncludeDataPackages(this IServiceProvider provider, params Type[] packages)
-    {
-        var typeCache = provider.GetRequiredService<ITypeCache>();
-        return provider.IncludeDataPackages(packages
-            .Select(package => typeCache.Get<DataPackageType>(package))
-            .ToArray());
-    }
+
     public static IServiceProvider IncludeDataPackages<T>(this IServiceProvider provider)
         where T : DataPackage
         => provider.IncludeDataPackages(typeof(T));

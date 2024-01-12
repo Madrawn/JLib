@@ -29,6 +29,14 @@ public interface IIdRegistry
     public string GetStringId(IdIdentifier identifier);
     public Guid GetGuidId(IdIdentifier identifier);
     public int GetIntId(IdIdentifier identifier);
+    public IdIdentifier? GetIdentifierOfId(string id);
+    public IdIdentifier? GetIdentifierOfId(StringValueType id);
+    public IdIdentifier? GetIdentifierOfId(int id);
+    public IdIdentifier? GetIdentifierOfId(int? id);
+    public IdIdentifier? GetIdentifierOfId(IntValueType id);
+    public IdIdentifier? GetIdentifierOfId(Guid id);
+    public IdIdentifier? GetIdentifierOfId(Guid? id);
+    public IdIdentifier? GetIdentifierOfId(GuidValueType id);
     internal void SetIdPropertyValue(object packageInstance, PropertyInfo property);
     internal void SaveToFile();
 }
@@ -101,6 +109,25 @@ internal class IdRegistry : IIdRegistry, IDisposable
             _isDirty = true;
             return Interlocked.Increment(ref _idIncrement);
         }).CastTo<int>();
+
+    private IdIdentifier? GetIdentifierOfId(object? id)
+        => _dictionary.Single(kv => kv.Value.Equals(id)).Key;
+    public IdIdentifier? GetIdentifierOfId(string id)
+        => GetIdentifierOfId((object)id);
+    public IdIdentifier? GetIdentifierOfId(StringValueType id)
+        => GetIdentifierOfId((object)id.Value);
+    public IdIdentifier? GetIdentifierOfId(int id)
+        => GetIdentifierOfId((object)id);
+    public IdIdentifier? GetIdentifierOfId(int? id)
+        => GetIdentifierOfId((object?)id);
+    public IdIdentifier? GetIdentifierOfId(IntValueType id)
+        => GetIdentifierOfId((object)id.Value);
+    public IdIdentifier? GetIdentifierOfId(Guid id)
+        => GetIdentifierOfId((object)id);
+    public IdIdentifier? GetIdentifierOfId(Guid? id)
+        => GetIdentifierOfId((object?)id);
+    public IdIdentifier? GetIdentifierOfId(GuidValueType id)
+        => GetIdentifierOfId((object)id.Value);
 
     /// <summary>
     /// sets the id of the given <paramref name="property"/> to the persisted id or creates a new one<br/>
