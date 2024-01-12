@@ -22,7 +22,7 @@ public static class DataPackageValues
     public record IdGroupName(string Value) : StringValueType(Value)
     {
         public IdGroupName(Type type)
-            : this(type.FullClassName())
+            : this(type.FullClassName(true))
         { }
         internal IdGroupName(DataPackage dataPackage)
             : this(dataPackage.GetType())
@@ -31,9 +31,9 @@ public static class DataPackageValues
         internal IdGroupName(PropertyInfo property)
             : this(
                 (property.DeclaringType != property.ReflectedType
-                    ? property.ReflectedType?.FullClassName() + ":"
+                    ? property.ReflectedType?.FullClassName(true) + ":"
                     : "")
-                + property.DeclaringType?.FullClassName()
+                + property.DeclaringType?.FullClassName(true)
             )
         { }
 

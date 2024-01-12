@@ -2,7 +2,7 @@
   "__registry__": {
     "IdIncrement": 0
   },
-  "ExampleUnitTests.DefaultArticleDp": {
-    "ArticleId": "5d47588b-16ee-4adc-8a6e-6a309f36422e"
+  "JLib.DataGeneration.Tests.ExampleUnitTests.DefaultArticleDp": {
+    "ArticleId": "f4e9ca80-b221-4ebb-ada1-8b1287457de8"
   }
 }
