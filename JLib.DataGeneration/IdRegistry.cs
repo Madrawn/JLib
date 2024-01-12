@@ -11,6 +11,7 @@ using JLib.Helper;
 using JLib.ValueTypes;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using static JLib.DataGeneration.DataPackageValues;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 using SaveFileType = System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, System.Text.Json.JsonElement>>;
@@ -30,6 +31,7 @@ public interface IIdRegistry
     public string GetStringId(IdIdentifier identifier);
     public Guid GetGuidId(IdIdentifier identifier);
     public int GetIntId(IdIdentifier identifier);
+    public IdIdentifier? GetIdentifierOfId(object? id);
     public IdIdentifier? GetIdentifierOfId(string id);
     public IdIdentifier? GetIdentifierOfId(StringValueType id);
     public IdIdentifier? GetIdentifierOfId(int id);
@@ -59,7 +61,7 @@ internal class IdRegistry : IIdRegistry, IDisposable
         _idIncrement = _dictionary.GetValueOrDefault(IncrementIdentifier) as int? ?? 0;
         _dictionary.Remove(IncrementIdentifier, out _);
         _mapper = new(serviceProvider.GetRequiredService<IMapper>);
-        IdDebug.Register(_dictionary);
+        IdDebug.Register(this);
     }
 
     private static string GetFileName()
@@ -111,8 +113,18 @@ internal class IdRegistry : IIdRegistry, IDisposable
             return Interlocked.Increment(ref _idIncrement);
         }).CastTo<int>();
 
-    private IdIdentifier? GetIdentifierOfId(object? id)
-        => _dictionary.Single(kv => kv.Value.Equals(id)).Key;
+    public IdIdentifier? GetIdentifierOfId(object? id)
+    {
+        var nativeId = id switch
+        {
+            IntValueType intVt => intVt.Value,
+            StringValueType stringVt => stringVt.Value,
+            GuidValueType guidVt => guidVt.Value,
+            _ => id
+        };
+        return _dictionary.Single(kv => kv.Value.Equals(nativeId)).Key;
+    }
+
     public IdIdentifier? GetIdentifierOfId(string id)
         => GetIdentifierOfId((object)id);
     public IdIdentifier? GetIdentifierOfId(StringValueType id)
@@ -232,6 +244,6 @@ internal class IdRegistry : IIdRegistry, IDisposable
     {
         // otherwise at runtime generated ids won't be persisted
         SaveToFile();
-        IdDebug.UnRegister(_dictionary);
+        IdDebug.UnRegister(this);
     }
 }

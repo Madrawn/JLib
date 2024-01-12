@@ -35,7 +35,8 @@ You **MUST NOT** select the classname of any DataPackage. Doing so might result 
 
 
 ## How to
-
+### get the identifier of an id value
+during debugging, you can simply use the .Info/
 ### Create a class Derived from DataPackage and implement the constructor
 ```cs
 using JLib.DataGeneration;

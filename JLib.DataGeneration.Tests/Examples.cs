@@ -140,7 +140,7 @@ public class ExampleUnitTests : IDisposable
                     .Select(article =>
                     new {
                         article.Id,
-                        IdInfo = article.Id.Info(),
+                        IdInfo = article.Id.IdInfo(),
                         article.Name
                     })
             },
