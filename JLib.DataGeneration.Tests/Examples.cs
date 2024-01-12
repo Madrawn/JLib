@@ -63,6 +63,7 @@ public class ExampleUnitTests : IDisposable
     private readonly ShopDbContext _dbContext;
     private readonly List<IDisposable> _disposables = new();
     private readonly ITypeCache _typeCache;
+    private readonly IIdRegistry _idRegistry;
 
     public ExampleUnitTests()
     {
@@ -88,6 +89,7 @@ public class ExampleUnitTests : IDisposable
 
         _dbContext = _provider.GetRequiredService<ShopDbContext>();
         _dbContext.Database.EnsureCreated();
+        _idRegistry = provider.GetRequiredService<IIdRegistry>();
         exceptions.ThrowIfNotEmpty();
     }
     public void Dispose()
@@ -140,7 +142,7 @@ public class ExampleUnitTests : IDisposable
                     .Select(article =>
                     new {
                         article.Id,
-                        IdInfo = article.Id.IdInfo(),
+                        IdInfo = article.Id.IdInfo(_idRegistry),
                         article.Name
                     })
             },
