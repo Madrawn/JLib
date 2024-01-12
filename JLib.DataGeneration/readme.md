@@ -17,6 +17,10 @@ A named id is defined by getting it from the datapackage base class. the name mu
 NamedIDs should be used when it is not neccessary to reference this entity from another entity like when creating a n:m reference entity.
 The name of the id should contain the propertynames of the related ids (for example when you create orderItems for the order named 'CompletedOrder', the name should be 'CompletedOrder_Item_1')
 A named Id can not be accessed from another package. 
+#### Manual ID
+A manual Id is a id which can be defined at runtime. It is composed of a groupName and a IdName.
+You **MUST NOT** select the classname of any DataPackage. Doing so might result in duplicate IDs.
+
 
 ### Data Packages
 #### Extentions
@@ -49,12 +53,61 @@ To create deterministic ids, add a public property of type `guid` or a derivativ
 using JLib.DataGeneration;
 using JLib.ValueTypes;
 // ...
-public record MyTypedId(Guid Value) : GuidValueType(Value);
+
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+namespace MyNamespace;
+
+#region referenced types
+// id valuetype
+public record ArticleId(Guid Value) : GuidValueType(Value);
+
+// efcore entity
+public class Article
+{
+    [Key]
+    Guid Id { get; init; }
+    string Name { get; init; }
+}
+
+public class ShopDbContext : DbContext
+#endregion
+
+// DataPackage
 public class MyDataPackage : DataPackage
 {
-    public Guid MyFirstNativeId { get; set; }
-    public MyTypedId MyTypedId { get; set; } = default!;
-    // ...
+    public ArticleId ArticleId { get; init; }
+    public MyDataPackage(IDataPackageManager packageManager, MyDbContext dbContext):base(packageManager)
+    {
+        dbContext.Articles.Add(new()
+        {
+            Id = ArticleId.Value,
+            Name = GetInfoText(nameof(ArticleId))
+        });
+    }
+}
+
+public class UnitTest : IDisposable
+{
+    [Fact] public async Task ImportLocationsOnly() => await RunTest(new[] { typeof(NotImportedLocationsDp) });
+   
+  
+
+    private readonly CancellationToken _cancellationToken;
+    private readonly IServiceProvider _provider;
+    private readonly List<IDisposable> _disposables = new();
+    private readonly ITypeCache _typeCache;
+
+    public UnitTest()
+    {
+        var id = Guid.NewGuid();
+        var exceptions = new ExceptionManager("test setup");
+        var services = new ServiceCollection()
+            .AddTypeCache(out _typeCache, exceptions,
+                BackendTestsTypePackage.Instance, JLibDataGenerationTypePackage.Instance)
+            .AddAutoMapper(p => p.AddProfiles(_typeCache))
+            .AddDataPackages(_typeCache)
+    }
 }
 ```
 

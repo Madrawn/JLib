@@ -1,0 +1,10 @@
+﻿{
+  "Database": [
+    {
+      "Id": "5d47588b-16ee-4adc-8a6e-6a309f36422e",
+      "IdInfo": "Guid ExampleUnitTests.DefaultArticleDp.ArticleId = 5d47588b-16ee-4adc-8a6e-6a309f36422e",
+      "Name": "ExampleUnitTests.DefaultArticleDp.ArticleId"
+    }
+  ],
+  "exception": null
+}
