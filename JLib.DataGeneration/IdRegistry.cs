@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using AutoMapper;
 using JLib.Exceptions;
@@ -185,10 +186,12 @@ internal class IdRegistry : IIdRegistry, IDisposable
             .ToImmutableSortedDictionary(g => g.Key,
                 g => g.ToImmutableSortedDictionary(kv => kv.Key.IdName.Value,
                     kv => kv.Value));
-        File.WriteAllText(_fileLocation, JsonSerializer.Serialize(obj, new JsonSerializerOptions()
+        var str = JsonSerializer.Serialize(obj, new JsonSerializerOptions()
         {
-            WriteIndented = true
-        }));
+            WriteIndented = true,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        });
+        File.WriteAllText(_fileLocation, str);
     }
 
 
