@@ -59,6 +59,13 @@ public static class EnumerableHelper
             col.Remove(i);
     }
 
+    public static IReadOnlyCollection<T> ToReadOnlyCollection<T>(this IEnumerable<T> col)
+        => col.ToArray();
+
+    public static ConcurrentDictionary<TKey, TValue> ToConcurrentDictionary<TKey, TValue>(
+        this IDictionary<TKey, TValue> source)
+        where TKey : notnull
+        => new(source);
     public static ConcurrentDictionary<TKey, TValue> ToConcurrentDictionary<TKey, TValue>(
         this IEnumerable<TValue> col, Func<TValue, TKey> keySelector)
         where TKey : notnull

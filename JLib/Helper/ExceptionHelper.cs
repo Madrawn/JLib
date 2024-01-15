@@ -3,7 +3,7 @@
 namespace JLib.Helper;
 public static class ExceptionHelper
 {
-    public static void RaiseExceptionIfNotEmpty<T>(this IEnumerable<T> errors, string message)
+    public static void ThrowExceptionIfNotEmpty<T>(this IEnumerable<T> errors, string message)
         where T : Exception
     {
         var mat = errors.Cast<Exception>().ToArray();

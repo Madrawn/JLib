@@ -6,7 +6,7 @@ using JLib.Helper;
 namespace JLib.Reflection;
 
 /// <summary>
-/// Contains Content to be used by the <see cref="TypeCache"/>
+/// Contains types to be used by the <see cref="TypeCache"/>
 /// </summary>
 public interface ITypePackage
 {
@@ -32,6 +32,8 @@ public interface ITypePackage
     /// returns a type package which is a combination of the given packages
     /// </summary>
     public ITypePackage Combine(params ITypePackage[] packages);
+
+    public string ToString(bool includeTypes);
 }
 /// <summary>
 /// Contains Content to be used by the <see cref="TypeCache"/>
@@ -114,26 +116,36 @@ public class TypePackage : ITypePackage
         => Get(packages.Append(this));
 
     public override string ToString()
+        => ToString(false);
+    public string ToString(bool includeTypes)
     {
         var sb = new StringBuilder();
-        ToString(this, 0, sb);
+        ToString(this, 0, sb, includeTypes);
         return sb.ToString();
     }
 
-    static void ToString(ITypePackage package, int indent, StringBuilder sb)
+    static void ToString(ITypePackage package, int indent, StringBuilder sb, bool includeTypes)
     {
         var indentStr = new string(' ', indent * 2);
         sb.Append(indentStr).Append('┐').AppendLine(string.Format(package.DescriptionTemplate, package.Children.Count(), package.Types.Count()));
         sb.Append(indentStr).Append("├ Types:").AppendLine(package.Types.Count().ToString());
-        if(package.Types.Count() <= 10)
+        if (package.Types.Count() <= 10)
         {
-            foreach(var type in package.Types)
+            foreach (var type in package.Types)
                 sb.Append(indentStr).Append("│   ").AppendLine(type.FullClassName());
         }
         sb.Append(indentStr).Append("├ Types Total:").AppendLine(package.Content.Count().ToString());
+        if (includeTypes)
+        {
+            sb.Append(indentStr).AppendLine("├┐");
+            foreach (var type in package.Types)
+            {
+                sb.Append(indentStr).Append("│├ ").AppendLine(type.FullClassName());
+            }
+        }
         sb.Append(indentStr).AppendLine("├ Children:");
         foreach (var child in package.Children)
-            ToString(child, indent + 1, sb);
+            ToString(child, indent + 1, sb, includeTypes);
 
     }
 }

@@ -32,7 +32,7 @@ public class AuthorizationTests
             .AddScopeProvider()
             .AddDataAuthorization(typeCache)
             .AddAutoMapper(b => { b.CreateMap<Guid, Guid>(); })
-            .AddDataProvider<CommandEntityType, MockDataProvider<IEntity>, IEntity>(
+            .AddDataProvider<CommandEntityType, InMemoryDataProvider<IEntity>, IEntity>(
                 typeCache, null, null, null, exceptions)
             ;
         _serviceProvider = services.BuildServiceProvider();
@@ -125,9 +125,9 @@ public class AuthorizationTests
         public TestDataObjectId FirstUnauthorizedId { get; protected set; } = null!;
         public TestDataObjectId SecondUnAuthorizedId { get; protected set; } = null!;
         public TestDataObjectId ThirdUnAuthorizedId { get; protected set; } = null!;
-        public TestObjectDataPackage(IDataPackageStore dataPackages) : base(dataPackages)
+        public TestObjectDataPackage(IDataPackageStore packageStore) : base(packageStore)
         {
-            dataPackages.AddEntities(new TestDataObject[]
+            packageStore.AddEntities(new TestDataObject[]
             {
                 new()
                 {

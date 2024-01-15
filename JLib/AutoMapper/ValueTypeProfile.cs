@@ -110,7 +110,7 @@ public class ValueTypeProfile : Profile
             }
             else
             {
-                Log.ForContext<ValueTypeProfile>().Debug("        adding map for strct-valueType {valueType}", valueType.Name);
+                Log.ForContext<ValueTypeProfile>().Debug("        adding map for struct-valueType {valueType}", valueType.Name);
                 var addMapping = typeof(StructValueTypeConversions<,>).MakeGenericType(valueType.Value, valueType.NativeType)
                                      .GetMethod(nameof(StructValueTypeConversions<ValueType<int>, int>.AddMapping)) ??
                                  throw new InvalidSetupException("AddProfileMethodNotFound");

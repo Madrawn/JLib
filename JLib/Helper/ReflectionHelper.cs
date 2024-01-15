@@ -6,6 +6,28 @@ namespace JLib.Helper;
 public record TypeAttributeInfo(Type Type, Attribute Attribute);
 public static class ReflectionHelper
 {
+    // https://alistairevans.co.uk/2020/11/01/detecting-init-only-properties-with-reflection-in-c-9/
+    /// <summary>
+    /// checks whether the property is init<br/>
+    /// { get; } => false<br/>
+    /// { get; set; } => false;<br/>
+    /// { get; init; } => true;
+    /// </summary>
+    public static bool IsInit(this PropertyInfo property)
+    {
+        if (!property.CanWrite)
+        {
+            return false;
+        }
+
+        var setMethod = property.SetMethod;
+
+        // Get the modifiers applied to the return parameter.
+        var setMethodReturnParameterModifiers = setMethod?.ReturnParameter.GetRequiredCustomModifiers();
+
+        // Init-only properties are marked with the IsExternalInit type.
+        return setMethodReturnParameterModifiers?.Contains(typeof(System.Runtime.CompilerServices.IsExternalInit)) ?? false;
+    }
 
     public static bool HasCustomAttribute(this MemberInfo type, Type attributeType, bool inherit = true)
         => type.GetCustomAttribute(attributeType, inherit) is not null;
