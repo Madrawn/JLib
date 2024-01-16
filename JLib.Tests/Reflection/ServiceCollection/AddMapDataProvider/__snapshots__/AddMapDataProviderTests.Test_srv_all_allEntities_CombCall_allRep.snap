@@ -1,0 +1,294 @@
+﻿{
+  "Parameters": {
+    "TestName": "srv_all_allEntities_CombCall_allRep",
+    "ExpectedBehavior": [
+      "  input: all entities                                                                                                                     ",
+      "  repos: none                                                                                                                             ",
+      "  filter: MappedGdo                                                                                                                       ",
+      "  Expected Implementations:                                                                                                               ",
+      "    TestXrmEntity                                                                                                                         ",
+      "      IDataProviderR       : AddMapDataProviderTests.TestDataProvider<AddMapDataProviderTests.TestXrmEntity>                              ",
+      "      IDataProviderRw      : AddMapDataProviderTests.TestDataProvider<AddMapDataProviderTests.TestXrmEntity>                              ",
+      "      ISourceDataProviderR : AddMapDataProviderTests.TestDataProvider<AddMapDataProviderTests.TestXrmEntity>                              ",
+      "      ISourceDataProviderRw: AddMapDataProviderTests.TestDataProvider<AddMapDataProviderTests.TestXrmEntity>                              ",
+      "    TestCommandEntity                                                                                                                     ",
+      "      IDataProviderR       : TestCeRepository                                                                                             ",
+      "      IDataProviderRw      : TestCeRepository                                                                                             ",
+      "      ISourceDataProviderR : WritableMapDataProvider<AddMapDataProviderTests.TestXrmEntity, AddMapDataProviderTests.TestCommandEntity>    ",
+      "      ISourceDataProviderRw: WritableMapDataProvider<AddMapDataProviderTests.TestXrmEntity, AddMapDataProviderTests.TestCommandEntity>    ",
+      "    TestGraphQlDataObject                                                                                                                 ",
+      "      IDataProviderR       : TestGdoRepository                                                                                            ",
+      "      IDataProviderRw      : -                                                                                                            ",
+      "      ISourceDataProviderR : MapDataProvider<AddMapDataProviderTests.TestXrmEntity, AddMapDataProviderTests.TestGraphQlDataObject>        ",
+      "      ISourceDataProviderRw: -                                                                                                            "
+    ],
+    "includedTypes": [
+      "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestXrmEntity",
+      "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestCommandEntity",
+      "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestGraphQlDataObject",
+      "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestCeRepository",
+      "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestGdoRepository"
+    ]
+  },
+  "exception": null,
+  "cache": {
+    "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider": {
+      "JLib.CommandEntityType": [
+        "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestXrmEntity"
+      ],
+      "JLib.MappedCommandEntityType": [
+        "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestCommandEntity"
+      ],
+      "JLib.MappedGraphQlDataObjectType": [
+        "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestGraphQlDataObject"
+      ],
+      "JLib.RepositoryType": [
+        "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestCeRepository",
+        "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestGdoRepository"
+      ]
+    }
+  },
+  "services": {
+    "non-generic": {
+      "JLib.ITypeCache": [
+        {
+          "Lifetime": "Singleton",
+          "ImplementationSource": "Instance",
+          "ServiceType": "JLib.ITypeCache",
+          "ServiceArguments": [],
+          "ImplementationType": "JLib.TypeCache",
+          "ImplementationTypeArguments": []
+        }
+      ],
+      "AutoMapper.IMapper": [
+        {
+          "Lifetime": "Singleton",
+          "ImplementationSource": "Instance",
+          "ServiceType": "AutoMapper.IMapper",
+          "ServiceArguments": [],
+          "ImplementationType": "Castle.Proxies.IMapperProxy",
+          "ImplementationTypeArguments": []
+        }
+      ],
+      "AutoMapper.IConfigurationProvider": [
+        {
+          "Lifetime": "Singleton",
+          "ImplementationSource": "Instance",
+          "ServiceType": "AutoMapper.IConfigurationProvider",
+          "ServiceArguments": [],
+          "ImplementationType": "Castle.Proxies.IConfigurationProviderProxy",
+          "ImplementationTypeArguments": []
+        }
+      ],
+      "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestCeRepository": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Type",
+          "ServiceType": "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestCeRepository",
+          "ServiceArguments": [],
+          "ImplementationType": "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestCeRepository",
+          "ImplementationTypeArguments": []
+        }
+      ],
+      "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestGdoRepository": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Type",
+          "ServiceType": "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestGdoRepository",
+          "ServiceArguments": [],
+          "ImplementationType": "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestGdoRepository",
+          "ImplementationTypeArguments": []
+        }
+      ]
+    },
+    "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestCommandEntity": {
+      "JLib.Data.IDataProviderR<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Factory",
+          "ServiceType": "JLib.Data.IDataProviderR<>",
+          "ServiceArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestCommandEntity"
+          ],
+          "ImplementationType": "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestCeRepository",
+          "ImplementationTypeArguments": []
+        }
+      ],
+      "JLib.Data.IDataProviderRw<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Factory",
+          "ServiceType": "JLib.Data.IDataProviderRw<>",
+          "ServiceArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestCommandEntity"
+          ],
+          "ImplementationType": "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestCeRepository",
+          "ImplementationTypeArguments": []
+        }
+      ],
+      "JLib.Data.WritableMapDataProvider<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Type",
+          "ServiceType": "JLib.Data.WritableMapDataProvider<>",
+          "ServiceArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestXrmEntity",
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestCommandEntity"
+          ],
+          "ImplementationType": "JLib.Data.WritableMapDataProvider<>",
+          "ImplementationTypeArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestXrmEntity",
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestCommandEntity"
+          ]
+        }
+      ],
+      "JLib.Data.ISourceDataProviderR<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Factory",
+          "ServiceType": "JLib.Data.ISourceDataProviderR<>",
+          "ServiceArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestCommandEntity"
+          ],
+          "ImplementationType": "JLib.Data.WritableMapDataProvider<>",
+          "ImplementationTypeArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestXrmEntity",
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestCommandEntity"
+          ]
+        }
+      ],
+      "JLib.Data.ISourceDataProviderRw<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Factory",
+          "ServiceType": "JLib.Data.ISourceDataProviderRw<>",
+          "ServiceArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestCommandEntity"
+          ],
+          "ImplementationType": "JLib.Data.WritableMapDataProvider<>",
+          "ImplementationTypeArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestXrmEntity",
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestCommandEntity"
+          ]
+        }
+      ]
+    },
+    "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestGraphQlDataObject": {
+      "JLib.Data.IDataProviderR<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Factory",
+          "ServiceType": "JLib.Data.IDataProviderR<>",
+          "ServiceArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestGraphQlDataObject"
+          ],
+          "ImplementationType": "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestGdoRepository",
+          "ImplementationTypeArguments": []
+        }
+      ],
+      "JLib.Data.MapDataProvider<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Type",
+          "ServiceType": "JLib.Data.MapDataProvider<>",
+          "ServiceArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestXrmEntity",
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestGraphQlDataObject"
+          ],
+          "ImplementationType": "JLib.Data.MapDataProvider<>",
+          "ImplementationTypeArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestXrmEntity",
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestGraphQlDataObject"
+          ]
+        }
+      ],
+      "JLib.Data.ISourceDataProviderR<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Factory",
+          "ServiceType": "JLib.Data.ISourceDataProviderR<>",
+          "ServiceArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestGraphQlDataObject"
+          ],
+          "ImplementationType": "JLib.Data.MapDataProvider<>",
+          "ImplementationTypeArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestXrmEntity",
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestGraphQlDataObject"
+          ]
+        }
+      ]
+    },
+    "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestXrmEntity": {
+      "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestDataProvider<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Type",
+          "ServiceType": "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestDataProvider<>",
+          "ServiceArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestXrmEntity"
+          ],
+          "ImplementationType": "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestDataProvider<>",
+          "ImplementationTypeArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestXrmEntity"
+          ]
+        }
+      ],
+      "JLib.Data.IDataProviderR<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Factory",
+          "ServiceType": "JLib.Data.IDataProviderR<>",
+          "ServiceArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestXrmEntity"
+          ],
+          "ImplementationType": "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestDataProvider<>",
+          "ImplementationTypeArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestXrmEntity"
+          ]
+        }
+      ],
+      "JLib.Data.IDataProviderRw<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Factory",
+          "ServiceType": "JLib.Data.IDataProviderRw<>",
+          "ServiceArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestXrmEntity"
+          ],
+          "ImplementationType": "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestDataProvider<>",
+          "ImplementationTypeArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestXrmEntity"
+          ]
+        }
+      ],
+      "JLib.Data.ISourceDataProviderR<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Factory",
+          "ServiceType": "JLib.Data.ISourceDataProviderR<>",
+          "ServiceArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestXrmEntity"
+          ],
+          "ImplementationType": "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestDataProvider<>",
+          "ImplementationTypeArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestXrmEntity"
+          ]
+        }
+      ],
+      "JLib.Data.ISourceDataProviderRw<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Factory",
+          "ServiceType": "JLib.Data.ISourceDataProviderRw<>",
+          "ServiceArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestXrmEntity"
+          ],
+          "ImplementationType": "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestDataProvider<>",
+          "ImplementationTypeArguments": [
+            "JLib.Tests.Reflection.ServiceCollection.AddMapDataProvider.AddMapDataProviderTests.TestXrmEntity"
+          ]
+        }
+      ]
+    }
+  }
+}

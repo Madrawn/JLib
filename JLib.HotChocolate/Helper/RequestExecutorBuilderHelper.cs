@@ -1,28 +1,49 @@
 ﻿using System.Reflection;
 using HotChocolate;
 using HotChocolate.Execution.Configuration;
+using HotChocolate.Types;
 using JLib.Data;
 using JLib.Exceptions;
 using JLib.Helper;
+using JLib.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
+using static JLib.FactoryAttributes.TvtFactoryAttributes;
 
 namespace JLib.HotChocolate.Helper;
 
+[IsClass, HasAttribute(typeof(ExtendObjectTypeAttribute))]
+public record TypeExtensionType(Type Value) : TypeValueType(Value);
+
 public static class RequestExecutorBuilderHelper
 {
-    public static IRequestExecutorBuilder RegisterDataProvider<TTvt>(
-        this IRequestExecutorBuilder builder, ITypeCache typeCache, ServiceKind serviceKind = ServiceKind.Default)
-        where TTvt : TypeValueType
+
+    /// <summary>
+    /// <b>WARNING!</b> This method must be called after <b>ALL</b> DataProvider have been registered!
+    /// </summary>
+    public static IRequestExecutorBuilder AddTypeExtensions(
+        this IRequestExecutorBuilder builder, ITypeCache typeCache)
     {
-        Log.Information("HotChocolate: Registering DataProvider of type {tvt} as {kind} well known Services",
-            typeof(TTvt).Name, serviceKind);
-        foreach (var tvt in typeCache.All<TTvt>())
-        {
-            var service = typeof(IDataProviderR<>).MakeGenericType(tvt.Value);
-            Log.Verbose("    {type,-25}: {service}", tvt.Name, service.FullClassName());
-            builder.RegisterService(service, serviceKind);
-        }
+        foreach (var type in typeCache.All<TypeExtensionType>())
+            builder.AddTypeExtension(type.Value);
+        return builder;
+    }
+
+    /// <summary>
+    /// <b>WARNING!</b> This method must be called after <b>ALL</b> DataProvider have been registered!
+    /// </summary>
+    public static IRequestExecutorBuilder RegisterDataProvider(
+        this IRequestExecutorBuilder builder, ServiceKind serviceKind = ServiceKind.Default)
+    {
+        foreach (var dataProviderRType in builder.Services
+                     .Select(x=>x.ServiceType)
+                     .Where(x=>x.ImplementsAny<IDataProviderR<IDataObject>>())
+                     .ToArray())
+            builder.RegisterService(dataProviderRType);
+        foreach (var dataProviderRwType in builder.Services
+                     .Select(x => x.ServiceType)
+                     .Where(x => x.ImplementsAny<IDataProviderRw<IEntity>>())
+                     .ToArray())
+            builder.RegisterService(dataProviderRwType);
         return builder;
     }
 

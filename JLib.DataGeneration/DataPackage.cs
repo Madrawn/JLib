@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using JLib.Data;
+using JLib.Exceptions;
 using JLib.Helper;
+using JLib.Reflection;
+using JLib.ValueTypes;
 using static JLib.FactoryAttributes.TvtFactoryAttributes;
 
 namespace JLib.DataGeneration;
@@ -11,37 +12,42 @@ public record DataPackageType(Type Value) : TypeValueType(Value);
 
 public abstract class DataPackage
 {
-    readonly IDataPackageStore _dataPackages;
-    protected DataPackage(IDataPackageStore dataPackages)
+    public string GetInfoText(string propertyName)
     {
-        _dataPackages = dataPackages;
+        var property = GetType().GetProperty(propertyName) ??
+                                      throw new InvalidSetupException(
+                                          $"property {propertyName} not found on {GetType().FullClassName()}");
+        return new DataPackageValues.IdGroupName(property).Value + "." + property.Name;
+    }
+
+    protected DataPackage(IDataPackageManager packageManager)
+    {
+        switch (packageManager.InitState)
+        {
+            case DataPackageInitState.Uninitialized:
+                throw new InvalidOperationException(
+                    "invalid injection. inject directly after provider build using 'JLib.DataGeneration.DataPackageExtensions.IncludeDataPackages'.");
+            case DataPackageInitState.Initialized:
+                throw new InvalidOperationException(
+                    "invalid injection: this type package has not been include when calling 'JLib.DataGeneration.DataPackageExtensions.IncludeDataPackages'.");
+            case DataPackageInitState.Initializing:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(packageManager.InitState));
+        }
+
+
         foreach (var propertyInfo in GetType().GetProperties())
         {
-            if (!propertyInfo.PropertyType.IsAssignableTo<GuidValueType>())
-                continue;
             if (propertyInfo.GetMethod?.IsPublic is not true)
                 continue;
             if (propertyInfo.CanWrite is false)
                 throw new(propertyInfo.DeclaringType?.FullClassName() + "." + propertyInfo.Name +
                           " can not be written");
-            if (propertyInfo.SetMethod?.IsPublic is true)
+            if (!propertyInfo.IsInit())
                 throw new(propertyInfo.DeclaringType?.FullClassName() + "." + propertyInfo.Name +
-                          " set method must be protected");
-            var id = _dataPackages.RetrieveId(propertyInfo);
-            propertyInfo.SetValue(this, id);
+                          " set method must be init");
+            packageManager.SetIdPropertyValue(this, propertyInfo);
         }
     }
-
-    protected TEntity[] AddEntities<TEntity>(IEnumerable<TEntity> entities)
-        where TEntity : IEntity
-        => _dataPackages.AddEntities(entities);
-
-
-    protected TId? DeriveId<TId>(GuidValueType? id)
-        where TId : GuidValueType
-        => _dataPackages.DeriveId<TId>(id, GetType());
-
-    protected TId? DeriveId<TId>(GuidValueType? idN, GuidValueType? idM)
-        where TId : GuidValueType
-        => _dataPackages.DeriveId<TId>(idN, idM, GetType());
 }

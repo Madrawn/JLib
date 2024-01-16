@@ -1,0 +1,10 @@
+﻿{
+  "Database": [
+    {
+      "Id": "f4e9ca80-b221-4ebb-ada1-8b1287457de8",
+      "IdInfo": "Guid JLib.DataGeneration.Tests.ExampleUnitTests.DefaultArticleDp.ArticleId = f4e9ca80-b221-4ebb-ada1-8b1287457de8",
+      "Name": "JLib.DataGeneration.Tests.ExampleUnitTests.DefaultArticleDp.ArticleId"
+    }
+  ],
+  "exception": null
+}

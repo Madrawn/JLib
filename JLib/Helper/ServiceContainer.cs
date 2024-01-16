@@ -2,11 +2,22 @@
 
 namespace JLib.Helper;
 
-public abstract record ServiceContainer
+/// <summary>
+/// contains a number of services which are defined in the type arguments
+/// <br/>can be used to reduce the number of required overloads of a method
+/// <br/>
+/// <remarks>
+/// using object deconstruction to access members improves code quality
+/// </remarks>
+/// </summary>
+public record ServiceContainer
 {
-    internal ServiceContainer() { }
     internal virtual void Init(IServiceProvider provider) { }
 }
+
+/// <summary>
+/// <inheritdoc cref="ServiceContainer"/>
+/// </summary>
 public record ServiceContainer<T1> : ServiceContainer
 where T1 : notnull
 {
@@ -21,6 +32,9 @@ where T1 : notnull
     public void Deconstruct(out T1 service1)
         => service1 = this.Service1;
 }
+/// <summary>
+/// <inheritdoc cref="ServiceContainer"/>
+/// </summary>
 public record ServiceContainer<T1, T2> : ServiceContainer<T1>
 where T1 : notnull
 where T2 : notnull
@@ -39,6 +53,9 @@ where T2 : notnull
         service2 = this.Service2;
     }
 }
+/// <summary>
+/// <inheritdoc cref="ServiceContainer"/>
+/// </summary>
 public record ServiceContainer<T1, T2, T3> : ServiceContainer<T1, T2>
     where T1 : notnull
     where T2 : notnull
@@ -59,6 +76,9 @@ public record ServiceContainer<T1, T2, T3> : ServiceContainer<T1, T2>
         service3 = this.Service3;
     }
 }
+/// <summary>
+/// <inheritdoc cref="ServiceContainer"/>
+/// </summary>
 public record ServiceContainer<T1, T2, T3, T4> : ServiceContainer<T1, T2, T3>
     where T1 : notnull
     where T2 : notnull
@@ -81,6 +101,9 @@ public record ServiceContainer<T1, T2, T3, T4> : ServiceContainer<T1, T2, T3>
         service4 = this.Service4;
     }
 }
+/// <summary>
+/// <inheritdoc cref="ServiceContainer"/>
+/// </summary>
 public record ServiceContainer<T1, T2, T3, T4, T5> : ServiceContainer<T1, T2, T3, T4>
     where T1 : notnull
     where T2 : notnull

@@ -1,27 +1,39 @@
-﻿namespace JLib.Helper;
+﻿using System.Collections.Concurrent;
+
+namespace JLib.Helper;
 
 public static class DictionaryHelper
 {
     /// <summary>
     /// returns the value of the given key. if the key is not found, a new value will be generated and added
     /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    /// <param name="dict"></param>
-    /// <param name="key"></param>
-    /// <param name="generator"></param>
-    /// <returns></returns>
     public static TValue GetValueOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key,
-        Func<TValue> generator)
-        => dict.GetValueOrAdd(key, _ => generator());
-    public static TValue GetValueOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, Func<TKey, TValue> generator)
+        Func<TValue> valueFactory)
+        where TKey : notnull
+        => dict.GetValueOrAdd(key, _ => valueFactory());
+    /// <summary>
+    /// <inheritdoc cref="GetValueOrAdd{TKey,TValue}(IDictionary{TKey,TValue},TKey,Func{TValue})"/>
+    /// </summary>
+    public static TValue GetValueOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, Func<TKey, TValue> valueFactory)
+        where TKey : notnull
     {
+        if (dict is ConcurrentDictionary<TKey, TValue> cDict)
+            return cDict.GetOrAdd(key, valueFactory);
+
         if (dict.TryGetValue(key, out var value))
             return value;
 
-        value = generator(key);
+        value = valueFactory(key);
         dict.Add(key, value);
 
         return value;
     }
+
+    public static TValue? TryGetValue<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key)
+    {
+        return dict.TryGetValue(key, out var value) 
+            ? value 
+            : default;
+    }
+
 }

@@ -1,0 +1,90 @@
+﻿{
+  "TestName": "InconclusiveFactory",
+  "Environment": {
+    "Types": {
+      "IDemoTypeA": {
+        "Kind": "Interface",
+        "Attributes": [],
+        "ImplementedInterfaces": []
+      },
+      "IDemoTypeB": {
+        "Kind": "Interface",
+        "Attributes": [],
+        "ImplementedInterfaces": []
+      },
+      "DemoTypeValueTypeA": {
+        "Kind": "Class",
+        "Attributes": [
+          "NullableContextAttribute",
+          "NullableAttribute",
+          "TvtFactoryAttributes.Implements",
+          "UnmappedAttribute"
+        ],
+        "ImplementedInterfaces": [
+          "IEquatable<ValueType<Type>>",
+          "ITypeValueType",
+          "IEquatable<TypeValueType>",
+          "IEquatable<TypeCacheTests.InconclusiveFactory.DemoTypeValueTypeA>"
+        ]
+      },
+      "DemoTypeValueTypeB": {
+        "Kind": "Class",
+        "Attributes": [
+          "NullableContextAttribute",
+          "NullableAttribute",
+          "TvtFactoryAttributes.Implements",
+          "UnmappedAttribute"
+        ],
+        "ImplementedInterfaces": [
+          "IEquatable<ValueType<Type>>",
+          "ITypeValueType",
+          "IEquatable<TypeValueType>",
+          "IEquatable<TypeCacheTests.InconclusiveFactory.DemoTypeValueTypeB>"
+        ]
+      },
+      "InconclusiveType": {
+        "Kind": "Class",
+        "Attributes": [],
+        "ImplementedInterfaces": [
+          "TypeCacheTests.InconclusiveFactory.IDemoTypeA",
+          "TypeCacheTests.InconclusiveFactory.IDemoTypeB"
+        ]
+      }
+    }
+  },
+  "Exceptions": {
+    "Type": "JLib.Exceptions.JLibAggregateException",
+    "Message": [
+      "InconclusiveFactory"
+    ],
+    "InnerExceptions": [
+      {
+        "Type": "JLib.Exceptions.JLibAggregateException",
+        "Message": [
+          "Cache setup failed"
+        ],
+        "InnerExceptions": [
+          {
+            "Type": "JLib.Exceptions.JLibAggregateException",
+            "Message": [
+              "type discovery failed"
+            ],
+            "InnerExceptions": [
+              {
+                "Type": "JLib.Exceptions.InvalidSetupException",
+                "message": [
+                  "multiple tvt candidates found for type InconclusiveType : [ DemoTypeValueTypeA(priority 10000), DemoTypeValueTypeB(priority 10000) ]"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "CachedTypes": {},
+  "KnownTypeValueTypes": [
+    "DemoTypeValueTypeA",
+    "DemoTypeValueTypeB"
+  ]
+}

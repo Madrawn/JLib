@@ -10,7 +10,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="6.12.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+    <PackageReference Include="Moq" Version="4.20.69" />
+    <PackageReference Include="Serilog.Sinks.Xunit2" Version="1.1.0" />
+    <PackageReference Include="Snapshooter.Xunit" Version="0.13.0" />
     <PackageReference Include="xunit" Version="2.4.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -23,7 +27,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\JLib.DataGeneration\JLib.DataGeneration.csproj" />
+    <ProjectReference Include="..\JLib.Testing\JLib.Testing.csproj" />
+    <ProjectReference Include="..\JLib.Tests.Reflection.DemoAssembly2\JLib.Tests.Reflection.DemoAssembly2.csproj" />
+    <ProjectReference Include="..\JLib.Tests.Reflection.DemoAssembly\JLib.Tests.Reflection.DemoAssembly.csproj" />
     <ProjectReference Include="..\JLib\JLib.csproj" />
   </ItemGroup>
-
 </Project>

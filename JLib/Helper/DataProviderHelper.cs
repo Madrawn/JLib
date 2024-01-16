@@ -1,11 +1,4 @@
-﻿using System;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using JLib.Data;
-using Microsoft.Extensions.DependencyInjection;
+﻿using JLib.Data;
 
 namespace JLib.Helper;
 public static class DataProviderHelper
@@ -19,7 +12,18 @@ public static class DataProviderHelper
     public static Dictionary<string, object> AnalyzeDependencies(Type serviceType, IServiceProvider serviceProvider)
     {
         var properties = new Dictionary<string, object>();
-        var implementationType = serviceProvider.GetService(serviceType)?.GetType();
+        Type? implementationType;
+        try
+        {
+            implementationType = serviceProvider.GetService(serviceType)?.GetType();
+        }
+        catch (Exception e)
+        {
+            properties.Add("error", "data provider could not be retrieved");
+            properties.Add("exception message",e.Message);
+            properties.Add("exception ToString",e.ToString());
+            return properties;
+        }
 
         properties.Add("service", serviceType.FullClassName());
 

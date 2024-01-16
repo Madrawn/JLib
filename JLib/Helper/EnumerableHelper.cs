@@ -1,9 +1,24 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 namespace JLib.Helper;
 
 public static class EnumerableHelper
 {
+    /// <summary>
+    /// returns true if <paramref name="src"/> contains at least 2 elements without enumerating the entire list
+    /// </summary>
+    public static bool Multiple<T>(this IEnumerable<T> src)
+    {
+        if (src is IReadOnlyCollection<T> col)
+            return col.Count > 1;
+        using var e = src.GetEnumerator();
+        e.MoveNext();//returns true if count >=1
+        return e.MoveNext();// returns true if count >=2
+    }
+
     /// <summary>
     ///     removes all null entries from the list
     /// </summary>
@@ -43,4 +58,23 @@ public static class EnumerableHelper
         foreach (var i in toRemove)
             col.Remove(i);
     }
+
+    public static IReadOnlyCollection<T> ToReadOnlyCollection<T>(this IEnumerable<T> col)
+        => col.ToArray();
+
+    public static ConcurrentDictionary<TKey, TValue> ToConcurrentDictionary<TKey, TValue>(
+        this IDictionary<TKey, TValue> source)
+        where TKey : notnull
+        => new(source);
+    public static ConcurrentDictionary<TKey, TValue> ToConcurrentDictionary<TKey, TValue>(
+        this IEnumerable<TValue> col, Func<TValue, TKey> keySelector)
+        where TKey : notnull
+        => new(col.ToDictionary(keySelector));
+    public static ConcurrentDictionary<TKey, TValue> ToConcurrentDictionary<TIn, TKey, TValue>(
+        this IEnumerable<TIn> col, Func<TIn, TKey> keySelector, Func<TIn, TValue> valueSelector)
+        where TKey : notnull
+        => new(col.ToDictionary(keySelector, valueSelector));
+
+    public static IEnumerable<ValueTuple<T, int>> AddIndex<T>(this IEnumerable<T> src)
+        => src.Select((item, index) => (item, index));
 }

@@ -6,24 +6,42 @@ namespace JLib.Helper;
 public record TypeAttributeInfo(Type Type, Attribute Attribute);
 public static class ReflectionHelper
 {
-    public static bool HasAnyCustomAttribute<T>(this Type type, bool inherit = true)
-        where T : Attribute
+    // https://alistairevans.co.uk/2020/11/01/detecting-init-only-properties-with-reflection-in-c-9/
+    /// <summary>
+    /// checks whether the property is init<br/>
+    /// { get; } => false<br/>
+    /// { get; set; } => false;<br/>
+    /// { get; init; } => true;
+    /// </summary>
+    public static bool IsInit(this PropertyInfo property)
     {
-        var compare = type.TryGetGenericTypeDefinition();
-        return Attribute.GetCustomAttributes(type, inherit).Any(t => t.GetType().TryGetGenericTypeDefinition() == compare);
+        if (!property.CanWrite)
+        {
+            return false;
+        }
+
+        var setMethod = property.SetMethod;
+
+        // Get the modifiers applied to the return parameter.
+        var setMethodReturnParameterModifiers = setMethod?.ReturnParameter.GetRequiredCustomModifiers();
+
+        // Init-only properties are marked with the IsExternalInit type.
+        return setMethodReturnParameterModifiers?.Contains(typeof(System.Runtime.CompilerServices.IsExternalInit)) ?? false;
     }
 
+    public static bool HasCustomAttribute(this MemberInfo type, Type attributeType, bool inherit = true)
+        => type.GetCustomAttribute(attributeType, inherit) is not null;
     public static bool HasCustomAttribute<T>(this MemberInfo type, bool inherit = true)
         where T : Attribute =>
-        type.GetCustomAttributes(inherit).Any(x => x is T);
+        type.HasCustomAttribute(typeof(T), inherit);
     public static T[] GetCustomAttributes<T>(this MemberInfo type, bool inherit = true)
         where T : Attribute =>
         Attribute.GetCustomAttributes(type, typeof(T), inherit).Cast<T>().ToArray();
     public static Attribute[] GetCustomAttributes(this MemberInfo type, Type attributeType, bool inherit = true)
         => Attribute.GetCustomAttributes(type, attributeType, inherit).ToArray();
 
-    public static Type? TryGetGenericTypeDefinition(this Type type)
-        => type.IsGenericType ? type.GetGenericTypeDefinition() : null;
+    public static Type TryGetGenericTypeDefinition(this Type type)
+        => type.IsGenericType ? type.GetGenericTypeDefinition() : type;
 
     public static IEnumerable<T> WithAttribute<T, TAttribute>(this IEnumerable<T> src)
         where T : MemberInfo

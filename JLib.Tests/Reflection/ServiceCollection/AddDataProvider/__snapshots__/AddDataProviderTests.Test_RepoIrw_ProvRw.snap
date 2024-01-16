@@ -1,0 +1,49 @@
+﻿{
+  "Parameters": {
+    "TestName": "RepoIrw_ProvRw",
+    "ExpectedBehavior": [
+      "  Provided:                                                                                                                                                          ",
+      "    DataProvider         : Read Write                                                                                                                                ",
+      "    Repository           : Invalid ReadWrite                                                                                                                         ",
+      "  Expected Error:                                                                                                                                                    ",
+      "    An error which tells you that repositories must not implement the ISourceDataProvider Interface and that you must only implement the IDataProvider Interfaces    "
+    ],
+    "includedTypes": [
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity",
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestDataProviderRw<>",
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestInvalidRepositoryRw"
+    ]
+  },
+  "exception": {
+    "Type": "JLib.Exceptions.JLibAggregateException",
+    "Message": [
+      "AddDataProviderTests"
+    ],
+    "InnerExceptions": [
+      {
+        "Type": "JLib.Exceptions.JLibAggregateException",
+        "Message": [
+          "Cache setup failed"
+        ],
+        "InnerExceptions": [
+          {
+            "Type": "JLib.Exceptions.JLibAggregateException",
+            "Message": [
+              "Type validation failed"
+            ],
+            "InnerExceptions": [
+              {
+                "Type": "JLib.Exceptions.InvalidTypeException",
+                "message": [
+                  "Error while initializing RepositoryType with JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestInvalidRepositoryRw: Should not implement JLib.Data.ISourceDataProviderR<>"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "cache": "disabled",
+  "services": "disabled"
+}

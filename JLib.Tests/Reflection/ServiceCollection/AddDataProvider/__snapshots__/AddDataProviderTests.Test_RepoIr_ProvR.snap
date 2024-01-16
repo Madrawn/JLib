@@ -1,0 +1,49 @@
+﻿{
+  "Parameters": {
+    "TestName": "RepoIr_ProvR",
+    "ExpectedBehavior": [
+      "  Provided:                                                                                                        ",
+      "    DataProvider         : ReadOnly                                                                                ",
+      "    Repository           : Invalid ReadOnly                                                                        ",
+      "  Expected Exception:                                                                                              ",
+      "    An exception which tells the user to not provide the DataProvider as ReadOnly and informs that it is forced    "
+    ],
+    "includedTypes": [
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity",
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestDataProviderR<>",
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestInvalidRepositoryR"
+    ]
+  },
+  "exception": {
+    "Type": "JLib.Exceptions.JLibAggregateException",
+    "Message": [
+      "AddDataProviderTests"
+    ],
+    "InnerExceptions": [
+      {
+        "Type": "JLib.Exceptions.JLibAggregateException",
+        "Message": [
+          "Cache setup failed"
+        ],
+        "InnerExceptions": [
+          {
+            "Type": "JLib.Exceptions.JLibAggregateException",
+            "Message": [
+              "Type validation failed"
+            ],
+            "InnerExceptions": [
+              {
+                "Type": "JLib.Exceptions.InvalidTypeException",
+                "message": [
+                  "Error while initializing RepositoryType with JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestInvalidRepositoryR: Should not implement JLib.Data.ISourceDataProviderR<>"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "cache": "disabled",
+  "services": "disabled"
+}

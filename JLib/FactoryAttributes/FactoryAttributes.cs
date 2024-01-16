@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using JLib.Helper;
+﻿using JLib.Helper;
 
 namespace JLib.FactoryAttributes;
 
@@ -48,10 +47,16 @@ public abstract class TvtFactoryAttributes
     }
 
     [AttributeUsage(AttributeTargets.Class)]
-    public class IsNotAbstract : Attribute, ITypeValueTypeFilterAttribute
+    public class HasAttributeAttribute : Attribute, ITypeValueTypeFilterAttribute
     {
+        public HasAttributeAttribute(Type attributeType)
+        {
+            AttributeType = attributeType;
+        }
+
+        public Type AttributeType { get; }
         public bool Filter(Type type)
-            => !type.IsAbstract;
+            => type.HasCustomAttribute(AttributeType);
     }
 
     [AttributeUsage(AttributeTargets.Class)]
@@ -59,6 +64,18 @@ public abstract class TvtFactoryAttributes
     {
         public bool Filter(Type type)
             => !type.IsAbstract;
+    }
+    [AttributeUsage(AttributeTargets.Class)]
+    public class BeGeneric : Attribute, ITypeValueTypeFilterAttribute
+    {
+        public bool Filter(Type type)
+            => type.IsGenericType;
+    }
+    [AttributeUsage(AttributeTargets.Class)]
+    public class NotBeGeneric : Attribute, ITypeValueTypeFilterAttribute
+    {
+        public bool Filter(Type type)
+            => !type.IsGenericType;
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
@@ -72,6 +89,30 @@ public abstract class TvtFactoryAttributes
         }
         public bool Filter(Type type)
             => type.IsDerivedFromAny(_type);
+    }
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    public sealed class SatisfiesCondition : Attribute, ITypeValueTypeFilterAttribute
+    {
+        private readonly Func<Type, bool> _predicate;
+
+        public SatisfiesCondition(Func<Type, bool> predicate)
+        {
+            _predicate = predicate;
+        }
+        public bool Filter(Type type)
+            => _predicate(type);
+    }
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    public sealed class IsAssignableTo : Attribute, ITypeValueTypeFilterAttribute
+    {
+        private readonly Type _type;
+
+        public IsAssignableTo(Type type)
+        {
+            _type = type;
+        }
+        public bool Filter(Type type)
+            => type.IsAssignableTo(_type);
     }
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public sealed class IsDerivedFrom : Attribute, ITypeValueTypeFilterAttribute
@@ -108,6 +149,18 @@ public abstract class TvtFactoryAttributes
         }
         public bool Filter(Type type)
             => type.ImplementsAny(_type);
+    }
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    public sealed class ImplementsNone : Attribute, ITypeValueTypeFilterAttribute
+    {
+        private readonly Type _type;
+
+        public ImplementsNone(Type type)
+        {
+            _type = type;
+        }
+        public bool Filter(Type type)
+            => !type.ImplementsAny(_type);
     }
 #if NET7_0_OR_GREATER
 

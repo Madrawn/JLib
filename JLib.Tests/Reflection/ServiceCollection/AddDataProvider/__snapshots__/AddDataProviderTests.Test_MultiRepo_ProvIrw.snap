@@ -1,0 +1,81 @@
+﻿{
+  "Parameters": {
+    "TestName": "MultiRepo_ProvIrw",
+    "ExpectedBehavior": [
+      "  Provided:                                                                                             ",
+      "    DataProvider         : ReadWrite                                                                    ",
+      "    Repository           : R, Rw                                                                        ",
+      "  Expected Error:                                                                                       ",
+      "    An error which tells the user that multiple repositories for the same dataObject have been found    "
+    ],
+    "includedTypes": [
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity",
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestDataProviderRw<>",
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestRepositoryR",
+      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestRepositoryRw"
+    ]
+  },
+  "exception": {
+    "Type": "JLib.Exceptions.JLibAggregateException",
+    "Message": [
+      "AddDataProviderTests"
+    ],
+    "InnerExceptions": [
+      {
+        "Type": "JLib.Exceptions.JLibAggregateException",
+        "Message": [
+          "Service Factory"
+        ],
+        "InnerExceptions": [
+          {
+            "Type": "JLib.Exceptions.JLibAggregateException",
+            "Message": [
+              "AddDataProvider"
+            ],
+            "InnerExceptions": [
+              {
+                "Type": "JLib.Exceptions.JLibAggregateException",
+                "Message": [
+                  "AddMapDataProvider failed for valueType CommandEntityType"
+                ],
+                "InnerExceptions": [
+                  {
+                    "Type": "JLib.Exceptions.InvalidSetupException",
+                    "message": [
+                      "The data provider Implementation JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestDataProviderRw<JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity> can write data but the Repository JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestRepositoryR can not. ",
+                      "Force the dataProvider to be ReadOnly or Implement IDataProviderRw with the repository."
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "Type": "JLib.Exceptions.JLibAggregateException",
+        "Message": [
+          "AddServices"
+        ],
+        "InnerExceptions": [
+          {
+            "Type": "JLib.Exceptions.JLibAggregateException",
+            "Message": [
+              "AddRepositories"
+            ],
+            "InnerExceptions": [
+              {
+                "Type": "JLib.Exceptions.InvalidSetupException",
+                "message": [
+                  "multiple repos have been provided for data object JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity: JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestRepositoryR, JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestRepositoryRw"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "cache": "disabled",
+  "services": "disabled"
+}
