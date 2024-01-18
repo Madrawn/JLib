@@ -29,10 +29,14 @@ public static class DictionaryHelper
         return value;
     }
 
+    public static void AddOrReplace<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dict, TKey key, TValue value)
+        where TKey : notnull
+        => dict.AddOrUpdate(key, _ => value, (_, _) => value);
+
     public static TValue? TryGetValue<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key)
     {
-        return dict.TryGetValue(key, out var value) 
-            ? value 
+        return dict.TryGetValue(key, out var value)
+            ? value
             : default;
     }
 
