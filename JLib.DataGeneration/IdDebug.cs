@@ -117,10 +117,10 @@ public static class IdDebug
     /// <summary>
     /// <inheritdoc cref="GetIdInfo"/>
     /// </summary>
-    public static string? GuidInfo(this string? id) => id is null
+    public static string? GuidInfo(this string? id, IIdRegistry? idRegistry = null) => id is null
         ? null
         : Guid.TryParse(id, out var guid)
-        ? GetIdInfo(guid)
+        ? GetIdInfo(guid, idRegistry)
         : throw new FormatException($"'{id}' is not a guid");
 
     /// <summary>

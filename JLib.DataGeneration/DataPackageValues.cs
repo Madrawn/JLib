@@ -43,7 +43,7 @@ public static class DataPackageValues
     {
         public IdIdentifier(PropertyInfo property) : this(new(property), new(property))
         { }
-        public override string ToString() => IdGroupName.Value + "." + IdName.Value;
+        public override string ToString() => $"[{IdGroupName.Value}].[{IdName.Value}]";
 
     }
 }
