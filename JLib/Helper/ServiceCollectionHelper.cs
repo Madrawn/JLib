@@ -151,7 +151,7 @@ public static class ServiceCollectionHelper
         IExceptionManager exceptions,
         string? assemblySearchDirectory = null,
         SearchOption searchOption = SearchOption.TopDirectoryOnly,
-        params string[] includedPrefixes) 
+        params string[] includedPrefixes)
         => services.AddTypeCache(out typeCache, exceptions, TypePackage.Get(assemblySearchDirectory, includedPrefixes, searchOption));
 
     public static IServiceCollection AddTypeCache(
@@ -275,7 +275,8 @@ public static class ServiceCollectionHelper
         var invalidRepos = groupedRepos
             .Where(x => x.Value.Count() > 1)
             .Select(group => new InvalidSetupException(
-                $"multiple repos have been provided for data object {group.Key.Value.FullClassName(true)}: {string.Join(", ", group.Value.Select(repo => repo.Value.FullClassName(true)))}"))
+                $"multiple repos have been provided for data object {group.Key.Value.FullClassName(true)}:" +
+                $" {string.Join(", ", group.Value.Select(repo => repo.Value.FullClassName(true)).OrderBy(r => r))}"))
             .ToArray();
 
         if (invalidRepos.Any())
@@ -306,21 +307,6 @@ public static class ServiceCollectionHelper
     #region AddDataProvider
 
     /// <summary>
-    /// <inheritdoc cref="AddDataProvider{TTvt,TImplementation,TIgnoredEntitiy}"/>
-    /// </summary>
-    public static IServiceCollection AddDataProvider<TTvt, TImplementation>(
-        this IServiceCollection services,
-        ITypeCache typeCache,
-        Func<TTvt, bool>? filter,
-        Func<TTvt, bool>? forceReadOnly,
-        Func<TTvt, ITypeValueType>[]? implementationTypeArgumentResolver,
-        IExceptionManager exceptions,
-        ServiceLifetime lifetime = ServiceLifetime.Scoped)
-        where TTvt : class, IDataObjectType
-        where TImplementation : IDataProviderR<IDataObject>
-        => services.AddDataProvider<TTvt, TImplementation, IDataObject>(typeCache, filter, forceReadOnly,
-            implementationTypeArgumentResolver, exceptions, lifetime);
-    /// <summary>
     /// Provides the following services for each <typeparamref name="TTvt"/> under the stated conditions:
     /// <br/>new Services:
     /// <br/>ㅤAlways - <typeparamref name="TImplementation"/> as using <paramref name="implementationTypeArgumentResolver"/> to resolve the type arguments
@@ -330,6 +316,31 @@ public static class ServiceCollectionHelper
     /// <br/>ㅤno <see cref="RepositoryType"/> for the given <typeparamref name="TTvt"/> - <see cref="IDataProviderR{TData}"/>
     /// <br/>ㅤno <see cref="RepositoryType"/> for the given <typeparamref name="TTvt"/> and <typeparamref name="TImplementation"/> implements <see cref="IDataProviderRw{TData}"/> - <see cref="IDataProviderRw{TData}"/>
     /// </summary>
+    /// <typeparam name="TTvt">the <see cref="TypeValueType"/> which instances will be added as <see cref="IDataProviderR{TDataObject}"/></typeparam>
+    /// <typeparam name="TImplementation">the implementation of the <see cref="IDataProviderR{TDataObject}"/> to be used. Generics will be ignored.</typeparam>
+    /// <typeparam name="TIgnoredDataObject">the ignored type argument of <see cref="IDataProviderR{TDataObject}"/> implemented by <typeparamref name="TImplementation"/></typeparam>
+    /// <param name="services"></param>
+    /// <param name="typeCache"><see cref="AddTypeCache(IServiceCollection,out ITypeCache, IExceptionManager, ITypePackage[])"/></param>
+    /// <param name="filter">if the filter is provided and returns false, no <see cref="IDataProviderR{TDataObject}"/> will be created for the given <see cref="TypeValueType"/><br/>
+    /// null defaults to '_=>true'</param>
+    /// <param name="forceReadOnly">if provided and true, only <see cref="IDataProviderR{TDataObject}"/> and <see cref="ISourceDataProviderR{TData}"/> will be provided but not <see cref="IDataProviderRw{TData}"/> or <see cref="ISourceDataProviderRw{TData}"/><br/>
+    /// null defaults to '_=>false'</param>
+    /// <param name="implementationTypeArgumentResolver">
+    /// resolves the type arguments for the implementation in order.<br/>
+    /// null defaults to 'new[]{ tvt => tvt }'<br/>
+    /// <p>Example</p>
+    /// <code>
+    /// DataProvider: ComplexDataProvider&lt;TEntity,TEntityInterface&gt; : IDataProviderR&lt;TEntity&gt;
+    /// TypeValueType: ComplexEntity { Interface : TypeValueType }
+    /// value of <paramref name="implementationTypeArgumentResolver"/>: new[]
+    /// {
+    ///     tvt=>tvt,
+    ///     (ComplexEntity tvt) => tvt.Interface
+    /// }
+    /// </code>
+    /// </param>
+    /// <param name="exceptions"></param>
+    /// <param name="lifetime">the lifetime of the services to be added</param>
     public static IServiceCollection AddDataProvider<TTvt, TImplementation, TIgnoredDataObject>(
     this IServiceCollection services,
     ITypeCache typeCache,
@@ -413,7 +424,7 @@ public static class ServiceCollectionHelper
     #region AddMockDataProvider
 
     /// <summary>
-    /// adds a <see cref="IDataProviderR{TData}"/> and <see cref="IDataProviderRw{TData}"/> with the <see cref="MockDataProvider{TEntity}"/> as implementation for each <typeparamref name="TTvt"/> as scoped
+    /// adds a <see cref="IDataProviderR{TData}"/> and <see cref="IDataProviderRw{TData}"/> with the <see cref="InMemoryDataProvider{TEntity}"/> as implementation for each <typeparamref name="TTvt"/> as scoped
     /// </summary>
     public static IServiceCollection AddMockDataProvider<TTvt>(
         this IServiceCollection services,
@@ -421,11 +432,11 @@ public static class ServiceCollectionHelper
         IExceptionManager exceptions)
         where TTvt : class, IDataObjectType
     {
-        Log.ForContext(typeof(ServiceCollectionHelper)).ForContext(typeof(ServiceCollectionHelper)).Warning("Providing MockDataProvider");
+        Log.ForContext(typeof(ServiceCollectionHelper)).ForContext(typeof(ServiceCollectionHelper)).Warning("Providing InMemoryDataProvider");
         var msg = $"{nameof(AddMockDataProvider)} failed for valueType {typeof(TTvt).Name}";
         exceptions = exceptions.CreateChild(msg);
 
-        services.AddDataProvider<TTvt, MockDataProvider<IEntity>, IEntity>(typeCache, null, null, null, exceptions, ServiceLifetime.Singleton);
+        services.AddDataProvider<TTvt, InMemoryDataProvider<IEntity>, IEntity>(typeCache, null, null, null, exceptions, ServiceLifetime.Singleton);
 
         return services;
     }

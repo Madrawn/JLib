@@ -59,11 +59,22 @@ public static class EnumerableHelper
             col.Remove(i);
     }
 
+    public static IReadOnlyCollection<T> ToReadOnlyCollection<T>(this IEnumerable<T> col)
+        => col.ToArray();
+
+    public static ConcurrentDictionary<TKey, TValue> ToConcurrentDictionary<TKey, TValue>(
+        this IDictionary<TKey, TValue> source)
+        where TKey : notnull
+        => new(source);
     public static ConcurrentDictionary<TKey, TValue> ToConcurrentDictionary<TKey, TValue>(
         this IEnumerable<TValue> col, Func<TValue, TKey> keySelector)
         where TKey : notnull
         => new(col.ToDictionary(keySelector));
+    public static ConcurrentDictionary<TKey, TValue> ToConcurrentDictionary<TIn, TKey, TValue>(
+        this IEnumerable<TIn> col, Func<TIn, TKey> keySelector, Func<TIn, TValue> valueSelector)
+        where TKey : notnull
+        => new(col.ToDictionary(keySelector, valueSelector));
 
-    public static IEnumerable<ValueTuple<T,int>> AddIndex<T>(this IEnumerable<T> src)
+    public static IEnumerable<ValueTuple<T, int>> AddIndex<T>(this IEnumerable<T> src)
         => src.Select((item, index) => (item, index));
 }

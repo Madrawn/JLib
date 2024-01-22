@@ -93,7 +93,7 @@ public class TypeCache : ITypeCache
 
     public TypeCache(ITypePackage typePackage, IExceptionManager? parentExceptionManager)
     {
-        var types = typePackage.Content.ToArray();
+        var types = typePackage.GetContent().ToArray();
         const string exceptionMessage = "Cache setup failed";
         var exceptions = parentExceptionManager?.CreateChild(exceptionMessage)
                          ?? new ExceptionManager(exceptionMessage);
@@ -118,6 +118,7 @@ public class TypeCache : ITypeCache
                 .Where(type => !type.HasCustomAttribute<IgnoreInCache>() && !type.IsAssignableTo<TypeValueType>())
                 .Select(type =>
                 {
+                    var name = type.Name;
                     try
                     {
                         var validTvtGroups = availableTypeValueTypes
@@ -132,7 +133,12 @@ public class TypeCache : ITypeCache
                             case > 1:
                                 discoveryExceptions.Add(new InvalidSetupException(
                                     $"multiple tvt candidates found for type {type.Name} : " +
-                                    $"[ {string.Join(", ", validTvts.Select(tvt => $"{tvt.Value.Name}(priority {tvt.Value.GetCustomAttribute<TvtFactoryAttributes.Priority>()?.Value ?? TvtFactoryAttributes.Priority.DefaultPriority})"))} ]"));
+                                    $@"[ {string.Join(", ", validTvts.Select(tvt =>
+                                    {
+                                        var priority = tvt.Value.GetCustomAttribute<TvtFactoryAttributes.Priority>()?.Value
+                                                       ?? TvtFactoryAttributes.Priority.DefaultPriority;
+                                        return $"{tvt.Value.Name}(priority {priority})";
+                                    }).OrderBy(d => d))} ]"));
                                 return null;
                             case 0:
                                 return null;

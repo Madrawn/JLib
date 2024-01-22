@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using JLib.Helper;
@@ -6,14 +7,14 @@ using JLib.Helper;
 namespace JLib.Reflection;
 
 /// <summary>
-/// Contains Content to be used by the <see cref="TypeCache"/>
+/// Contains types to be used by the <see cref="TypeCache"/>
 /// </summary>
 public interface ITypePackage
 {
     /// <summary>
     /// The <see cref="Types"/> of this package and all its <see cref="Children"/>
     /// </summary>
-    public IEnumerable<Type> Content { get; }
+    public ImmutableHashSet<Type> GetContent();
     /// <summary>
     /// other nested packages, this could be peer dependencies, the assemblies of a directory or any other group of packages
     /// </summary>
@@ -32,6 +33,8 @@ public interface ITypePackage
     /// returns a type package which is a combination of the given packages
     /// </summary>
     public ITypePackage Combine(params ITypePackage[] packages);
+
+    public string ToString(bool includeTypes);
 }
 /// <summary>
 /// Contains Content to be used by the <see cref="TypeCache"/>
@@ -109,31 +112,38 @@ public class TypePackage : ITypePackage
     public IEnumerable<ITypePackage> Children { get; }
     public IEnumerable<Type> Types { get; }
     public string DescriptionTemplate { get; }
-    public IEnumerable<Type> Content => Children.SelectMany(x => x.Content).Concat(Types);
+    public ImmutableHashSet<Type> GetContent() => GetContent(this).ToImmutableHashSet();
+
+    private static IEnumerable<Type> GetContent(ITypePackage package) 
+        => package.Children.SelectMany(GetContent).Concat(package.Types).Distinct();
+
     public ITypePackage Combine(params ITypePackage[] packages)
         => Get(packages.Append(this));
 
     public override string ToString()
+        => ToString(false);
+    public string ToString(bool includeTypes)
     {
         var sb = new StringBuilder();
-        ToString(this, 0, sb);
+        ToString(this, 0, sb, includeTypes);
         return sb.ToString();
     }
 
-    static void ToString(ITypePackage package, int indent, StringBuilder sb)
+    static void ToString(ITypePackage package, int indent, StringBuilder sb, bool includeTypes)
     {
         var indentStr = new string(' ', indent * 2);
         sb.Append(indentStr).Append('┐').AppendLine(string.Format(package.DescriptionTemplate, package.Children.Count(), package.Types.Count()));
         sb.Append(indentStr).Append("├ Types:").AppendLine(package.Types.Count().ToString());
-        if(package.Types.Count() <= 10)
+        if (package.Types.Count() <= 10 || includeTypes)
         {
-            foreach(var type in package.Types)
+            foreach (var type in package.Types)
                 sb.Append(indentStr).Append("│   ").AppendLine(type.FullClassName());
         }
-        sb.Append(indentStr).Append("├ Types Total:").AppendLine(package.Content.Count().ToString());
-        sb.Append(indentStr).AppendLine("├ Children:");
-        foreach (var child in package.Children)
-            ToString(child, indent + 1, sb);
-
+        if (package.Children.Any())
+        {
+            sb.Append(indentStr).AppendLine("├ Children:");
+            foreach (var child in package.Children)
+                ToString(child, indent + 1, sb, includeTypes);
+        }
     }
 }

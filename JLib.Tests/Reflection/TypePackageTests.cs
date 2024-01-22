@@ -185,8 +185,8 @@ public class TypePackageTests
     public void PackageGeneration(
         string name, ITypePackage package, IEnumerable<Type> expectedTypes)
     {
-        package.Content.Should().OnlyContain(t => expectedTypes.Contains(t));
-        expectedTypes.Should().OnlyContain(t => package.Content.Contains(t));
+        package.GetContent().Should().OnlyContain(t => expectedTypes.Contains(t));
+        expectedTypes.Should().OnlyContain(t => package.GetContent().Contains(t));
         package.ToString().MatchSnapshot(new SnapshotNameExtension(name));
     }
 }
