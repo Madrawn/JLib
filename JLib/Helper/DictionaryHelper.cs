@@ -11,10 +11,12 @@ public static class DictionaryHelper
         Func<TValue> valueFactory)
         where TKey : notnull
         => dict.GetValueOrAdd(key, _ => valueFactory());
+
     /// <summary>
     /// <inheritdoc cref="GetValueOrAdd{TKey,TValue}(IDictionary{TKey,TValue},TKey,Func{TValue})"/>
     /// </summary>
-    public static TValue GetValueOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, Func<TKey, TValue> valueFactory)
+    public static TValue GetValueOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key,
+        Func<TKey, TValue> valueFactory)
         where TKey : notnull
     {
         if (dict is ConcurrentDictionary<TKey, TValue> cDict)
@@ -39,5 +41,4 @@ public static class DictionaryHelper
             ? value
             : default;
     }
-
 }

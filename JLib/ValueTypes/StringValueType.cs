@@ -12,9 +12,12 @@ public abstract record StringValueType(string Value) : ValueType<string>(Value)
         validator.CastTo<IExceptionProvider>().GetException()?.Throw();
     }
 }
+
 public class StringValidator : ValueValidator<string?>
 {
-    public StringValidator(string? value, string valueTypeName) : base(value, valueTypeName) { }
+    public StringValidator(string? value, string valueTypeName) : base(value, valueTypeName)
+    {
+    }
 
     public StringValidator NotBeNull()
     {
@@ -23,6 +26,7 @@ public class StringValidator : ValueValidator<string?>
             AddError("Value is null");
         return this;
     }
+
     public StringValidator NotBeNullOrEmpty()
     {
         if (Value.IsNullOrEmpty())
@@ -36,8 +40,10 @@ public class StringValidator : ValueValidator<string?>
             AddError("Value is not one of the following: " + string.Join(", ", validValues));
         return this;
     }
+
     public StringValidator BeAlphanumeric()
         => SatisfyCondition(char.IsLetterOrDigit, nameof(BeAlphanumeric));
+
     public StringValidator SatisfyCondition(Func<char, bool> validator, string name)
     {
         if (Value is null)
@@ -45,6 +51,7 @@ public class StringValidator : ValueValidator<string?>
             AddError(name + "failed: string is null");
             return this;
         }
+
         var errorIndices = Value
             .AddIndex()
             .Where(x => !validator(x.Item1))
@@ -59,12 +66,14 @@ public class StringValidator : ValueValidator<string?>
         AddError(name + " failed");
         return this;
     }
+
     public StringValidator NotBeNullOrWhitespace()
     {
         if (Value.IsNullOrEmpty())
             AddError("Value is null or whitespace");
         return this;
     }
+
     public StringValidator StartWith(string prefix)
     {
         NotBeNull();
@@ -73,6 +82,7 @@ public class StringValidator : ValueValidator<string?>
             AddError($"Value does not start with {prefix}");
         return this;
     }
+
     public StringValidator NotContain(string value)
     {
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
@@ -134,6 +144,7 @@ public class StringValidator : ValueValidator<string?>
     /// </summary>
     public StringValidator BeNumeric()
         => SatisfyCondition(char.IsNumber, nameof(BeNumeric));
+
     public StringValidator MinimumLength(int length)
     {
         NotBeNull();
@@ -141,6 +152,7 @@ public class StringValidator : ValueValidator<string?>
             AddError($"the value has to be at least {length} characters long but got length {Value.Length}");
         return this;
     }
+
     public StringValidator MaximumLength(int length)
     {
         NotBeNull();
@@ -148,6 +160,7 @@ public class StringValidator : ValueValidator<string?>
             AddError($"the value has to be at most {length} characters long but got length {Value.Length}");
         return this;
     }
+
     public StringValidator BeOfLength(int length)
     {
         NotBeNull();

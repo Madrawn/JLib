@@ -1,8 +1,8 @@
-﻿using System.Diagnostics;
-using System.Text.Json;
-using JLib.DataGeneration;
+﻿using System.Text.Json;
 using JLib.Helper;
 using JLib.ValueTypes;
+
+namespace JLib.DataGeneration;
 
 /// <summary>
 /// adds debug methods to resolve the name of an id managed by a <see cref="IIdRegistry"/>
@@ -56,6 +56,7 @@ public static class IdDebug
         string GetInfoString(DataPackageValues.IdIdentifier? identifier) =>
             $"{value?.GetType().FullClassName()} {identifier} = {nativeValue}";
     }
+
     /// <summary>
     /// <inheritdoc cref="GetIdInfo"/> as structured data
     /// </summary>
@@ -78,7 +79,6 @@ public static class IdDebug
         return identifier is null
             ? null
             : new IdInformation(value.GetType(), identifier, value);
-
     }
 
     /// <summary>
@@ -90,71 +90,89 @@ public static class IdDebug
     /// <inheritdoc cref="GetIdInfo"/>
     /// </summary>
     public static string? IdInfo(this Guid id, IIdRegistry? idRegistry = null) => GetIdInfo(id, idRegistry);
+
     /// <summary>
     /// <inheritdoc cref="GetIdInfo"/>
     /// </summary>
     public static string? IdInfo(this GuidValueType id, IIdRegistry? idRegistry = null) => GetIdInfo(id, idRegistry);
+
     /// <summary>
     /// <inheritdoc cref="GetIdInfo"/>
     /// </summary>
     public static string? IdInfo(this int? id, IIdRegistry? idRegistry = null) => GetIdInfo(id, idRegistry);
+
     /// <summary>
     /// <inheritdoc cref="GetIdInfo"/>
     /// </summary>
     public static string? IdInfo(this int id, IIdRegistry? idRegistry = null) => GetIdInfo(id, idRegistry);
+
     /// <summary>
     /// <inheritdoc cref="GetIdInfo"/>
     /// </summary>
     public static string? IdInfo(this IntValueType id, IIdRegistry? idRegistry = null) => GetIdInfo(id, idRegistry);
+
     /// <summary>
     /// <inheritdoc cref="GetIdInfo"/>
     /// </summary>
     public static string? IdInfo(this string? id, IIdRegistry? idRegistry = null) => GetIdInfo(id, idRegistry);
+
     /// <summary>
     /// <inheritdoc cref="GetIdInfo"/>
     /// </summary>
     public static string? IdInfo(this StringValueType id, IIdRegistry? idRegistry = null) => GetIdInfo(id, idRegistry);
+
     /// <summary>
     /// <inheritdoc cref="GetIdInfo"/>
     /// </summary>
     public static string? GuidInfo(this string? id, IIdRegistry? idRegistry = null) => id is null
         ? null
         : Guid.TryParse(id, out var guid)
-        ? GetIdInfo(guid, idRegistry)
-        : throw new FormatException($"'{id}' is not a guid");
+            ? GetIdInfo(guid, idRegistry)
+            : throw new FormatException($"'{id}' is not a guid");
 
     /// <summary>
     /// <inheritdoc cref="GetIdInfoObj"/>
     /// </summary>
     public static IdInformation? InfoObj(this Guid id, IIdRegistry? idRegistry = null) => GetIdInfoObj(id, idRegistry);
+
     /// <summary>
     /// <inheritdoc cref="GetIdInfoObj"/>
     /// </summary>
     public static IdInformation? InfoObj(this Guid? id, IIdRegistry? idRegistry = null) => GetIdInfoObj(id, idRegistry);
+
     /// <summary>
     /// <inheritdoc cref="GetIdInfoObj"/>
     /// </summary>
-    public static IdInformation? InfoObj(this GuidValueType id, IIdRegistry? idRegistry = null) => GetIdInfoObj(id, idRegistry);
+    public static IdInformation? InfoObj(this GuidValueType id, IIdRegistry? idRegistry = null) =>
+        GetIdInfoObj(id, idRegistry);
+
     /// <summary>
     /// <inheritdoc cref="GetIdInfoObj"/>
     /// </summary>
     public static IdInformation? InfoObj(this int id, IIdRegistry? idRegistry = null) => GetIdInfoObj(id, idRegistry);
+
     /// <summary>
     /// <inheritdoc cref="GetIdInfoObj"/>
     /// </summary>
     public static IdInformation? InfoObj(this int? id, IIdRegistry? idRegistry = null) => GetIdInfoObj(id, idRegistry);
+
     /// <summary>
     /// <inheritdoc cref="GetIdInfoObj"/>
     /// </summary>
-    public static IdInformation? InfoObj(this IntValueType id, IIdRegistry? idRegistry = null) => GetIdInfoObj(id, idRegistry);
+    public static IdInformation? InfoObj(this IntValueType id, IIdRegistry? idRegistry = null) =>
+        GetIdInfoObj(id, idRegistry);
+
     /// <summary>
     /// <inheritdoc cref="GetIdInfoObj"/>
     /// </summary>
-    public static IdInformation? IdInfoObj(this string id, IIdRegistry? idRegistry = null) => GetIdInfoObj(id, idRegistry);
+    public static IdInformation? IdInfoObj(this string id, IIdRegistry? idRegistry = null) =>
+        GetIdInfoObj(id, idRegistry);
+
     /// <summary>
     /// <inheritdoc cref="GetIdInfoObj"/>
     /// </summary>
-    public static IdInformation? InfoObj(this StringValueType id, IIdRegistry? idRegistry = null) => GetIdInfoObj(id, idRegistry);
+    public static IdInformation? InfoObj(this StringValueType id, IIdRegistry? idRegistry = null) =>
+        GetIdInfoObj(id, idRegistry);
 
     internal static void Register(IIdRegistry idRegistry)
     {

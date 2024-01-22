@@ -5,7 +5,6 @@ using static JLib.FactoryAttributes.TvtFactoryAttributes;
 
 namespace JLib.Reflection;
 
-
 [IsDerivedFromAny(typeof(ValueType<>))]
 public record ValueTypeType(Type Value) : TypeValueType(Value), IValidatedType
 {
@@ -16,7 +15,6 @@ public record ValueTypeType(Type Value) : TypeValueType(Value), IValidatedType
             try
             {
                 return Value.GetAnyBaseType<ValueType<Ignored>>()?.GenericTypeArguments.First()!;
-
             }
             catch (Exception e)
             {
@@ -27,6 +25,7 @@ public record ValueTypeType(Type Value) : TypeValueType(Value), IValidatedType
     }
 
     public bool Mapped => !Value.HasCustomAttribute<UnmappedAttribute>() && !Value.IsAbstract;
+
     void IValidatedType.Validate(ITypeCache cache, TvtValidator value)
     {
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
@@ -34,4 +33,3 @@ public record ValueTypeType(Type Value) : TypeValueType(Value), IValidatedType
             value.AddError("the NativeType could not be found");
     }
 }
-

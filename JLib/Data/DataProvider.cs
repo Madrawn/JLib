@@ -7,7 +7,7 @@ namespace JLib.Data;
 /// assuming that all queryable features are supported
 /// </summary>
 /// <typeparam name="TDataObject"></typeparam>
-public abstract class DataProviderRBase<TDataObject>: IDataProviderR<TDataObject>
+public abstract class DataProviderRBase<TDataObject> : IDataProviderR<TDataObject>
     where TDataObject : IDataObject
 {
     public abstract IQueryable<TDataObject> Get();
@@ -33,9 +33,9 @@ public abstract class DataProviderRBase<TDataObject>: IDataProviderR<TDataObject
 
     public TDataObject? TryGet(Guid? id)
         => id.HasValue ? Get().SingleOrDefault(x => x.Id == id.Value) : default;
+
     public bool Contains(Guid? id)
         => id.HasValue && Get().Any(x => x.Id == id.Value);
-
 }
 
 public interface IDataProviderR<TDataObject>
@@ -54,7 +54,6 @@ public interface IDataProviderR<TDataObject>
 public interface ISourceDataProviderR<TData> : IDataProviderR<TData>
     where TData : IDataObject
 {
-
 }
 
 public interface IDataProviderRw<TData> : IDataProviderR<TData>
@@ -71,5 +70,4 @@ public interface IDataProviderRw<TData> : IDataProviderR<TData>
 public interface ISourceDataProviderRw<TData> : IDataProviderRw<TData>, ISourceDataProviderR<TData>
     where TData : IEntity
 {
-
 }

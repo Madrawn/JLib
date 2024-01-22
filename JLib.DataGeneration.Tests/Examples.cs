@@ -1,18 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
-// <PackageReference Include="FluentAssertions" Version="6.12.0" />
-using FluentAssertions;
 using System.Runtime.CompilerServices;
+using FluentAssertions;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
 using JLib.ValueTypes;
-// <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.14" />
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-// <PackageReference Include="Snapshooter.Xunit" Version="0.14.0" />
-using Snapshooter.Xunit;
 using Snapshooter;
+using Snapshooter.Xunit;
+using Xunit;
+// <PackageReference Include="FluentAssertions" Version="6.12.0" />
+// <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.14" />
+// <PackageReference Include="Snapshooter.Xunit" Version="0.14.0" />
 // <PackageReference Include="xunit" Version="2.4.2" />
 // <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
 //   <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -22,7 +23,6 @@ using Snapshooter;
 //   <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 //   <PrivateAssets>all</PrivateAssets>
 // </PackageReference>
-using Xunit;
 
 namespace JLib.DataGeneration.Tests;
 
@@ -46,6 +46,7 @@ public class ExampleUnitTests : IDisposable
     public class DefaultArticleDp : DataPackage
     {
         public ArticleId ArticleId { get; init; }
+
         public DefaultArticleDp(IDataPackageManager packageManager, ShopDbContext dbContext) : base(packageManager)
         {
             dbContext.Articles.Add(new()
@@ -70,12 +71,12 @@ public class ExampleUnitTests : IDisposable
         var id = Guid.NewGuid();
         var exceptions = new ExceptionManager("test setup");
         var services = new ServiceCollection()
-            .AddTypeCache(out _typeCache, exceptions,
-                // defines the types which can be found by reflection. JLibDataGenerationTypePackage.Instance is required for dataPackages to work.
-                TypePackage.GetNested<ExampleUnitTests>(), JLibDataGenerationTypePackage.Instance)
-            .AddAutoMapper(p => p.AddProfiles(_typeCache))
-            .AddDataPackages(_typeCache)
-            .AddDbContext<ShopDbContext>(b => b.UseInMemoryDatabase(id.ToString()))
+                .AddTypeCache(out _typeCache, exceptions,
+                    // defines the types which can be found by reflection. JLibDataGenerationTypePackage.Instance is required for dataPackages to work.
+                    TypePackage.GetNested<ExampleUnitTests>(), JLibDataGenerationTypePackage.Instance)
+                .AddAutoMapper(p => p.AddProfiles(_typeCache))
+                .AddDataPackages(_typeCache)
+                .AddDbContext<ShopDbContext>(b => b.UseInMemoryDatabase(id.ToString()))
             ;
 
         var provider = services.BuildServiceProvider();
@@ -92,6 +93,7 @@ public class ExampleUnitTests : IDisposable
         _idRegistry = provider.GetRequiredService<IIdRegistry>();
         exceptions.ThrowIfNotEmpty();
     }
+
     public void Dispose()
     {
         _dbContext.Database.EnsureDeleted();
@@ -104,7 +106,6 @@ public class ExampleUnitTests : IDisposable
     {
         try
         {
-
             _provider.IncludeDataPackages(dataPackages.Select(dp => _typeCache.Get<DataPackageType>(dp)).ToArray());
             await _dbContext.SaveChangesAsync(_cancellationToken);
         }
@@ -112,6 +113,7 @@ public class ExampleUnitTests : IDisposable
         {
             throw new("setup failed", e);
         }
+
         Exception? ex = null;
 
         CheckSnapshot(new("setup"), ex);
@@ -140,11 +142,12 @@ public class ExampleUnitTests : IDisposable
                 "Database",
                 _dbContext.Articles
                     .Select(article =>
-                    new {
-                        article.Id,
-                        IdInfo = article.Id.IdInfo(_idRegistry),
-                        article.Name
-                    })
+                        new
+                        {
+                            article.Id,
+                            IdInfo = article.Id.IdInfo(_idRegistry),
+                            article.Name
+                        })
             },
             {
                 "exception",
@@ -154,13 +157,12 @@ public class ExampleUnitTests : IDisposable
             o => o
                 // should be ignored since the value might change if tests are run in parallel.
                 .IgnoreField("$.Database[*].IdInfo")
-
         );
     }
 
 
-
     #region referenced types
+
     /// <summary>
     /// id ValueType
     /// </summary>
@@ -171,8 +173,7 @@ public class ExampleUnitTests : IDisposable
     /// </summary>
     public class Article
     {
-        [Key]
-        public Guid Id { get; init; }
+        [Key] public Guid Id { get; init; }
 
         public string Name { get; set; } = "";
     }
@@ -186,11 +187,8 @@ public class ExampleUnitTests : IDisposable
 
         public ShopDbContext(DbContextOptions<ShopDbContext> options) : base(options)
         {
-
         }
     }
 
     #endregion
-
-
 }

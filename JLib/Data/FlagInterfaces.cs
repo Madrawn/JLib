@@ -13,9 +13,12 @@ namespace JLib.Data;
 public interface IDataObject
 {
     public Guid Id { get; }
-
 }
-public interface IDataObjectType : ITypeValueType { }
+
+public interface IDataObjectType : ITypeValueType
+{
+}
+
 /// <summary>
 /// the <see cref="MappedDataObjectProfile"/> will create a map for each <see cref="MappingInfo"/>
 /// </summary>
@@ -23,6 +26,7 @@ public interface IMappedDataObjectType : IDataObjectType
 {
     ExplicitTypeMappingInfo[] MappingInfo { get; }
 }
+
 public abstract record DataObjectType(Type Value) : NavigatingTypeValueType(Value), IDataObjectType
 {
     public const int NextPriority = 10_000;
@@ -34,6 +38,7 @@ public abstract record DataObjectType(Type Value) : NavigatingTypeValueType(Valu
 public interface IEntity : IDataObject
 {
 }
+
 /// <summary>
 /// enables the <see cref="QueryableHelper.ById{T,TId}"/> extention method
 /// </summary>
@@ -41,6 +46,7 @@ public interface ITypedIdDataObject<TId> : IDataObject
     where TId : GuidValueType
 {
 }
+
 /// <summary>
 /// a class which directly accesses data using EfCore, a web api or other methods
 /// </summary>
@@ -49,10 +55,12 @@ public interface ITypedIdDataObject<TId> : IDataObject
 public record EntityType(Type Value) : DataObjectType(Value), IValidatedType
 {
     public new const int NextPriority = DataObjectType.NextPriority - 1_000;
+
     public virtual void Validate(ITypeCache cache, TvtValidator value)
     {
         if (GetType() == typeof(EntityType))
-            value.AddError($"You have to specify which type of entity this is by implementing a derivation of the {nameof(IEntity)} interface");
+            value.AddError(
+                $"You have to specify which type of entity this is by implementing a derivation of the {nameof(IEntity)} interface");
     }
 }
 
@@ -61,8 +69,8 @@ public record EntityType(Type Value) : DataObjectType(Value), IValidatedType
 /// </summary>
 public interface ICommandEntity : IEntity
 {
-
 }
+
 /// <summary>
 /// An entity which uses ValueTypes to ensure data validity
 /// </summary>
@@ -70,5 +78,4 @@ public interface ICommandEntity : IEntity
 public record CommandEntityType(Type Value) : EntityType(Value)
 {
     public new const int NextPriority = EntityType.NextPriority - 1_000;
-
 }

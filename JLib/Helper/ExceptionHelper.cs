@@ -1,6 +1,7 @@
 ﻿using JLib.Exceptions;
 
 namespace JLib.Helper;
+
 public static class ExceptionHelper
 {
     /// <summary>
@@ -20,6 +21,7 @@ public static class ExceptionHelper
         var e = new JLibAggregateException(message, mat);
         throw e;
     }
+
     /// <summary>
     /// </summary>
     /// <typeparam name="T"></typeparam>
@@ -34,6 +36,7 @@ public static class ExceptionHelper
             ? new JLibAggregateException(message, mat)
             : null;
     }
+
     /// <summary>
     /// adds all <paramref name="errors"/> bundled as <see cref="JLibAggregateException"/> to the <see cref="masterExceptionList"/> if <paramref name="errors"/> is not empty.
     /// </summary>
@@ -41,7 +44,8 @@ public static class ExceptionHelper
     /// <param name="errors"></param>
     /// <param name="message"><see cref="JLibAggregateException.Message"/> of the to-be thrown exception</param>
     /// <param name="masterExceptionList">the list the generated <see cref="JLibAggregateException"/> should be added to</param>
-    public static void AddIfNotEmpty<T>(this IEnumerable<T> errors, string message, IList<Exception> masterExceptionList)
+    public static void AddIfNotEmpty<T>(this IEnumerable<T> errors, string message,
+        IList<Exception> masterExceptionList)
         where T : Exception
     {
         var mat = errors.Cast<Exception>().ToArray();

@@ -5,7 +5,6 @@ namespace JLib.Reflection;
 
 public abstract record NavigatingTypeValueType(Type Value) : TypeValueType(Value)
 {
-
     private TvtNavigationManager? _navigationManager;
 
     internal void SetCache(ITypeCache typeCache)
@@ -15,8 +14,10 @@ public abstract record NavigatingTypeValueType(Type Value) : TypeValueType(Value
 
         _navigationManager = new(this, typeCache);
     }
+
     private string CacheExceptionText([CallerMemberName] string callerMemberName = "")
         => $"{GetType().Name}.{callerMemberName} ({Value.Name}) cache has not been set yet";
+
     internal void MaterializeNavigation()
     {
         if (_navigationManager is null)
@@ -40,7 +41,8 @@ public abstract record NavigatingTypeValueType(Type Value) : TypeValueType(Value
         catch (Exception e)
         {
             throw new TvtNavigationFailedException(
-                $"{typeof(T).Name} {GetType().Name}.{propertyName}: The navigation failed due to an unhandled error: {e.Message}", e);
+                $"{typeof(T).Name} {GetType().Name}.{propertyName}: The navigation failed due to an unhandled error: {e.Message}",
+                e);
         }
     }
 }

@@ -34,6 +34,7 @@ public static class TypeHelper
     /// </summary>
     public static bool IsDerivedFromAny<T>(this Type type)
         => type.GetAnyBaseType<T>() is not null;
+
     /// <summary>
     /// <inheritdoc cref="IsDerivedFromAny{T}"/>
     /// </summary>
@@ -42,6 +43,7 @@ public static class TypeHelper
 
     public static Type? GetAnyBaseType<T>(this Type type)
         => type.GetAnyBaseType(typeof(T));
+
     public static Type? GetAnyBaseType(this Type type, Type baseType)
     {
         var current = type;
@@ -152,7 +154,9 @@ public static class TypeHelper
         }
         catch (Exception e)
         {
-            throw new InvalidOperationException($"adding <{string.Join(", ", typeArguments.Select(x => x.FullClassName(true)))}> as typeArguments to type {type.FullClassName(true)} failed: {Environment.NewLine}{e.Message}", e);
+            throw new InvalidOperationException(
+                $"adding <{string.Join(", ", typeArguments.Select(x => x.FullClassName(true)))}> as typeArguments to type {type.FullClassName(true)} failed: {Environment.NewLine}{e.Message}",
+                e);
         }
     }
 
@@ -164,7 +168,8 @@ public static class TypeHelper
         var name = (type.FullName ?? type.Name);
         string res = name
             .Split("[")
-            .First(); ;
+            .First();
+        ;
         if (!includeNamespace)
             res = res.Split(".").Last();
         res = res

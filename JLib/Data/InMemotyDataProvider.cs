@@ -30,19 +30,22 @@ public class InMemoryDataProvider<TEntity> : DataProviderRBase<TEntity>, ISource
         if (_idProperty.PropertyType.IsAssignableTo<GuidValueType>())
         {
             var idPropertyVtCtor = _idProperty.PropertyType.GetConstructor(new[] { typeof(Guid) }) ??
-                                throw new InvalidSetupException("vtId ctor not found");
+                                   throw new InvalidSetupException("vtId ctor not found");
             _idGenerator = id => idPropertyVtCtor.Invoke(new object[] { id }).CastTo<GuidValueType>();
         }
         else
             _idGenerator = id => id;
+
         Log.Verbose("creating {type}", GetType().FullClassName());
     }
+
     private void CreateAndSetId(TEntity entity)
     {
         if (_idProperty.GetValue(entity) is not null)
             return;
         _idProperty.SetValue(entity, _idGenerator?.Invoke(Guid.NewGuid()));
     }
+
     private readonly ConcurrentDictionary<Guid, TEntity> _items = new();
     private readonly IAuthorizationInfo<TEntity> _authorize;
 

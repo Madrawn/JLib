@@ -25,28 +25,36 @@ public interface ITypeCache
 
     public TTvt Get<TTvt>(Func<TTvt, bool> filter) where TTvt : class, ITypeValueType
         => All(filter).Single();
+
     public TTvt Get<TTvt>(Type weakType) where TTvt : class, ITypeValueType;
+
     public TTvt Get<TTvt, TType>() where TTvt : class, ITypeValueType
         => Get<TTvt>(typeof(TType));
+
     public TTvt? TryGet<TTvt>(Func<TTvt, bool> filter) where TTvt : class, ITypeValueType
         => All(filter).SingleOrDefault();
+
     public TTvt? TryGet<TTvt>(Type? weakType) where TTvt : class, ITypeValueType;
+
     public TTvt? TryGet<TTvt, TType>() where TTvt : class, ITypeValueType
         => TryGet<TTvt>(typeof(TType).TryGetGenericTypeDefinition());
+
     public IEnumerable<TTvt> All<TTvt>() where TTvt : class, ITypeValueType;
+
     public IEnumerable<TTvt> All<TTvt>(Func<TTvt, bool> filter) where TTvt : class, ITypeValueType
         => All<TTvt>().Where(filter);
+
     public TTvt? SingleOrDefault<TTvt>(Func<TTvt, bool> selector) where TTvt : class, ITypeValueType
     {
         var res = All<TTvt>().Where(selector).ToArray();
         if (res.Length > 1)
-            throw new InvalidSetupException($"multiple selectors matched to be cast to {typeof(TTvt).Name}: " + string.Join(", ", res.Select(r => r.Value.Name)));
+            throw new InvalidSetupException($"multiple selectors matched to be cast to {typeof(TTvt).Name}: " +
+                                            string.Join(", ", res.Select(r => r.Value.Name)));
         return res.FirstOrDefault();
     }
 
     public TTvt Single<TTvt>(Func<TTvt, bool> selector) where TTvt : TypeValueType
         => SingleOrDefault(selector) ?? throw new InvalidSetupException("no selector matched");
-
 }
 
 /// <summary>
@@ -76,11 +84,11 @@ public class TypeCache : ITypeCache
         public TypeValueType Create(Type type)
         {
             var ctor = Value.GetConstructor(new[] { typeof(Type) })
-                ?? throw new InvalidTypeException(Value, Value, $"ctor not found for {Value.Name}");
+                       ?? throw new InvalidTypeException(Value, Value, $"ctor not found for {Value.Name}");
             var instance = ctor.Invoke(new object[] { type })
-                ?? throw new InvalidSetupException($"ctor could not be invoked for {Value.Name}");
+                           ?? throw new InvalidSetupException($"ctor could not be invoked for {Value.Name}");
             return instance as TypeValueType
-                ?? throw new InvalidSetupException($"instance of {Value} is not a {nameof(TypeValueType)}");
+                   ?? throw new InvalidSetupException($"instance of {Value} is not a {nameof(TypeValueType)}");
         }
     }
 
@@ -89,7 +97,6 @@ public class TypeCache : ITypeCache
     public IEnumerable<Type> KnownTypeValueTypes { get; }
 
     #region constructor
-
 
     public TypeCache(ITypePackage typePackage, IExceptionManager? parentExceptionManager)
     {
@@ -107,10 +114,12 @@ public class TypeCache : ITypeCache
 
         exceptions.CreateChild(
             "some Types have no filter attributes",
-                availableTypeValueTypes.Where(tvtt => tvtt.Value
-                    .CustomAttributes.None(a => a.AttributeType.Implements<TvtFactoryAttributes.ITypeValueTypeFilterAttribute>())
-                ).Select(tvtt => new InvalidTypeException(tvtt.GetType(), tvtt.Value, $"{tvtt.Value.Name} does not have any filter attribute added"))
-            );
+            availableTypeValueTypes.Where(tvtt => tvtt.Value
+                .CustomAttributes.None(a =>
+                    a.AttributeType.Implements<TvtFactoryAttributes.ITypeValueTypeFilterAttribute>())
+            ).Select(tvtt => new InvalidTypeException(tvtt.GetType(), tvtt.Value,
+                $"{tvtt.Value.Name} does not have any filter attribute added"))
+        );
         var discoveryExceptions = exceptions.CreateChild("type discovery failed");
         try
         {
@@ -126,7 +135,7 @@ public class TypeCache : ITypeCache
                                 t.Value.GetCustomAttribute<TvtFactoryAttributes.Priority>()?.Value
                                 ?? TvtFactoryAttributes.Priority.DefaultPriority);
                         var validTvts = validTvtGroups.MinBy(x => x.Key)?
-                         .ToArray() ?? Array.Empty<ValueTypeForTypeValueTypes>();
+                            .ToArray() ?? Array.Empty<ValueTypeForTypeValueTypes>();
                         switch (validTvts.Length)
                         {
                             case > 1:
@@ -156,7 +165,6 @@ public class TypeCache : ITypeCache
             if (_typeValueTypes is null || _typeMappings is null)
                 throw exceptions.GetException()!;
         }
-
 
 
         foreach (var typeValueType in _typeValueTypes.OfType<NavigatingTypeValueType>())
@@ -203,7 +211,8 @@ public class TypeCache : ITypeCache
         {
             try
             {
-                var tvtValidator = new TvtValidator(typeValueType.CastTo<TypeValueType>(), typeValueType.GetType().FullClassName());
+                var tvtValidator = new TvtValidator(typeValueType.CastTo<TypeValueType>(),
+                    typeValueType.GetType().FullClassName());
                 typeValueType.Validate(this, tvtValidator);
                 exceptions.AddChild(tvtValidator);
             }
@@ -230,8 +239,8 @@ public class TypeCache : ITypeCache
         => weakType is null
             ? null
             : _typeMappings.TryGetValue(weakType, out var tvt)
-            ? tvt.As<T?>()
-            : null;
+                ? tvt.As<T?>()
+                : null;
 
     public IEnumerable<T> All<T>()
         where T : class, ITypeValueType
@@ -260,7 +269,8 @@ public class TypeCache : ITypeCache
 
             foreach (var typesInAssembly in typesByAssembly)
             {
-                log.Debug("  Found {typeCount} types in Assemlby {assemblyName}", typesInAssembly.Count(), typesInAssembly.Key);
+                log.Debug("  Found {typeCount} types in Assemlby {assemblyName}", typesInAssembly.Count(),
+                    typesInAssembly.Key);
                 WriteTypes(typesInAssembly);
             }
             //Log.Verbose("  Total Types:");

@@ -2,7 +2,10 @@
 
 namespace JLib.AutoMapper;
 
-public record ExplicitTypeMappingInfo(ITypeValueType Source, ITypeValueType Destination, MappingDataProviderMode DataProviderMode);
+public record ExplicitTypeMappingInfo(
+    ITypeValueType Source,
+    ITypeValueType Destination,
+    MappingDataProviderMode DataProviderMode);
 
 public enum MappingDataProviderMode
 {

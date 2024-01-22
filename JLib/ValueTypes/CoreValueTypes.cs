@@ -15,6 +15,7 @@ public record PropertyPrefix(string Value) : Prefix(Value)
             : propertyName[(i + 1)..];
     }
 }
+
 /// <summary>
 /// the string that separates a prefix from the rest of the propertyName
 /// </summary>
@@ -33,4 +34,5 @@ public record PropertyPrefixSeparator(string Value) : StringValueType(Value)
         return result;
     }
 }
+
 public record ClassPrefix(string Value) : Prefix(Value);

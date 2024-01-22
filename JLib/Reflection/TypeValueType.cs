@@ -25,6 +25,7 @@ public interface ITypeValueType
     Type Value { get; }
     public bool HasCustomAutoMapperProfile { get; }
 }
+
 [Unmapped]
 public abstract record TypeValueType(Type Value) : ValueType<Type>(Value), ITypeValueType
 {
@@ -34,5 +35,4 @@ public abstract record TypeValueType(Type Value) : ValueType<Type>(Value), IType
         => new(GetType(), Value, message);
 
     public bool HasCustomAutoMapperProfile => Value.GetCustomAttributes().Any(a => a is IDisableAutoProfileAttribute);
-
 }

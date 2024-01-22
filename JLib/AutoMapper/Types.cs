@@ -9,6 +9,7 @@ namespace JLib.AutoMapper;
 public record AutoMapperProfileType(Type Value) : TypeValueType(Value)
 {
     private static readonly Type[] CtorParamArray = new[] { typeof(ITypeCache) };
+
     public Profile Create(ITypeCache typeCache)
         => Value.GetConstructor(Array.Empty<Type>())
                ?.Invoke(null).As<Profile>()

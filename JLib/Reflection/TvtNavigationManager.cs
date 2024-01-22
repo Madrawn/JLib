@@ -8,6 +8,7 @@ internal class TvtNavigationManager
 {
     private readonly NavigatingTypeValueType _owner;
     private readonly ITypeCache _cache;
+
     internal TvtNavigationManager(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
         NavigatingTypeValueType owner,
@@ -24,7 +25,9 @@ internal class TvtNavigationManager
         => _lazies.GetValueOrAdd(propertyName, () =>
         {
             var value = resolver(_cache);
-            var pi = _owner.GetType().GetProperty(propertyName) ?? throw new InvalidSetupException($"property {propertyName} not found in type {_owner.GetType().Name}");
+            var pi = _owner.GetType().GetProperty(propertyName) ??
+                     throw new InvalidSetupException(
+                         $"property {propertyName} not found in type {_owner.GetType().Name}");
 
             if (pi.IsNullable() is false && value is null)
                 throw new InvalidSetupException($"property {_owner.Name}.{propertyName} must not be null");
@@ -40,5 +43,4 @@ internal class TvtNavigationManager
             .ToList()
             .ForEach(p => p.GetValue(_owner));
     }
-
 }

@@ -27,6 +27,7 @@ public interface IExceptionManager : IExceptionProvider
             Add(e);
         }
     }
+
     /// <summary>
     /// wraps the exception in a try catch block and adds the exception on throw.
     /// </summary>
@@ -49,6 +50,7 @@ public interface IExceptionManager : IExceptionProvider
     void CreateChild(string message, IEnumerable<Exception> childExceptions);
     void AddChild(IExceptionProvider exceptionProvider);
 }
+
 public class ExceptionManager : IExceptionManager
 {
     private readonly string _message;
@@ -57,6 +59,7 @@ public class ExceptionManager : IExceptionManager
 
     private IEnumerable<Exception?> BuildExceptionList()
         => _exceptions.Concat(_children.Select(c => c.GetException()));
+
     public void Add(Exception exception) => _exceptions.Add(exception);
 
     public void Add(IEnumerable<Exception> exceptions)

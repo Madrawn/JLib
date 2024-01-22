@@ -7,6 +7,7 @@ namespace JLib.Reflection;
 public class TvtValidator : ValueValidator<Type>
 {
     private readonly TypeValueType _valueType;
+
     public TvtValidator(TypeValueType valueType, string valueTypeName) : base(valueType.Value, valueTypeName)
     {
         _valueType = valueType;
@@ -22,11 +23,13 @@ public class TvtValidator : ValueValidator<Type>
         if (!Value.IsGenericType)
             AddError(string.Join(Environment.NewLine, "Must be Generic", hint));
     }
+
     public void ShouldNotBeGeneric(string? hint = null)
     {
         if (Value.IsGenericType)
             AddError(string.Join(Environment.NewLine, "Must not be Generic", hint));
     }
+
     public void ShouldHaveNTypeArguments(int argumentCount)
     {
         ShouldBeGeneric();
@@ -34,8 +37,8 @@ public class TvtValidator : ValueValidator<Type>
         if (!Value.IsGenericType)
             AddError("Must be Generic");
         if (Value.GenericTypeArguments.Length != argumentCount)
-            AddError($"It must have exactly {argumentCount} type arguments but got {Value.GenericTypeArguments.Length}");
-
+            AddError(
+                $"It must have exactly {argumentCount} type arguments but got {Value.GenericTypeArguments.Length}");
     }
 
     public void ShouldHaveAttribute<TAttribute>(string hint)
@@ -44,20 +47,24 @@ public class TvtValidator : ValueValidator<Type>
         if (!Value.HasCustomAttribute<TAttribute>())
             AddError($"Should have {typeof(TAttribute).FullClassName(true)}", hint);
     }
+
     public void ShouldImplementAny<TInterface>(string? hint = null)
     {
         if (!Value.ImplementsAny<TInterface>())
-            AddError($"Should implement any {typeof(TInterface).TryGetGenericTypeDefinition().FullClassName(true)}", hint);
+            AddError($"Should implement any {typeof(TInterface).TryGetGenericTypeDefinition().FullClassName(true)}",
+                hint);
     }
+
     public void ShouldImplement<TInterface>(string? hint = null)
     {
         if (!Value.ImplementsAny<TInterface>())
             AddError($"Should implement {typeof(TInterface).FullClassName(true)}", hint);
     }
+
     public void ShouldNotImplementAny<TInterface>(string? hint = null)
     {
         if (Value.ImplementsAny<TInterface>())
-            AddError($"Should not implement {typeof(TInterface).TryGetGenericTypeDefinition().FullClassName(true)}", hint);
+            AddError($"Should not implement {typeof(TInterface).TryGetGenericTypeDefinition().FullClassName(true)}",
+                hint);
     }
-
 }

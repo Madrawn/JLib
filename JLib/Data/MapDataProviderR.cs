@@ -3,7 +3,7 @@ using AutoMapper.QueryableExtensions;
 
 namespace JLib.Data;
 
-public class MapDataProviderR<TFrom, TTo> :DataProviderRBase<TTo>, ISourceDataProviderR<TTo>
+public class MapDataProviderR<TFrom, TTo> : DataProviderRBase<TTo>, ISourceDataProviderR<TTo>
     where TFrom : IDataObject
     where TTo : IDataObject
 {
@@ -15,6 +15,7 @@ public class MapDataProviderR<TFrom, TTo> :DataProviderRBase<TTo>, ISourceDataPr
         _provider = provider;
         _config = config;
     }
+
     public override IQueryable<TTo> Get()
     {
         return _provider.Get().ProjectTo<TTo>(_config);

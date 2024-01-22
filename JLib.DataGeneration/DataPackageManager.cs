@@ -12,6 +12,7 @@ public interface IDataPackageManager
     internal void IncludeDataPackages(Type[] packages);
     internal void SetIdPropertyValue(object packageInstance, PropertyInfo property);
 }
+
 internal class DataPackageManager : IDataPackageManager
 {
     private readonly IIdRegistry _idRegistry;
@@ -22,7 +23,9 @@ internal class DataPackageManager : IDataPackageManager
         _idRegistry = idRegistry;
         _provider = provider;
     }
+
     public DataPackageInitState InitState { get; private set; }
+
     public void IncludeDataPackages(Type[] packages)
     {
         if (InitState != DataPackageInitState.Uninitialized)
@@ -30,7 +33,8 @@ internal class DataPackageManager : IDataPackageManager
 
         packages.Where(p => !p.IsAssignableTo<DataPackage>() || p.IsAbstract)
             .Select(p =>
-                new InvalidSetupException(p.FullClassName() + "is not a valid typePackage. it must not be abstract and be Derived from DataPackage"))
+                new InvalidSetupException(p.FullClassName() +
+                                          "is not a valid typePackage. it must not be abstract and be Derived from DataPackage"))
             .ThrowExceptionIfNotEmpty("invalid DataPackages found");
 
         InitState = DataPackageInitState.Initializing;

@@ -2,5 +2,7 @@
 
 public class InvalidConfigException : JLibException
 {
-    public InvalidConfigException(string message) : base(message) { }
+    public InvalidConfigException(string message) : base(message)
+    {
+    }
 }

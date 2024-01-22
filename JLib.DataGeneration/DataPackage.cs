@@ -1,8 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using JLib.Exceptions;
+﻿using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
-using JLib.ValueTypes;
 using static JLib.FactoryAttributes.TvtFactoryAttributes;
 
 namespace JLib.DataGeneration;
@@ -15,8 +13,8 @@ public abstract class DataPackage
     public string GetInfoText(string propertyName)
     {
         var property = GetType().GetProperty(propertyName) ??
-                                      throw new InvalidSetupException(
-                                          $"property {propertyName} not found on {GetType().FullClassName()}");
+                       throw new InvalidSetupException(
+                           $"property {propertyName} not found on {GetType().FullClassName()}");
         return new DataPackageValues.IdGroupName(property).Value + "." + property.Name;
     }
 

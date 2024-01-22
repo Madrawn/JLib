@@ -8,11 +8,13 @@ public abstract class ValueValidator<TValue> : IExceptionProvider
     private readonly string _valueTypeName;
     protected TValue Value { get; }
     protected readonly List<string> Messages = new();
+
     protected ValueValidator(TValue value, string valueTypeName)
     {
         _valueTypeName = valueTypeName;
         Value = value;
     }
+
     public void AddError(string message, string? hint = null)
     {
         if (hint != null)
