@@ -1,5 +1,7 @@
 ﻿using JLib.AutoMapper;
+using JLib.Helper;
 using JLib.Reflection;
+using JLib.ValueTypes;
 using static JLib.FactoryAttributes.TvtFactoryAttributes;
 
 namespace JLib.Data;
@@ -30,6 +32,13 @@ public abstract record DataObjectType(Type Value) : NavigatingTypeValueType(Valu
 /// enables a class to be requested and edited via <see cref="IDataProviderRw{TData}"/> 
 /// </summary>
 public interface IEntity : IDataObject
+{
+}
+/// <summary>
+/// enables the <see cref="QueryableHelper.ById{T,TId}"/> extention method
+/// </summary>
+public interface ITypedIdDataObject<TId> : IDataObject
+    where TId : GuidValueType
 {
 }
 /// <summary>
