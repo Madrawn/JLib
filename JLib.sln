@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
 		JLib.sln.DotSettings = JLib.sln.DotSettings
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.Tests", "JLib.Tests\JLib.Tests.csproj", "{21845041-BF53-41D2-AD32-02D1A214EB85}"
@@ -23,9 +24,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.HotChocolate", "JLib.H
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{610F90DD-CC3F-46F1-8D49-01B8A26B1E81}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.Tests.Reflection.DemoAssembly", "JLib.Tests.Reflection.DemoAssembly\JLib.Tests.Reflection.DemoAssembly.csproj", "{A1EAF821-44AE-4C97-A625-DB7D6022C2D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.Tests.Reflection.DemoAssembly", "JLib.Tests.Reflection.DemoAssembly\JLib.Tests.Reflection.DemoAssembly.csproj", "{A1EAF821-44AE-4C97-A625-DB7D6022C2D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.Tests.Reflection.DemoAssembly2", "JLib.Tests.Reflection.DemoAssembly2\JLib.Tests.Reflection.DemoAssembly2.csproj", "{4F8A73B0-058E-4EF1-BA11-B01CD6D85137}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.Tests.Reflection.DemoAssembly2", "JLib.Tests.Reflection.DemoAssembly2\JLib.Tests.Reflection.DemoAssembly2.csproj", "{4F8A73B0-058E-4EF1-BA11-B01CD6D85137}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.EfCore", "..\..\Projekte\gelsenwasser\DexmaImport\JLib\JLib.EfCore\JLib.EfCore.csproj", "{569EE52C-92BA-4C33-9409-E0BA3DA967D2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.DataGeneration.Tests", "..\..\Projekte\gelsenwasser\DexmaImport\JLib\JLib.DataGeneration.Tests\JLib.DataGeneration.Tests.csproj", "{F30E60F8-7E87-4225-AEFC-571929C94BB2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +66,14 @@ Global
 		{4F8A73B0-058E-4EF1-BA11-B01CD6D85137}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F8A73B0-058E-4EF1-BA11-B01CD6D85137}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F8A73B0-058E-4EF1-BA11-B01CD6D85137}.Release|Any CPU.Build.0 = Release|Any CPU
+		{569EE52C-92BA-4C33-9409-E0BA3DA967D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{569EE52C-92BA-4C33-9409-E0BA3DA967D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{569EE52C-92BA-4C33-9409-E0BA3DA967D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{569EE52C-92BA-4C33-9409-E0BA3DA967D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F30E60F8-7E87-4225-AEFC-571929C94BB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F30E60F8-7E87-4225-AEFC-571929C94BB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F30E60F8-7E87-4225-AEFC-571929C94BB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F30E60F8-7E87-4225-AEFC-571929C94BB2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -70,6 +83,7 @@ Global
 		{34951258-F562-4992-93E0-385292AE1B43} = {610F90DD-CC3F-46F1-8D49-01B8A26B1E81}
 		{A1EAF821-44AE-4C97-A625-DB7D6022C2D6} = {610F90DD-CC3F-46F1-8D49-01B8A26B1E81}
 		{4F8A73B0-058E-4EF1-BA11-B01CD6D85137} = {610F90DD-CC3F-46F1-8D49-01B8A26B1E81}
+		{F30E60F8-7E87-4225-AEFC-571929C94BB2} = {610F90DD-CC3F-46F1-8D49-01B8A26B1E81}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9007D83B-9D61-4FD9-927F-EEAC8281BF90}

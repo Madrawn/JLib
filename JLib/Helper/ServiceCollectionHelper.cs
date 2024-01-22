@@ -290,7 +290,8 @@ public static class ServiceCollectionHelper
         var invalidRepos = groupedRepos
             .Where(x => x.Value.Count() > 1)
             .Select(group => new InvalidSetupException(
-                $"multiple repos have been provided for data object {group.Key.Value.FullClassName(true)}: {string.Join(", ", group.Value.Select(repo => repo.Value.FullClassName(true)))}"))
+                $"multiple repos have been provided for data object {group.Key.Value.FullClassName(true)}:" +
+                $" {string.Join(", ", group.Value.Select(repo => repo.Value.FullClassName(true)).OrderBy(r => r))}"))
             .ToArray();
 
         if (invalidRepos.Any())

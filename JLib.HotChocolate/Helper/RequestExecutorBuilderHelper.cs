@@ -7,7 +7,7 @@ using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using static JLib.FactoryAttributes.TvtFactoryAttributes;
+using static JLib.Reflection.Attributes.TvtFactoryAttributes;
 
 namespace JLib.HotChocolate.Helper;
 

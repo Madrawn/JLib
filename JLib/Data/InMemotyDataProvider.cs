@@ -1,9 +1,12 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using JLib.Data.Authorization;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.ValueTypes;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace JLib.Data;
@@ -20,9 +23,9 @@ public class InMemoryDataProvider<TEntity> : DataProviderRBase<TEntity>, ISource
 
     private readonly Func<Guid, object> _idGenerator;
 
-    public InMemoryDataProvider(IAuthorizationInfo<TEntity> authorizationInfo)
+    public InMemoryDataProvider(IServiceProvider serviceProvider)
     {
-        _authorize = authorizationInfo;
+        _authorize = serviceProvider.GetService<IAuthorizationInfo<TEntity>>();
         // reflection to support vt ids
         _idProperty = typeof(TEntity)
             .GetProperties()
@@ -47,17 +50,19 @@ public class InMemoryDataProvider<TEntity> : DataProviderRBase<TEntity>, ISource
     }
 
     private readonly ConcurrentDictionary<Guid, TEntity> _items = new();
-    private readonly IAuthorizationInfo<TEntity> _authorize;
+    private readonly IAuthorizationInfo<TEntity>? _authorize;
 
     public override IQueryable<TEntity> Get()
     {
         Log.Verbose("InMemoryDataProvider Expression for {0}", typeof(TEntity).Name);
-        return _items.Values.AsQueryable().Where(_authorize.Expression());
+        return _authorize is null
+         ? _items.Values.AsQueryable()
+         : _items.Values.AsQueryable().Where(_authorize.Expression());
     }
 
     public void Add(TEntity item)
     {
-        _authorize.AndRaiseException(item);
+        _authorize?.AndRaiseException(item);
         CreateAndSetId(item);
         if (!_items.TryAdd(item.Id, item))
             throw new InvalidOperationException("item could not be added");

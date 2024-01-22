@@ -14,11 +14,15 @@ public static class EnumerableHelper
     /// </summary>
     public static object PrepareSnapshot(this IEnumerable<ITypeValueType> source)
         => source.ToLookup(tvt => tvt.Value.Namespace ?? "")
+            .OrderBy(x => x.Key)
             .ToDictionary(tvtGroup1 => tvtGroup1.Key, tvt => tvt
                 .ToLookup(tvt1 => tvt1.GetType().FullClassName(true))
+                .OrderBy(x=>x.Key)
                 .ToDictionary(
                     tvtGroup2 => tvtGroup2.Key,
-                    tvtGroup2 => tvtGroup2.Select(tvt2 => tvt2.Value.FullClassName(true))
+                    tvtGroup2 => tvtGroup2
+                        .Select(tvt2 => tvt2.Value.FullClassName(true))
+                        .OrderBy(x => x)
                 )
             );
 
@@ -75,10 +79,14 @@ public static class EnumerableHelper
                         => t?.GenericTypeArguments.Select(t => t.FullClassName(true)).ToArray() ??
                            Array.Empty<string>();
                 })
+            .OrderBy(x => x.Key)
             .ToDictionary(x => x.Key, descriptorInfos
                 => descriptorInfos
                     .ToLookup(service => service.ServiceType)
-                    .ToDictionary(serviceImplementations => serviceImplementations.Key));
+                    .OrderBy(x => x.Key)
+                    .ToDictionary(
+                        serviceImplementations => serviceImplementations.Key,
+                        x => x.OrderBy(y => y)));
         disposables.ForEach(d => d.Dispose());
         return res;
     }

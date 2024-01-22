@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using JLib.Helper;
@@ -13,8 +14,7 @@ public interface ITypePackage
     /// <summary>
     /// The <see cref="Types"/> of this package and all its <see cref="Children"/>
     /// </summary>
-    public IEnumerable<Type> Content { get; }
-
+    public ImmutableHashSet<Type> GetContent();
     /// <summary>
     /// other nested packages, this could be peer dependencies, the assemblies of a directory or any other group of packages
     /// </summary>
@@ -124,7 +124,10 @@ public class TypePackage : ITypePackage
     public IEnumerable<ITypePackage> Children { get; }
     public IEnumerable<Type> Types { get; }
     public string DescriptionTemplate { get; }
-    public IEnumerable<Type> Content => Children.SelectMany(x => x.Content).Concat(Types);
+    public ImmutableHashSet<Type> GetContent() => GetContent(this).ToImmutableHashSet();
+
+    private static IEnumerable<Type> GetContent(ITypePackage package) 
+        => package.Children.SelectMany(GetContent).Concat(package.Types).Distinct();
 
     public ITypePackage Combine(params ITypePackage[] packages)
         => Get(packages.Append(this));
@@ -145,24 +148,16 @@ public class TypePackage : ITypePackage
         sb.Append(indentStr).Append('┐').AppendLine(string.Format(package.DescriptionTemplate, package.Children.Count(),
             package.Types.Count()));
         sb.Append(indentStr).Append("├ Types:").AppendLine(package.Types.Count().ToString());
-        if (package.Types.Count() <= 10)
+        if (package.Types.Count() <= 10 || includeTypes)
         {
             foreach (var type in package.Types)
                 sb.Append(indentStr).Append("│   ").AppendLine(type.FullClassName());
         }
-
-        sb.Append(indentStr).Append("├ Types Total:").AppendLine(package.Content.Count().ToString());
-        if (includeTypes)
+        if (package.Children.Any())
         {
-            sb.Append(indentStr).AppendLine("├┐");
-            foreach (var type in package.Types)
-            {
-                sb.Append(indentStr).Append("│├ ").AppendLine(type.FullClassName());
-            }
+            sb.Append(indentStr).AppendLine("├ Children:");
+            foreach (var child in package.Children)
+                ToString(child, indent + 1, sb, includeTypes);
         }
-
-        sb.Append(indentStr).AppendLine("├ Children:");
-        foreach (var child in package.Children)
-            ToString(child, indent + 1, sb, includeTypes);
     }
 }

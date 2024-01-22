@@ -10,10 +10,10 @@
           "UnmappedAttribute"
         ],
         "ImplementedInterfaces": [
-          "IEquatable<ValueType<Type>>",
-          "ITypeValueType",
+          "IEquatable<TypeCacheTests.TypeValueTypeWithoutFactoryAttribute.InvalidTypeValueType>",
           "IEquatable<TypeValueType>",
-          "IEquatable<TypeCacheTests.TypeValueTypeWithoutFactoryAttribute.InvalidTypeValueType>"
+          "IEquatable<ValueType<Type>>",
+          "ITypeValueType"
         ]
       }
     }

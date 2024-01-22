@@ -21,10 +21,10 @@
           "UnmappedAttribute"
         ],
         "ImplementedInterfaces": [
-          "IEquatable<ValueType<Type>>",
-          "ITypeValueType",
+          "IEquatable<TypeCacheTests.InconclusiveFactory.DemoTypeValueTypeA>",
           "IEquatable<TypeValueType>",
-          "IEquatable<TypeCacheTests.InconclusiveFactory.DemoTypeValueTypeA>"
+          "IEquatable<ValueType<Type>>",
+          "ITypeValueType"
         ]
       },
       "DemoTypeValueTypeB": {
@@ -36,10 +36,10 @@
           "UnmappedAttribute"
         ],
         "ImplementedInterfaces": [
-          "IEquatable<ValueType<Type>>",
-          "ITypeValueType",
+          "IEquatable<TypeCacheTests.InconclusiveFactory.DemoTypeValueTypeB>",
           "IEquatable<TypeValueType>",
-          "IEquatable<TypeCacheTests.InconclusiveFactory.DemoTypeValueTypeB>"
+          "IEquatable<ValueType<Type>>",
+          "ITypeValueType"
         ]
       },
       "InconclusiveType": {
