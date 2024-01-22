@@ -4,7 +4,7 @@ using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
 using JLib.ValueTypes;
-using static JLib.FactoryAttributes.TvtFactoryAttributes;
+using static JLib.Reflection.Attributes.TvtFactoryAttributes;
 
 namespace JLib.DataGeneration;
 

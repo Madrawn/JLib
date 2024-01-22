@@ -1,3 +1,4 @@
+﻿# Project: JLib.Data.Authorization
 ## Requirements: 
 - [AuthorizationExtensions](./AuthorizationExtensions.cs).AddDataAuthorization
 - ServiceCollectionHelper.AddScopes

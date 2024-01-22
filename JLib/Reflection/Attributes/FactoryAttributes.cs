@@ -1,6 +1,6 @@
 ﻿using JLib.Helper;
 
-namespace JLib.FactoryAttributes;
+namespace JLib.Reflection.Attributes;
 
 /// <summary>
 /// classes with this given attribute will not be ignored by the typeCache

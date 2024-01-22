@@ -7,10 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
-using JLib.FactoryAttributes;
 using JLib.Testing;
 using Snapshooter;
 using Snapshooter.Xunit;
+using JLib.Reflection.Attributes;
 
 namespace JLib.Tests.Reflection;
 /// <summary>

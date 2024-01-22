@@ -1,6 +1,6 @@
 ﻿using JLib.AutoMapper;
 using JLib.Reflection;
-using static JLib.FactoryAttributes.TvtFactoryAttributes;
+using static JLib.Reflection.Attributes.TvtFactoryAttributes;
 
 namespace JLib.Data;
 

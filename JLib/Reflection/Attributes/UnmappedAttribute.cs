@@ -1,6 +1,6 @@
 ﻿using JLib.AutoMapper;
 
-namespace JLib.Attributes;
+namespace JLib.Reflection.Attributes;
 /// <summary>
 /// the <see cref="ValueTypeProfile"/> will not create a profile from <see cref="ValueTypeType{T}.Value"/> to the <see cref="ValueTypeType{T}"/>
 /// </summary>
@@ -13,6 +13,7 @@ public class UnmappedAttribute : Attribute
 public interface IDisableAutoProfileAttribute
 {
 }
+
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 public class DisableAutoProfileAttribute : Attribute, IDisableAutoProfileAttribute { }
 
