@@ -27,8 +27,7 @@ public static class DataPackageExtensions
             }
         });
 
-        if (configuration is not null)
-            services.AddSingleton(configuration);
+        services.AddSingleton(configuration ?? new DataPackageConfiguration());
 
         services.AddSingleton<IDataPackageManager, DataPackageManager>();
 

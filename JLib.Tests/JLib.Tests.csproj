@@ -33,8 +33,4 @@
     <ProjectReference Include="..\JLib.Tests.Reflection.DemoAssembly\JLib.Tests.Reflection.DemoAssembly.csproj" />
     <ProjectReference Include="..\JLib\JLib.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Reflection\__snapshots__\" />
-  </ItemGroup>
 </Project>
