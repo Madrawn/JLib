@@ -5,9 +5,33 @@ namespace JLib.DataGeneration;
 
 public static class DataPackageExtensions
 {
-    public static IServiceCollection AddDataPackages(this IServiceCollection services, ITypeCache typeCache)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="typeCache"></param>
+    /// <param name="defaultNamespace">this namespace will be removed from the idGroupName via string replace.</param>
+    /// <returns></returns>
+    public static IServiceCollection AddDataPackages(this IServiceCollection services, ITypeCache typeCache, string? defaultNamespace = null)
     {
-        services.AddSingleton<IIdRegistry, IdRegistry>();
+        services.AddSingleton<IIdRegistry, IdRegistry>(provider =>
+        {
+            return new(provider, PostProcessor);
+
+            DataPackageValues.IdIdentifier PostProcessor(DataPackageValues.IdIdentifier id)
+            {
+                if (defaultNamespace is null)
+                    return id;
+
+                return id with
+                {
+                    IdGroupName = new(id.IdGroupName.Value.Replace(
+                        defaultNamespace.EndsWith(".")
+                        ? defaultNamespace
+                        : defaultNamespace + ".", ""))
+                };
+            }
+        });
         services.AddSingleton<IDataPackageManager, DataPackageManager>();
         foreach (var package in typeCache.All<DataPackageType>())
             services.AddSingleton(package.Value);

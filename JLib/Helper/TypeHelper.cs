@@ -4,15 +4,28 @@ namespace JLib.Helper;
 
 public static class TypeHelper
 {
-    public static IEnumerable<Type> GetDeclaringTypeTree(this Type type)
+    public static IReadOnlyCollection<Type> GetDeclaringTypeTree(this Type type)
     {
         var cur = type;
         List<Type> res = new();
-        while (cur.DeclaringType is not null)
+        do
         {
             res.Add(cur);
             cur = cur.DeclaringType;
-        }
+        } while (cur is not null);
+
+        return res;
+    }
+    public static IReadOnlyCollection<Type> GetBaseTypeTree(this Type type)
+    {
+        var cur = type;
+        List<Type> res = new();
+
+        do
+        {
+            res.Add(cur);
+            cur = cur.BaseType;
+        } while (cur is not null);
 
         return res;
     }

@@ -4,6 +4,12 @@ using JLib.ValueTypes;
 
 namespace JLib.DataGeneration;
 
+public record IdInformation(Type Type, DataPackageValues.IdIdentifier Identifier, object Value) : IComparable<IdInformation>
+{
+    public int CompareTo(IdInformation? other) => Value.ToString()?.CompareTo(other?.Value.ToString()) ?? -1;
+
+    public override string ToString() => Type.FullClassName() + " " + Identifier + " = " + Value;
+}
 /// <summary>
 /// adds debug methods to resolve the name of an id managed by a <see cref="IIdRegistry"/>
 /// </summary>
@@ -14,10 +20,6 @@ public static class IdDebug
     private static readonly object InstancesLock = new();
     private static readonly List<IIdRegistry> Instances = new();
 
-    public record IdInformation(Type Type, DataPackageValues.IdIdentifier Identifier, object Value)
-    {
-        public override string ToString() => Type.FullClassName() + " " + Identifier + " = " + Value;
-    }
 
     /// <summary>
     /// searches for the given id across all IdRegistry Instances and returns all associated keys
@@ -133,33 +135,33 @@ public static class IdDebug
     /// <summary>
     /// <inheritdoc cref="GetIdInfoObj"/>
     /// </summary>
-    public static IdInformation? InfoObj(this Guid id, IIdRegistry? idRegistry = null) => GetIdInfoObj(id, idRegistry);
+    public static IdInformation? IdInfoObj(this Guid id, IIdRegistry? idRegistry = null) => GetIdInfoObj(id, idRegistry);
 
     /// <summary>
     /// <inheritdoc cref="GetIdInfoObj"/>
     /// </summary>
-    public static IdInformation? InfoObj(this Guid? id, IIdRegistry? idRegistry = null) => GetIdInfoObj(id, idRegistry);
+    public static IdInformation? IdInfoObj(this Guid? id, IIdRegistry? idRegistry = null) => GetIdInfoObj(id, idRegistry);
 
     /// <summary>
     /// <inheritdoc cref="GetIdInfoObj"/>
     /// </summary>
-    public static IdInformation? InfoObj(this GuidValueType id, IIdRegistry? idRegistry = null) =>
+    public static IdInformation? IdInfoObj(this GuidValueType id, IIdRegistry? idRegistry = null) =>
         GetIdInfoObj(id, idRegistry);
 
     /// <summary>
     /// <inheritdoc cref="GetIdInfoObj"/>
     /// </summary>
-    public static IdInformation? InfoObj(this int id, IIdRegistry? idRegistry = null) => GetIdInfoObj(id, idRegistry);
+    public static IdInformation? IdInfoObj(this int id, IIdRegistry? idRegistry = null) => GetIdInfoObj(id, idRegistry);
 
     /// <summary>
     /// <inheritdoc cref="GetIdInfoObj"/>
     /// </summary>
-    public static IdInformation? InfoObj(this int? id, IIdRegistry? idRegistry = null) => GetIdInfoObj(id, idRegistry);
+    public static IdInformation? IdInfoObj(this int? id, IIdRegistry? idRegistry = null) => GetIdInfoObj(id, idRegistry);
 
     /// <summary>
     /// <inheritdoc cref="GetIdInfoObj"/>
     /// </summary>
-    public static IdInformation? InfoObj(this IntValueType id, IIdRegistry? idRegistry = null) =>
+    public static IdInformation? IdInfoObj(this IntValueType id, IIdRegistry? idRegistry = null) =>
         GetIdInfoObj(id, idRegistry);
 
     /// <summary>
@@ -171,7 +173,7 @@ public static class IdDebug
     /// <summary>
     /// <inheritdoc cref="GetIdInfoObj"/>
     /// </summary>
-    public static IdInformation? InfoObj(this StringValueType id, IIdRegistry? idRegistry = null) =>
+    public static IdInformation? IdInfoObj(this StringValueType id, IIdRegistry? idRegistry = null) =>
         GetIdInfoObj(id, idRegistry);
 
     internal static void Register(IIdRegistry idRegistry)

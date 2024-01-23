@@ -41,7 +41,6 @@ public class ExampleUnitTests : IDisposable
     // pragmas are used to allow for (id) property declaration without explicitly setting them to null and using said values to create entities.
     // the ids are said in the ctor of the base class
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     // DataPackage
     public class DefaultArticleDp : DataPackage
     {
@@ -57,7 +56,6 @@ public class ExampleUnitTests : IDisposable
         }
     }
 #pragma warning restore CS8602
-#pragma warning restore CS8618
 
     private readonly CancellationToken _cancellationToken;
     private readonly IServiceProvider _provider;
@@ -131,7 +129,7 @@ public class ExampleUnitTests : IDisposable
             ex = e;
         }
 
-        CheckSnapshot(new("result"), ex);
+        CheckSnapshot(new("result"), ex, testName);
     }
 
     private void CheckSnapshot(string checkType, Exception? exception, [CallerMemberName] string testName = "")

@@ -30,13 +30,7 @@ public static class ExpressionHelper
 
         if (propInfo.ReflectedType is null)
             throw new ArgumentException($"Expression '{propertyLambda}' has no ReflectedType.");
-
-
-        var tValue = typeof(TValue);
-        var propType = tValue.IsGenericType && tValue.GetGenericTypeDefinition() == typeof(Nullable<>)
-            ? tValue.GenericTypeArguments.First()
-            : tValue;
-
+        
         if (type != propInfo.ReflectedType && (propInfo.ReflectedType.IsInterface &&
                                                !type.Implements(propInfo.ReflectedType))
                                            && !type.IsSubclassOf(propInfo.ReflectedType))

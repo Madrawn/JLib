@@ -81,14 +81,15 @@ public class TypePackage : ITypePackage
     public static ITypePackage Get(params ITypePackage[] packages)
         => Get(packages.AsEnumerable());
 
-    [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
     public static ITypePackage Get(IEnumerable<ITypePackage> packages, string name = "{0} Packages")
+        // ReSharper disable  PossibleMultipleEnumeration
         => packages.Multiple()
             ? new TypePackage(
                 null,
                 packages,
                 name)
             : packages.Single();
+    // ReSharper restore PossibleMultipleEnumeration
 
     /// <summary>
     /// creates a <see cref="ITypePackage"/> which contains all types of all assemblies in the given directory which match any of the given prefixes.
@@ -126,7 +127,7 @@ public class TypePackage : ITypePackage
     public string DescriptionTemplate { get; }
     public ImmutableHashSet<Type> GetContent() => GetContent(this).ToImmutableHashSet();
 
-    private static IEnumerable<Type> GetContent(ITypePackage package) 
+    private static IEnumerable<Type> GetContent(ITypePackage package)
         => package.Children.SelectMany(GetContent).Concat(package.Types).Distinct();
 
     public ITypePackage Combine(params ITypePackage[] packages)

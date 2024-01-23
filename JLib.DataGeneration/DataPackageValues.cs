@@ -31,13 +31,26 @@ public static class DataPackageValues
         {
         }
 
-        internal IdGroupName(PropertyInfo property)
-            : this(
-                (property.DeclaringType != property.ReflectedType
-                    ? property.ReflectedType?.FullClassName(true) + ":"
-                    : "")
-                + property.DeclaringType?.FullClassName(true)
-            )
+        private static string ExtractKey(PropertyInfo property)
+        {
+            if (property.DeclaringType is null)
+                return "No declaring type found";
+            if (property.ReflectedType is null)
+                return "No reflected type found";
+
+            if (property.DeclaringType == property.ReflectedType)
+                return property.ReflectedType.FullClassName(true);
+
+            var baseTypeTree = property.ReflectedType
+                .GetBaseTypeTree()
+                .TakeWhile(t => t != property.DeclaringType)
+                .Append(property.DeclaringType)
+                .Select(t=>t.FullClassName(true));
+
+            return string.Join(":", baseTypeTree);
+        }
+
+        internal IdGroupName(PropertyInfo property) : this(ExtractKey(property))
         {
         }
     }

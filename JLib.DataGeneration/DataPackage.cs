@@ -32,7 +32,7 @@ public abstract class DataPackage
             case DataPackageInitState.Initializing:
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(packageManager.InitState));
+                throw new IndexOutOfRangeException(nameof(packageManager.InitState));
         }
 
 

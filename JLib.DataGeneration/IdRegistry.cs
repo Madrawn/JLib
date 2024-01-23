@@ -50,9 +50,12 @@ internal class IdRegistry : IIdRegistry, IDisposable
     private readonly ConcurrentDictionary<IdIdentifier, object> _dictionary;
     private bool _isDirty;
     private int _idIncrement;
+    private readonly Func<IdIdentifier, IdIdentifier> _idIdentifierPostProcessor;
 
-    public IdRegistry(IServiceProvider serviceProvider)
+    public IdRegistry(IServiceProvider serviceProvider,
+        Func<IdIdentifier, IdIdentifier>? idIdentifierPostProcessor)
     {
+        _idIdentifierPostProcessor = idIdentifierPostProcessor ?? (x => x);
         _fileLocation = GetFileName();
         _dictionary = LoadFromFile().ToConcurrentDictionary();
         _idIncrement = _dictionary.GetValueOrDefault(IncrementIdentifier) as int? ?? 0;
@@ -86,7 +89,7 @@ internal class IdRegistry : IIdRegistry, IDisposable
     /// </summary>
     public string GetStringId(IdIdentifier identifier)
     {
-        _isDirty = true;
+        identifier = _idIdentifierPostProcessor(identifier);
         return _dictionary.GetValueOrAdd(identifier, () =>
         {
             _isDirty = true;
@@ -96,21 +99,27 @@ internal class IdRegistry : IIdRegistry, IDisposable
     }
 
     public Guid GetGuidId(IdIdentifier identifier)
-        => _dictionary.GetValueOrAdd(identifier, () =>
+    {
+        identifier = _idIdentifierPostProcessor(identifier);
+        return _dictionary.GetValueOrAdd(identifier, () =>
         {
             _isDirty = true;
             return Guid.NewGuid();
         }).CastTo<Guid>();
+    }
 
     /// <summary>
     /// returns a deterministic <see cref="int"/> value for the given <paramref name="identifier"/>
     /// </summary>
     public int GetIntId(IdIdentifier identifier)
-        => _dictionary.GetValueOrAdd(identifier, () =>
+    {
+        identifier = _idIdentifierPostProcessor(identifier);
+        return _dictionary.GetValueOrAdd(identifier, () =>
         {
             _isDirty = true;
             return Interlocked.Increment(ref _idIncrement);
         }).CastTo<int>();
+    }
 
     public IdIdentifier? GetIdentifierOfId(object? id)
     {
@@ -155,9 +164,6 @@ internal class IdRegistry : IIdRegistry, IDisposable
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     void IIdRegistry.SetIdPropertyValue(object packageInstance, PropertyInfo property)
     {
-        var packageType = property.ReflectedType
-                          ?? throw new Exception("Property has no Reflected type");
-
         var id = GetId(new(property), property.PropertyType);
         property.SetValue(packageInstance, id);
     }
@@ -216,13 +222,13 @@ internal class IdRegistry : IIdRegistry, IDisposable
     }
 
 
-    private object DeserializeId(JsonElement value)
+    private static object DeserializeId(JsonElement value)
     {
-        switch (value.ValueKind)
+        switch (value)
         {
-            case JsonValueKind.Number:
+            case { ValueKind: JsonValueKind.Number }:
                 return value.GetInt32();
-            case JsonValueKind.String:
+            case { ValueKind: JsonValueKind.String }:
             {
                 var raw = value.GetString() ?? throw new InvalidSetupException("read empty id from file");
                 return Guid.TryParse(raw, out var guid)
