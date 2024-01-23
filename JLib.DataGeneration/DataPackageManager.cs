@@ -12,19 +12,23 @@ public interface IDataPackageManager
     internal void IncludeDataPackages(Type[] packages);
     internal void SetIdPropertyValue(object packageInstance, PropertyInfo property);
 }
-
+/// <summary>
+/// init manager and ctor parameter bundle for <see cref="DataPackage"/>s
+/// </summary>
 internal class DataPackageManager : IDataPackageManager
 {
     private readonly IIdRegistry _idRegistry;
     private readonly IServiceProvider _provider;
-
-    public DataPackageManager(IIdRegistry idRegistry, IServiceProvider provider)
+    public DataPackageManager(IIdRegistry idRegistry, IServiceProvider provider, DataPackageConfiguration configuration)
     {
         _idRegistry = idRegistry;
         _provider = provider;
+        Configuration = configuration;
     }
 
     public DataPackageInitState InitState { get; private set; }
+
+    public DataPackageConfiguration Configuration { get; }
 
     public void IncludeDataPackages(Type[] packages)
     {

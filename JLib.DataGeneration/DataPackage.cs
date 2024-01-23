@@ -1,7 +1,6 @@
 ﻿using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
-using JLib.ValueTypes;
 using static JLib.Reflection.Attributes.TvtFactoryAttributes;
 
 namespace JLib.DataGeneration;
@@ -35,7 +34,6 @@ public abstract class DataPackage
                 throw new IndexOutOfRangeException(nameof(packageManager.InitState));
         }
 
-
         foreach (var propertyInfo in GetType().GetProperties())
         {
             if (propertyInfo.GetMethod?.IsPublic is not true)
@@ -48,5 +46,6 @@ public abstract class DataPackage
                           " set method must be init");
             packageManager.SetIdPropertyValue(this, propertyInfo);
         }
+
     }
 }

@@ -1,18 +1,12 @@
-﻿using JLib.Reflection;
+﻿using JLib.Helper;
+using JLib.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace JLib.DataGeneration;
 
 public static class DataPackageExtensions
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="services"></param>
-    /// <param name="typeCache"></param>
-    /// <param name="defaultNamespace">this namespace will be removed from the idGroupName via string replace.</param>
-    /// <returns></returns>
-    public static IServiceCollection AddDataPackages(this IServiceCollection services, ITypeCache typeCache, string? defaultNamespace = null)
+    public static IServiceCollection AddDataPackages(this IServiceCollection services, ITypeCache typeCache, DataPackageConfiguration? configuration = null)
     {
         services.AddSingleton<IIdRegistry, IdRegistry>(provider =>
         {
@@ -20,19 +14,24 @@ public static class DataPackageExtensions
 
             DataPackageValues.IdIdentifier PostProcessor(DataPackageValues.IdIdentifier id)
             {
-                if (defaultNamespace is null)
+                if (configuration?.DefaultNamespace is null)
                     return id;
 
                 return id with
                 {
                     IdGroupName = new(id.IdGroupName.Value.Replace(
-                        defaultNamespace.EndsWith(".")
-                        ? defaultNamespace
-                        : defaultNamespace + ".", ""))
+                        configuration.DefaultNamespace.EndsWith(".")
+                        ? configuration.DefaultNamespace
+                        : configuration.DefaultNamespace + ".", ""))
                 };
             }
         });
+
+        if (configuration is not null)
+            services.AddSingleton(configuration);
+
         services.AddSingleton<IDataPackageManager, DataPackageManager>();
+
         foreach (var package in typeCache.All<DataPackageType>())
             services.AddSingleton(package.Value);
         return services;

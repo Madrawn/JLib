@@ -4,7 +4,7 @@ namespace JLib.Helper;
 
 public static class ServiceProviderHelper
 {
-    public static TSrvContainer GetRequiredServices<TSrvContainer>(this IServiceProvider provider)
+    public static TSrvContainer GetServiceContainer<TSrvContainer>(this IServiceProvider provider)
         where TSrvContainer : ServiceContainer, new()
     {
         var c = new TSrvContainer();
@@ -12,6 +12,12 @@ public static class ServiceProviderHelper
         return c;
     }
 
+    public static IServiceProvider GetRequiredServices<T1>(this IServiceProvider provider,
+        out T1 s1) where T1 : notnull 
+    {
+        s1 = provider.GetRequiredService<T1>();
+        return provider;
+    }
     public static IServiceProvider GetRequiredServices<T1, T2>(this IServiceProvider provider,
         out T1 s1, out T2 s2) where T1 : notnull where T2 : notnull
     {
