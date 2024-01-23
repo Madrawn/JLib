@@ -4,11 +4,20 @@ using JLib.ValueTypes;
 
 namespace JLib.DataGeneration;
 
+public record IdSnapshotInformation(string IdGroupName, string IdName, object Value) : IComparable<IdSnapshotInformation>
+{
+    public int CompareTo(IdSnapshotInformation? other) => Value.ToString()?.CompareTo(other?.Value.ToString()) ?? -1;
+
+    public override string ToString() => $"{IdGroupName}.{IdName} = {Value}";
+}
 public record IdInformation(Type Type, DataPackageValues.IdIdentifier Identifier, object Value) : IComparable<IdInformation>
 {
     public int CompareTo(IdInformation? other) => Value.ToString()?.CompareTo(other?.Value.ToString()) ?? -1;
 
     public override string ToString() => Type.FullClassName() + " " + Identifier + " = " + Value;
+
+    public IdSnapshotInformation ToSnapshotInfo()
+        => new(Identifier.IdGroupName.Value, Identifier.IdName.Value, Value);
 }
 /// <summary>
 /// adds debug methods to resolve the name of an id managed by a <see cref="IIdRegistry"/>
