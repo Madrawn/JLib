@@ -1,11 +1,19 @@
-﻿using JLib.Helper;
+﻿using System.Collections;
+using JLib.Helper;
 
 namespace JLib.Exceptions;
 
-public class InvalidTypeException : InvalidSetupException
+public sealed class InvalidTypeException : InvalidSetupException
 {
-    public InvalidTypeException(Type tvt, Type value, string message) : base(
+    public Type TvtType { get; }
+    public Type Value { get; }
+
+    public InvalidTypeException(Type tvtType, Type value, string message) : base(
         message)
     {
+        TvtType = tvtType;
+        Value = value;
+        Data[nameof(TvtType)] = tvtType;
+        Data[nameof(value)] = value;
     }
 }
