@@ -30,7 +30,6 @@ public class TypePackageTests
         public class NestedDemoClass2B { }
         public class NestedDemoClass2C { }
     }
-    public static Type NestingClass = typeof(NestingDemoClass);
     public static IReadOnlyCollection<Type> NestedTypes => new[]
     {
         typeof(NestingDemoClass.NestedDemoClassA),
@@ -48,7 +47,7 @@ public class TypePackageTests
     private class DemoClassA { }
     private class DemoClassB { }
     private class DemoClassC { }
-    private static IReadOnlyCollection<Type> DemoTypes = new[]
+    private static readonly IReadOnlyCollection<Type> DemoTypes = new[]
     {
         typeof(DemoClassA),
         typeof(DemoClassB),
@@ -56,23 +55,23 @@ public class TypePackageTests
     };
     #endregion
     #region assembly
-    private static IReadOnlyCollection<Type> DemoAssemblyTypes = new[]
+    private static readonly IReadOnlyCollection<Type> DemoAssemblyTypes = new[]
     {
         typeof(TestAssemblyDemoClassA),
         typeof(TestAssemblyDemoClassB),
         typeof(TestAssemblyDemoClassC),
     };
-    private static Assembly DemoAssembly = DemoAssemblyTypes.First().Assembly;
-    private static IReadOnlyCollection<Type> DemoAssembly2Types = new[]
+    private static readonly Assembly DemoAssembly = DemoAssemblyTypes.First().Assembly;
+    private static readonly IReadOnlyCollection<Type> DemoAssembly2Types = new[]
     {
         typeof(TestAssembly2DemoClassA),
         typeof(TestAssembly2DemoClassB),
         typeof(TestAssembly2DemoClassC),
     };
-    private static Assembly DemoAssembly2 = DemoAssembly2Types.First().Assembly;
+    private static readonly Assembly DemoAssembly2 = DemoAssembly2Types.First().Assembly;
     #endregion
 
-    public static object[][] TestCases = new object[][]
+    public static readonly object[][] TestCases = new object[][]
     {
         #region Assembly
         new object[]

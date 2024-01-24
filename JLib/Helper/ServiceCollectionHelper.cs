@@ -222,7 +222,7 @@ public static class ServiceCollectionHelper
                     }
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException();
+                        throw new IndexOutOfRangeException();
                 }
             }
         }

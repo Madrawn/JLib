@@ -10,7 +10,7 @@ public record ConfigSectionName(string Value) : StringValueType(Value)
 {
     public static implicit operator ConfigSectionName(string value) => new(value);
 }
-
+[AttributeUsage(AttributeTargets.Class)]
 public sealed class ConfigSectionNameAttribute : Attribute
 {
     public ConfigSectionNameAttribute(string sectionName)

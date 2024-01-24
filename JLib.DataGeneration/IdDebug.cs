@@ -7,17 +7,17 @@ namespace JLib.DataGeneration;
 
 public record struct IdSnapshotInformation(string IdGroupName, string IdName, object? Value) : IComparable<IdSnapshotInformation>
 {
-    public int CompareTo(IdSnapshotInformation other) => Value?.ToString()?.CompareTo(other.Value?.ToString()) ?? -1;
+    public readonly int CompareTo(IdSnapshotInformation other) => Value?.ToString()?.CompareTo(other.Value?.ToString()) ?? -1;
 
-    public override string ToString() => $"{IdGroupName}.{IdName} = {Value}";
+    public readonly override string ToString() => $"{IdGroupName}.{IdName} = {Value}";
 }
 public record struct IdInformation(Type Type, DataPackageValues.IdIdentifier Identifier, object? Value) : IComparable<IdInformation>
 {
-    public int CompareTo(IdInformation other) => Value?.ToString()?.CompareTo(other.Value?.ToString()) ?? -1;
+    public readonly int CompareTo(IdInformation other) => Value?.ToString()?.CompareTo(other.Value?.ToString()) ?? -1;
 
-    public override string ToString() => Type.FullClassName() + " " + Identifier + " = " + Value;
+    public readonly override string ToString() => Type.FullClassName() + " " + Identifier + " = " + Value;
 
-    public IdSnapshotInformation ToSnapshotInfo()
+    public readonly IdSnapshotInformation ToSnapshotInfo()
         => new(Identifier.IdGroupName.Value, Identifier.IdName.Value, Value);
 }
 /// <summary>
