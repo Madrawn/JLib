@@ -28,15 +28,7 @@ public interface IIdRegistry
     public string GetStringId(IdIdentifier identifier);
     public Guid GetGuidId(IdIdentifier identifier);
     public int GetIntId(IdIdentifier identifier);
-    public IdIdentifier? GetIdentifierOfId(object? id);
-    public IdIdentifier? GetIdentifierOfId(string id);
-    public IdIdentifier? GetIdentifierOfId(StringValueType id);
-    public IdIdentifier? GetIdentifierOfId(int id);
-    public IdIdentifier? GetIdentifierOfId(int? id);
-    public IdIdentifier? GetIdentifierOfId(IntValueType id);
-    public IdIdentifier? GetIdentifierOfId(Guid id);
-    public IdIdentifier? GetIdentifierOfId(Guid? id);
-    public IdIdentifier? GetIdentifierOfId(GuidValueType id);
+    public IdIdentifier GetIdentifierOfId(object? id);
     internal void SetIdPropertyValue(object packageInstance, PropertyInfo property);
     internal void SaveToFile();
 }
@@ -51,6 +43,9 @@ internal class IdRegistry : IIdRegistry, IDisposable
     private bool _isDirty;
     private int _idIncrement;
     private readonly Func<IdIdentifier, IdIdentifier> _idIdentifierPostProcessor;
+
+    private static IdIdentifier NullValueErrorIdentifier { get; } = new(new("invalid"), new("value is null"));
+    private static IdIdentifier NotFoundErrorIdentifier { get; } = new(new("invalid"), new("value not found"));
 
     public IdRegistry(IServiceProvider serviceProvider,
         Func<IdIdentifier, IdIdentifier>? idIdentifierPostProcessor)
@@ -121,8 +116,10 @@ internal class IdRegistry : IIdRegistry, IDisposable
         }).CastTo<int>();
     }
 
-    public IdIdentifier? GetIdentifierOfId(object? id)
+    public IdIdentifier GetIdentifierOfId(object? id)
     {
+        if (id is null)
+            return NullValueErrorIdentifier;
         var nativeId = id switch
         {
             IntValueType intVt => intVt.Value,
@@ -130,32 +127,12 @@ internal class IdRegistry : IIdRegistry, IDisposable
             GuidValueType guidVt => guidVt.Value,
             _ => id
         };
-        return _dictionary.Single(kv => kv.Value.Equals(nativeId)).Key;
+        return _dictionary
+            .Cast<KeyValuePair<IdIdentifier, object>?>()
+            .SingleOrDefault(kv => kv!.Value.Value.Equals(nativeId))
+            ?.Key
+            ?? NotFoundErrorIdentifier;
     }
-
-    public IdIdentifier? GetIdentifierOfId(string id)
-        => GetIdentifierOfId((object)id);
-
-    public IdIdentifier? GetIdentifierOfId(StringValueType id)
-        => GetIdentifierOfId((object)id.Value);
-
-    public IdIdentifier? GetIdentifierOfId(int id)
-        => GetIdentifierOfId((object)id);
-
-    public IdIdentifier? GetIdentifierOfId(int? id)
-        => GetIdentifierOfId((object?)id);
-
-    public IdIdentifier? GetIdentifierOfId(IntValueType id)
-        => GetIdentifierOfId((object)id.Value);
-
-    public IdIdentifier? GetIdentifierOfId(Guid id)
-        => GetIdentifierOfId((object)id);
-
-    public IdIdentifier? GetIdentifierOfId(Guid? id)
-        => GetIdentifierOfId((object?)id);
-
-    public IdIdentifier? GetIdentifierOfId(GuidValueType id)
-        => GetIdentifierOfId((object)id.Value);
 
     /// <summary>
     /// sets the id of the given <paramref name="property"/> to the persisted id or creates a new one<br/>
@@ -229,12 +206,12 @@ internal class IdRegistry : IIdRegistry, IDisposable
             case { ValueKind: JsonValueKind.Number }:
                 return value.GetInt32();
             case { ValueKind: JsonValueKind.String }:
-            {
-                var raw = value.GetString() ?? throw new InvalidSetupException("read empty id from file");
-                return Guid.TryParse(raw, out var guid)
-                    ? guid
-                    : raw;
-            }
+                {
+                    var raw = value.GetString() ?? throw new InvalidSetupException("read empty id from file");
+                    return Guid.TryParse(raw, out var guid)
+                        ? guid
+                        : raw;
+                }
             default:
                 throw new IndexOutOfRangeException(nameof(value.ValueKind));
         }
