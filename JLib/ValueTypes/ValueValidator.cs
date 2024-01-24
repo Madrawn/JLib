@@ -5,13 +5,14 @@ namespace JLib.ValueTypes;
 
 public abstract class ValueValidator<TValue> : IExceptionProvider
 {
-    private readonly string _valueTypeName;
+    protected string ValueTypeName { get; }
     protected TValue Value { get; }
-    protected readonly List<string> Messages = new();
+    private readonly List<string> _messages = new();
+    public IReadOnlyCollection<string> Messages => _messages;
 
     protected ValueValidator(TValue value, string valueTypeName)
     {
-        _valueTypeName = valueTypeName;
+        ValueTypeName = valueTypeName;
         Value = value;
     }
 
@@ -19,14 +20,15 @@ public abstract class ValueValidator<TValue> : IExceptionProvider
     {
         if (hint != null)
             message += $" this might be resolved by {hint}";
-        Messages.Add(message);
+        _messages.Add(message);
     }
 
+
     Exception? IExceptionProvider.GetException()
-        => BuildException(Messages);
+        => BuildException(_messages);
 
     protected virtual Exception? BuildException(IReadOnlyCollection<string> messages)
         => JLibAggregateException.ReturnIfNotEmpty(
-            $"{_valueTypeName} validation failed: '{Value}' is not a valid Value.",
-            Messages.Distinct().Select(msg => new ValidationException(msg)));
+            $"{ValueTypeName} validation failed: '{Value}' is not a valid Value.",
+            _messages.Distinct().Select(msg => new ValidationException(msg)));
 }

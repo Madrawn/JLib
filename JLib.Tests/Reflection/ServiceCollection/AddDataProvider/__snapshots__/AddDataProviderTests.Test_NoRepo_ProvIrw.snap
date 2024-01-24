@@ -28,13 +28,13 @@
           {
             "Type": "JLib.Exceptions.JLibAggregateException",
             "Message": [
-              "Type validation failed"
+              "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestInvalidDataProviderRw<> is not a valid JLib.Reflection.SourceDataProviderType"
             ],
             "InnerExceptions": [
               {
                 "Type": "JLib.Exceptions.InvalidTypeException",
                 "message": [
-                  "Error while initializing SourceDataProviderType with JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestInvalidDataProviderRw<>: Should implement any JLib.Data.ISourceDataProviderRw<>"
+                  "Should implement any JLib.Data.ISourceDataProviderRw<>"
                 ]
               }
             ]

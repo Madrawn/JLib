@@ -42,7 +42,7 @@ public class ExampleUnitTests : IDisposable
     // the ids are said in the ctor of the base class
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
     // DataPackage
-    public class DefaultArticleDp : DataPackage
+    public sealed class DefaultArticleDp : DataPackage
     {
         public ArticleId ArticleId { get; init; }
 
