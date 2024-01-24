@@ -5,20 +5,47 @@ using JLib.ValueTypes;
 
 namespace JLib.DataGeneration;
 
-public record struct IdSnapshotInformation(string IdGroupName, string IdName, object? Value) : IComparable<IdSnapshotInformation>
+public struct IdSnapshotInformation : IComparable<IdSnapshotInformation>
 {
+    public IdSnapshotInformation(DataPackageValues.IdIdentifier idIdentifier, object? value)
+    {
+        this.IdGroupName = idIdentifier.IdGroupName.Value;
+        this.IdName = idIdentifier.IdName.Value;
+        this.Value = ExtractNativeType(value);
+        this.IdType = value?.GetType().FullClassName();
+    }
+
     public readonly int CompareTo(IdSnapshotInformation other) => Value?.ToString()?.CompareTo(other.Value?.ToString()) ?? -1;
 
     public readonly override string ToString() => $"{IdGroupName}.{IdName} = {Value}";
+
+
+    [return: NotNullIfNotNull("value")]
+    private static object? ExtractNativeType(object? value)
+        => value switch
+        {
+            null => null,
+            IntValueType vt => vt.Value,
+            StringValueType vt => vt.Value,
+            GuidValueType vt => vt.Value,
+            _ => value
+        };
+
+    public string IdGroupName { get; set; }
+    public string IdName { get; set; }
+    public object? Value { get; set; }
+    public string? IdType { get; set; }
+
 }
 public record struct IdInformation(Type Type, DataPackageValues.IdIdentifier Identifier, object? Value) : IComparable<IdInformation>
 {
     public readonly int CompareTo(IdInformation other) => Value?.ToString()?.CompareTo(other.Value?.ToString()) ?? -1;
 
-    public readonly override string ToString() => Type.FullClassName() + " " + Identifier + " = " + Value;
+    public readonly override string ToString() => $"{Type.FullClassName()} {Identifier} = {Value}";
+
 
     public readonly IdSnapshotInformation ToSnapshotInfo()
-        => new(Identifier.IdGroupName.Value, Identifier.IdName.Value, Value);
+        => new(Identifier, Value);
 }
 /// <summary>
 /// adds debug methods to resolve the name of an id managed by a <see cref="IIdRegistry"/>
@@ -258,7 +285,7 @@ public static class IdDebug
             ? GetIdInfoObj(null, idRegistry).ToSnapshotInfo()
             : Guid.TryParse(id, out var guid)
                 ? guid.IdSnapshot(idRegistry)
-                : new("invalid", "value is not a guid", id);
+                : new(new(new("invalid"), new("value is not a guid")), id);
 
     #endregion
 
