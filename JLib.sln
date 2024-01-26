@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
 		JLib.sln.DotSettings = JLib.sln.DotSettings
+		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -31,6 +32,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.EfCore", "..\..\Projekte\gelsenwasser\DexmaImport\JLib\JLib.EfCore\JLib.EfCore.csproj", "{569EE52C-92BA-4C33-9409-E0BA3DA967D2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.DataGeneration.Tests", "..\..\Projekte\gelsenwasser\DexmaImport\JLib\JLib.DataGeneration.Tests\JLib.DataGeneration.Tests.csproj", "{F30E60F8-7E87-4225-AEFC-571929C94BB2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{B450BA69-F38B-4EF5-81A5-7551941524E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
