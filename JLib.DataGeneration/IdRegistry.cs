@@ -1,8 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Immutable;
-using System.IO;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using AutoMapper;
@@ -10,11 +8,11 @@ using JLib.Exceptions;
 using JLib.Helper;
 using JLib.ValueTypes;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using static JLib.DataGeneration.DataPackageValues;
 using JsonSerializer = System.Text.Json.JsonSerializer;
-using SaveFileType = System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, System.Text.Json.JsonElement>>;
+using SaveFileType =
+    System.Collections.Generic.Dictionary<string,
+        System.Collections.Generic.Dictionary<string, System.Text.Json.JsonElement>>;
 
 namespace JLib.DataGeneration;
 
@@ -25,28 +23,18 @@ internal enum DataPackageInitState
     Initialized
 }
 
-
 public interface IIdRegistry
 {
     public string GetStringId(IdIdentifier identifier);
     public Guid GetGuidId(IdIdentifier identifier);
     public int GetIntId(IdIdentifier identifier);
-    public IdIdentifier? GetIdentifierOfId(object? id);
-    public IdIdentifier? GetIdentifierOfId(string id);
-    public IdIdentifier? GetIdentifierOfId(StringValueType id);
-    public IdIdentifier? GetIdentifierOfId(int id);
-    public IdIdentifier? GetIdentifierOfId(int? id);
-    public IdIdentifier? GetIdentifierOfId(IntValueType id);
-    public IdIdentifier? GetIdentifierOfId(Guid id);
-    public IdIdentifier? GetIdentifierOfId(Guid? id);
-    public IdIdentifier? GetIdentifierOfId(GuidValueType id);
+    public IdIdentifier GetIdentifierOfId(object? id);
     internal void SetIdPropertyValue(object packageInstance, PropertyInfo property);
     internal void SaveToFile();
 }
 
 internal class IdRegistry : IIdRegistry, IDisposable
 {
-
     private static readonly IdIdentifier IncrementIdentifier = new(new("__registry__"), new("IdIncrement"));
 
     private readonly Lazy<IMapper> _mapper;
@@ -54,8 +42,15 @@ internal class IdRegistry : IIdRegistry, IDisposable
     private readonly ConcurrentDictionary<IdIdentifier, object> _dictionary;
     private bool _isDirty;
     private int _idIncrement;
-    public IdRegistry(IServiceProvider serviceProvider)
+    private readonly Func<IdIdentifier, IdIdentifier> _idIdentifierPostProcessor;
+
+    private static IdIdentifier NullValueErrorIdentifier { get; } = new(new("invalid"), new("value is null"));
+    private static IdIdentifier NotFoundErrorIdentifier { get; } = new(new("invalid"), new("value not found"));
+
+    public IdRegistry(IServiceProvider serviceProvider,
+        Func<IdIdentifier, IdIdentifier>? idIdentifierPostProcessor)
     {
+        _idIdentifierPostProcessor = idIdentifierPostProcessor ?? (x => x);
         _fileLocation = GetFileName();
         _dictionary = LoadFromFile().ToConcurrentDictionary();
         _idIncrement = _dictionary.GetValueOrDefault(IncrementIdentifier) as int? ?? 0;
@@ -89,32 +84,42 @@ internal class IdRegistry : IIdRegistry, IDisposable
     /// </summary>
     public string GetStringId(IdIdentifier identifier)
     {
-        _isDirty = true;
+        identifier = _idIdentifierPostProcessor(identifier);
         return _dictionary.GetValueOrAdd(identifier, () =>
         {
             _isDirty = true;
-            return $"{identifier.IdGroupName.Value}.{identifier.IdName.Value}:{Interlocked.Increment(ref _idIncrement)}";
+            return
+                $"{identifier.IdGroupName.Value}.{identifier.IdName.Value}:{Interlocked.Increment(ref _idIncrement)}";
         }).CastTo<string>();
     }
 
     public Guid GetGuidId(IdIdentifier identifier)
-        => _dictionary.GetValueOrAdd(identifier, () =>
+    {
+        identifier = _idIdentifierPostProcessor(identifier);
+        return _dictionary.GetValueOrAdd(identifier, () =>
         {
             _isDirty = true;
             return Guid.NewGuid();
         }).CastTo<Guid>();
+    }
+
     /// <summary>
     /// returns a deterministic <see cref="int"/> value for the given <paramref name="identifier"/>
     /// </summary>
     public int GetIntId(IdIdentifier identifier)
-        => _dictionary.GetValueOrAdd(identifier, () =>
+    {
+        identifier = _idIdentifierPostProcessor(identifier);
+        return _dictionary.GetValueOrAdd(identifier, () =>
         {
             _isDirty = true;
             return Interlocked.Increment(ref _idIncrement);
         }).CastTo<int>();
+    }
 
-    public IdIdentifier? GetIdentifierOfId(object? id)
+    public IdIdentifier GetIdentifierOfId(object? id)
     {
+        if (id is null)
+            return NullValueErrorIdentifier;
         var nativeId = id switch
         {
             IntValueType intVt => intVt.Value,
@@ -122,25 +127,12 @@ internal class IdRegistry : IIdRegistry, IDisposable
             GuidValueType guidVt => guidVt.Value,
             _ => id
         };
-        return _dictionary.Single(kv => kv.Value.Equals(nativeId)).Key;
+        return _dictionary
+            .Cast<KeyValuePair<IdIdentifier, object>?>()
+            .SingleOrDefault(kv => kv!.Value.Value.Equals(nativeId))
+            ?.Key
+            ?? NotFoundErrorIdentifier;
     }
-
-    public IdIdentifier? GetIdentifierOfId(string id)
-        => GetIdentifierOfId((object)id);
-    public IdIdentifier? GetIdentifierOfId(StringValueType id)
-        => GetIdentifierOfId((object)id.Value);
-    public IdIdentifier? GetIdentifierOfId(int id)
-        => GetIdentifierOfId((object)id);
-    public IdIdentifier? GetIdentifierOfId(int? id)
-        => GetIdentifierOfId((object?)id);
-    public IdIdentifier? GetIdentifierOfId(IntValueType id)
-        => GetIdentifierOfId((object)id.Value);
-    public IdIdentifier? GetIdentifierOfId(Guid id)
-        => GetIdentifierOfId((object)id);
-    public IdIdentifier? GetIdentifierOfId(Guid? id)
-        => GetIdentifierOfId((object?)id);
-    public IdIdentifier? GetIdentifierOfId(GuidValueType id)
-        => GetIdentifierOfId((object)id.Value);
 
     /// <summary>
     /// sets the id of the given <paramref name="property"/> to the persisted id or creates a new one<br/>
@@ -149,12 +141,10 @@ internal class IdRegistry : IIdRegistry, IDisposable
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     void IIdRegistry.SetIdPropertyValue(object packageInstance, PropertyInfo property)
     {
-        var packageType = property.ReflectedType
-                          ?? throw new Exception("Property has no Reflected type");
-
         var id = GetId(new(property), property.PropertyType);
         property.SetValue(packageInstance, id);
     }
+
     /// <summary>
     /// gets the id with the given <paramref name="identifier"/> of the given <paramref name="idType"/><br/>
     /// throws a <see cref="ArgumentOutOfRangeException"/> when the property is neither a <see cref="int"/>, <see cref="Guid"/>, <see cref="IntValueType"/> nor <see cref="GuidValueType"/>
@@ -169,6 +159,7 @@ internal class IdRegistry : IIdRegistry, IDisposable
             var nativeId = GetIntId(identifier);
             return _mapper.Value.Map(nativeId, nativeId.GetType(), idType);
         }
+
         if (idType == typeof(Guid))
             return GetGuidId(identifier);
         if (idType.IsAssignableTo(typeof(GuidValueType)))
@@ -176,6 +167,7 @@ internal class IdRegistry : IIdRegistry, IDisposable
             var nativeId = GetGuidId(identifier);
             return _mapper.Value.Map(nativeId, nativeId.GetType(), idType);
         }
+
         if (idType == typeof(string))
             return GetStringId(identifier);
         if (idType.IsAssignableTo(typeof(StringValueType)))
@@ -207,13 +199,13 @@ internal class IdRegistry : IIdRegistry, IDisposable
     }
 
 
-    private object DeserializeId(JsonElement value)
+    private static object DeserializeId(JsonElement value)
     {
-        switch (value.ValueKind)
+        switch (value)
         {
-            case JsonValueKind.Number:
+            case { ValueKind: JsonValueKind.Number }:
                 return value.GetInt32();
-            case JsonValueKind.String:
+            case { ValueKind: JsonValueKind.String }:
                 {
                     var raw = value.GetString() ?? throw new InvalidSetupException("read empty id from file");
                     return Guid.TryParse(raw, out var guid)
@@ -224,6 +216,7 @@ internal class IdRegistry : IIdRegistry, IDisposable
                 throw new IndexOutOfRangeException(nameof(value.ValueKind));
         }
     }
+
     public Dictionary<IdIdentifier, object> LoadFromFile()
     {
         if (File.Exists(_fileLocation) is false)
@@ -232,10 +225,10 @@ internal class IdRegistry : IIdRegistry, IDisposable
         var raw1 = JsonSerializer.Deserialize<SaveFileType>(str) ?? new();
         var raw2 = raw1
             .SelectMany(groupName => groupName.Value
-            .ToDictionary(
-                name => new IdIdentifier(new(groupName.Key), new(name.Key)),
-                x => DeserializeId(x.Value)
-            ))
+                .ToDictionary(
+                    name => new IdIdentifier(new(groupName.Key), new(name.Key)),
+                    x => DeserializeId(x.Value)
+                ))
             .ToDictionary(x => x.Key, x => x.Value);
         return raw2;
     }

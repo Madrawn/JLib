@@ -587,7 +587,7 @@ public class AddDataProviderTests : ReflectionTestBase
 
     public class TestRepositoryR : DataProviderRBase<TestCommandEntity>, IDataProviderR<TestCommandEntity>
     {
-        public TestRepositoryR(ISourceDataProviderR<TestCommandEntity> sourceProvider)
+        public TestRepositoryR(ISourceDataProviderR<TestCommandEntity> _)
         {
 
         }

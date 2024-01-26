@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Serilog;
 
 namespace JLib.Helper;
+
 public static class ConfigurationHelper
 {
     /// <summary>
@@ -47,7 +48,8 @@ public static class ConfigurationHelper
     /// </summary>
     // ReSharper disable once UnusedMember.Local
     // only used to hold the summary above
-    private static Ignored BehaviorSummaryHolder => throw new InvalidOperationException("you should not call this property");
+    private static Ignored BehaviorSummaryHolder =>
+        throw new InvalidOperationException("you should not call this property");
 
 
     /// <summary>
@@ -56,9 +58,8 @@ public static class ConfigurationHelper
     /// <br/>does not check whether the section is actually present
     /// <inheritdoc cref="BehaviorSummaryHolder"/>
     /// </summary>
-
     public static IConfigurationSection GetSection<T>(this IConfiguration config, string configSectionName)
-    where T : class, new()
+        where T : class, new()
     {
         // code duplicated in ServiceCollectionHelper.AddAllConfigSections
         var topLevelEnvironment = config[ConfigurationSections.Environment];
@@ -73,15 +74,18 @@ public static class ConfigurationHelper
         if (environment is not null)
         {
             var environmentType = sectionEnvironment is not null ? "override" : "topLevel";
-            Log.Information("Loading section {environment}.{section} ({sectionType}). Environment is defined in {environmentType}",
+            Log.Information(
+                "Loading section {environment}.{section} ({sectionType}). Environment is defined in {environmentType}",
                 environment, configSectionName, typeof(T).FullClassName(true), environmentType);
             sectionInstance = sectionInstance.GetSection(environment);
         }
         else
-            Log.Information("Loading section {section} ({sectionType})", configSectionName, typeof(T).FullClassName(true));
+            Log.Information("Loading section {section} ({sectionType})", configSectionName,
+                typeof(T).FullClassName(true));
 
         return sectionInstance;
     }
+
     /// <summary>
     /// extracts the sectionName from the <see cref="ConfigSectionNameAttribute"/> of <typeparamref name="T"/>. if it is not found, a <see cref="InvalidSetupException"/> will be thrown<br/>
     /// <inheritdoc cref="GetSection{T}(IConfiguration,string)"/>
@@ -94,6 +98,7 @@ public static class ConfigurationHelper
                               $"missing {nameof(ConfigSectionNameAttribute)} on class {typeof(T).FullClassName()}");
         return config.GetSection<T>(sectionName.Value);
     }
+
     /// <summary>
     /// extracts the sectionName from the <see cref="ConfigSectionNameAttribute"/> of <typeparamref name="T"/>. if it is not found, a <see cref="InvalidSetupException"/> will be thrown<br/>
     /// <inheritdoc cref="GetSection{T}(IConfiguration,string)"/>

@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 #endif
 
 namespace JLib.AutoMapper;
+
 /// <summary>
 /// to make a property required for mapping, add the <see cref="RequiredAttribute"/> to it or add the required keyword on .net7 or higher
 /// </summary>
@@ -22,7 +23,7 @@ public class MappedDataObjectProfile : Profile
                          !mapInfo.Source.HasCustomAutoMapperProfile
                          && !mapInfo.Destination.HasCustomAutoMapperProfile)
                      .ToArray()
-                 )
+                )
         {
             var (source, destination, _) = mapInfo;
             CreateMap(source.Value, destination.Value);

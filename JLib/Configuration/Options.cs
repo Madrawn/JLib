@@ -2,7 +2,7 @@
 using JLib.Exceptions;
 using JLib.Reflection;
 using JLib.ValueTypes;
-using static JLib.FactoryAttributes.TvtFactoryAttributes;
+using static JLib.Reflection.Attributes.TvtFactoryAttributes;
 
 namespace JLib.Configuration;
 
@@ -10,7 +10,7 @@ public record ConfigSectionName(string Value) : StringValueType(Value)
 {
     public static implicit operator ConfigSectionName(string value) => new(value);
 }
-
+[AttributeUsage(AttributeTargets.Class)]
 public sealed class ConfigSectionNameAttribute : Attribute
 {
     public ConfigSectionNameAttribute(string sectionName)
@@ -28,5 +28,5 @@ public sealed record ConfigurationSectionType(Type Value) : TypeValueType(Value)
 
     public void Initialize(ITypeCache cache, IExceptionManager exceptions)
         => SectionName = Value.GetCustomAttribute<ConfigSectionNameAttribute>()?.SectionName
-        ?? throw NewInvalidTypeException("sectionName not found");
+                         ?? throw NewInvalidTypeException("sectionName not found");
 }

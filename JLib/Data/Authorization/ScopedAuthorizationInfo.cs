@@ -21,6 +21,7 @@ public interface IAuthorizationInfo<TDataObject> : IAuthorizationInfo
             .ThrowExceptionIfNotEmpty("some Data Objects are not Authorized");
         return dataObjects;
     }
+
     TDataObject AndRaiseException(TDataObject dataObject)
     {
         var ex = AndGetException(dataObject);
@@ -28,6 +29,7 @@ public interface IAuthorizationInfo<TDataObject> : IAuthorizationInfo
             throw ex;
         return dataObject;
     }
+
     Exception? AndGetException(TDataObject dataObject)
     {
         if (DataObject(dataObject))
@@ -35,8 +37,8 @@ public interface IAuthorizationInfo<TDataObject> : IAuthorizationInfo
         return new UnauthorizedAccessException(
             $"you are not allowed to access the DataObject {typeof(TDataObject).FullClassName()} {dataObject.Id}");
     }
-
 }
+
 internal class AuthorizationInfo<TDataObject, TDependency1> : IAuthorizationInfo<TDataObject>
     where TDataObject : class, IDataObject
     where TDependency1 : notnull

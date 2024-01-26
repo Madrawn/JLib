@@ -1,9 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace JLib.Helper;
 
 public record TypeAttributeInfo(Type Type, Attribute Attribute);
+
 public static class ReflectionHelper
 {
     // https://alistairevans.co.uk/2020/11/01/detecting-init-only-properties-with-reflection-in-c-9/
@@ -26,17 +28,20 @@ public static class ReflectionHelper
         var setMethodReturnParameterModifiers = setMethod?.ReturnParameter.GetRequiredCustomModifiers();
 
         // Init-only properties are marked with the IsExternalInit type.
-        return setMethodReturnParameterModifiers?.Contains(typeof(System.Runtime.CompilerServices.IsExternalInit)) ?? false;
+        return setMethodReturnParameterModifiers?.Contains(typeof(IsExternalInit)) ?? false;
     }
 
     public static bool HasCustomAttribute(this MemberInfo type, Type attributeType, bool inherit = true)
         => type.GetCustomAttribute(attributeType, inherit) is not null;
+
     public static bool HasCustomAttribute<T>(this MemberInfo type, bool inherit = true)
         where T : Attribute =>
         type.HasCustomAttribute(typeof(T), inherit);
+
     public static T[] GetCustomAttributes<T>(this MemberInfo type, bool inherit = true)
         where T : Attribute =>
         Attribute.GetCustomAttributes(type, typeof(T), inherit).Cast<T>().ToArray();
+
     public static Attribute[] GetCustomAttributes(this MemberInfo type, Type attributeType, bool inherit = true)
         => Attribute.GetCustomAttributes(type, attributeType, inherit).ToArray();
 
@@ -49,9 +54,10 @@ public static class ReflectionHelper
         => src.Where(m => m.HasCustomAttribute<TAttribute>());
 
     #region get property nullabillity
+
     // source: https://stackoverflow.com/questions/58453972/how-to-use-net-reflection-to-check-for-nullable-reference-type
     public static bool IsNullable(this PropertyInfo property) =>
-    IsNullableHelper(property.PropertyType, property.DeclaringType, property.CustomAttributes);
+        IsNullableHelper(property.PropertyType, property.DeclaringType, property.CustomAttributes);
 
     public static bool IsNullable(this FieldInfo field) =>
         IsNullableHelper(field.FieldType, field.DeclaringType, field.CustomAttributes);
@@ -59,7 +65,8 @@ public static class ReflectionHelper
     public static bool IsNullable(this ParameterInfo parameter) =>
         IsNullableHelper(parameter.ParameterType, parameter.Member, parameter.CustomAttributes);
 
-    private static bool IsNullableHelper(Type memberType, MemberInfo? declaringType, IEnumerable<CustomAttributeData> customAttributes)
+    private static bool IsNullableHelper(Type memberType, MemberInfo? declaringType,
+        IEnumerable<CustomAttributeData> customAttributes)
     {
         if (memberType.IsValueType)
             return Nullable.GetUnderlyingType(memberType) != null;
@@ -86,7 +93,8 @@ public static class ReflectionHelper
         for (var type = declaringType; type != null; type = type.DeclaringType)
         {
             var context = type.CustomAttributes
-                .FirstOrDefault(x => x.AttributeType.FullName == "System.Runtime.CompilerServices.NullableContextAttribute");
+                .FirstOrDefault(x =>
+                    x.AttributeType.FullName == "System.Runtime.CompilerServices.NullableContextAttribute");
             if (context != null &&
                 context.ConstructorArguments.Count == 1 &&
                 context.ConstructorArguments[0].ArgumentType == typeof(byte))
@@ -98,6 +106,6 @@ public static class ReflectionHelper
         // Couldn't find a suitable attribute
         return false;
     }
-    #endregion
 
+    #endregion
 }

@@ -2,7 +2,7 @@
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
-using static JLib.FactoryAttributes.TvtFactoryAttributes;
+using static JLib.Reflection.Attributes.TvtFactoryAttributes;
 
 namespace JLib.Data.Authorization;
 
@@ -10,12 +10,14 @@ namespace JLib.Data.Authorization;
 public record AuthorizationProfileType(Type Value) : TypeValueType(Value), IPostNavigationInitializedType
 {
     public AuthorizationProfile Instance { get; private set; } = null!;
+
     public void Initialize(ITypeCache cache, IExceptionManager exceptions)
     {
         Instance = Activator.CreateInstance(Value, new object[] { cache })?.As<AuthorizationProfile>()
                    ?? throw new("instance could not be created");
     }
 }
+
 /// <summary>
 /// can be derived from to add unboundAuthorization to an entity
 /// <br/> the resulting unboundAuthorization can be applied using the <see cref="IAuthorizationManager"/>
@@ -24,6 +26,7 @@ public abstract class AuthorizationProfile
 {
     private readonly ITypeCache _typeCache;
     private readonly List<IUnboundAuthorizationInfo> _authorizationProvider = new();
+
     internal IReadOnlyCollection<IUnboundAuthorizationInfo> Build()
         => _authorizationProvider;
 
@@ -31,6 +34,7 @@ public abstract class AuthorizationProfile
     {
         _typeCache = typeCache;
     }
+
     #region AddAuthorization
 
     /// <summary>
@@ -47,7 +51,9 @@ public abstract class AuthorizationProfile
     )
         where TDataObject : class, IDataObject
         where TS1 : notnull
-        => _authorizationProvider.Add(new UnboundAuthorizationInfo<TDataObject, TS1>(queryPredicate, dataObjectPredicate, _typeCache));
+        => _authorizationProvider.Add(
+            new UnboundAuthorizationInfo<TDataObject, TS1>(queryPredicate, dataObjectPredicate, _typeCache));
+
     /// <summary>
     /// adds a authorization rule for all <typeparamref name="TDataObject"/>
     /// the <paramref name="predicate"/> will be
@@ -82,9 +88,8 @@ public abstract class AuthorizationProfile
     }
 
     #endregion
-
-
 }
+
 internal class ParToConstVisitor : ExpressionVisitor
 {
     private readonly ParameterExpression _par;
@@ -95,6 +100,7 @@ internal class ParToConstVisitor : ExpressionVisitor
         _par = par;
         _const = @const;
     }
+
     protected override Expression VisitParameter(ParameterExpression node)
     {
         return node == _par

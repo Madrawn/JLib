@@ -1,22 +1,31 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using AutoMapper.Internal;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
-using JLib.ValueTypes;
-using static JLib.FactoryAttributes.TvtFactoryAttributes;
+using static JLib.Reflection.Attributes.TvtFactoryAttributes;
 
 namespace JLib.DataGeneration;
 
 [IsDerivedFrom(typeof(DataPackage)), NotAbstract]
-public record DataPackageType(Type Value) : TypeValueType(Value);
+public record DataPackageType(Type Value) : TypeValueType(Value), IValidatedType
+{
+    public void Validate(ITypeCache cache, TvtValidator value)
+    {
+        value.ShouldBeSealed("a DataPackage has to be either Sealed or Abstract.");
+
+        value.ValidateProperties(p => p.IsPublic(), p => p
+            .ShouldHavePublicInit()
+            .ShouldHavePublicGet());
+    }
+}
 
 public abstract class DataPackage
 {
     public string GetInfoText(string propertyName)
     {
         var property = GetType().GetProperty(propertyName) ??
-                                      throw new InvalidSetupException(
-                                          $"property {propertyName} not found on {GetType().FullClassName()}");
+                       throw new InvalidSetupException(
+                           $"property {propertyName} not found on {GetType().FullClassName()}");
         return new DataPackageValues.IdGroupName(property).Value + "." + property.Name;
     }
 
@@ -33,21 +42,10 @@ public abstract class DataPackage
             case DataPackageInitState.Initializing:
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(packageManager.InitState));
+                throw new IndexOutOfRangeException(nameof(packageManager.InitState));
         }
-
 
         foreach (var propertyInfo in GetType().GetProperties())
-        {
-            if (propertyInfo.GetMethod?.IsPublic is not true)
-                continue;
-            if (propertyInfo.CanWrite is false)
-                throw new(propertyInfo.DeclaringType?.FullClassName() + "." + propertyInfo.Name +
-                          " can not be written");
-            if (!propertyInfo.IsInit())
-                throw new(propertyInfo.DeclaringType?.FullClassName() + "." + propertyInfo.Name +
-                          " set method must be init");
             packageManager.SetIdPropertyValue(this, propertyInfo);
-        }
     }
 }

@@ -4,6 +4,7 @@ using JLib.Reflection;
 using Serilog;
 
 namespace JLib.Helper;
+
 public static class AutoMapperHelper
 {
     public static void AddProfiles(this IMapperConfigurationExpression builder, ITypeCache typeCache)

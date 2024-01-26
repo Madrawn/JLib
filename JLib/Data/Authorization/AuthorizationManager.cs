@@ -12,7 +12,6 @@ public interface IAuthorizationManager
         where TDo : class, IDataObject;
 
     public IAuthorizationInfo Get(DataObjectType type, IServiceScope requestScope);
-
 }
 
 public class AuthorizationManager : IAuthorizationManager
@@ -31,12 +30,11 @@ public class AuthorizationManager : IAuthorizationManager
             .GetValueOrAdd(
                 type.Value,
                 () => Activator.CreateInstance(
-                    typeof(EmptyUnboundAuthorizationInfo<>)
-                      .MakeGenericType(type.Value), _typeCache
-                  )?.CastTo<IUnboundAuthorizationInfo>()
-              ?? throw new InvalidSetupException("default authInfo could not be created")
+                          typeof(EmptyUnboundAuthorizationInfo<>)
+                              .MakeGenericType(type.Value), _typeCache
+                      )?.CastTo<IUnboundAuthorizationInfo>()
+                      ?? throw new InvalidSetupException("default authInfo could not be created")
             ).Bind(requestScope);
-
     }
 
     public AuthorizationManager(ITypeCache typeCache)

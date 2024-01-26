@@ -29,13 +29,13 @@
           {
             "Type": "JLib.Exceptions.JLibAggregateException",
             "Message": [
-              "Type validation failed"
+              "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestInvalidRepositoryR is not a valid JLib.Reflection.RepositoryType"
             ],
             "InnerExceptions": [
               {
                 "Type": "JLib.Exceptions.InvalidTypeException",
                 "message": [
-                  "Error while initializing RepositoryType with JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestInvalidRepositoryR: Should not implement JLib.Data.ISourceDataProviderR<>"
+                  "Should not implement JLib.Data.ISourceDataProviderR<>"
                 ]
               }
             ]

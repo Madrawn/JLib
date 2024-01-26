@@ -2,7 +2,7 @@
 using JLib.Data;
 using JLib.Helper;
 using JLib.Reflection;
-using static JLib.FactoryAttributes.TvtFactoryAttributes;
+using static JLib.Reflection.Attributes.TvtFactoryAttributes;
 
 namespace JLib.HotChocolate;
 

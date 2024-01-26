@@ -7,6 +7,7 @@ public class TvtNavigationFailedException : InvalidSetupException
     public TvtNavigationFailedException(string message) : base(message)
     {
     }
+
     public TvtNavigationFailedException(string message, Exception innerException) : base(message, innerException)
     {
     }

@@ -3,6 +3,7 @@ using JLib.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace JLib.Data.Authorization;
+
 public static class AuthorizationExtensions
 {
     /// <summary>
@@ -24,6 +25,7 @@ public static class AuthorizationExtensions
                 p => p.GetRequiredService<IAuthorizationManager>()
                     .Get(dataObjectType, p.GetRequiredService<IServiceScope>()));
         }
+
         return services;
     }
 }

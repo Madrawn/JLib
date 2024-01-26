@@ -10,10 +10,10 @@
           "UnmappedAttribute"
         ],
         "ImplementedInterfaces": [
-          "IEquatable<ValueType<Type>>",
-          "ITypeValueType",
+          "IEquatable<TypeCacheTests.TypeValueTypeWithoutFactoryAttribute.InvalidTypeValueType>",
           "IEquatable<TypeValueType>",
-          "IEquatable<TypeCacheTests.TypeValueTypeWithoutFactoryAttribute.InvalidTypeValueType>"
+          "IEquatable<ValueType<Type>>",
+          "ITypeValueType"
         ]
       }
     }
@@ -39,7 +39,7 @@
               {
                 "Type": "JLib.Exceptions.InvalidTypeException",
                 "message": [
-                  "Error while initializing ValueTypeForTypeValueTypes with JLib.Tests.Reflection.TypeCacheTests.TypeValueTypeWithoutFactoryAttribute.InvalidTypeValueType: InvalidTypeValueType does not have any filter attribute added"
+                  "InvalidTypeValueType does not have any filter attribute added"
                 ]
               }
             ]

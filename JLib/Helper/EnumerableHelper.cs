@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
 
 namespace JLib.Helper;
 
@@ -15,8 +13,8 @@ public static class EnumerableHelper
         if (src is IReadOnlyCollection<T> col)
             return col.Count > 1;
         using var e = src.GetEnumerator();
-        e.MoveNext();//returns true if count >=1
-        return e.MoveNext();// returns true if count >=2
+        e.MoveNext(); //returns true if count >=1
+        return e.MoveNext(); // returns true if count >=2
     }
 
     /// <summary>
@@ -43,16 +41,19 @@ public static class EnumerableHelper
 
     public static IEnumerable<T> Except<T>(this IEnumerable<T> col, params T[] values)
         => col.Except(values.AsEnumerable());
+
     public static void RemoveWhere<T>(this ICollection<T> col, Func<T, bool> filter)
     {
         foreach (var i in col.Where(filter).ToArray())
             col.Remove(i);
     }
+
     public static void RemoveWhere<T>(this IList<T> col, Func<T, bool> filter)
     {
         foreach (var i in col.Where(filter).ToArray())
             col.Remove(i);
     }
+
     public static void Remove<T>(this IList<T> col, IEnumerable<T> toRemove)
     {
         foreach (var i in toRemove)
@@ -66,10 +67,12 @@ public static class EnumerableHelper
         this IDictionary<TKey, TValue> source)
         where TKey : notnull
         => new(source);
+
     public static ConcurrentDictionary<TKey, TValue> ToConcurrentDictionary<TKey, TValue>(
         this IEnumerable<TValue> col, Func<TValue, TKey> keySelector)
         where TKey : notnull
         => new(col.ToDictionary(keySelector));
+
     public static ConcurrentDictionary<TKey, TValue> ToConcurrentDictionary<TIn, TKey, TValue>(
         this IEnumerable<TIn> col, Func<TIn, TKey> keySelector, Func<TIn, TValue> valueSelector)
         where TKey : notnull

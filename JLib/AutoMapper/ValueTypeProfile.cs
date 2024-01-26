@@ -26,8 +26,9 @@ public class ValueTypeProfile : Profile
         public static TValueType CtorPlaceholder(TNative Value) =>
             throw new InvalidSetupException("this should have been replaced");
 
-        private static readonly MethodInfo PlaceholderMi = typeof(CtorReplacementExpressionVisitor<TValueType, TNative>).GetMethod(nameof(CtorPlaceholder))
-                                                            ?? throw new InvalidSetupException("PlaceholderMethodInfo not found");
+        private static readonly MethodInfo PlaceholderMi =
+            typeof(CtorReplacementExpressionVisitor<TValueType, TNative>).GetMethod(nameof(CtorPlaceholder))
+            ?? throw new InvalidSetupException("PlaceholderMethodInfo not found");
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
@@ -35,7 +36,7 @@ public class ValueTypeProfile : Profile
                 return node;
 
             var ctor = typeof(TValueType).GetConstructor(new[] { typeof(TNative) })
-                ?? throw new InvalidSetupException("valueType ctor not found");
+                       ?? throw new InvalidSetupException("valueType ctor not found");
             return Expression.New(ctor, node.Arguments);
         }
 
@@ -47,16 +48,16 @@ public class ValueTypeProfile : Profile
         where TValueType : ValueType<TNative>
         where TNative : class
     {
-
         public static void AddMapping(Profile profile)
         {
-            Log.ForContext<ValueTypeProfile>().Verbose("            {tvt}? => {tNative}?", typeof(TValueType).Name, typeof(TNative).Name);
+            Log.ForContext<ValueTypeProfile>().Verbose("            {tvt}? => {tNative}?", typeof(TValueType).Name,
+                typeof(TNative).Name);
             profile.CreateMap<TValueType?, TNative?>().ConvertUsing(vt => vt == null ? null : vt.Value);
-            Log.ForContext<ValueTypeProfile>().Verbose("            {tNative}? => {tvt}?", typeof(TNative).Name, typeof(TValueType).Name);
+            Log.ForContext<ValueTypeProfile>().Verbose("            {tNative}? => {tvt}?", typeof(TNative).Name,
+                typeof(TValueType).Name);
             profile.CreateMap<TNative?, TValueType?>().ConvertUsing(
                 new CtorReplacementExpressionVisitor<TValueType?, TNative?>().Visit(
-                v => v == null ? null :
-                    CtorReplacementExpressionVisitor<TValueType?, TNative?>.CtorPlaceholder(v)
+                    v => v == null ? null : CtorReplacementExpressionVisitor<TValueType?, TNative?>.CtorPlaceholder(v)
                 ));
         }
     }
@@ -65,21 +66,24 @@ public class ValueTypeProfile : Profile
         where TValueType : ValueType<TNative>
         where TNative : struct
     {
-
         public static void AddMapping(Profile profile)
         {
-            Log.ForContext<ValueTypeProfile>().Verbose("            {tvt} => {tNative}", typeof(TValueType).Name, typeof(TNative).Name);
+            Log.ForContext<ValueTypeProfile>().Verbose("            {tvt} => {tNative}", typeof(TValueType).Name,
+                typeof(TNative).Name);
             profile.CreateMap<TValueType, TNative>().ConvertUsing(vt => vt.Value);
-            Log.ForContext<ValueTypeProfile>().Verbose("            {tNative} => {tvt}", typeof(TNative).Name, typeof(TValueType).Name);
+            Log.ForContext<ValueTypeProfile>().Verbose("            {tNative} => {tvt}", typeof(TNative).Name,
+                typeof(TValueType).Name);
             profile.CreateMap<TNative, TValueType>().ConvertUsing(
                 new CtorReplacementExpressionVisitor<TValueType, TNative>().Visit(
                     v =>
                         CtorReplacementExpressionVisitor<TValueType, TNative>.CtorPlaceholder(v)
                 ));
 
-            Log.ForContext<ValueTypeProfile>().Verbose("            {tvt} => {tNative}", typeof(TValueType).Name, typeof(TNative?).FullClassName());
+            Log.ForContext<ValueTypeProfile>().Verbose("            {tvt} => {tNative}", typeof(TValueType).Name,
+                typeof(TNative?).FullClassName());
             profile.CreateMap<TValueType, TNative?>().ConvertUsing(vt => vt == null ? null : vt.Value);
-            Log.ForContext<ValueTypeProfile>().Verbose("            {tNative} => {tvt}", typeof(TNative?).FullClassName(), typeof(TValueType).Name);
+            Log.ForContext<ValueTypeProfile>().Verbose("            {tNative} => {tvt}",
+                typeof(TNative?).FullClassName(), typeof(TValueType).Name);
             profile.CreateMap<TNative?, TValueType?>().ConvertUsing(
                 new CtorReplacementExpressionVisitor<TValueType?, TNative?>().Visit(
                     v => v.HasValue
@@ -90,28 +94,27 @@ public class ValueTypeProfile : Profile
     }
 
 
-
-
-
-
-
-
     public ValueTypeProfile(ITypeCache cache)
     {
         foreach (var valueType in cache.All<ValueTypeType>(vt => vt is { Mapped: true }))
         {
             if (valueType.NativeType.IsClass)
             {
-                Log.ForContext<ValueTypeProfile>().Debug("        adding map for class-valueType {valueType}", valueType.Name);
-                var addMapping = typeof(ClassValueTypeConversions<,>).MakeGenericType(valueType.Value, valueType.NativeType)
-                        .GetMethod(nameof(ClassValueTypeConversions<ValueType<Ignored>, Ignored>.AddMapping)) ??
-                    throw new InvalidSetupException("AddProfileMethodNotFound");
+                Log.ForContext<ValueTypeProfile>()
+                    .Debug("        adding map for class-valueType {valueType}", valueType.Name);
+                var addMapping = typeof(ClassValueTypeConversions<,>)
+                                     .MakeGenericType(valueType.Value, valueType.NativeType)
+                                     .GetMethod(
+                                         nameof(ClassValueTypeConversions<ValueType<Ignored>, Ignored>.AddMapping)) ??
+                                 throw new InvalidSetupException("AddProfileMethodNotFound");
                 addMapping.Invoke(null, new object?[] { this });
             }
             else
             {
-                Log.ForContext<ValueTypeProfile>().Debug("        adding map for struct-valueType {valueType}", valueType.Name);
-                var addMapping = typeof(StructValueTypeConversions<,>).MakeGenericType(valueType.Value, valueType.NativeType)
+                Log.ForContext<ValueTypeProfile>()
+                    .Debug("        adding map for struct-valueType {valueType}", valueType.Name);
+                var addMapping = typeof(StructValueTypeConversions<,>)
+                                     .MakeGenericType(valueType.Value, valueType.NativeType)
                                      .GetMethod(nameof(StructValueTypeConversions<ValueType<int>, int>.AddMapping)) ??
                                  throw new InvalidSetupException("AddProfileMethodNotFound");
                 addMapping.Invoke(null, new object?[] { this });

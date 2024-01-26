@@ -7,10 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
-using JLib.FactoryAttributes;
 using JLib.Testing;
 using Snapshooter;
 using Snapshooter.Xunit;
+using JLib.Reflection.Attributes;
 
 namespace JLib.Tests.Reflection;
 /// <summary>
@@ -37,7 +37,7 @@ public class TypeCacheTests
         public record DemoTypeValueTypeB(Type Value) : TypeValueType(Value);
         public class InconclusiveType : IDemoTypeA, IDemoTypeB { }
     }
-    
+
 
     #region testing logic
     /// <summary>
@@ -79,7 +79,7 @@ public class TypeCacheTests
                                     {
                                         { "Kind", t.IsClass?"Class":t.IsValueType?"struct":t.IsInterface?"Interface":"other"},
                                         { "Attributes", t.GetCustomAttributes<Attribute>().Select(a=>a.GetType().FullClassName()) },
-                                        { "ImplementedInterfaces", t.GetInterfaces().Select(t2=>t2.FullClassName())},
+                                        { "ImplementedInterfaces", t.GetInterfaces().Select(t2=>t2.FullClassName()).OrderBy(i=>i)},
                                     }
                                 )
                         }
@@ -95,7 +95,7 @@ public class TypeCacheTests
                 },
                 {
                     "KnownTypeValueTypes",
-                    cache.KnownTypeValueTypes.Select(t=>t.Name)
+                    cache.KnownTypeValueTypes.Select(t=>t.Name).OrderBy(x=>x)
                 }
             }.MatchSnapshot(new SnapshotNameExtension(testName));
     }

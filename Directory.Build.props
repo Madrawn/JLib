@@ -1,13 +1,36 @@
 <Project>
 	<PropertyGroup>
+
+        <Version>0.1.0</Version>
+
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
         <WarningsAsErrors>Nullable</WarningsAsErrors>
-		<Company>-</Company>
+        <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+
+        <Company>-</Company>
 		<Authors>Marcel Rehkemper</Authors>
-		<Version>0.0.0</Version>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<AssemblyName>$(MSBuildProjectName)</AssemblyName>
-		<RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+		
+        <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+        <Title>$(MSBuildProjectName)</Title>
+        <IncludeSymbols>True</IncludeSymbols>
+        <RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+        <RepositoryUrl>https://github.com/JonnyIV/JLib</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/jonnyIV/jlib</PackageProjectUrl>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
+        <PackageReadmeFile>$(MSBuildProjectName).Documentation.md</PackageReadmeFile>
 	</PropertyGroup>
+
+    <ItemGroup>
+        <None Include="LICENSE">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+        <None Include="$(MSBuildProjectName).Documentation.md">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+    </ItemGroup>
+
 </Project>

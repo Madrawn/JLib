@@ -4,7 +4,8 @@ public record IntValueType(int Value) : ValueType<int>(Value)
 {
     protected IntValueType(int Value, Action<IntValidator> validator) : this(Value)
     {
-
+        var val = new IntValidator(Value, GetType().Name);
+        validator(val);
     }
 }
 
@@ -20,18 +21,21 @@ public class IntValidator : ValueValidator<int>
             AddError($"value is smaller than {minimum}");
         return this;
     }
+
     public IntValidator BeLessOrEqualThan(int maximum)
     {
         if (Value > maximum)
             AddError($"value is greater than {maximum}");
         return this;
     }
+
     public IntValidator BeGreaterThan(int minimum)
     {
         if (Value <= minimum)
             AddError($"value is smaller than or equal to {minimum}");
         return this;
     }
+
     public IntValidator BeLessThan(int maximum)
     {
         if (Value >= maximum)
@@ -44,6 +48,7 @@ public class IntValidator : ValueValidator<int>
     /// </summary>
     public IntValidator NotBeNegative()
         => BeGreaterOrEqualThan(0);
+
     /// <summary>
     /// values > 0 are valid
     /// </summary>

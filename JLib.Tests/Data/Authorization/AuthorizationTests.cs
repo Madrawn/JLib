@@ -5,7 +5,6 @@ using JLib.DataGeneration;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
-using JLib.Testing;
 using JLib.ValueTypes;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,8 +14,8 @@ public class AuthorizationTests
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IDataProviderRw<TestDataObject> _dataProvider;
-    private readonly IDataPackageRetriever _dataPackages;
     private readonly TestAuthorizationCondition _authEnabler;
+    private readonly TestObjectDataPackage _dataPackage;
 
     public AuthorizationTests()
     {
@@ -29,6 +28,7 @@ public class AuthorizationTests
                 TypePackage.GetNested<AuthorizationTests>()
                 )
             .AddSingleton<TestAuthorizationCondition>()
+            .AddDataPackages(typeCache)
             .AddScopeProvider()
             .AddDataAuthorization(typeCache)
             .AddAutoMapper(b => { b.CreateMap<Guid, Guid>(); })
@@ -36,11 +36,11 @@ public class AuthorizationTests
                 typeCache, null, null, null, exceptions)
             ;
         _serviceProvider = services.BuildServiceProvider();
-        _dataPackages = DataPackageManager
-            .ApplyPackages(_serviceProvider, p => p.Include<TestObjectDataPackage>());
+        _serviceProvider.IncludeDataPackages<TestObjectDataPackage>();
         _dataProvider = _serviceProvider.GetRequiredService<IDataProviderRw<TestDataObject>>();
         _authEnabler = _serviceProvider.GetRequiredService<TestAuthorizationCondition>();
         _authEnabler.AuthorizationEnabled = true;
+        _dataPackage = _serviceProvider.GetRequiredService<TestObjectDataPackage>();
     }
 
     [Fact]
@@ -60,22 +60,20 @@ public class AuthorizationTests
     [Fact]
     public void GetByIdWorks()
     {
-        var id = _dataPackages.GetPackage<TestObjectDataPackage>().FirstAuthorizedId;
-        _dataProvider.Get(id)
+        _dataProvider.Get(_dataPackage.FirstAuthorizedId)
             .Id
             .Should()
-            .Be(id);
+            .Be(_dataPackage.FirstAuthorizedId);
     }
     [Fact]
     public void GetByIdUnauthorizedWorks()
     {
-        var id = _dataPackages.GetPackage<TestObjectDataPackage>().FirstUnauthorizedId;
         var f = () =>
         {
-            _dataProvider.Get(id)
+            _dataProvider.Get(_dataPackage.FirstUnauthorizedId)
                 .Id
                 .Should()
-                .Be(id);
+                .Be(_dataPackage.FirstUnauthorizedId);
         };
         f.Should().Throw<InvalidOperationException>();
     }
@@ -83,9 +81,9 @@ public class AuthorizationTests
     [Fact]
     public void GetByIdsUnauthorizedWorks()
     {
-        var id1 = _dataPackages.GetPackage<TestObjectDataPackage>().FirstAuthorizedId.Value;
-        var idU1 = _dataPackages.GetPackage<TestObjectDataPackage>().FirstUnauthorizedId.Value;
-        var idU2 = _dataPackages.GetPackage<TestObjectDataPackage>().SecondAuthorizedId.Value;
+        var id1 = _dataPackage.FirstAuthorizedId.Value;
+        var idU1 = _dataPackage.FirstUnauthorizedId.Value;
+        var idU2 = _dataPackage.SecondAuthorizedId.Value;
         var f = () =>
         {
             _dataProvider.Get(new[] { id1, idU1, idU2 });
@@ -95,13 +93,13 @@ public class AuthorizationTests
     [Fact]
     public void ContainsUnauthorized()
     {
-        var id = _dataPackages.GetPackage<TestObjectDataPackage>().FirstUnauthorizedId.Value;
+        var id = _dataPackage.FirstUnauthorizedId.Value;
         _dataProvider.Contains(id).Should().BeFalse();
     }
     [Fact]
     public void ContainsAuthorized()
     {
-        var id = _dataPackages.GetPackage<TestObjectDataPackage>().FirstAuthorizedId.Value;
+        var id = _dataPackage.FirstAuthorizedId.Value;
         _dataProvider.Contains(id).Should().BeTrue();
     }
     #region test classes
@@ -119,15 +117,16 @@ public class AuthorizationTests
     }
     public class TestObjectDataPackage : DataPackage
     {
-        public TestDataObjectId FirstAuthorizedId { get; protected set; } = null!;
-        public TestDataObjectId SecondAuthorizedId { get; protected set; } = null!;
-        public TestDataObjectId ThirdAuthorizedId { get; protected set; } = null!;
-        public TestDataObjectId FirstUnauthorizedId { get; protected set; } = null!;
-        public TestDataObjectId SecondUnAuthorizedId { get; protected set; } = null!;
-        public TestDataObjectId ThirdUnAuthorizedId { get; protected set; } = null!;
-        public TestObjectDataPackage(IDataPackageStore packageStore) : base(packageStore)
+        public TestDataObjectId FirstAuthorizedId { get; init; } = null!;
+        public TestDataObjectId SecondAuthorizedId { get; init; } = null!;
+        public TestDataObjectId ThirdAuthorizedId { get; init; } = null!;
+        public TestDataObjectId FirstUnauthorizedId { get; init; } = null!;
+        public TestDataObjectId SecondUnAuthorizedId { get; init; } = null!;
+        public TestDataObjectId ThirdUnAuthorizedId { get; init; } = null!;
+        public TestObjectDataPackage(IDataPackageManager packageManager, IDataProviderRw<TestDataObject> dataProvider) : base(packageManager)
         {
-            packageStore.AddEntities(new TestDataObject[]
+            
+            dataProvider.Add(new TestDataObject[]
             {
                 new()
                 {

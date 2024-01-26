@@ -1,6 +1,7 @@
 ﻿using JLib.Data;
 
 namespace JLib.Helper;
+
 public static class DataProviderHelper
 {
     /// <summary>
@@ -20,8 +21,8 @@ public static class DataProviderHelper
         catch (Exception e)
         {
             properties.Add("error", "data provider could not be retrieved");
-            properties.Add("exception message",e.Message);
-            properties.Add("exception ToString",e.ToString());
+            properties.Add("exception message", e.Message);
+            properties.Add("exception ToString", e.ToString());
             return properties;
         }
 
@@ -42,12 +43,15 @@ public static class DataProviderHelper
 
         properties.Add("implementation", implementationType.FullClassName());
 
-        properties.Add("implemented services", implementationType.GetInterfaces().Select(i => i.FullClassName()).ToArray());
+        properties.Add("implemented services",
+            implementationType.GetInterfaces().Select(i => i.FullClassName()).ToArray());
 
 
         var ctor = implementationType.GetConstructors().First();
         var ctorParams = ctor.GetParameters();
-        properties.Add("service dependencies", ctorParams.ToDictionary(param => param.Name ?? "", param => AnalyzeDependencies(param.ParameterType, serviceProvider)));
+        properties.Add("service dependencies",
+            ctorParams.ToDictionary(param => param.Name ?? "",
+                param => AnalyzeDependencies(param.ParameterType, serviceProvider)));
 
         return properties;
     }

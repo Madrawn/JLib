@@ -10,5 +10,6 @@ public class CastDataProviderR<TFrom, TTo> : DataProviderRBase<TTo>, ISourceData
     {
         _srcProvider = srcProvider;
     }
+
     public override IQueryable<TTo> Get() => _srcProvider.Get().Cast<TTo>();
 }

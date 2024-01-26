@@ -3,7 +3,6 @@ using JLib.Helper;
 
 namespace JLib.Exceptions;
 
-
 /// <summary>
 ///     baseClass for all custom exceptions.
 ///     can be used to handle custom exceptions separate
@@ -23,6 +22,7 @@ public abstract class JLibException : Exception
     {
     }
 }
+
 /// <summary>
 ///     baseClass for all custom exceptions.
 ///     can be used to handle custom exceptions separate
@@ -47,8 +47,10 @@ public class JLibAggregateException : AggregateException
                         string.Join(Environment.NewLine,
                             group.OrderBy(ex => ex.Message)
                                 .Select(ex =>
-                                (ex is NullReferenceException ? ex.ToString() : ex.Message.Replace(Environment.NewLine, Environment.NewLine + "│  "))
-                            )
+                                    (ex is NullReferenceException
+                                        ? ex.ToString()
+                                        : ex.Message.Replace(Environment.NewLine, Environment.NewLine + "│  "))
+                                )
                         ) + Environment.NewLine
                     )
             )

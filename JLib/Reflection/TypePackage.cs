@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using JLib.Helper;
@@ -13,21 +14,24 @@ public interface ITypePackage
     /// <summary>
     /// The <see cref="Types"/> of this package and all its <see cref="Children"/>
     /// </summary>
-    public IEnumerable<Type> Content { get; }
+    public ImmutableHashSet<Type> GetContent();
     /// <summary>
     /// other nested packages, this could be peer dependencies, the assemblies of a directory or any other group of packages
     /// </summary>
     public IEnumerable<ITypePackage> Children { get; }
+
     /// <summary>
     /// The types which are directly defined in this package.
     /// </summary>
     public IEnumerable<Type> Types { get; }
+
     /// <summary>
     /// a short description of the contents of the type package.<br/>
     /// {0} is replaced by the number of <see cref="Children"/><br/>
     /// {1} is replaced by the number of <see cref="Types"/>
     /// </summary>
     public string DescriptionTemplate { get; }
+
     /// <summary>
     /// returns a type package which is a combination of the given packages
     /// </summary>
@@ -35,6 +39,7 @@ public interface ITypePackage
 
     public string ToString(bool includeTypes);
 }
+
 /// <summary>
 /// Contains Content to be used by the <see cref="TypeCache"/>
 /// </summary>
@@ -45,37 +50,46 @@ public class TypePackage : ITypePackage
 
     public static ITypePackage Get(params Assembly[] assemblies)
         => Get(assemblies.CastTo<IReadOnlyCollection<Assembly>>());
+
     public static ITypePackage Get(IReadOnlyCollection<Assembly> assemblies)
         => new TypePackage(null, assemblies.Select(a => Get(a)), "{1} Assemblies");
+
     public static ITypePackage Get(params Type[] types)
         => Get(types.CastTo<IReadOnlyCollection<Type>>());
+
     public static ITypePackage Get(IReadOnlyCollection<Type> types)
         => new TypePackage(types, null, "{1} Types");
+
     /// <summary>
     /// creates a <see cref="ITypePackage"/> which contains all types nested in the given types, but not the types themselves.<br/>
     /// this can be usefull for testing purposes
     /// </summary>
     public static ITypePackage GetNested(params Type[] types)
-        => new TypePackage(types.SelectMany(x => x.GetNestedTypes()), null, "nested types of " + string.Join(", ", types.Select(x => x.FullClassName())));
+        => new TypePackage(types.SelectMany(x => x.GetNestedTypes()), null,
+            "nested types of " + string.Join(", ", types.Select(x => x.FullClassName())));
 
     /// <summary>
     /// creates a <see cref="ITypePackage"/> which contains all types nested in <typeparamref nameTemplate="T"/> but not <typeparamref nameTemplate="T"/> itself.
     /// </summary>
     public static ITypePackage GetNested<T>()
         => GetNested(typeof(T));
-    public static ITypePackage Get(IEnumerable<Assembly> assemblies, IEnumerable<Type> types, string name = "{0} Assemblies and {1} types")
+
+    public static ITypePackage Get(IEnumerable<Assembly> assemblies, IEnumerable<Type> types,
+        string name = "{0} Assemblies and {1} types")
         => new TypePackage(types, assemblies.Select(a => Get(a)), name);
 
     public static ITypePackage Get(params ITypePackage[] packages)
         => Get(packages.AsEnumerable());
-    [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+
     public static ITypePackage Get(IEnumerable<ITypePackage> packages, string name = "{0} Packages")
+        // ReSharper disable  PossibleMultipleEnumeration
         => packages.Multiple()
             ? new TypePackage(
                 null,
                 packages,
                 name)
             : packages.Single();
+    // ReSharper restore PossibleMultipleEnumeration
 
     /// <summary>
     /// creates a <see cref="ITypePackage"/> which contains all types of all assemblies in the given directory which match any of the given prefixes.
@@ -89,7 +103,6 @@ public class TypePackage : ITypePackage
         string[] includedPrefixes,
         SearchOption searchOption = SearchOption.TopDirectoryOnly)
     {
-
         directory ??= AppDomain.CurrentDomain.BaseDirectory;
         var assemblyNames = Directory.EnumerateFiles(directory, "*.dll", searchOption).Where(file =>
         {
@@ -100,6 +113,7 @@ public class TypePackage : ITypePackage
         var assemblies = assemblyNames.Select(Assembly.Load).ToArray();
         return Get(assemblies);
     }
+
     private TypePackage(IEnumerable<Type>? types, IEnumerable<ITypePackage>? children, string nameTemplate)
     {
         Types = types ?? Enumerable.Empty<Type>();
@@ -111,12 +125,17 @@ public class TypePackage : ITypePackage
     public IEnumerable<ITypePackage> Children { get; }
     public IEnumerable<Type> Types { get; }
     public string DescriptionTemplate { get; }
-    public IEnumerable<Type> Content => Children.SelectMany(x => x.Content).Concat(Types);
+    public ImmutableHashSet<Type> GetContent() => GetContent(this).ToImmutableHashSet();
+
+    private static IEnumerable<Type> GetContent(ITypePackage package)
+        => package.Children.SelectMany(GetContent).Concat(package.Types).Distinct();
+
     public ITypePackage Combine(params ITypePackage[] packages)
         => Get(packages.Append(this));
 
     public override string ToString()
         => ToString(false);
+
     public string ToString(bool includeTypes)
     {
         var sb = new StringBuilder();
@@ -127,25 +146,19 @@ public class TypePackage : ITypePackage
     static void ToString(ITypePackage package, int indent, StringBuilder sb, bool includeTypes)
     {
         var indentStr = new string(' ', indent * 2);
-        sb.Append(indentStr).Append('┐').AppendLine(string.Format(package.DescriptionTemplate, package.Children.Count(), package.Types.Count()));
+        sb.Append(indentStr).Append('┐').AppendLine(string.Format(package.DescriptionTemplate, package.Children.Count(),
+            package.Types.Count()));
         sb.Append(indentStr).Append("├ Types:").AppendLine(package.Types.Count().ToString());
-        if (package.Types.Count() <= 10)
+        if (package.Types.Count() <= 10 || includeTypes)
         {
             foreach (var type in package.Types)
                 sb.Append(indentStr).Append("│   ").AppendLine(type.FullClassName());
         }
-        sb.Append(indentStr).Append("├ Types Total:").AppendLine(package.Content.Count().ToString());
-        if (includeTypes)
+        if (package.Children.Any())
         {
-            sb.Append(indentStr).AppendLine("├┐");
-            foreach (var type in package.Types)
-            {
-                sb.Append(indentStr).Append("│├ ").AppendLine(type.FullClassName());
-            }
+            sb.Append(indentStr).AppendLine("├ Children:");
+            foreach (var child in package.Children)
+                ToString(child, indent + 1, sb, includeTypes);
         }
-        sb.Append(indentStr).AppendLine("├ Children:");
-        foreach (var child in package.Children)
-            ToString(child, indent + 1, sb, includeTypes);
-
     }
 }

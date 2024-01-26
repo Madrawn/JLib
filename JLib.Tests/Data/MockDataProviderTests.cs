@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using JLib.Data;
 using JLib.Exceptions;
-using JLib.FactoryAttributes;
 using JLib.Helper;
 using JLib.Reflection;
+using JLib.Reflection.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace JLib.Tests.Data;
@@ -16,8 +16,8 @@ public class InMemoryDataProviderTests
 {
     private readonly IDataProviderRw<TestEntity> _dataProvider;
 
-    [TvtFactoryAttributes.Implements(typeof(ITestEntity))]
-    public record TestEntityType(Type Value) : DataObjectType(Value);
+    [TvtFactoryAttributes.Implements(typeof(ITestEntity)), TvtFactoryAttributes.Priority(NextPriority - 1000)]
+    public record TestEntityType(Type Value) : EntityType(Value);
     public interface ITestEntity : IEntity
     {
 
