@@ -1,5 +1,6 @@
-﻿using JLib.DataGeneration.Examples.Models;
-using JLib.DataGeneration.Examples.SystemUnderTest;
+﻿using JLib.DataGeneration.Examples.Setup.Models;
+using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
+
 #pragma warning disable CS8604 // Possible null reference argument.
 #pragma warning disable CS8601 // Possible null reference assignment.
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

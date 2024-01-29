@@ -1,5 +1,5 @@
-﻿using JLib.DataGeneration.Examples.Models;
-using JLib.DataGeneration.Examples.SystemUnderTest;
+﻿using JLib.DataGeneration.Examples.Setup.Models;
+using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
 
 namespace JLib.DataGeneration.Examples.DataPackages;
 

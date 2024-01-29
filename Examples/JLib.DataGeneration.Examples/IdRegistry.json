@@ -14,6 +14,12 @@
   "CustomerDp:CustomerDpb": {
     "Customer": "f4ad4cc6-fdb0-44b0-93a8-1fa942b23b95"
   },
+  "JLib.DataGeneration.Examples.MinimalCode.ArticleDp": {
+    "FirstArticle": "c6dbee79-24ad-41a0-8079-72b220b7841a",
+    "FourthArticle": "b6b12aaf-6303-44ae-83b9-aa86330738eb",
+    "SecondArticle": "e7bcd889-7e74-474d-afd5-793a59e87dd7",
+    "ThirdArticle": "bc4db502-8154-4ca6-897f-663ad33a9471"
+  },
   "ShoppingServiceMock": {
     "Guid [CustomerDp:CustomerDpb].[Customer] = f4ad4cc6-fdb0-44b0-93a8-1fa942b23b95": "25e92b87-c48f-490d-bf8a-490e9a7367c9",
     "Guid [invalid].[value not found] = 00000001-0000-0000-0000-000000000000": "7728751b-2795-4e27-9eac-6994971f1c3e",

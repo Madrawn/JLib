@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using JLib.DataGeneration.Examples.Models;
+using JLib.DataGeneration.Examples.Setup.Models;
 
 namespace JLib.DataGeneration.Examples.SnapshotInfo;
 public class CustomerSnapshotInfo

@@ -1,6 +1,6 @@
 using JLib.ValueTypes;
 
-namespace JLib.DataGeneration.Examples.Models;
+namespace JLib.DataGeneration.Examples.Setup.Models;
 
 public record ArticleId(Guid Value) : GuidValueType(Value);
 

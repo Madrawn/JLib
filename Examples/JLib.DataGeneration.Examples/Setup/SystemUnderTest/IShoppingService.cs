@@ -1,6 +1,6 @@
-using JLib.DataGeneration.Examples.Models;
+using JLib.DataGeneration.Examples.Setup.Models;
 
-namespace JLib.DataGeneration.Examples.SystemUnderTest;
+namespace JLib.DataGeneration.Examples.Setup.SystemUnderTest;
 
 public interface IShoppingService
 {

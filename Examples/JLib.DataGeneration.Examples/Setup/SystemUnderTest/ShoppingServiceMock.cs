@@ -1,7 +1,7 @@
-using JLib.DataGeneration.Examples.Models;
+using JLib.DataGeneration.Examples.Setup.Models;
 using JLib.Helper;
 
-namespace JLib.DataGeneration.Examples.SystemUnderTest;
+namespace JLib.DataGeneration.Examples.Setup.SystemUnderTest;
 
 public class ShoppingServiceMock : IShoppingService
 {

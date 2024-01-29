@@ -1,7 +1,7 @@
-﻿using JLib.DataGeneration.Examples.Models;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Xml.Linq;
-using JLib.DataGeneration.Examples.SystemUnderTest;
+using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
+using JLib.DataGeneration.Examples.Setup.Models;
 
 namespace JLib.DataGeneration.Examples.SnapshotInfo;
 

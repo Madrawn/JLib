@@ -1,4 +1,4 @@
-﻿using JLib.DataGeneration.Examples.Models;
+﻿using JLib.DataGeneration.Examples.Setup.Models;
 
 namespace JLib.DataGeneration.Examples.SnapshotInfo;
 

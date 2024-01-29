@@ -1,4 +1,4 @@
-namespace JLib.DataGeneration.Examples.Models;
+namespace JLib.DataGeneration.Examples.Setup.Models;
 
 public enum OrderStatus
 {
