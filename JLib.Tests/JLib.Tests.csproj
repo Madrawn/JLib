@@ -33,4 +33,11 @@
     <ProjectReference Include="..\JLib.Tests.Reflection.DemoAssembly\JLib.Tests.Reflection.DemoAssembly.csproj" />
     <ProjectReference Include="..\JLib\JLib.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="LICENSE">
+      <PackagePath>\</PackagePath>
+      <Pack>True</Pack>
+    </None>
+  </ItemGroup>
 </Project>

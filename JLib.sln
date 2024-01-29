@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
 		JLib.sln.DotSettings = JLib.sln.DotSettings
+		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -31,6 +32,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.EfCore", "..\..\Projekte\gelsenwasser\DexmaImport\JLib\JLib.EfCore\JLib.EfCore.csproj", "{569EE52C-92BA-4C33-9409-E0BA3DA967D2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.DataGeneration.Tests", "..\..\Projekte\gelsenwasser\DexmaImport\JLib\JLib.DataGeneration.Tests\JLib.DataGeneration.Tests.csproj", "{F30E60F8-7E87-4225-AEFC-571929C94BB2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{B450BA69-F38B-4EF5-81A5-7551941524E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.DataGeneration.Examples", "Examples\JLib.DataGeneration.Examples\JLib.DataGeneration.Examples.csproj", "{69DB9CDA-72C8-4155-987E-479574580683}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -74,6 +79,10 @@ Global
 		{F30E60F8-7E87-4225-AEFC-571929C94BB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F30E60F8-7E87-4225-AEFC-571929C94BB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F30E60F8-7E87-4225-AEFC-571929C94BB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69DB9CDA-72C8-4155-987E-479574580683}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69DB9CDA-72C8-4155-987E-479574580683}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69DB9CDA-72C8-4155-987E-479574580683}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69DB9CDA-72C8-4155-987E-479574580683}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -84,6 +93,7 @@ Global
 		{A1EAF821-44AE-4C97-A625-DB7D6022C2D6} = {610F90DD-CC3F-46F1-8D49-01B8A26B1E81}
 		{4F8A73B0-058E-4EF1-BA11-B01CD6D85137} = {610F90DD-CC3F-46F1-8D49-01B8A26B1E81}
 		{F30E60F8-7E87-4225-AEFC-571929C94BB2} = {610F90DD-CC3F-46F1-8D49-01B8A26B1E81}
+		{69DB9CDA-72C8-4155-987E-479574580683} = {B450BA69-F38B-4EF5-81A5-7551941524E4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9007D83B-9D61-4FD9-927F-EEAC8281BF90}
