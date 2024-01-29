@@ -1,4 +1,7 @@
 ﻿# Overview JLib.DataGeneration
+
+JLib.DataGeneration aims to simplify the generation of (test-) data by using a package based approach and abstracting IDs with properties.
+
 ## Deterministic Id Generator
 - provides a way to use readable string identifier instead of integer/guid ids to handle Ids
 - currently supports int, guid & string
