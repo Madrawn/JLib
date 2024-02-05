@@ -1,6 +1,6 @@
 ﻿namespace JLib.ValueTypes;
 
-public record IntValueType(int Value) : ValueType<int>(Value)
+public abstract record IntValueType(int Value) : ValueType<int>(Value)
 {
     protected IntValueType(int Value, Action<IntValidator> validator) : this(Value)
     {

@@ -4,6 +4,35 @@ namespace JLib.Helper;
 
 public static class TypeHelper
 {
+    public static bool IsString(this Type type)
+        => type == typeof(string);
+    public static bool IsGuid(this Type type)
+        => type == typeof(Guid);
+    public static bool IsNullableGuid(this Type type)
+        => type == typeof(Guid?);
+
+    public static bool IsNumber(this Type type)
+    {
+        return Type.GetTypeCode(type) switch
+        {
+            TypeCode.Byte => true,
+            TypeCode.SByte => true,
+            TypeCode.UInt16 => true,
+            TypeCode.UInt32 => true,
+            TypeCode.UInt64 => true,
+            TypeCode.Int16 => true,
+            TypeCode.Int32 => true,
+            TypeCode.Int64 => true,
+            TypeCode.Decimal => true,
+            TypeCode.Double => true,
+            TypeCode.Single => true,
+            _ => false
+        };
+    }
+    
+    public static bool IsNullableNumber(this Type type) 
+        => Nullable.GetUnderlyingType(type)?.IsNumber() is true;
+
     public static IReadOnlyCollection<Type> GetDeclaringTypeTree(this Type type)
     {
         var cur = type;
