@@ -57,7 +57,7 @@ internal class NumericValueTypeJsonConverter<T> : JsonConverter<ValueType<T>>
             return;
         }
 
-        switch (value.Value)
+        switch (value.Value)// required to select the correct overload
         {
             case byte v:
                 writer.WriteNumberValue(v);
