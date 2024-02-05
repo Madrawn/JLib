@@ -2,13 +2,16 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AutoMapper;
+using JLib.AutoMapper;
 using JLib.Helper;
 using JLib.Reflection;
 
 namespace JLib.ValueTypes.SystemTextJson;
 
 /// <summary>
-/// used by the <see cref="ValueTypeJsonConverterFactory"/> to enable <see cref="ValueType{T}"/> interpretation of types
+/// used by the <see cref="ValueTypeJsonConverterFactory"/> to enable <see cref="ValueType{T}"/> interpretation of types<br/>
+/// uses automapper to instantiate the <see cref="ValueType{T}"/>.<br/>
+/// <seealso cref="ValueTypeProfile"/> can generate all required maps and is included in <seealso cref="AutoMapperHelper.AddProfiles"/> as long as the <seealso cref="ITypeCache"/> contains said <seealso cref="ValueType{T}"/>
 /// <list type="bullet">
 /// <item><see cref="Guid"/></item>
 /// <item><see cref="string"/></item>
@@ -24,7 +27,6 @@ namespace JLib.ValueTypes.SystemTextJson;
 /// <item><see cref="double"/></item>
 /// <item><see cref="float"/></item>
 /// </list>
-/// in their nullable and non-nullable forms
 /// </summary>
 public class ValueTypeJsonConverterFactory : JsonConverterFactory
 {
