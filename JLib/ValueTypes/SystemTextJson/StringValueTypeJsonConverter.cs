@@ -10,7 +10,8 @@ namespace JLib.ValueTypes.SystemTextJson;
 /// <item><see cref="string"/></item>
 /// </list>
 /// </summary>
-internal class StringValueTypeJsonConverter : JsonConverter<ValueType<string>>
+internal class StringValueTypeJsonConverter<T> : JsonConverter<T>
+    where T: ValueType<string>
 {
     private readonly IMapper _mapper;
 
@@ -18,15 +19,15 @@ internal class StringValueTypeJsonConverter : JsonConverter<ValueType<string>>
     {
         _mapper = mapper;
     }
-    public override ValueType<string>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override T? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var value = reader.GetString();
-        if (value is null)
-            return null;
-        return (ValueType<string>)_mapper.Map(value, value.GetType(), typeToConvert);
+        return value is null 
+            ? null 
+            : _mapper.Map<T>(value);
     }
 
-    public override void Write(Utf8JsonWriter writer, ValueType<string>? value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, T? value, JsonSerializerOptions options)
     {
         if (value is null)
         {

@@ -1,6 +1,8 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using AutoMapper;
+using JLib.Helper;
+using JLib.Reflection;
 
 namespace JLib.ValueTypes.SystemTextJson;
 
@@ -20,7 +22,8 @@ namespace JLib.ValueTypes.SystemTextJson;
 /// <item><see cref="float"/></item>
 /// </list>
 /// </summary>
-internal class NumericValueTypeJsonConverter<T> : JsonConverter<ValueType<T>>
+internal class NumericValueTypeJsonConverter<TVt, TValue> : JsonConverter<TVt>
+    where TVt : ValueType<TValue>
 {
     private readonly IMapper _mapper;
 
@@ -28,9 +31,12 @@ internal class NumericValueTypeJsonConverter<T> : JsonConverter<ValueType<T>>
     {
         _mapper = mapper;
     }
-    public override ValueType<T>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override TVt? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        object value = typeof(T) switch
+        object value = typeof(TVt)
+                .GetAnyBaseType<ValueType<Ignored>>()
+                ?.GenericTypeArguments.First()
+            switch
         {
             { } type when type == typeof(byte) => reader.GetByte(),
             { } type when type == typeof(sbyte) => reader.GetSByte(),
@@ -44,12 +50,12 @@ internal class NumericValueTypeJsonConverter<T> : JsonConverter<ValueType<T>>
             { } type when type == typeof(double) => reader.GetDouble(),
             { } type when type == typeof(float) => reader.GetSingle(),
             _ => throw new NotSupportedException(
-                $"Type {typeof(T).FullName} is not supported. Only Numbers are supported")
+                $"Type {typeof(TVt).FullName} is not supported. Only Numbers are supported")
         };
-        return (ValueType<T>)_mapper.Map(value, value.GetType(), typeToConvert);
+        return _mapper.Map<TVt>(value);
     }
 
-    public override void Write(Utf8JsonWriter writer, ValueType<T>? value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, TVt? value, JsonSerializerOptions options)
     {
         if (value is null)
         {

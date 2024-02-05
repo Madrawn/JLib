@@ -10,7 +10,8 @@ namespace JLib.ValueTypes.SystemTextJson;
 /// <item><see cref="Guid"/></item>
 /// </list>
 /// </summary>
-internal class GuidValueTypeJsonConverter : JsonConverter<ValueType<Guid>?>
+internal class GuidValueTypeJsonConverter<T> : JsonConverter<T>
+    where T : ValueType<Guid>?
 {
     private readonly IMapper _mapper;
 
@@ -18,16 +19,16 @@ internal class GuidValueTypeJsonConverter : JsonConverter<ValueType<Guid>?>
     {
         _mapper = mapper;
     }
-    public override ValueType<Guid>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override T? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var value = reader.GetString();
         if (value is null)
             return null;
         var guid = Guid.Parse(value);
-        return (ValueType<Guid>)_mapper.Map(guid, guid.GetType(), typeToConvert);
+        return (T)_mapper.Map(guid, guid.GetType(), typeToConvert);
     }
 
-    public override void Write(Utf8JsonWriter writer, ValueType<Guid>? value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, T? value, JsonSerializerOptions options)
     {
         if (value is null)
         {

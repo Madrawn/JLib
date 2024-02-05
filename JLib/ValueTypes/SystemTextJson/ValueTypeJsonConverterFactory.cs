@@ -40,7 +40,7 @@ public class ValueTypeJsonConverterFactory : JsonConverterFactory
     public override bool CanConvert(Type typeToConvert)
         => typeToConvert.IsDerivedFromAny(typeof(ValueType<Ignored>));
 
-    public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options) 
+    public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
         => _converters.GetValueOrAdd(typeToConvert, type =>
         {
             Type nativeType = type
@@ -50,9 +50,9 @@ public class ValueTypeJsonConverterFactory : JsonConverterFactory
 
             Type converterType = nativeType switch
             {
-                _ when nativeType.IsString() => typeof(StringValueTypeJsonConverter),
-                _ when nativeType.IsNumber() => typeof(NumericValueTypeJsonConverter<>).MakeGenericType(nativeType),
-                _ when nativeType.IsGuid() => typeof(GuidValueTypeJsonConverter),
+                _ when nativeType.IsString() => typeof(StringValueTypeJsonConverter<>).MakeGenericType(typeToConvert),
+                _ when nativeType.IsNumber() => typeof(NumericValueTypeJsonConverter<,>).MakeGenericType(typeToConvert, nativeType),
+                _ when nativeType.IsGuid() => typeof(GuidValueTypeJsonConverter<>).MakeGenericType(typeToConvert),
                 _ => throw new NotSupportedException(
                     $"Type {type.FullClassName()} is not supported. Only Numbers, strings and Guids are supported")
             };

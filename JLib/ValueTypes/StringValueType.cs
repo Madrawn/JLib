@@ -123,7 +123,7 @@ public class StringValidator : ValueValidator<string?>
         NotBeNull();
         if (Value is null)
             return this;
-        if (expression.IsMatch(Value))
+        if (expression.IsMatch(Value) == false)
             AddError($"value does not match regex {expression}");
         return this;
     }
