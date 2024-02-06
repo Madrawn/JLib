@@ -1,8 +1,9 @@
 <Project>
 	<PropertyGroup>
 
-        <Version>0.1.0</Version>
-
+        <Version>0.1$(VersionSuffix)</Version>
+        <AssemblyVersion>0.1$(VersionSuffix)</AssemblyVersion>
+        <FileVersion>0.1$(VersionSuffix)</FileVersion>
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -18,15 +19,11 @@
         <RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
         <RepositoryUrl>https://github.com/JonnyIV/JLib</RepositoryUrl>
         <PackageProjectUrl>https://github.com/jonnyIV/jlib</PackageProjectUrl>
-        <PackageLicenseFile>LICENSE</PackageLicenseFile>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>$(MSBuildProjectName).Documentation.md</PackageReadmeFile>
 	</PropertyGroup>
 
     <ItemGroup>
-        <None Include="LICENSE">
-            <Pack>True</Pack>
-            <PackagePath>\</PackagePath>
-        </None>
         <None Include="$(MSBuildProjectName).Documentation.md">
             <Pack>True</Pack>
             <PackagePath>\</PackagePath>

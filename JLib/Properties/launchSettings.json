@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "JLib": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "VersionSuffix": "1"
+      }
+    }
+  }
+}

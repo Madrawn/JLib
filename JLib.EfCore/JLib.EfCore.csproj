@@ -12,11 +12,4 @@
         <ProjectReference Include="..\JLib\JLib.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <None Update="LICENSE">
-        <PackagePath>\</PackagePath>
-        <Pack>True</Pack>
-      </None>
-    </ItemGroup>
-
 </Project>
