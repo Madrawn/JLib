@@ -133,8 +133,8 @@ public class TypeCache : ITypeCache
                         var validTvtGroups = availableTypeValueTypes
                             .Where(availableTvtt => availableTvtt.Filter(type))
                             .ToLookup(t =>
-                                t.Value.GetCustomAttribute<TvtFactoryAttributes.Priority>()?.Value
-                                ?? TvtFactoryAttributes.Priority.DefaultPriority);
+                                t.Value.GetCustomAttribute<TvtFactoryAttributes.PriorityAttribute>()?.Value
+                                ?? TvtFactoryAttributes.PriorityAttribute.DefaultPriority);
                         var validTvts = validTvtGroups.MinBy(x => x.Key)?
                             .ToArray() ?? Array.Empty<ValueTypeForTypeValueTypes>();
                         switch (validTvts.Length)
@@ -144,8 +144,8 @@ public class TypeCache : ITypeCache
                                     $"multiple tvt candidates found for type {type.Name} : " +
                                     $@"[ {string.Join(", ", validTvts.Select(tvt =>
                                     {
-                                        var priority = tvt.Value.GetCustomAttribute<TvtFactoryAttributes.Priority>()?.Value
-                                                       ?? TvtFactoryAttributes.Priority.DefaultPriority;
+                                        var priority = tvt.Value.GetCustomAttribute<TvtFactoryAttributes.PriorityAttribute>()?.Value
+                                                       ?? TvtFactoryAttributes.PriorityAttribute.DefaultPriority;
                                         return $"{tvt.Value.Name}(priority {priority})";
                                     }).OrderBy(d => d))} ]"));
                                 return null;

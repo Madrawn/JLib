@@ -556,7 +556,7 @@ public static class ServiceCollectionHelper
         where TTvt : class, ITypeValueType
         where TImplementation : TService
         where TService : notnull
-        => services.AddGenericServices<TTvt>(typeCache, typeof(TService), typeof(TImplementation), lifetime,
+        => services.AddGenericServices(typeCache, typeof(TService), typeof(TImplementation), lifetime,
             exceptions, filter, serviceTypeArgumentResolver, implementationTypeArgumentResolver);
 
     /// <summary>
