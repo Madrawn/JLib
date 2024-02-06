@@ -1,4 +1,5 @@
-﻿using JLib.Exceptions;
+﻿using System.Text.RegularExpressions;
+using JLib.Exceptions;
 using JLib.Helper;
 
 namespace JLib.ValueTypes;
@@ -114,6 +115,16 @@ public class StringValidator : ValueValidator<string?>
             || uriResult.Scheme != Uri.UriSchemeHttps)
             AddError("Value is not a valid https uri");
 
+        return this;
+    }
+
+    public StringValidator MatchRegex(Regex expression)
+    {
+        NotBeNull();
+        if (Value is null)
+            return this;
+        if (expression.IsMatch(Value) == false)
+            AddError($"value does not match regex {expression}");
         return this;
     }
 

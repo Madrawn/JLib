@@ -1,7 +1,18 @@
-﻿using JLib.Exceptions;
+﻿using System.Text.Json;
+using JLib.AutoMapper;
+using JLib.Exceptions;
+using JLib.Helper;
+using JLib.Reflection;
+using JLib.ValueTypes.SystemTextJson;
 
 namespace JLib.ValueTypes;
 
+/// <summary>
+/// Base class for all value types<br/>
+/// use <seealso cref="ValueTypeJsonConverterFactory"/> for <seealso cref="JsonSerializer"/> conversions<br/>
+/// uses automapper to instantiate the <see cref="ValueType{T}"/>.<br/>
+/// <seealso cref="ValueTypeProfile"/> can generate all required maps and is included in <seealso cref="AutoMapperHelper.AddProfiles"/> as long as the <seealso cref="ITypeCache"/> contains said <seealso cref="ValueType{T}"/>
+/// </summary>
 public abstract record ValueType<T>(T Value)
 {
     public virtual void Deconstruct(out T value)

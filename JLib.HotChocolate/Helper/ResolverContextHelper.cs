@@ -22,16 +22,21 @@ public static class ResolverContextHelper
     /// </summary>
     public static async Task<TDo?> GetOneDataObjectAsync<TDo>(this IResolverContext context, Guid? id)
         where TDo : class, IDataObject
-        => id.HasValue
+    {
+        // when the resolver is called a second time, the old context.services might be null. this ensures that we can still create a new scope.
+        var provider = context.Services;
+        return id.HasValue
             ? await context.BatchAsync<Guid, TDo>(
                 async (ids, token)
                     =>
                 {
-                    using var scope = context.Services.CreateScope();
-                    return await scope.ServiceProvider.GetRequiredService<IDataProviderR<TDo>>()
+                    using var scope = provider.CreateScope();
+                    var dataProvider = scope.ServiceProvider.GetRequiredService<IDataProviderR<TDo>>();
+                    return await dataProvider
                         .Get().Where(dataObject => ids.Contains(dataObject.Id))
                         .ToDictionaryAsync(gdo => gdo.Id, token);
                 },
                 id.Value)
-            : null;    
+            : null;
+    }
 }

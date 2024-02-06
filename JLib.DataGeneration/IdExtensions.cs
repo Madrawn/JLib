@@ -51,7 +51,7 @@ public record struct IdInformation(Type Type, DataPackageValues.IdIdentifier Ide
 /// adds debug methods to resolve the name of an id managed by a <see cref="IIdRegistry"/>
 /// </summary>
 // ReSharper disable once CheckNamespace
-public static class IdDebug
+public static class IdExtensions
 {
     // there might be more than one instance if the tests are executed in parallel. If that's the case, there are no new keys expected.
     private static readonly object InstancesLock = new();

@@ -46,15 +46,14 @@ public class TypeCacheTests
     [AttributeUsage(AttributeTargets.Class)]
     // ReSharper disable once ClassNeverInstantiated.Local
     private class FocusTestAttribute : Attribute { }
-    public static object[][] GetTestTypes()
+    public static TheoryData<Type> GetTestTypes()
     {
         var anyFocus = typeof(TypeCacheTests).GetNestedTypes().Any(t => t.HasCustomAttribute<FocusTestAttribute>());
 
-        return typeof(TypeCacheTests)
+        return new(typeof(TypeCacheTests)
             .GetNestedTypes()
             .Where(t => !anyFocus || t.HasCustomAttribute<FocusTestAttribute>())
-            .Select(t => new object[] { t })
-            .ToArray();
+            );
     }
 
     [Theory]

@@ -25,12 +25,23 @@ internal enum DataPackageInitState
 
 public interface IIdRegistry
 {
+    /// <summary>
+    /// <inheritdoc cref="IdRegistry.GetStringId"/>
+    /// </summary>
     public string GetStringId(IdIdentifier identifier);
+    /// <summary>
+    /// <inheritdoc cref="IdRegistry.GetGuidId"/>
+    /// </summary>
     public Guid GetGuidId(IdIdentifier identifier);
+    /// <summary>
+    /// <inheritdoc cref="IdRegistry.GetIntId"/>
+    /// </summary>
     public int GetIntId(IdIdentifier identifier);
+    /// <summary>
+    /// <inheritdoc cref="IdRegistry.GetIdentifierOfId"/>
+    /// </summary>
     public IdIdentifier GetIdentifierOfId(object? id);
     internal void SetIdPropertyValue(object packageInstance, PropertyInfo property);
-    internal void SaveToFile();
 }
 
 internal class IdRegistry : IIdRegistry, IDisposable
@@ -56,7 +67,7 @@ internal class IdRegistry : IIdRegistry, IDisposable
         _idIncrement = _dictionary.GetValueOrDefault(IncrementIdentifier) as int? ?? 0;
         _dictionary.Remove(IncrementIdentifier, out _);
         _mapper = new(serviceProvider.GetRequiredService<IMapper>);
-        IdDebug.Register(this);
+        IdExtensions.Register(this);
     }
 
     private static string GetFileName()
@@ -80,7 +91,7 @@ internal class IdRegistry : IIdRegistry, IDisposable
     }
 
     /// <summary>
-    /// returns a deterministic <see cref="Guid"/> value for the given <paramref name="identifier"/>
+    /// returns a deterministic <see cref="string"/> value for the given <paramref name="identifier"/>
     /// </summary>
     public string GetStringId(IdIdentifier identifier)
     {
@@ -93,6 +104,9 @@ internal class IdRegistry : IIdRegistry, IDisposable
         }).CastTo<string>();
     }
 
+    /// <summary>
+    /// returns a deterministic <see cref="Guid"/> value for the given <paramref name="identifier"/>
+    /// </summary>
     public Guid GetGuidId(IdIdentifier identifier)
     {
         identifier = _idIdentifierPostProcessor(identifier);
@@ -115,7 +129,11 @@ internal class IdRegistry : IIdRegistry, IDisposable
             return Interlocked.Increment(ref _idIncrement);
         }).CastTo<int>();
     }
-
+    
+    /// <summary>
+    /// returns the <see cref="IdIdentifier"/> for the given <paramref name="id"/><br/>
+    /// consider using the <see cref="IdExtensions"/> to access the value.
+    /// </summary>
     public IdIdentifier GetIdentifierOfId(object? id)
     {
         if (id is null)
@@ -237,6 +255,6 @@ internal class IdRegistry : IIdRegistry, IDisposable
     {
         // otherwise at runtime generated ids won't be persisted
         SaveToFile();
-        IdDebug.UnRegister(this);
+        IdExtensions.UnRegister(this);
     }
 }

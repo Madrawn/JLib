@@ -46,7 +46,6 @@ internal class DataPackageManager : IDataPackageManager
         foreach (var dataPackageType in packages)
             _provider.GetRequiredService(dataPackageType);
         InitState = DataPackageInitState.Initialized;
-        _idRegistry.SaveToFile();
     }
 
     public void SetIdPropertyValue(object packageInstance, PropertyInfo property)
