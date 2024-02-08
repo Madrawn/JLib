@@ -1,3 +1,4 @@
+using FluentAssertions;
 using JLib.DataGeneration.Examples.DataPackages;
 using JLib.DataGeneration.Examples.Setup.Models;
 using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
@@ -6,8 +7,10 @@ using JLib.Exceptions;
 using JLib.Helper;
 using Microsoft.Extensions.DependencyInjection;
 using Snapshooter;
+using Snapshooter.Exceptions;
 using Snapshooter.Xunit;
 using Xunit;
+using Xunit.Sdk;
 
 namespace JLib.DataGeneration.Examples;
 
@@ -93,8 +96,9 @@ public class ExampleTests : IDisposable
             );
 
         _shoppingService.AddArticleToCart(customerId, thirdArticle, 10);
-
-        _shoppingService.MatchSnapshot();
+       
+        Action testFails = ()=> _shoppingService.MatchSnapshot();
+        testFails.Should().Throw<EqualException>();
     }
     [Fact]
     public void Version1_ManualData()

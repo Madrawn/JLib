@@ -44,7 +44,7 @@ public sealed class Setup : IDisposable
         // references will be resolved automatically
         _provider.IncludeDataPackages<ArticleDp>();
 
-        _shoppingService.Articles.Should().HaveCount(4);
+        _shoppingService.Articles.Should().HaveCount(2);
     }
 
     public void Dispose() => _provider.Dispose();

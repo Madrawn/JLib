@@ -37,7 +37,7 @@ public sealed class MinimalCode : IDisposable
         _provider.IncludeDataPackages<CustomerOrdersDp>();
 
         _shoppingService.Customers.Should().HaveCount(1);
-        _shoppingService.Orders.Should().HaveCount(1);
+        _shoppingService.Orders.Should().HaveCount(2);
     }
 
     public void Dispose() 
