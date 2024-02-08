@@ -8,6 +8,7 @@ namespace JLib.Exceptions;
 public interface IExceptionProvider
 {
     Exception? GetException();
+    void ThrowIfNotEmpty(LogEventLevel? level = null);
 }
 
 public interface IExceptionManager : IExceptionProvider
@@ -45,7 +46,6 @@ public interface IExceptionManager : IExceptionProvider
 
     void Add(Exception exception);
     void Add(IEnumerable<Exception> exceptions);
-    void ThrowIfNotEmpty(LogEventLevel? level = null);
     IExceptionManager CreateChild(string message);
     void CreateChild(string message, IEnumerable<Exception> childExceptions);
     void AddChild(IExceptionProvider exceptionProvider);
@@ -70,14 +70,14 @@ public class ExceptionManager : IExceptionManager
 
     public void ThrowIfNotEmpty(LogEventLevel? level = null)
     {
-        var ex = JLibAggregateException.ReturnIfNotEmpty(_message, BuildExceptionList().WhereNotNull());
+        var ex = GetException();
         if (level is not null && ex is not null)
             Log.Write(level.Value, ex, "an aggregate exception has been thrown");
         if (ex is not null)
             throw ex;
     }
 
-    public Exception? GetException() => JLibAggregateException.ReturnIfNotEmpty(_message, BuildExceptionList());
+    public Exception? GetException() => JLibAggregateException.ReturnIfNotEmpty(_message, BuildExceptionList().WhereNotNull());
 
     public ExceptionManager(string message)
     {

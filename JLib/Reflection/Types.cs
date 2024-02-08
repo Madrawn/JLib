@@ -2,7 +2,7 @@
 using JLib.Helper;
 using JLib.Reflection.Attributes;
 using JLib.ValueTypes;
-using static JLib.Reflection.Attributes.TvtFactoryAttributes;
+using static JLib.Reflection.Attributes.TvtFactoryAttribute;
 
 namespace JLib.Reflection;
 

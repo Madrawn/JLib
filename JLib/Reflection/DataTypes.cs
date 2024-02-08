@@ -1,7 +1,7 @@
 ﻿using JLib.Data;
 using JLib.Exceptions;
 using JLib.Helper;
-using static JLib.Reflection.Attributes.TvtFactoryAttributes;
+using static JLib.Reflection.Attributes.TvtFactoryAttribute;
 
 namespace JLib.Reflection;
 

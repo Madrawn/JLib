@@ -39,7 +39,7 @@
               {
                 "Type": "JLib.Exceptions.InvalidTypeException",
                 "message": [
-                  "InvalidTypeValueType does not have any filter attribute added"
+                  "JLib.Tests.Reflection.TypeCacheTests.TypeValueTypeWithoutFactoryAttribute.InvalidTypeValueType"
                 ]
               }
             ]

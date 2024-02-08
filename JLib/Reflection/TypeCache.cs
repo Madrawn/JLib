@@ -16,12 +16,21 @@ namespace JLib.Reflection;
 /// <br/>- <seealso cref="IValidatedType"/>
 /// <br/>- <seealso cref="IPostNavigationInitializedType"/>
 /// <br/>- <seealso cref=""/>
-/// <br/>- <seealso cref="TvtFactoryAttributes"/>
+/// <br/>- <seealso cref="TvtFactoryAttribute"/>
 /// <br/>- <seealso cref="IgnoreInCache"/>
 /// </summary>
 public interface ITypeCache
 {
-    public IEnumerable<Type> KnownTypeValueTypes { get; }
+    /// <summary>
+    /// all known <see cref="TypeValueType"/>s 
+    /// </summary>
+    // todo: change type to TypeValueType
+    public IReadOnlyCollection<Type> KnownTypeValueTypes { get; }
+
+    /// <summary>
+    /// all types known to the typeCache without any filters or applied valueTypes
+    /// </summary>
+    public IReadOnlyCollection<Type> KnownTypes { get; }
 
     public TTvt Get<TTvt>(Func<TTvt, bool> filter) where TTvt : class, ITypeValueType
         => All(filter).Single();
@@ -58,8 +67,8 @@ public interface ITypeCache
 }
 
 /// <summary>
-/// provides a easy to use way to group types by kind, i.e. entities
-/// <br/>searches the Application for <see cref="TypeValueType"/> instances with <see cref="TvtFactoryAttributes.ITypeValueTypeFilterAttribute"/> attributes
+/// provides an easy-to-use way to group types by kind, i.e. entities
+/// <br/>searches the Application for <see cref="TypeValueType"/> instances with <see cref="TvtFactoryAttribute.ITypeValueTypeFilterAttribute"/> attributes
 /// and populates them with the types provided via constructor.
 /// <br/> all reflection is done in the constructor
 /// <br/> should be used as singleton
@@ -78,7 +87,7 @@ public class TypeCache : ITypeCache
 
         public bool Filter(Type otherType)
             => Value.GetCustomAttributes()
-                .OfType<TvtFactoryAttributes.ITypeValueTypeFilterAttribute>()
+                .OfType<TvtFactoryAttribute>()
                 .All(filterAttr => filterAttr.Filter(otherType));
 
         public TypeValueType Create(Type type)
@@ -94,18 +103,20 @@ public class TypeCache : ITypeCache
 
     private readonly TypeValueType[] _typeValueTypes;
     private readonly IReadOnlyDictionary<Type, TypeValueType> _typeMappings;
-    public IEnumerable<Type> KnownTypeValueTypes { get; }
+    public IReadOnlyCollection<Type> KnownTypeValueTypes { get; }
+
+    public IReadOnlyCollection<Type> KnownTypes { get; }
 
     #region constructor
 
     public TypeCache(ITypePackage typePackage, IExceptionManager? parentExceptionManager)
     {
-        var types = typePackage.GetContent().ToArray();
+        KnownTypes = typePackage.GetContent().ToArray();
         const string exceptionMessage = "Cache setup failed";
         var exceptions = parentExceptionManager?.CreateChild(exceptionMessage)
                          ?? new ExceptionManager(exceptionMessage);
 
-        var availableTypeValueTypes = types
+        var availableTypeValueTypes = KnownTypes
             .Where(type => !type.HasCustomAttribute<IgnoreInCache>())
             .Where(type => type.IsAssignableTo<TypeValueType>() && !type.IsAbstract)
             .Select(tvt => new ValueTypeForTypeValueTypes(tvt))
@@ -116,14 +127,14 @@ public class TypeCache : ITypeCache
             "some Types have no filter attributes",
             availableTypeValueTypes.Where(tvtt => tvtt.Value
                 .CustomAttributes.None(a =>
-                    a.AttributeType.Implements<TvtFactoryAttributes.ITypeValueTypeFilterAttribute>())
+                    a.AttributeType.IsAssignableTo<TvtFactoryAttribute>())
             ).Select(tvtt => new InvalidTypeException(tvtt.GetType(), tvtt.Value,
-                $"{tvtt.Value.Name} does not have any filter attribute added"))
+                tvtt.Value.FullClassName(true)))
         );
         var discoveryExceptions = exceptions.CreateChild("type discovery failed");
         try
         {
-            _typeValueTypes = types
+            _typeValueTypes = KnownTypes
                 .Where(type => !type.HasCustomAttribute<IgnoreInCache>() && !type.IsAssignableTo<TypeValueType>())
                 .Select(type =>
                 {
@@ -133,8 +144,8 @@ public class TypeCache : ITypeCache
                         var validTvtGroups = availableTypeValueTypes
                             .Where(availableTvtt => availableTvtt.Filter(type))
                             .ToLookup(t =>
-                                t.Value.GetCustomAttribute<TvtFactoryAttributes.PriorityAttribute>()?.Value
-                                ?? TvtFactoryAttributes.PriorityAttribute.DefaultPriority);
+                                t.Value.GetCustomAttribute<TvtFactoryAttribute.PriorityAttribute>()?.Value
+                                ?? TvtFactoryAttribute.PriorityAttribute.DefaultPriority);
                         var validTvts = validTvtGroups.MinBy(x => x.Key)?
                             .ToArray() ?? Array.Empty<ValueTypeForTypeValueTypes>();
                         switch (validTvts.Length)
@@ -144,8 +155,8 @@ public class TypeCache : ITypeCache
                                     $"multiple tvt candidates found for type {type.Name} : " +
                                     $@"[ {string.Join(", ", validTvts.Select(tvt =>
                                     {
-                                        var priority = tvt.Value.GetCustomAttribute<TvtFactoryAttributes.PriorityAttribute>()?.Value
-                                                       ?? TvtFactoryAttributes.PriorityAttribute.DefaultPriority;
+                                        var priority = tvt.Value.GetCustomAttribute<TvtFactoryAttribute.PriorityAttribute>()?.Value
+                                                       ?? TvtFactoryAttribute.PriorityAttribute.DefaultPriority;
                                         return $"{tvt.Value.Name}(priority {priority})";
                                     }).OrderBy(d => d))} ]"));
                                 return null;

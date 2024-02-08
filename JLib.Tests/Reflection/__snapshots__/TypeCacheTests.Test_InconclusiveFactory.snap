@@ -17,7 +17,7 @@
         "Attributes": [
           "NullableContextAttribute",
           "NullableAttribute",
-          "TvtFactoryAttributes.Implements",
+          "TvtFactoryAttribute.ImplementsAttribute",
           "UnmappedAttribute"
         ],
         "ImplementedInterfaces": [
@@ -32,7 +32,7 @@
         "Attributes": [
           "NullableContextAttribute",
           "NullableAttribute",
-          "TvtFactoryAttributes.Implements",
+          "TvtFactoryAttribute.ImplementsAttribute",
           "UnmappedAttribute"
         ],
         "ImplementedInterfaces": [

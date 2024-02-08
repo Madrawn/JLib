@@ -6,12 +6,12 @@ using JLib.Data;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
+using JLib.Reflection.Attributes;
 using Microsoft.Extensions.DependencyInjection;
-using static JLib.Reflection.Attributes.TvtFactoryAttributes;
 
 namespace JLib.HotChocolate.Helper;
 
-[IsClass, HasAttribute(typeof(ExtendObjectTypeAttribute))]
+[TvtFactoryAttribute.IsClass, TvtFactoryAttribute.HasAttribute(typeof(ExtendObjectTypeAttribute))]
 public record TypeExtensionType(Type Value) : TypeValueType(Value);
 
 public static class RequestExecutorBuilderHelper

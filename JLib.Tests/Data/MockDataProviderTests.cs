@@ -16,7 +16,7 @@ public class InMemoryDataProviderTests
 {
     private readonly IDataProviderRw<TestEntity> _dataProvider;
 
-    [TvtFactoryAttributes.Implements(typeof(ITestEntity)), TvtFactoryAttributes.Priority(NextPriority - 1000)]
+    [TvtFactoryAttribute.Implements(typeof(ITestEntity)), TvtFactoryAttribute.Priority(NextPriority - 1000)]
     public record TestEntityType(Type Value) : EntityType(Value);
     public interface ITestEntity : IEntity
     {

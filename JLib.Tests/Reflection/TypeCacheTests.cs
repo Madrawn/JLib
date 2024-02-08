@@ -31,9 +31,9 @@ public class TypeCacheTests
         public interface IDemoTypeA { }
         public interface IDemoTypeB { }
 
-        [TvtFactoryAttributes.Implements(typeof(IDemoTypeA))]
+        [TvtFactoryAttribute.Implements(typeof(IDemoTypeA))]
         public record DemoTypeValueTypeA(Type Value) : TypeValueType(Value);
-        [TvtFactoryAttributes.Implements(typeof(IDemoTypeB))]
+        [TvtFactoryAttribute.Implements(typeof(IDemoTypeB))]
         public record DemoTypeValueTypeB(Type Value) : TypeValueType(Value);
         public class InconclusiveType : IDemoTypeA, IDemoTypeB { }
     }

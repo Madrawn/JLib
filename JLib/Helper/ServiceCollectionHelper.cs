@@ -120,7 +120,7 @@ public static class ServiceCollectionHelper
     #region AddAlias
 
     /// <summary>
-    /// injects <typeparamref name="TImpl"/> and provides it as <typeparamref name="TAlias"/>, therefore using the same instance
+    /// injects <typeparamref name="TImpl"/> and provides it as <typeparamref name="TAlias"/> using a factory, therefore using the same instance
     /// </summary>
     public static IServiceCollection AddAlias<TAlias, TImpl>(this IServiceCollection serviceCollection,
         ServiceLifetime lifetime)
@@ -133,7 +133,7 @@ public static class ServiceCollectionHelper
     }
 
     /// <summary>
-    /// injects <paramref name="existing"/> and provides it as <paramref name="alias"/>, therefore using the same instance
+    /// injects <paramref name="existing"/> and provides it as <paramref name="alias"/> using a factory, therefore using the same instance
     /// </summary>
     public static IServiceCollection AddAlias(this IServiceCollection services, Type alias, Type existing,
         ServiceLifetime lifetime)

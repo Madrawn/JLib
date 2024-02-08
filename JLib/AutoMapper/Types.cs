@@ -5,7 +5,7 @@ using JLib.Reflection.Attributes;
 
 namespace JLib.AutoMapper;
 
-[TvtFactoryAttributes.IsDerivedFrom(typeof(Profile)), TvtFactoryAttributes.NotAbstract]
+[TvtFactoryAttribute.IsDerivedFrom(typeof(Profile)), TvtFactoryAttribute.NotAbstract]
 public record AutoMapperProfileType(Type Value) : TypeValueType(Value)
 {
     private static readonly Type[] CtorParamArray = new[] { typeof(ITypeCache) };
