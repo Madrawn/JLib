@@ -133,6 +133,29 @@ public static class ServiceCollectionHelper
     }
 
     /// <summary>
+    /// injects <typeparamref name="TImpl"/> and provides it as <typeparamref name="TAlias"/> using a factory, therefore using the same instance
+    /// </summary>
+    public static IServiceCollection AddTransientAlias<TAlias, TImpl>(this IServiceCollection serviceCollection)
+        where TImpl : TAlias
+        where TAlias : notnull
+        => serviceCollection.AddAlias<TAlias, TImpl>(ServiceLifetime.Transient);
+
+    /// <summary>
+    /// injects <typeparamref name="TImpl"/> and provides it as <typeparamref name="TAlias"/> using a factory, therefore using the same instance
+    /// </summary>
+    public static IServiceCollection AddScopedAlias<TAlias, TImpl>(this IServiceCollection serviceCollection)
+        where TImpl : TAlias
+        where TAlias : notnull
+        => serviceCollection.AddAlias<TAlias, TImpl>(ServiceLifetime.Scoped);
+    /// <summary>
+    /// injects <typeparamref name="TImpl"/> and provides it as <typeparamref name="TAlias"/> using a factory, therefore using the same instance
+    /// </summary>
+    public static IServiceCollection AddSingletonAlias<TAlias, TImpl>(this IServiceCollection serviceCollection)
+        where TImpl : TAlias
+        where TAlias : notnull
+        => serviceCollection.AddAlias<TAlias, TImpl>(ServiceLifetime.Singleton);
+
+    /// <summary>
     /// injects <paramref name="existing"/> and provides it as <paramref name="alias"/> using a factory, therefore using the same instance
     /// </summary>
     public static IServiceCollection AddAlias(this IServiceCollection services, Type alias, Type existing,
@@ -202,24 +225,24 @@ public static class ServiceCollectionHelper
                     case MappingDataProviderMode.Disabled:
                         continue;
                     case MappingDataProviderMode.Read:
-                    {
-                        if (repo is { CanWrite: true })
                         {
-                            exceptions.Add(new InvalidSetupException(
-                                $"Repository {repo.Value.FullClassName()} for Entity {destinationType.Value.FullClassName()} can write data but the mapping is configured to provide a {nameof(IDataProviderR<IDataObject>)}." +
-                                Environment.NewLine +
-                                $"To fix this issue either set the mapping to ReadWrite or don't implement {nameof(IDataProviderRw<IEntity>)} on the repository"));
-                            continue;
-                        }
+                            if (repo is { CanWrite: true })
+                            {
+                                exceptions.Add(new InvalidSetupException(
+                                    $"Repository {repo.Value.FullClassName()} for Entity {destinationType.Value.FullClassName()} can write data but the mapping is configured to provide a {nameof(IDataProviderR<IDataObject>)}." +
+                                    Environment.NewLine +
+                                    $"To fix this issue either set the mapping to ReadWrite or don't implement {nameof(IDataProviderRw<IEntity>)} on the repository"));
+                                continue;
+                            }
 
-                        var implementation = typeof(MapDataProviderR<,>).MakeGenericType(sourceType, destinationType);
-                        services.AddScoped(implementation);
-                        services.AddScoped(typeof(ISourceDataProviderR<>).MakeGenericType(destinationType),
-                            implementation);
-                        if (repo is null)
-                            services.AddScoped(typeof(IDataProviderR<>).MakeGenericType(destinationType),
+                            var implementation = typeof(MapDataProviderR<,>).MakeGenericType(sourceType, destinationType);
+                            services.AddScoped(implementation);
+                            services.AddScoped(typeof(ISourceDataProviderR<>).MakeGenericType(destinationType),
                                 implementation);
-                    }
+                            if (repo is null)
+                                services.AddScoped(typeof(IDataProviderR<>).MakeGenericType(destinationType),
+                                    implementation);
+                        }
                         break;
                     default:
                         throw new IndexOutOfRangeException();
