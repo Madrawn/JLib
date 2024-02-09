@@ -5,12 +5,20 @@ using Serilog.Events;
 
 namespace JLib.Exceptions;
 
+/// <summary>
+/// abstracted way for exception providers.
+/// <seealso cref="ExceptionManager"/>
+/// </summary>
 public interface IExceptionProvider
 {
     Exception? GetException();
     void ThrowIfNotEmpty(LogEventLevel? level = null);
 }
 
+/// <summary>
+/// Abstracted Utility methods for exception generation
+/// implemented by <see cref="ExceptionManager"/>
+/// </summary>
 public interface IExceptionManager : IExceptionProvider
 {
     /// <summary>
@@ -51,6 +59,9 @@ public interface IExceptionManager : IExceptionProvider
     void AddChild(IExceptionProvider exceptionProvider);
 }
 
+/// <summary>
+/// Utility class for generating nested Aggregate Exceptions
+/// </summary>
 public class ExceptionManager : IExceptionManager
 {
     private readonly string _message;
