@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using JLib.Exceptions;
 using JLib.Helper;
-using JLib.ValueTypes;
+using Xunit;
 
-namespace JLib.Tests.ValueTypes;
+namespace JLib.ValueTypes.Tests;
 public class StringValueTypeTests
 {
     public record TestArgument(string? TestString, string ValidatorName, Action<StringValidator> Validator,

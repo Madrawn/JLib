@@ -171,27 +171,27 @@ public static class ServiceCollectionHelper
     /// Adds the <see cref="ITypeCache"/> to your services, executes its Initialization and returns the ready-to-use instance.
     /// </summary>
     public static IServiceCollection AddTypeCache(this IServiceCollection services, out ITypeCache typeCache,
-        IExceptionManager exceptions, ILoggerProvider loggerProvider,
+        IExceptionManager exceptions, ILoggerFactory loggerFactory,
         params string[] includedPrefixes)
-        => services.AddTypeCache(out typeCache, exceptions, loggerProvider, null, SearchOption.TopDirectoryOnly, includedPrefixes);
+        => services.AddTypeCache(out typeCache, exceptions, loggerFactory, null, SearchOption.TopDirectoryOnly, includedPrefixes);
 
     public static IServiceCollection AddTypeCache(
         this IServiceCollection services,
         out ITypeCache typeCache,
         IExceptionManager exceptions,
-        ILoggerProvider loggerProvider,
+        ILoggerFactory loggerFactory,
         string? assemblySearchDirectory = null,
         SearchOption searchOption = SearchOption.TopDirectoryOnly,
         params string[] includedPrefixes)
-        => services.AddTypeCache(out typeCache, exceptions, loggerProvider,
+        => services.AddTypeCache(out typeCache, exceptions, loggerFactory,
             TypePackage.Get(assemblySearchDirectory, includedPrefixes, searchOption));
 
     public static IServiceCollection AddTypeCache(
         this IServiceCollection services,
         out ITypeCache typeCache,
-        IExceptionManager exceptionManager, ILoggerProvider loggerProvider, params ITypePackage[] typePackages)
+        IExceptionManager exceptionManager, ILoggerFactory loggerFactory, params ITypePackage[] typePackages)
     {
-        typeCache = new TypeCache(TypePackage.Get(typePackages), exceptionManager, loggerProvider);
+        typeCache = new TypeCache(TypePackage.Get(typePackages), exceptionManager, loggerFactory);
         return services.AddSingleton(typeCache);
     }
 
@@ -207,7 +207,7 @@ public static class ServiceCollectionHelper
         ITypeCache typeCache,
         ServiceLifetime lifetime,
         IExceptionManager exceptions,
-        ILoggerProvider loggerProvider,
+        ILoggerFactory loggerFactory,
         Func<TTvt, bool>? filter = null,
         Func<TTvt, ITypeValueType>[]? serviceTypeArgumentResolver = null,
         Func<TTvt, ITypeValueType>[]? implementationTypeArgumentResolver = null)
@@ -215,7 +215,7 @@ public static class ServiceCollectionHelper
         where TProvided : TAlias
         where TAlias : notnull
         => services.AddGenericAlias(typeCache, typeof(TAlias).TryGetGenericTypeDefinition(), typeof(TProvided),
-            lifetime, exceptions, loggerProvider, filter,
+            lifetime, exceptions, loggerFactory, filter,
             serviceTypeArgumentResolver, implementationTypeArgumentResolver);
 
     /// <summary>
@@ -228,13 +228,13 @@ public static class ServiceCollectionHelper
         Type providedType,
         ServiceLifetime lifetime,
         IExceptionManager exceptions,
-        ILoggerProvider loggerProvider,
+        ILoggerFactory loggerFactory,
         Func<TTvt, bool>? filter = null,
         Func<TTvt, ITypeValueType>[]? aliasTypeArgumentResolver = null,
         Func<TTvt, ITypeValueType>[]? providedTypeArgumentResolver = null)
         where TTvt : class, ITypeValueType
     {
-        var logger = loggerProvider.CreateLogger(typeof(ServiceCollectionHelper).FullName!);
+        var logger = loggerFactory.CreateLogger(typeof(ServiceCollectionHelper).FullName!);
         using var _ = logger.BeginScope(nameof(AddGenericAlias));
 
         aliasTypeArgumentResolver ??= new Func<TTvt, ITypeValueType>[] { e => e };
@@ -282,7 +282,7 @@ public static class ServiceCollectionHelper
         ITypeCache typeCache,
         ServiceLifetime lifetime,
         IExceptionManager exceptions,
-        ILoggerProvider loggerProvider,
+        ILoggerFactory loggerFactory,
         Func<TTvt, bool>? filter = null,
         Func<TTvt, ITypeValueType>[]? serviceTypeArgumentResolver = null,
         Func<TTvt, ITypeValueType>[]? implementationTypeArgumentResolver = null)
@@ -290,7 +290,7 @@ public static class ServiceCollectionHelper
         where TImplementation : TService
         where TService : notnull
         => services.AddGenericServices(typeCache, typeof(TService), typeof(TImplementation), lifetime,
-            exceptions, loggerProvider, filter, serviceTypeArgumentResolver, implementationTypeArgumentResolver);
+            exceptions, loggerFactory, filter, serviceTypeArgumentResolver, implementationTypeArgumentResolver);
 
     /// <summary>
     /// adds a descriptor of <paramref name="serviceType"/> implemented as <paramref name="implementationType"/> for each instance of <typeparamref name="TTvt"/> which match the <paramref name="filter"/> using the <paramref name="serviceTypeArgumentResolver"/> and <paramref name="implementationTypeArgumentResolver"/> to get the type parameters
@@ -302,13 +302,13 @@ public static class ServiceCollectionHelper
         Type implementationType,
         ServiceLifetime lifetime,
         IExceptionManager exceptions,
-        ILoggerProvider loggerProvider,
+        ILoggerFactory loggerFactory,
         Func<TTvt, bool>? filter = null,
         Func<TTvt, ITypeValueType>[]? serviceTypeArgumentResolver = null,
         Func<TTvt, ITypeValueType>[]? implementationTypeArgumentResolver = null)
         where TTvt : class, ITypeValueType
     {
-        var logger = loggerProvider.CreateLogger(typeof(ServiceCollectionHelper).FullName!);
+        var logger = loggerFactory.CreateLogger(typeof(ServiceCollectionHelper).FullName!);
         using var _ = logger.BeginScope(nameof(AddGenericServices));
 
         serviceTypeArgumentResolver ??= new Func<TTvt, ITypeValueType>[] { e => e };

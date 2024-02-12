@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentAssertions;
-using FluentAssertions.Common;
+﻿using FluentAssertions;
 using JLib.DependencyInjection;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 
 // ReSharper disable ClassNeverInstantiated.Local
 
@@ -24,8 +18,12 @@ public class AttributeServicesTest : IDisposable
     public AttributeServicesTest(ITestOutputHelper output)
     {
         _output = output;
+        _loggerFactory = new LoggerFactory()
+            .AddXunit(output);
+        _disposables.Add(_loggerFactory);
     }
     private readonly List<IDisposable> _disposables = new();
+    private readonly ILoggerFactory _loggerFactory;
 
     private IServiceProvider CreateSetup<T>(out IExceptionProvider exceptionProvider)
         => CreateSetup<T>(out exceptionProvider, out _);
@@ -35,7 +33,7 @@ public class AttributeServicesTest : IDisposable
         var typePackage = TypePackage.GetNested<T>();
         _output.WriteLine(typePackage.ToString(true));
         services = new ServiceCollection()
-            .AddTypeCache(out var typeCache, exceptions, typePackage)
+            .AddTypeCache(out var typeCache, exceptions, _loggerFactory, typePackage)
             .AddServicesWithAttributes(typeCache, exceptions);
         exceptionProvider = exceptions;
         return services.BuildServiceProvider().DisposeWith(_disposables);
@@ -275,12 +273,12 @@ public class AttributeServicesTest : IDisposable
         var commandServices =
             services
                 .Where(d => d.ServiceType == typeof(DuplicateServiceRegistrationClasses.IShoppingCommandService))
-                .Select(p => new { Instance = p.ImplementationFactory?.Invoke(provider), ServiceType = p.ServiceType })
+                .Select(p => new { Instance = p.ImplementationFactory?.Invoke(provider), p.ServiceType })
                 .ToReadOnlyCollection();
         var queryServices =
             services
                 .Where(d => d.ServiceType == typeof(DuplicateServiceRegistrationClasses.IShoppingQueryService))
-                .Select(p => new { Instance = p.ImplementationFactory?.Invoke(provider), ServiceType = p.ServiceType })
+                .Select(p => new { Instance = p.ImplementationFactory?.Invoke(provider), p.ServiceType })
                 .ToReadOnlyCollection();
         // results in duplicate service registration
         commandServices.Count.Should().Be(2);

@@ -1,24 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentAssertions;
-using JLib.Data;
+﻿using FluentAssertions;
 using JLib.DataProvider;
 using JLib.DependencyInjection;
 using JLib.Exceptions;
-using JLib.Helper;
 using JLib.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using static JLib.Reflection.Attributes.TvtFactoryAttribute;
+using Microsoft.Extensions.Logging;
+using Xunit.Abstractions;
 
-namespace JLib.Tests.Data;
+namespace JLib.DataProvider.InMemory.Tests;
 public class InMemoryDataProviderTests
 {
     private readonly IDataProviderRw<TestEntity> _dataProvider;
 
-    [Implements(typeof(ITestEntity)), Priority(NextPriority - 1000)]
+    [TvtFactoryAttribute.Implements(typeof(ITestEntity)), TvtFactoryAttribute.Priority(NextPriority - 1000)]
     public record TestEntityType(Type Value) : EntityType(Value);
     public interface ITestEntity : IEntity
     {
@@ -29,15 +23,16 @@ public class InMemoryDataProviderTests
         public Guid Id { get; set; }
 
     }
-    public InMemoryDataProviderTests()
+    public InMemoryDataProviderTests(ITestOutputHelper testOutputHelper)
     {
+        var loggerFactory = new LoggerFactory()
+            .AddXunit(testOutputHelper);
         IExceptionManager exceptions = new ExceptionManager("Test");
         IServiceCollection services = new ServiceCollection()
-            .AddTypeCache(out var typeCache, exceptions,
-                // todo
-
+            .AddTypeCache(out var typeCache, exceptions, loggerFactory,
                 TypePackage.GetNested<InMemoryDataProviderTests>())
-            .AddDataProvider<TestEntityType, InMemoryDataProvider<ITestEntity>, ITestEntity>(typeCache, null, null, null, exceptions);
+            .AddDataProvider<TestEntityType, InMemoryDataProvider<ITestEntity>, ITestEntity>(
+                typeCache, null, null, null, exceptions, loggerFactory);
         ;
         exceptions.ThrowIfNotEmpty();
         var provider = services.BuildServiceProvider();

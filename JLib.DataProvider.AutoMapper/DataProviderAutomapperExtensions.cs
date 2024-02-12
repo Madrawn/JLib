@@ -80,10 +80,10 @@ public static class DataProviderAutomapperExtensions
         Func<TTvt, ITypeValueType?> sourcePropertyReader,
         Func<TTvt, bool> isReadOnly,
         IExceptionManager exceptions,
-        ILoggerProvider loggerProvider)
+        ILoggerFactory loggerFactory)
         where TTvt : class, IDataObjectType
     {
-        var logger = loggerProvider.CreateLogger(typeof(DataProviderAutomapperExtensions).FullName!);
+        var logger = loggerFactory.CreateLogger(typeof(DataProviderAutomapperExtensions).FullName!);
         using var _ = logger.BeginScope(nameof(AddMapDataProvider));
         filter ??= _ => true;
         exceptions = exceptions.CreateChild(
@@ -101,7 +101,7 @@ public static class DataProviderAutomapperExtensions
             null,
             typeArguments,
             exceptions,
-            loggerProvider
+            loggerFactory
         );
         //Log.ForContext(typeof(ServiceCollectionHelper)).ForContext<IDataProviderR<IDataObject>>().Verbose("WritableMapDataProvider");
         //services.AddDataProvider<TTvt, WritableMapDataProvider<IEntity, IEntity>, IEntity>(

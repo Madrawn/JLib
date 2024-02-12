@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <IsTestProject>true</IsTestProject>
@@ -10,6 +10,10 @@
     <ProjectReference Include="..\JLib.Testing\JLib.Testing.csproj" />
     <ProjectReference Include="..\JLib.Tests.Reflection.DemoAssembly2\JLib.Tests.Reflection.DemoAssembly2.csproj" />
     <ProjectReference Include="..\JLib.Tests.Reflection.DemoAssembly\JLib.Tests.Reflection.DemoAssembly.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\" />
   </ItemGroup>
 
 </Project>

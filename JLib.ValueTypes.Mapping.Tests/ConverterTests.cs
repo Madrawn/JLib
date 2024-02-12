@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using AutoMapper;
 using FluentAssertions;
-using JLib.DataGeneration;
+using JLib.AutoMapper;
+using JLib.DependencyInjection;
 using JLib.Exceptions;
-using JLib.Helper;
 using JLib.Reflection;
 using JLib.ValueTypes;
-using JLib.ValueTypes.SystemTextJson;
+using JLib.ValueTypes.Mapping.SystemTextJson;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Xunit;
+using Xunit.Abstractions;
 
 namespace JLib.Tests.ValueTypes.SystemTextJson;
 
@@ -25,12 +23,13 @@ public class ConverterTests : IDisposable
     record GuidVt(Guid Value) : GuidValueType(Value);
     record IntVt(int Value) : IntValueType(Value);
 
-    public ConverterTests()
+    public ConverterTests(ITestOutputHelper testOutputHelper)
     {
+        var loggerFactory = new LoggerFactory().AddXunit(testOutputHelper);
         var exceptions = new ExceptionManager("setup");
         var services = new ServiceCollection()
-            .AddTypeCache(out var typeCache, exceptions, JLibTypePackage.Instance, TypePackage.GetNested<ConverterTests>())
-            .AddAutoMapper(m => m.AddProfiles(typeCache));
+            .AddTypeCache(out var typeCache, exceptions, loggerFactory, JLibReflectionTp.Instance, TypePackage.GetNested<ConverterTests>())
+            .AddAutoMapper(m => m.AddProfiles(typeCache, loggerFactory));
 
         _provider = services.BuildServiceProvider();
         _mapper = _provider.GetRequiredService<IMapper>();

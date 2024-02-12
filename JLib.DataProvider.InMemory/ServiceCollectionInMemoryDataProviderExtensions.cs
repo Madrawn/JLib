@@ -16,17 +16,17 @@ public static class ServiceCollectionInMemoryDataProviderExtensions
     public static IServiceCollection AddInMemoryDataProvider<TTvt>(
         this IServiceCollection services,
         ITypeCache typeCache,
-        IExceptionManager exceptions, ILoggerProvider loggerProvider)
+        IExceptionManager exceptions, ILoggerFactory loggerFactory)
         where TTvt : class, IDataObjectType
     {
-        var logger = loggerProvider.CreateLogger(typeof(ServiceCollectionInMemoryDataProviderExtensions).FullName!);
+        var logger = loggerFactory.CreateLogger(typeof(ServiceCollectionInMemoryDataProviderExtensions).FullName!);
         var _ = logger.BeginScope(nameof(AddInMemoryDataProvider));
         logger.LogWarning("Providing InMemoryDataProvider");
         var msg = $"{nameof(AddInMemoryDataProvider)} failed for valueType {typeof(TTvt).Name}";
         exceptions = exceptions.CreateChild(msg);
 
         services.AddDataProvider<TTvt, InMemoryDataProvider<IEntity>, IEntity>(typeCache, null, null, null, exceptions,
-            loggerProvider, ServiceLifetime.Singleton);
+            loggerFactory, ServiceLifetime.Singleton);
 
         return services;
     }

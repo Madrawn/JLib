@@ -1,3 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <ItemGroup>
+    <ProjectReference Include="..\JLib.Reflection\JLib.Reflection.csproj" />
+  </ItemGroup>
 </Project>

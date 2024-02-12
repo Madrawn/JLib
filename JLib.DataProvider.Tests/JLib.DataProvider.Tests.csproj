@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+      <IstestProject>true</IstestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JLib.Cqrs\JLib.Cqrs.csproj" />
+    <ProjectReference Include="..\JLib.DataGeneration\JLib.DataGeneration.csproj" />
+    <ProjectReference Include="..\JLib.DataProvider.Testing\JLib.DataProvider.Testing.csproj" />
+    <ProjectReference Include="..\JLib.DataProvider\JLib.DataProvider.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,20 +1,13 @@
-﻿using FluentAssertions;
+﻿using System.Reflection;
+using FluentAssertions;
 using JLib.Helper;
-using JLib.Reflection;
 using JLib.Tests.Reflection.DemoAssembly;
 using JLib.Tests.Reflection.DemoAssembly2;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using FluentAssertions.Types;
 using Snapshooter;
 using Snapshooter.Xunit;
+using Xunit;
 
-namespace JLib.Tests.Reflection;
+namespace JLib.Reflection.Tests;
 public class TypePackageTests
 {
     #region nested classes

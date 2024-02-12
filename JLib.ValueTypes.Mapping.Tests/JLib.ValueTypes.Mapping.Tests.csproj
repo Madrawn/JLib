@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+      <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JLib.DependencyInjection\JLib.DependencyInjection.csproj" />
+    <ProjectReference Include="..\JLib.Reflection\JLib.Reflection.csproj" />
+    <ProjectReference Include="..\JLib.ValueTypes.Mapping\JLib.ValueTypes.Mapping.csproj" />
+    <ProjectReference Include="..\JLib.ValueTypes\JLib.ValueTypes.csproj" />
+  </ItemGroup>
+
+</Project>

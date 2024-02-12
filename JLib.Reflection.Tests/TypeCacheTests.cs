@@ -1,26 +1,24 @@
-﻿using JLib.Exceptions;
+﻿using FluentAssertions;
+using JLib.Exceptions;
 using JLib.Helper;
-using JLib.Reflection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentAssertions;
 using JLib.Testing;
+using Microsoft.Extensions.Logging;
 using Snapshooter;
 using Snapshooter.Xunit;
-using JLib.Reflection.Attributes;
+using Xunit;
+using Xunit.Abstractions;
 
-namespace JLib.Tests.Reflection;
+namespace JLib.Reflection.Tests;
 /// <summary>
 /// tests for multiple constellations of inputTypes for the typeCache<br/>
 /// to add a testcase, create a subclass with the expected types.<br/>
 /// the result will be validated via snapshot<br/>
 /// to run only a single test for debug purposes, add the <see cref="FocusTestAttribute"/> to the container class
 /// </summary>
-public class TypeCacheTests
+public class TypeCacheTests : IDisposable
 {
+    private readonly ILoggerFactory _loggerFactory;
+    private readonly List<IDisposable> _disposables = new();
 
     public static class TypeValueTypeWithoutFactoryAttribute
     {
@@ -38,8 +36,12 @@ public class TypeCacheTests
         public class InconclusiveType : IDemoTypeA, IDemoTypeB { }
     }
 
+    public TypeCacheTests(ITestOutputHelper testOutputHelper)
+    {
+        _loggerFactory = new LoggerFactory().AddXunit(testOutputHelper);
+        _disposables.Add(_loggerFactory);
+    }
 
-    #region testing logic
     /// <summary>
     /// a parent class with this attribute will be the only test executed and cause the <see cref="TypeCacheTests.FocusNotSet"/> test to fail
     /// </summary>
@@ -48,12 +50,18 @@ public class TypeCacheTests
     private class FocusTestAttribute : Attribute { }
     public static TheoryData<Type> GetTestTypes()
     {
+
         var anyFocus = typeof(TypeCacheTests).GetNestedTypes().Any(t => t.HasCustomAttribute<FocusTestAttribute>());
 
-        return new(typeof(TypeCacheTests)
-            .GetNestedTypes()
-            .Where(t => !anyFocus || t.HasCustomAttribute<FocusTestAttribute>())
-            );
+        var d = new TheoryData<Type>();
+        foreach (var type in typeof(TypeCacheTests)
+                     .GetNestedTypes()
+                     .Where(t => !anyFocus || t.HasCustomAttribute<FocusTestAttribute>())
+                )
+        {
+            d.Add(type);
+        }
+        return d;
     }
 
     [Theory]
@@ -63,7 +71,7 @@ public class TypeCacheTests
         var testName = sut.Name;
         var package = TypePackage.GetNested(sut);
         var exceptions = new ExceptionManager(testName);
-        var cache = new TypeCache(package, exceptions);
+        var cache = new TypeCache(package, exceptions, _loggerFactory);
         new Dictionary<string, object?>()
             {
                 { "TestName",testName },
@@ -107,5 +115,6 @@ public class TypeCacheTests
             .Should()
             .OnlyContain(t => !t.HasCustomAttribute<FocusTestAttribute>(true), "Some tests have the Focus attribute set");
     }
-    #endregion
+
+    public void Dispose() => _disposables.DisposeAll();
 }

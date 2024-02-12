@@ -1,8 +1,12 @@
-﻿using JLib.Data;
+﻿using JLib.Cqrs;
+using JLib.DataProvider;
+using JLib.DataProvider.Testing;
+using JLib.DependencyInjection;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Xunit;
 using Xunit.Abstractions;
 
 namespace JLib.Tests.Reflection.ServiceCollection.AddDataProvider;
@@ -35,9 +39,9 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestCommandEntity),
                 typeof(TestDataProviderR<>),
             },
-            (services,cache,exceptions)=>
+            (services,cache,loggerFactory,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
-                    cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
+                    cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
             ),
         #endregion
         #region Repository: None       DataProvider: ReadWrite          NoRepo_ProvRw
@@ -59,9 +63,9 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestCommandEntity),
                 typeof(TestDataProviderRw<>),
             },
-            (services,cache,exceptions)=>
+            (services,cache,loggerFactory,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
-                    cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
+                    cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
         ),
         #endregion
         #region Repository: None       DataProvider: Forced ReadOnly    NoRepo_ProvFr
@@ -83,9 +87,9 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestCommandEntity),
                 typeof(TestDataProviderRw<>),
             },
-            (services,cache,exceptions)=>
+            (services,cache,loggerFactory,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
-                    cache, null, _=>true, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
+                    cache, null, _=>true, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
         ),
         #endregion
         #region Repository: ReadOnly   DataProvider: ReadOnly           RepoR_ProvR
@@ -108,9 +112,9 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestDataProviderR<>),
                 typeof(TestRepositoryR)
             },
-            (services,cache,exceptions)=>
+            (services,cache,loggerFactory,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
-                    cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
+                    cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
         ),
         #endregion
         #region Repository: None       DataProvider: ReadOnly           NoRepo_ProvR_Filter
@@ -140,9 +144,9 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestCommandEntity2),
                 typeof(TestDataProviderR<>)
             },
-            (services,cache,exceptions)=>
+            (services,cache,loggerFactory,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
-                    cache, tvt=>tvt.Value == typeof(TestCommandEntity2), null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
+                    cache, tvt=>tvt.Value == typeof(TestCommandEntity2), null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
         ),
         #endregion
         #region Repository: None       DataProvider: ReadOnly           NoRepo_ProvR_FilteredInv
@@ -173,9 +177,9 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestRepositoryRw),
                 typeof(TestDataProviderR<>)
             },
-            (services,cache,exceptions)=>
+            (services,cache,loggerFactory,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
-                    cache, tvt=>tvt.Value == typeof(TestCommandEntity2), null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
+                    cache, tvt=>tvt.Value == typeof(TestCommandEntity2), null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
         ),
         #endregion
         #region Repository: None       DataProvider: ReadOnly           NoRepo_ProvR_2Ce
@@ -204,9 +208,9 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestCommandEntity2),
                 typeof(TestDataProviderR<>)
             },
-            (services,cache,exceptions)=>
+            (services,cache,loggerFactory,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
-                    cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
+                    cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
         ),
         #endregion
         #region Repository: None       DataProvider: ReadOnly           NoRepo_Prov`2_Ce2
@@ -236,7 +240,7 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestCommandEntity2),
                 typeof(TestDataProviderR<,>)
             },
-            (services,cache,exceptions)=>
+            (services,cache,loggerFactory,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestDataProviderR<ITestEntity1,ITestEntity2>, ITestEntity2>(
                     cache, ce=>ce.Value == typeof(TestCommandEntity), null,
                     new Func<CommandEntityType,ITypeValueType>[]
@@ -244,7 +248,7 @@ public class AddDataProviderTests : ReflectionTestBase
                         ce=>ce,
                         _=>cache.Get<CommandEntityType>(typeof(TestCommandEntity2)),
                     },
-                    exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
+                    exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
         ),
         #endregion
         #region Repository: None       DataProvider: Ce R, Ce2 Rw       NoRepo_ProvCeR_provCe2Rw
@@ -274,9 +278,9 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestCommandEntity2),
                 typeof(TestDataProviderRw<>)
             },
-            (services,cache,exceptions)=>
+            (services,cache,loggerFactory,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
-                    cache, null, tvt=>tvt.Value == typeof(TestCommandEntity), null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
+                    cache, null, tvt=>tvt.Value == typeof(TestCommandEntity), null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
         ),
         #endregion
         #region Repository: ReadOnly   DataProvider: ReadWrite          RepoR_ProvRw
@@ -297,9 +301,9 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestDataProviderRw<>),
                 typeof(TestRepositoryR)
             },
-            (services,cache,exceptions)=>
+            (services,cache,loggerFactory,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
-                        cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
+                        cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory),
             true,false,false
         ),
         #endregion
@@ -323,9 +327,9 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestDataProviderRw<>),
                 typeof(TestRepositoryR)
             },
-            (services,cache,exceptions)=>
+            (services,cache,loggerFactory,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
-                    cache, null, _=>true, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
+                    cache, null, _=>true, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
         ),
         #endregion
         #region Repository: ReadWrite  DataProvider: ReadOnly           RepoRw_ProvR
@@ -345,9 +349,9 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestDataProviderR<>),
                 typeof(TestRepositoryRw)
             },
-            (services,cache,exceptions)=>
+            (services,cache,loggerFactory,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
-                    cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
+                    cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory),
             true,false,false
         ),
         #endregion
@@ -371,9 +375,9 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestDataProviderRw<>),
                 typeof(TestRepositoryRw)
             },
-            (services,cache,exceptions)=>
+            (services,cache,loggerFactory,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
-                    cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider)))
+                    cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
         ),
         #endregion
         #region Repository: ReadWrite  DataProvider: Forced ReadOnly    RepoRw_ProvFr
@@ -393,9 +397,9 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestDataProviderRw<>),
                 typeof(TestRepositoryRw)
             },
-            (services,cache,exceptions)=>
+            (services,cache,loggerFactory,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
-                    cache, null, _=>true, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
+                    cache, null, _=>true, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory),
             true,false,false
         ),
         #endregion
@@ -416,9 +420,9 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestDataProviderRw<>),
                 typeof(TestInvalidRepositoryRw)
             },
-            (services,cache,exceptions)=>
+            (services,cache,loggerFactory,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
-                    cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
+                    cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory),
             true,false,false
         ),
         #endregion
@@ -439,9 +443,9 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestDataProviderR<>),
                 typeof(TestInvalidRepositoryR)
             },
-            (services,cache,exceptions)=>
+            (services,cache,loggerFactory,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
-                    cache, null, _=>true, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
+                    cache, null, _=>true, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory),
             true,false,false
         ),
         #endregion
@@ -461,9 +465,9 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestCommandEntity),
                 typeof(TestInvalidDataProviderR<>),
             },
-            (services,cache,exceptions)=>
+            (services,cache,loggerFactory,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestInvalidDataProviderR<IEntity>, IEntity>(
-                    cache, null, _=>true, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
+                    cache, null, _=>true, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory),
             true,false,false
         ),
         #endregion
@@ -483,9 +487,9 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestCommandEntity),
                 typeof(TestInvalidDataProviderRw<>),
             },
-            (services,cache,exceptions)=>
+            (services,cache,loggerFactory,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestInvalidDataProviderRw<IEntity>, IEntity>(
-                    cache, null, _=>true, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
+                    cache, null, _=>true, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory),
             true,false,false
         ),
         #endregion
@@ -507,9 +511,9 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestRepositoryR),
                 typeof(TestRepositoryRw)
             },
-            (services,cache,exceptions)=>
+            (services,cache,loggerFactory,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
-                    cache, null, null, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
+                    cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory),
             true,false,false
         ),
         #endregion
@@ -529,9 +533,9 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestCommandEntity),
                 typeof(TestInvalidInterfaceDataProvider<>),
             },
-            (services,cache,exceptions)=>
+            (services,cache,loggerFactory,exceptions)=>
                 services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
-                    cache, null, _=>true, null, exceptions.CreateChild(nameof(ServiceCollectionHelper.AddDataProvider))),
+                    cache, null, _=>true, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory),
             true,false,false
         ),
         #endregion
@@ -659,7 +663,7 @@ public class AddDataProviderTests : ReflectionTestBase
         public override IQueryable<T> Get() => throw new NotImplementedException();
     }
 
-    public class TestInvalidInterfaceDataProvider<T> :DataProviderRBase<T>, ISourceDataProviderR<T>, IDataProviderRw<T>
+    public class TestInvalidInterfaceDataProvider<T> : DataProviderRBase<T>, ISourceDataProviderR<T>, IDataProviderRw<T>
         where T : IEntity
     {
         public override IQueryable<T> Get() => throw new NotImplementedException();

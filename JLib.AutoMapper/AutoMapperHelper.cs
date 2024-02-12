@@ -6,13 +6,13 @@ namespace JLib.AutoMapper;
 
 public static class AutoMapperHelper
 {
-    public static void AddProfiles(this IMapperConfigurationExpression builder, ITypeCache typeCache, ILogger logger)
+    public static void AddProfiles(this IMapperConfigurationExpression builder, ITypeCache typeCache, ILoggerFactory loggerFactory)
     {
-        using var scope = logger.BeginScope("Adding AutoMapper profiles");
+        var logger = loggerFactory.CreateLogger(typeof(AutoMapperHelper));
         builder.AddProfiles(typeCache.All<AutoMapperProfileType>().Select(p =>
         {
             logger.LogDebug("    Loading {profile}", p.Name);
-            return p.Create(typeCache);
+            return p.Create(typeCache, loggerFactory);
         }));
     }
 }

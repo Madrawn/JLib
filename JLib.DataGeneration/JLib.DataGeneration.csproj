@@ -1,15 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <IsPackable>true</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="AutoMapper" Version="12.0.1" />
+        <PackageReference Include="AutoMapper" Version="12.0.1" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\JLib.Reflection\JLib.Reflection.csproj" />
+        <ProjectReference Include="..\JLib.Reflection\JLib.Reflection.csproj" />
     </ItemGroup>
 
 </Project>

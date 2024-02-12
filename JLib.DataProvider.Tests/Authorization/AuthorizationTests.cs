@@ -1,14 +1,19 @@
 ﻿using FluentAssertions;
-using JLib.Data;
-using JLib.Data.Authorization;
+using JLib.Cqrs;
 using JLib.DataGeneration;
+using JLib.DataProvider.Authorization;
+using JLib.DependencyInjection;
 using JLib.Exceptions;
-using JLib.Helper;
 using JLib.Reflection;
 using JLib.ValueTypes;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using Xunit;
+using Xunit.Abstractions;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
-namespace JLib.Tests.Data.Authorization;
+namespace JLib.DataProvider.Tests.Authorization;
 
 public class AuthorizationTests
 {
@@ -17,14 +22,19 @@ public class AuthorizationTests
     private readonly TestAuthorizationCondition _authEnabler;
     private readonly TestObjectDataPackage _dataPackage;
 
-    public AuthorizationTests()
+    public AuthorizationTests(ITestOutputHelper testOutputHelper)
     {
+
+        using var loggerFactory = new LoggerFactory().AddXunit(testOutputHelper);
+
+        var logger = new LoggerConfiguration().CreateLogger();
         var exceptions = new ExceptionManager("test");
         var services = new ServiceCollection()
+            .AddLogging()
             .AddTypeCache(
-                out var typeCache, exceptions,
-                JLibTypePackage.Instance,
-                JLibDataGenerationTypePackage.Instance,
+                out var typeCache, exceptions, loggerFactory,
+                JLibDataProviderTp.Instance,
+                JLibDataGenerationTp.Instance,
                 TypePackage.GetNested<AuthorizationTests>()
                 )
             .AddSingleton<TestAuthorizationCondition>()
@@ -33,7 +43,7 @@ public class AuthorizationTests
             .AddDataAuthorization(typeCache)
             .AddAutoMapper(b => { b.CreateMap<Guid, Guid>(); })
             .AddDataProvider<CommandEntityType, InMemoryDataProvider<IEntity>, IEntity>(
-                typeCache, null, null, null, exceptions)
+                typeCache, null, null, null, exceptions, loggerFactory)
             ;
         _serviceProvider = services.BuildServiceProvider();
         _serviceProvider.IncludeDataPackages<TestObjectDataPackage>();
@@ -125,7 +135,7 @@ public class AuthorizationTests
         public TestDataObjectId ThirdUnAuthorizedId { get; init; } = null!;
         public TestObjectDataPackage(IDataPackageManager packageManager, IDataProviderRw<TestDataObject> dataProvider) : base(packageManager)
         {
-            
+
             dataProvider.Add(new TestDataObject[]
             {
                 new()

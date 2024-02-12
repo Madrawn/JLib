@@ -6,7 +6,7 @@ using Snapshooter;
 using Snapshooter.Xunit;
 
 namespace JLib.Testing;
-public static class EnumerableHelper
+public static class EnumerableSnapshotExtensions
 {
     /// <summary>
     /// groups the enumerable by namespace and then by typeValueType, using json objects to identify each group

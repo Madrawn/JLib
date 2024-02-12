@@ -103,7 +103,7 @@ public static class DataProviderServiceCollectionExtensions
         Func<TTvt, bool>? forceReadOnly,
         Func<TTvt, ITypeValueType>[]? implementationTypeArgumentResolver,
         IExceptionManager exceptions,
-        ILoggerProvider loggerProvider,
+        ILoggerFactory loggerFactory,
         ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TTvt : class, IDataObjectType
         where TImplementation : IDataProviderR<TIgnoredDataObject>
@@ -118,7 +118,7 @@ public static class DataProviderServiceCollectionExtensions
         exceptions = exceptions.CreateChild(msg);
 
         services.AddGenericServices(typeCache, implementation, implementation,
-            lifetime, exceptions, loggerProvider, filter, implementationTypeArgumentResolver,
+            lifetime, exceptions, loggerFactory, filter, implementationTypeArgumentResolver,
             implementationTypeArgumentResolver);
 
         #region read/write mode mismatch check
@@ -167,7 +167,7 @@ public static class DataProviderServiceCollectionExtensions
                      typeof(ISourceDataProviderRw<>)
                  })
             services.AddGenericAlias(typeCache, serviceType, implementation,
-                lifetime, exceptions, loggerProvider, FilterIt(implementation, serviceType, repos),
+                lifetime, exceptions, loggerFactory, FilterIt(implementation, serviceType, repos),
                 null, implementationTypeArgumentResolver);
 
         return services;

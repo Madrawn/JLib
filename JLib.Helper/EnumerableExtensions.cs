@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace JLib.Helper;
 
-public static class EnumerableHelper
+public static class EnumerableExtensions
 {
     /// <summary>
     /// returns true if <paramref name="src"/> contains at least 2 elements without enumerating the entire list

@@ -1,81 +1,30 @@
-﻿using System.Collections;
+﻿using JLib.DependencyInjection;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
 using JLib.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Snapshooter;
 using Snapshooter.Xunit;
+using Xunit;
 using Xunit.Abstractions;
 
-namespace JLib.Tests.Reflection;
+namespace JLib.DataProvider.Testing;
 
-public record ReflectionTestOptions(string TestName, string[] ExpectedBehavior, Type[] IncludedTypes,
-    Action<IServiceCollection, ITypeCache, IExceptionManager> ServiceFactory, bool TestException = true,
-    bool TestCache = true,
-    bool TestServices = true)
-{
-    public ReflectionTestOptions(string TestName, string[] ExpectedBehavior, IEnumerable<Type> IncludedTypes,
-        Action<IServiceCollection, ITypeCache, IExceptionManager> ServiceFactory, bool TestException = true,
-        bool TestCache = true,
-        bool TestServices = true) :
-        this(TestName, ExpectedBehavior, IncludedTypes.ToArray(), ServiceFactory, TestException, TestCache, TestServices)
-    { }
-}
-
-public abstract class ReflectionTestArguments : IEnumerable<object[]>
-{
-    /// <summary>
-    /// the options to provide to the test method
-    /// </summary>
-    protected abstract IEnumerable<ReflectionTestOptions> Options { get; }
-    /// <summary>
-    /// filters for test options with this exact name
-    /// </summary>
-    protected virtual string Filter { get; } = "";
-    /// <summary>
-    /// when true, skipped tests will be executed
-    /// </summary>
-    protected virtual bool ListSkippedTests { get; } = false;
-
-    public IEnumerator<object[]> GetEnumerator()
-        => Options
-            .Select(options =>
-            {
-                var skip = !string.IsNullOrWhiteSpace(Filter) && options.TestName != Filter;
-                return new object[]
-                {
-                    options , skip
-                };
-            })
-            //adding the first 2 tests to make sure that even if the test have been filtered, at least one test fails when a filter is applied
-            // this guarantees that no tests are skipped unintentionally in the test pipeline
-            .Where((parameters, i)
-                => !(bool)parameters[1] || ListSkippedTests
-#if RELEASE // guarantees, that when running the test in release mode at least one test fails when a test is focused
-                                        || i == 0 || i == 1
-#endif
-            )
-            .GetEnumerator();
-
-    IEnumerator IEnumerable.GetEnumerator()
-        => GetEnumerator();
-}
 public abstract class ReflectionTestBase
 {
     private readonly ITestOutputHelper _testOutput;
     private readonly IExceptionManager _exceptions;
+    private readonly ILoggerFactory _loggerFactory;
 
     protected ReflectionTestBase(ITestOutputHelper testOutput)
     {
         _exceptions = new ExceptionManager(GetType().FullClassName());
         _testOutput = testOutput;
-        Log.Logger = new LoggerConfiguration()
-            .WriteTo.Xunit(testOutput)
-            .Enrich.FromLogContext()
-            .MinimumLevel.Warning()
-            .CreateLogger();
+        _loggerFactory = new LoggerFactory()
+            .AddXunit(testOutput);
     }
 
     protected virtual void AddServices(IServiceCollection services, ITypeCache cache, IExceptionManager exceptions)
@@ -92,9 +41,9 @@ public abstract class ReflectionTestBase
         }
         var (testName, expectedBehavior, content, serviceFactory, testExceptions, testCache, testServices) = options;
 
-        IServiceCollection services = new Microsoft.Extensions.DependencyInjection.ServiceCollection()
+        IServiceCollection services = new ServiceCollection()
             .AddTypeCache(
-                out var cache, _exceptions, TypePackage.Get(content), JLibTypePackage.Instance);
+                out var cache, _exceptions, _loggerFactory, TypePackage.Get(content), JLibDataProviderTp.Instance);
 
         // group by namespace, then by typeValueType and use json objects for the grouping
         object cacheValidator;
@@ -110,7 +59,7 @@ public abstract class ReflectionTestBase
         }
 
         AddServices(services, cache, _exceptions.CreateChild(nameof(AddServices)));
-        serviceFactory(services, cache, _exceptions.CreateChild("Service Factory"));
+        serviceFactory(services, cache, _loggerFactory, _exceptions.CreateChild("Service Factory"));
 
         var exceptionValidator = _exceptions.GetException().PrepareSnapshot();
 
