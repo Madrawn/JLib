@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace JLib.HotChocolate.Reflection;
+namespace JLib.Reflection.HotChocolate.Query;
 
 public class AssemblyGdo
 {

@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
-using HotChocolate;
+using HotChocolate.Data;
 using JLib.Helper;
-using JLib.Reflection;
+using ServiceAttribute = HotChocolate.ServiceAttribute;
 
-namespace JLib.HotChocolate.Reflection;
+namespace JLib.Reflection.HotChocolate.Query;
 public class TypeCacheGdo
 {
     private readonly ITypeCache _typeCache;

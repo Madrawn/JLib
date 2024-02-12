@@ -1,6 +1,6 @@
 ﻿using JLib.DataProvider;
 
-namespace JLib.HotChocolate.Reflection;
+namespace JLib.Reflection.HotChocolate.Query;
 
 public class DataProviderInfoGdo
 {

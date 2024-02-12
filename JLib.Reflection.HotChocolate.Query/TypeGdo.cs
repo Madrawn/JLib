@@ -1,6 +1,6 @@
 ﻿using JLib.Helper;
 
-namespace JLib.HotChocolate.Reflection;
+namespace JLib.Reflection.HotChocolate.Query;
 
 
 public class TypeGdo

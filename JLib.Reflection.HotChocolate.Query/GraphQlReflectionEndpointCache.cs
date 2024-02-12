@@ -1,10 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using JLib.DataProvider;
 using JLib.Helper;
-using JLib.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace JLib.HotChocolate.Reflection;
+namespace JLib.Reflection.HotChocolate.Query;
 
 public interface IGraphQlReflectionEndpointCache
 {

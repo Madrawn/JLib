@@ -1,6 +1,4 @@
-﻿using JLib.Reflection;
-
-namespace JLib.HotChocolate.Reflection;
+﻿namespace JLib.Reflection.HotChocolate.Query;
 public class TypeValueTypeGdo
 {
     private readonly TypeValueType _src;

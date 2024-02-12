@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5E282B5F-814C-45E8-B4EA-818C627FFC6D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "__Solution Items__", "__Solution Items__", "{5E282B5F-814C-45E8-B4EA-818C627FFC6D}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
@@ -20,7 +20,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.DataGeneration", "JLib
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.HotChocolate", "JLib.HotChocolate\JLib.HotChocolate.csproj", "{D408B36B-2C09-48AA-B35A-C5431EF33D4B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{610F90DD-CC3F-46F1-8D49-01B8A26B1E81}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "__Tests__", "__Tests__", "{610F90DD-CC3F-46F1-8D49-01B8A26B1E81}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.Tests.Reflection.DemoAssembly", "JLib.Tests.Reflection.DemoAssembly\JLib.Tests.Reflection.DemoAssembly.csproj", "{A1EAF821-44AE-4C97-A625-DB7D6022C2D6}"
 EndProject
@@ -30,7 +30,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.EfCore", "JLib.EfCore\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.DataGeneration.Tests", "JLib.DataGeneration.Tests\JLib.DataGeneration.Tests.csproj", "{F30E60F8-7E87-4225-AEFC-571929C94BB2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{B450BA69-F38B-4EF5-81A5-7551941524E4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "__Examples__", "__Examples__", "{B450BA69-F38B-4EF5-81A5-7551941524E4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.DataGeneration.Examples", "Examples\JLib.DataGeneration.Examples\JLib.DataGeneration.Examples.csproj", "{69DB9CDA-72C8-4155-987E-479574580683}"
 EndProject
@@ -46,8 +46,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.ValueTypes.Mapping", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.AutoMapper", "JLib.AutoMapper\JLib.AutoMapper.csproj", "{97BFCC9F-5575-45F2-B16E-54E5535D298B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.ValueTypes.Common", "JLib.ValueTypes.Common\JLib.ValueTypes.Common.csproj", "{8C6435B0-4D80-4A15-979A-58BB8A723953}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.Cqrs", "JLib.Cqrs\JLib.Cqrs.csproj", "{5A0FF581-3DF6-42F4-B5EB-C26F449CF441}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.DataProvider", "JLib.DataProvider\JLib.DataProvider.csproj", "{58B2DE06-79BD-4BAE-8454-FC75B0A83C56}"
@@ -62,15 +60,23 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.DataProvider.AutoMappe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.Reflection.HotChocolate.Query", "JLib.Reflection.HotChocolate.Query\JLib.Reflection.HotChocolate.Query.csproj", "{0ACECC90-0DB2-42CA-BD96-2B07DAE32C46}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.DataTypes", "JLib.DataTypes\JLib.DataTypes.csproj", "{368E6193-8964-4EC3-BD37-B5C02CC5068D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.DataProvider.EfCore", "JLib.DataProvider.EfCore\JLib.DataProvider.EfCore.csproj", "{594712A4-8A7E-436B-8BB2-0252B0E3D823}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.DataProvider.EfCore", "JLib.DataProvider.EfCore\JLib.DataProvider.EfCore.csproj", "{594712A4-8A7E-436B-8BB2-0252B0E3D823}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.DataProvider.InMemory", "JLib.DataProvider.InMemory\JLib.DataProvider.InMemory.csproj", "{8B9CF432-5B5F-465F-9C75-027916E47DB8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.DataProvider.InMemory", "JLib.DataProvider.InMemory\JLib.DataProvider.InMemory.csproj", "{8B9CF432-5B5F-465F-9C75-027916E47DB8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib", "JLib\JLib.csproj", "{0449B90B-0EA8-4511-B887-4F40909FEAE7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib", "JLib\JLib.csproj", "{0449B90B-0EA8-4511-B887-4F40909FEAE7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.DataProvider.InMemory.Tests", "JLib.DataProvider.InMemory.Tests\JLib.DataProvider.InMemory.Tests.csproj", "{57032444-A4D3-41B9-9A3F-CBF8F97C742D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JLib.DataProvider", "JLib.DataProvider", "{0D921AA7-8601-4FFE-9F37-ADF3735AA21C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JLib.ValueTypes", "JLib.ValueTypes", "{80BEDE7B-0252-461E-B890-C652AA9F0A01}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JLib.Reflection", "JLib.Reflection", "{EFA2EA40-BBFA-474F-894E-655FDF9A0EE4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "__Tools__", "__Tools__", "{19B7F873-28AD-4EE6-B981-51A3FD42CAB0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.Tools.TypePackageGenerator", "Tools\JLib.Tools.TypePackageGenerator\JLib.Tools.TypePackageGenerator.csproj", "{FB2C8A19-7E95-4A47-B288-8D12C5D7F32C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -138,10 +144,6 @@ Global
 		{97BFCC9F-5575-45F2-B16E-54E5535D298B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97BFCC9F-5575-45F2-B16E-54E5535D298B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97BFCC9F-5575-45F2-B16E-54E5535D298B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8C6435B0-4D80-4A15-979A-58BB8A723953}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8C6435B0-4D80-4A15-979A-58BB8A723953}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8C6435B0-4D80-4A15-979A-58BB8A723953}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8C6435B0-4D80-4A15-979A-58BB8A723953}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5A0FF581-3DF6-42F4-B5EB-C26F449CF441}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5A0FF581-3DF6-42F4-B5EB-C26F449CF441}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A0FF581-3DF6-42F4-B5EB-C26F449CF441}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -170,10 +172,6 @@ Global
 		{0ACECC90-0DB2-42CA-BD96-2B07DAE32C46}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0ACECC90-0DB2-42CA-BD96-2B07DAE32C46}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0ACECC90-0DB2-42CA-BD96-2B07DAE32C46}.Release|Any CPU.Build.0 = Release|Any CPU
-		{368E6193-8964-4EC3-BD37-B5C02CC5068D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{368E6193-8964-4EC3-BD37-B5C02CC5068D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{368E6193-8964-4EC3-BD37-B5C02CC5068D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{368E6193-8964-4EC3-BD37-B5C02CC5068D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{594712A4-8A7E-436B-8BB2-0252B0E3D823}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{594712A4-8A7E-436B-8BB2-0252B0E3D823}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{594712A4-8A7E-436B-8BB2-0252B0E3D823}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -190,6 +188,10 @@ Global
 		{57032444-A4D3-41B9-9A3F-CBF8F97C742D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57032444-A4D3-41B9-9A3F-CBF8F97C742D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57032444-A4D3-41B9-9A3F-CBF8F97C742D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB2C8A19-7E95-4A47-B288-8D12C5D7F32C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB2C8A19-7E95-4A47-B288-8D12C5D7F32C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB2C8A19-7E95-4A47-B288-8D12C5D7F32C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB2C8A19-7E95-4A47-B288-8D12C5D7F32C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -200,7 +202,17 @@ Global
 		{4F8A73B0-058E-4EF1-BA11-B01CD6D85137} = {610F90DD-CC3F-46F1-8D49-01B8A26B1E81}
 		{F30E60F8-7E87-4225-AEFC-571929C94BB2} = {610F90DD-CC3F-46F1-8D49-01B8A26B1E81}
 		{69DB9CDA-72C8-4155-987E-479574580683} = {B450BA69-F38B-4EF5-81A5-7551941524E4}
+		{F66E7219-A47E-4FBF-83C4-9EE74EE05B1E} = {EFA2EA40-BBFA-474F-894E-655FDF9A0EE4}
+		{7CA446BF-04A2-47FF-A850-C7C67DCC576D} = {80BEDE7B-0252-461E-B890-C652AA9F0A01}
+		{D5CADC6B-AC86-46FB-85B1-7EDAE496E19B} = {80BEDE7B-0252-461E-B890-C652AA9F0A01}
+		{58B2DE06-79BD-4BAE-8454-FC75B0A83C56} = {0D921AA7-8601-4FFE-9F37-ADF3735AA21C}
+		{8916BCB9-CB90-48FE-A102-0C984E75B531} = {EFA2EA40-BBFA-474F-894E-655FDF9A0EE4}
+		{C796F629-5DD0-49D7-84A7-67B8D41A0493} = {0D921AA7-8601-4FFE-9F37-ADF3735AA21C}
+		{0ACECC90-0DB2-42CA-BD96-2B07DAE32C46} = {EFA2EA40-BBFA-474F-894E-655FDF9A0EE4}
+		{594712A4-8A7E-436B-8BB2-0252B0E3D823} = {0D921AA7-8601-4FFE-9F37-ADF3735AA21C}
+		{8B9CF432-5B5F-465F-9C75-027916E47DB8} = {0D921AA7-8601-4FFE-9F37-ADF3735AA21C}
 		{57032444-A4D3-41B9-9A3F-CBF8F97C742D} = {610F90DD-CC3F-46F1-8D49-01B8A26B1E81}
+		{FB2C8A19-7E95-4A47-B288-8D12C5D7F32C} = {19B7F873-28AD-4EE6-B981-51A3FD42CAB0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9007D83B-9D61-4FD9-927F-EEAC8281BF90}

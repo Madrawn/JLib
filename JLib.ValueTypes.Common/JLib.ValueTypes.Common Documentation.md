@@ -1,1 +1,0 @@
-﻿contains commonly used domain ValueTypes, excluding technical valuetypes like GuidValueType, IntValueType etc.

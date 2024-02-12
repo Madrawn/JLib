@@ -1,4 +1,6 @@
-﻿namespace JLib.HotChocolate.Reflection;
+﻿using HotChocolate.Data;
+
+namespace JLib.Reflection.HotChocolate.Query;
 
 public class TypeValueTypeGroupGdo
 {

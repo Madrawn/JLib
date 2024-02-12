@@ -6,4 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\JLib.DataProvider\JLib.DataProvider.csproj" />
+    <ProjectReference Include="..\JLib.HotChocolate\JLib.HotChocolate.csproj" />
+    <ProjectReference Include="..\JLib.Reflection\JLib.Reflection.csproj" />
+  </ItemGroup>
+
 </Project>

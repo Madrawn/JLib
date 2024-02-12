@@ -1,4 +1,4 @@
-﻿namespace JLib.DependencyInjection;
+﻿namespace JLib.Configuration;
 
 public static class ConfigurationSections
 {

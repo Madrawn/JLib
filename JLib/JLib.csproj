@@ -15,7 +15,6 @@
     <ProjectReference Include="..\JLib.DataProvider.EfCore\JLib.DataProvider.EfCore.csproj" />
     <ProjectReference Include="..\JLib.DataProvider.InMemory\JLib.DataProvider.InMemory.csproj" />
     <ProjectReference Include="..\JLib.DataProvider\JLib.DataProvider.csproj" />
-    <ProjectReference Include="..\JLib.DataTypes\JLib.DataTypes.csproj" />
     <ProjectReference Include="..\JLib.DependencyInjection\JLib.DependencyInjection.csproj" />
     <ProjectReference Include="..\JLib.EfCore\JLib.EfCore.csproj" />
     <ProjectReference Include="..\JLib.Exceptions\JLib.Exceptions.csproj" />
@@ -24,7 +23,6 @@
     <ProjectReference Include="..\JLib.Reflection.DependencyInjection\JLib.Reflection.DependencyInjection.csproj" />
     <ProjectReference Include="..\JLib.Reflection.HotChocolate.Query\JLib.Reflection.HotChocolate.Query.csproj" />
     <ProjectReference Include="..\JLib.Reflection\JLib.Reflection.csproj" />
-    <ProjectReference Include="..\JLib.ValueTypes.Common\JLib.ValueTypes.Common.csproj" />
     <ProjectReference Include="..\JLib.ValueTypes.Mapping\JLib.ValueTypes.Mapping.csproj" />
     <ProjectReference Include="..\JLib.ValueTypes\JLib.ValueTypes.csproj" />
   </ItemGroup>
