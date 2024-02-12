@@ -1,5 +1,5 @@
 <Project>
-	<PropertyGroup>
+    <PropertyGroup>
 
         <Version>0.1$(VersionSuffix)</Version>
         <AssemblyVersion>0.1$(VersionSuffix)</AssemblyVersion>
@@ -11,8 +11,8 @@
         <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 
         <Company>-</Company>
-		<Authors>Marcel Rehkemper</Authors>
-		
+        <Authors>Marcel Rehkemper</Authors>
+
         <AssemblyName>$(MSBuildProjectName)</AssemblyName>
         <Title>$(MSBuildProjectName)</Title>
         <IncludeSymbols>True</IncludeSymbols>
@@ -20,14 +20,15 @@
         <RepositoryUrl>https://github.com/JonnyIV/JLib</RepositoryUrl>
         <PackageProjectUrl>https://github.com/jonnyIV/jlib</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageReadmeFile>$(MSBuildProjectName).Documentation.md</PackageReadmeFile>
-	</PropertyGroup>
+        <PackageReadmeFile>$(MSBuildProjectName) Documentation.md</PackageReadmeFile>
+    </PropertyGroup>
 
     <ItemGroup>
-        <None Include="$(MSBuildProjectName).Documentation.md">
+        <None Include="$(MSBuildProjectName) Documentation.md">
             <Pack>True</Pack>
             <PackagePath>\</PackagePath>
         </None>
+
     </ItemGroup>
 
 </Project>
