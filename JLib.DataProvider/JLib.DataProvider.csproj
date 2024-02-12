@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JLib.DependencyInjection\JLib.DependencyInjection.csproj" />
+    <ProjectReference Include="..\JLib.Exceptions\JLib.Exceptions.csproj" />
+    <ProjectReference Include="..\JLib.Helper\JLib.Helper.csproj" />
+    <ProjectReference Include="..\JLib.Reflection\JLib.Reflection.csproj" />
+  </ItemGroup>
+
+</Project>

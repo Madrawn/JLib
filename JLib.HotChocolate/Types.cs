@@ -1,7 +1,8 @@
 ﻿using System.Reflection;
-using JLib.Data;
+using JLib.DataProvider;
 using JLib.Helper;
 using JLib.Reflection;
+using JLib.ValueTypes;
 using static JLib.Reflection.Attributes.TvtFactoryAttribute;
 
 namespace JLib.HotChocolate;

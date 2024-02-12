@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JLib.DataProvider\JLib.DataProvider.csproj" />
+    <ProjectReference Include="..\JLib.Reflection\JLib.Reflection.csproj" />
+  </ItemGroup>
+
+</Project>

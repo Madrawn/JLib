@@ -3,5 +3,6 @@
 namespace JLib.EfCore;
 public static class JLibEfCoreTypePackage
 {
-    public static ITypePackage Instance { get; } = TypePackage.Get(typeof(JLibEfCoreTypePackage).Assembly).Combine(JLibTypePackage.Instance);
+    // todo
+    public static ITypePackage Instance { get; } = TypePackage.Get(typeof(JLibEfCoreTypePackage).Assembly);
 }

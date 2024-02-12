@@ -1,0 +1,1 @@
+﻿contains types which enable the generic handling of classes which are identified by IDs, aka Entities

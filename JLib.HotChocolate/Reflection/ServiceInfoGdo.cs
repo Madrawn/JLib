@@ -1,4 +1,4 @@
-﻿using JLib.Data;
+﻿using JLib.DataProvider;
 using JLib.Helper;
 using JLib.Reflection;
 using Microsoft.Extensions.DependencyInjection;
