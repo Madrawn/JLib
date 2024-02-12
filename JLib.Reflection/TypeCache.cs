@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using JLib.Exceptions;
 using JLib.Helper;
-using JLib.Reflection.Attributes;
 using JLib.ValueTypes;
 using Microsoft.Extensions.Logging;
 
@@ -229,7 +228,7 @@ public class TypeCache : ITypeCache
         {
             try
             {
-                var tvtValidator = new TvtValidator(typeValueType.CastTo<TypeValueType>(),
+                var tvtValidator = new TypeValidator(typeValueType.CastTo<TypeValueType>(),
                     typeValueType.GetType().FullClassName());
                 typeValueType.Validate(this, tvtValidator);
                 exceptions.AddChild(tvtValidator);

@@ -1,5 +1,4 @@
 ﻿using JLib.Reflection;
-using JLib.Reflection.Attributes;
 
 namespace JLib.DataProvider;
 
@@ -12,7 +11,7 @@ public record EntityType(Type Value) : DataObjectType(Value), IValidatedType
 {
     public new const int NextPriority = DataObjectType.NextPriority - 1_000;
 
-    public virtual void Validate(ITypeCache cache, TvtValidator value)
+    public virtual void Validate(ITypeCache cache, TypeValidator value)
     {
         if (GetType() == typeof(EntityType))
             value.AddError(

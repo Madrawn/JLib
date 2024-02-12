@@ -3,14 +3,14 @@ using JLib.DataProvider;
 using JLib.Helper;
 using JLib.Reflection;
 using JLib.ValueTypes;
-using static JLib.Reflection.Attributes.TvtFactoryAttribute;
+using static JLib.Reflection.TvtFactoryAttribute;
 
 namespace JLib.HotChocolate;
 
 [Implements(typeof(IQueryDataObject)), IsClass, NotAbstract]
 public record QueryDataObjectType(Type Value) : DataObjectType(Value), IValidatedType
 {
-    public void Validate(ITypeCache cache, TvtValidator value)
+    public void Validate(ITypeCache cache, TypeValidator value)
     {
         var ctors = Value.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
         if (ctors.Length == 1)

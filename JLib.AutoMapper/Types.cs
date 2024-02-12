@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using JLib.Helper;
 using JLib.Reflection;
-using JLib.Reflection.Attributes;
 
 namespace JLib.AutoMapper;
 

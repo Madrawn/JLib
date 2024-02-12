@@ -2,7 +2,7 @@
 using JLib.Exceptions;
 using JLib.Reflection;
 using JLib.ValueTypes;
-using static JLib.Reflection.Attributes.TvtFactoryAttribute;
+using static JLib.Reflection.TvtFactoryAttribute;
 
 namespace JLib.Configuration;
 

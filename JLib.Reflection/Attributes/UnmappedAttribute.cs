@@ -1,4 +1,4 @@
-﻿namespace JLib.Reflection.Attributes;
+﻿namespace JLib.Reflection;
 
 /// <summary>
 /// the <see cref="ValueTypeProfile"/> will not create a profile from <see cref="ValueTypeType{T}.Value"/> to the <see cref="ValueTypeType{T}"/>

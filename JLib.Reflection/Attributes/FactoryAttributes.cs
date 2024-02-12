@@ -1,7 +1,7 @@
 ﻿using JLib.Exceptions;
 using JLib.Helper;
 
-namespace JLib.Reflection.Attributes;
+namespace JLib.Reflection;
 
 /// <summary>
 /// classes with this given attribute will not be ignored by the typeCache

@@ -6,7 +6,6 @@ using JLib.DataProvider;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
-using JLib.Reflection.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace JLib.HotChocolate.Helper;

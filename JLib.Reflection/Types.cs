@@ -1,7 +1,6 @@
 ﻿using JLib.Helper;
-using JLib.Reflection.Attributes;
 using JLib.ValueTypes;
-using static JLib.Reflection.Attributes.TvtFactoryAttribute;
+using static JLib.Reflection.TvtFactoryAttribute;
 
 namespace JLib.Reflection;
 
@@ -26,7 +25,7 @@ public record ValueTypeType(Type Value) : TypeValueType(Value), IValidatedType
 
     public bool Mapped => !Value.HasCustomAttribute<UnmappedAttribute>() && !Value.IsAbstract;
 
-    void IValidatedType.Validate(ITypeCache cache, TvtValidator value)
+    void IValidatedType.Validate(ITypeCache cache, TypeValidator value)
     {
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (NativeType is null)

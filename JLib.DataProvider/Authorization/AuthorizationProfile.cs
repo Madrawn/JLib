@@ -2,7 +2,7 @@
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
-using static JLib.Reflection.Attributes.TvtFactoryAttribute;
+using static JLib.Reflection.TvtFactoryAttribute;
 
 namespace JLib.DataProvider.Authorization;
 

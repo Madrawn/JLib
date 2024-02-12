@@ -1,6 +1,6 @@
 ﻿using JLib.DataProvider;
 using JLib.ValueTypes;
-using static JLib.Reflection.Attributes.TvtFactoryAttribute;
+using static JLib.Reflection.TvtFactoryAttribute;
 
 namespace JLib.Cqrs;
 

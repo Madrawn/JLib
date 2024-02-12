@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using JLib.Exceptions;
-using JLib.Reflection.Attributes;
 using JLib.ValueTypes;
 
 namespace JLib.Reflection;
@@ -16,7 +15,7 @@ public interface IPostNavigationInitializedType : ITypeValueType
 
 public interface IValidatedType : ITypeValueType
 {
-    void Validate(ITypeCache cache, TvtValidator value);
+    void Validate(ITypeCache cache, TypeValidator value);
 }
 
 public interface ITypeValueType
