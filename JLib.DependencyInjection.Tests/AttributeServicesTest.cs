@@ -1,15 +1,15 @@
 ﻿using FluentAssertions;
-using JLib.DependencyInjection;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Xunit;
 using Xunit.Abstractions;
 
 // ReSharper disable ClassNeverInstantiated.Local
 
-namespace JLib.Tests.DependencyInjection;
+namespace JLib.DependencyInjection.Tests;
 public class AttributeServicesTest : IDisposable
 {
     #region setup

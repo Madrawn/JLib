@@ -1,15 +1,12 @@
 ﻿using JLib.Cqrs;
-using JLib.DataProvider;
 using JLib.DataProvider.Testing;
-using JLib.DependencyInjection;
 using JLib.Exceptions;
-using JLib.Helper;
 using JLib.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace JLib.Tests.Reflection.ServiceCollection.AddDataProvider;
+namespace JLib.DataProvider.Tests.AddDataProvider;
 
 public class AddDataProviderTests : ReflectionTestBase
 {

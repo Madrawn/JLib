@@ -5,14 +5,13 @@ using JLib.AutoMapper;
 using JLib.DependencyInjection;
 using JLib.Exceptions;
 using JLib.Reflection;
-using JLib.ValueTypes;
 using JLib.ValueTypes.Mapping.SystemTextJson;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace JLib.Tests.ValueTypes.SystemTextJson;
+namespace JLib.ValueTypes.Mapping.Tests;
 
 public class ConverterTests : IDisposable
 {
