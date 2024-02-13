@@ -1,0 +1,50 @@
+﻿{
+  "Parameters": {
+    "TestName": "RepoIrw_ProvRw",
+    "ExpectedBehavior": [
+      "  Provided:                                                                                                                                                          ",
+      "    DataProvider         : Read Write                                                                                                                                ",
+      "    Repository           : Invalid ReadWrite                                                                                                                         ",
+      "  Expected Error:                                                                                                                                                    ",
+      "    An error which tells you that repositories must not implement the ISourceDataProvider Interface and that you must only implement the IDataProvider Interfaces    "
+    ],
+    "includedTypes": [
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity",
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderRw<>",
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestInvalidRepositoryRw"
+    ]
+  },
+  "exception": {
+    "Type": "JLib.Exceptions.JLibAggregateException",
+    "MessageLines": [
+      "AddDataProviderTests"
+    ],
+    "InnerExceptions": [
+      {
+        "Type": "JLib.Exceptions.JLibAggregateException",
+        "MessageLines": [
+          "Cache setup failed"
+        ],
+        "InnerExceptions": [
+          {
+            "Type": "JLib.Exceptions.JLibAggregateException",
+            "MessageLines": [
+              "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestInvalidRepositoryRw is not a valid JLib.DataProvider.RepositoryType"
+            ],
+            "InnerExceptions": [
+              {
+                "Type": "JLib.Exceptions.InvalidTypeException",
+                "MessageLines": [
+                  "Should not implement JLib.DataProvider.ISourceDataProviderR<>"
+                ],
+                "InnerExceptions": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "cache": "disabled",
+  "services": "disabled"
+}

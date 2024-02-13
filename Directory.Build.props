@@ -1,9 +1,8 @@
 <Project>
-	<PropertyGroup>
-
-        <Version>0.1$(VersionSuffix)</Version>
-        <AssemblyVersion>0.1$(VersionSuffix)</AssemblyVersion>
-        <FileVersion>0.1$(VersionSuffix)</FileVersion>
+    <PropertyGroup>
+        <Version>0.2$(VersionSuffix)</Version>
+        <AssemblyVersion>0.2$(VersionSuffix)</AssemblyVersion>
+        <FileVersion>0.2$(VersionSuffix)</FileVersion>
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -11,23 +10,63 @@
         <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 
         <Company>-</Company>
-		<Authors>Marcel Rehkemper</Authors>
-		
+        <Authors>Marcel Rehkemper</Authors>
+
         <AssemblyName>$(MSBuildProjectName)</AssemblyName>
         <Title>$(MSBuildProjectName)</Title>
-        <IncludeSymbols>True</IncludeSymbols>
         <RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-        <RepositoryUrl>https://github.com/JonnyIV/JLib</RepositoryUrl>
+    </PropertyGroup>
+
+    <!--Packed Projects-->
+    <PropertyGroup Condition="$(IsPackable)==true">
         <PackageProjectUrl>https://github.com/jonnyIV/jlib</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageReadmeFile>$(MSBuildProjectName).Documentation.md</PackageReadmeFile>
-	</PropertyGroup>
+        <PackageReadmeFile>$(MSBuildProjectName) Documentation.md</PackageReadmeFile>
+        <IncludeSymbols>True</IncludeSymbols>
+        <RepositoryUrl>https://github.com/JonnyIV/JLib</RepositoryUrl>
+        <!--Generate package only on release builds-->
+        <GeneratePackageOnBuild Condition="$(Configuration) == 'Release'">True</GeneratePackageOnBuild>
+    </PropertyGroup>
 
-    <ItemGroup>
-        <None Include="$(MSBuildProjectName).Documentation.md">
+    <!--Library Projects-->
+
+    <ItemGroup Condition="$(IsTestProject)!=true">
+        <!--Include documentation-->
+        <None Include="$(MSBuildProjectName) Documentation.md">
             <Pack>True</Pack>
             <PackagePath>\</PackagePath>
         </None>
+    </ItemGroup>
+
+    <!--Test Projects-->
+    <PropertyGroup Condition="$(IsTestProject)==true or $(MSBuildProjectName.EndsWith('testing'))">
+        <IsPackable Condition="$(OutputType)==Library">false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup Condition="$(IsTestProject)==true or $(MSBuildProjectName.EndsWith('testing'))">
+        <!--Setup-->
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+        <PackageReference Include="xunit" Version="2.4.2" />
+        <PackageReference Include="xunit.abstractions" Version="2.0.3" />
+        <PackageReference Include="xunit.assert" Version="2.4.2" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="coverlet.collector" Version="3.2.0">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <!--test methods-->
+        <PackageReference Include="Snapshooter.Xunit" Version="0.14.1" />
+        <PackageReference Include="FluentAssertions" Version="6.12.0" />
+        <PackageReference Include="Moq" Version="4.20.69" />
+        <!--logging-->
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+        <PackageReference Include="Xunit.Extensions.Logging" Version="1.1.0" />
+        <!--dependency injection-->
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
     </ItemGroup>
 
 </Project>

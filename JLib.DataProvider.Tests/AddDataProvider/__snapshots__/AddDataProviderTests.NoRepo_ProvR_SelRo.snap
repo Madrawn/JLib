@@ -1,0 +1,175 @@
+﻿{
+  "Parameters": {
+    "TestName": "NoRepo_ProvR_SelRo",
+    "ExpectedBehavior": [
+      "  Provided:                                  ",
+      "    DataProvider           : Read Only       ",
+      "    Repository             : -               ",
+      "    ReadOnlySelect         : Ce R, Ce2 Rw    ",
+      "  Expected Implementations:                  ",
+      "    TestCommandEntity                        ",
+      "      IDataProviderR       : DataProvider    ",
+      "      IDataProviderRw      : -               ",
+      "      ISourceDataProviderR : DataProvider    ",
+      "      ISourceDataProviderRw: -               ",
+      "    TestCommandEntity2                       ",
+      "      IDataProviderR       : DataProvider    ",
+      "      IDataProviderRw      : DataProvider    ",
+      "      ISourceDataProviderR : DataProvider    ",
+      "      ISourceDataProviderRw: DataProvider    "
+    ],
+    "includedTypes": [
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity",
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity2",
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderRw<>"
+    ]
+  },
+  "exception": null,
+  "cache": {
+    "JLib.DataProvider": {
+      "JLib.DataProvider.SourceDataProviderType": [
+        "JLib.DataProvider.CastDataProviderR<>",
+        "JLib.DataProvider.InMemoryDataProvider<>"
+      ]
+    },
+    "JLib.DataProvider.Tests.AddDataProvider": {
+      "JLib.Cqrs.CommandEntityType": [
+        "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity",
+        "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity2"
+      ],
+      "JLib.DataProvider.SourceDataProviderType": [
+        "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderRw<>"
+      ]
+    }
+  },
+  "services": {
+    "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity": {
+      "JLib.DataProvider.IDataProviderR<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Factory",
+          "ServiceType": "JLib.DataProvider.IDataProviderR<>",
+          "ServiceArguments": [
+            "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity"
+          ],
+          "ImplementationType": "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderRw<>",
+          "ImplementationTypeArguments": [
+            "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity"
+          ]
+        }
+      ],
+      "JLib.DataProvider.ISourceDataProviderR<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Factory",
+          "ServiceType": "JLib.DataProvider.ISourceDataProviderR<>",
+          "ServiceArguments": [
+            "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity"
+          ],
+          "ImplementationType": "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderRw<>",
+          "ImplementationTypeArguments": [
+            "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity"
+          ]
+        }
+      ],
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderRw<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Type",
+          "ServiceType": "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderRw<>",
+          "ServiceArguments": [
+            "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity"
+          ],
+          "ImplementationType": "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderRw<>",
+          "ImplementationTypeArguments": [
+            "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity"
+          ]
+        }
+      ]
+    },
+    "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity2": {
+      "JLib.DataProvider.IDataProviderR<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Factory",
+          "ServiceType": "JLib.DataProvider.IDataProviderR<>",
+          "ServiceArguments": [
+            "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity2"
+          ],
+          "ImplementationType": "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderRw<>",
+          "ImplementationTypeArguments": [
+            "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity2"
+          ]
+        }
+      ],
+      "JLib.DataProvider.IDataProviderRw<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Factory",
+          "ServiceType": "JLib.DataProvider.IDataProviderRw<>",
+          "ServiceArguments": [
+            "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity2"
+          ],
+          "ImplementationType": "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderRw<>",
+          "ImplementationTypeArguments": [
+            "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity2"
+          ]
+        }
+      ],
+      "JLib.DataProvider.ISourceDataProviderR<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Factory",
+          "ServiceType": "JLib.DataProvider.ISourceDataProviderR<>",
+          "ServiceArguments": [
+            "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity2"
+          ],
+          "ImplementationType": "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderRw<>",
+          "ImplementationTypeArguments": [
+            "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity2"
+          ]
+        }
+      ],
+      "JLib.DataProvider.ISourceDataProviderRw<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Factory",
+          "ServiceType": "JLib.DataProvider.ISourceDataProviderRw<>",
+          "ServiceArguments": [
+            "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity2"
+          ],
+          "ImplementationType": "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderRw<>",
+          "ImplementationTypeArguments": [
+            "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity2"
+          ]
+        }
+      ],
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderRw<>": [
+        {
+          "Lifetime": "Scoped",
+          "ImplementationSource": "Type",
+          "ServiceType": "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderRw<>",
+          "ServiceArguments": [
+            "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity2"
+          ],
+          "ImplementationType": "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderRw<>",
+          "ImplementationTypeArguments": [
+            "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity2"
+          ]
+        }
+      ]
+    },
+    "non-generic": {
+      "JLib.Reflection.ITypeCache": [
+        {
+          "Lifetime": "Singleton",
+          "ImplementationSource": "Instance",
+          "ServiceType": "JLib.Reflection.ITypeCache",
+          "ServiceArguments": [],
+          "ImplementationType": "JLib.Reflection.TypeCache",
+          "ImplementationTypeArguments": []
+        }
+      ]
+    }
+  }
+}

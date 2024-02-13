@@ -1,0 +1,13 @@
+﻿┐2 Assemblies
+├ Types:0
+├ Children:
+  ┐JLib.Reflection.Tests.DemoAssembly1
+  ├ Types:3
+  │   TestAssemblyDemoClassA
+  │   TestAssemblyDemoClassB
+  │   TestAssemblyDemoClassC
+  ┐JLib.Reflection.Tests.DemoAssembly2
+  ├ Types:3
+  │   TestAssembly2DemoClassA
+  │   TestAssembly2DemoClassB
+  │   TestAssembly2DemoClassC

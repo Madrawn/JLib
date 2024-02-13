@@ -1,0 +1,59 @@
+﻿{
+  "Parameters": {
+    "TestName": "RepoRw_ProvR",
+    "ExpectedBehavior": [
+      "  Provided:                                                                                                           ",
+      "    DataProvider         : Read Only                                                                                  ",
+      "    Repository           : Read Write                                                                                 ",
+      "  Expected Exception:                                                                                                 ",
+      "    an exception, which tells the user to provide the data provider as Read Write or not implement IDataProviderRw    "
+    ],
+    "includedTypes": [
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity",
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderR<>",
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestRepositoryRw"
+    ]
+  },
+  "exception": {
+    "Type": "JLib.Exceptions.JLibAggregateException",
+    "MessageLines": [
+      "AddDataProviderTests"
+    ],
+    "InnerExceptions": [
+      {
+        "Type": "JLib.Exceptions.JLibAggregateException",
+        "MessageLines": [
+          "Service Factory"
+        ],
+        "InnerExceptions": [
+          {
+            "Type": "JLib.Exceptions.JLibAggregateException",
+            "MessageLines": [
+              "AddDataProvider"
+            ],
+            "InnerExceptions": [
+              {
+                "Type": "JLib.Exceptions.JLibAggregateException",
+                "MessageLines": [
+                  "CommandEntityType"
+                ],
+                "InnerExceptions": [
+                  {
+                    "Type": "JLib.Exceptions.InvalidSetupException",
+                    "MessageLines": [
+                      "The data provider Implementation JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderR<JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity> is read only but the Repository JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestRepositoryRw can write data. ",
+                      "You can resolve this issue by not implementing IDataProviderRw with the Repository or using a data provider which implements ISourceDataProviderRw"
+                    ],
+                    "InnerExceptions": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "cache": "disabled",
+  "services": "disabled"
+}

@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+      <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JLib.DataProvider\JLib.DataProvider.csproj" />
+    <ProjectReference Include="..\JLib.Reflection\JLib.Reflection.csproj" />
+  </ItemGroup>
+
+</Project>

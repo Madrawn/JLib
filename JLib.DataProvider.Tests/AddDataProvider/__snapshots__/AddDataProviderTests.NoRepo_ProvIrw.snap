@@ -1,0 +1,49 @@
+﻿{
+  "Parameters": {
+    "TestName": "NoRepo_ProvIrw",
+    "ExpectedBehavior": [
+      "  Provided:                                                                             ",
+      "    DataProvider         : Invalid ReadWrite                                            ",
+      "    Repository           : -                                                            ",
+      "  Expected Exception:                                                                   ",
+      "    An exception which tells the user to implement the SourceDataProvider Interfaces    "
+    ],
+    "includedTypes": [
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity",
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestInvalidDataProviderRw<>"
+    ]
+  },
+  "exception": {
+    "Type": "JLib.Exceptions.JLibAggregateException",
+    "MessageLines": [
+      "AddDataProviderTests"
+    ],
+    "InnerExceptions": [
+      {
+        "Type": "JLib.Exceptions.JLibAggregateException",
+        "MessageLines": [
+          "Cache setup failed"
+        ],
+        "InnerExceptions": [
+          {
+            "Type": "JLib.Exceptions.JLibAggregateException",
+            "MessageLines": [
+              "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestInvalidDataProviderRw<> is not a valid JLib.DataProvider.SourceDataProviderType"
+            ],
+            "InnerExceptions": [
+              {
+                "Type": "JLib.Exceptions.InvalidTypeException",
+                "MessageLines": [
+                  "Should implement any JLib.DataProvider.ISourceDataProviderRw<>"
+                ],
+                "InnerExceptions": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "cache": "disabled",
+  "services": "disabled"
+}

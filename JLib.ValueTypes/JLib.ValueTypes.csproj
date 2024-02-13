@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+      <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JLib.Exceptions\JLib.Exceptions.csproj" />
+    <ProjectReference Include="..\JLib.Helper\JLib.Helper.csproj" />
+  </ItemGroup>
+
+</Project>

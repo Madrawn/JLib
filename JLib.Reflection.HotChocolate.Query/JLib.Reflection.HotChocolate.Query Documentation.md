@@ -1,0 +1,1 @@
+﻿adds a HotChocolate Graphql ObjectType which can be used to query the cached reflection state of the application

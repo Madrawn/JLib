@@ -2,14 +2,14 @@
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
-using static JLib.Reflection.Attributes.TvtFactoryAttribute;
+using static JLib.Reflection.TvtFactoryAttribute;
 
 namespace JLib.DataGeneration;
 
 [IsDerivedFrom(typeof(DataPackage)), NotAbstract]
 public record DataPackageType(Type Value) : TypeValueType(Value), IValidatedType
 {
-    public void Validate(ITypeCache cache, TvtValidator value)
+    public void Validate(ITypeCache cache, TypeValidator value)
     {
         value.ShouldBeSealed("a DataPackage has to be either Sealed or Abstract.");
 
