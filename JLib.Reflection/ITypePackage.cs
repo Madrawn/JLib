@@ -33,5 +33,5 @@ public interface ITypePackage
     /// </summary>
     public ITypePackage Combine(params ITypePackage[] packages);
 
-    public string ToString(bool includeTypes);
+    public string ToString(bool includeTypes, bool includeVersion = false);
 }

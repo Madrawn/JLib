@@ -114,7 +114,7 @@ public static class DataProviderServiceCollectionExtensions
         filter ??= _ => true;
         forceReadOnly ??= _ => false;
         var implementation = typeof(TImplementation).TryGetGenericTypeDefinition();
-        var msg = $"{nameof(AddDataProvider)} failed for valueType {typeof(TTvt).Name}";
+        var msg = typeof(TTvt).FullClassName();
         exceptions = exceptions.CreateChild(msg);
 
         services.AddGenericServices(typeCache, implementation, implementation,

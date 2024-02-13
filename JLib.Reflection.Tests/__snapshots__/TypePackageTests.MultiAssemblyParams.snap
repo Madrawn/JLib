@@ -1,12 +1,12 @@
-﻿┐0 Assemblies
+﻿┐2 Assemblies
 ├ Types:0
 ├ Children:
-  ┐JLib.Tests.Reflection.DemoAssembly, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+  ┐JLib.Reflection.Tests.DemoAssembly1
   ├ Types:3
   │   TestAssemblyDemoClassA
   │   TestAssemblyDemoClassB
   │   TestAssemblyDemoClassC
-  ┐JLib.Tests.Reflection.DemoAssembly2, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null
+  ┐JLib.Reflection.Tests.DemoAssembly2
   ├ Types:3
   │   TestAssembly2DemoClassA
   │   TestAssembly2DemoClassB

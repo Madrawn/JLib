@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using FluentAssertions;
 using JLib.Helper;
-using JLib.Tests.Reflection.DemoAssembly;
-using JLib.Tests.Reflection.DemoAssembly2;
-using Snapshooter;
+using JLib.Reflection.Tests.DemoAssembly1;
+using JLib.Reflection.Tests.DemoAssembly2;
 using Snapshooter.Xunit;
 using Xunit;
 
@@ -64,121 +64,123 @@ public class TypePackageTests
     private static readonly Assembly DemoAssembly2 = DemoAssembly2Types.First().Assembly;
     #endregion
 
-    public static readonly object[][] TestCases = new object[][]
-    {
-        #region Assembly
-        new object[]
-        {
-            "SingleAssemblyWithNameTemplate",
-            TypePackage.Get(DemoAssembly, "Testing Assembly {0} {1}"),
-            DemoAssemblyTypes
-        },
-        new object[]
-        {
-            "SingleAssembly",
-            TypePackage.Get(DemoAssembly),
-            DemoAssemblyTypes
-        },
-        new object[]
-        {
-            "MultiAssemblyParams",
-            TypePackage.Get(DemoAssembly,DemoAssembly2),
-            DemoAssemblyTypes.Concat(DemoAssembly2Types)
-        },
-        new object[]
-        {
-            "MultiAssemblyCollection",
-            TypePackage.Get(new []
-                {
+    #region Assembly
+    [Fact]
+    public void SingleAssemblyWithNameTemplate()
+    => RunTest(
+        TypePackage.Get(DemoAssembly, "Testing Assembly {0} {1}"),
+        DemoAssemblyTypes
+);
+    [Fact]
+    public void SingleAssembly()
+    => RunTest(
+        TypePackage.Get(DemoAssembly),
+        DemoAssemblyTypes
+);
+    [Fact]
+    public void MultiAssemblyParams()
+    => RunTest(
+        TypePackage.Get(DemoAssembly, DemoAssembly2),
+        DemoAssemblyTypes.Concat(DemoAssembly2Types)
+);
+    [Fact]
+    public void MultiAssemblyCollection()
+    => RunTest(
+        TypePackage.Get(new[]
+            {
                     DemoAssembly,
                     DemoAssembly2
-                }.CastTo<IReadOnlyCollection<Assembly>>()),
-            DemoAssemblyTypes.Concat(DemoAssembly2Types)
-        },
-        #endregion
-        #region explicit type
-        new object[]
-        {
-            "SingleTypeAssembly",
-            TypePackage.Get(typeof(DemoClassA)),
-            new[]{typeof(DemoClassA)},
-        },
-        new object[]
-        {
-            "MultiTypeAssemblyParams",
-            TypePackage.Get(DemoTypes.ToArray()),
-            DemoTypes,
-        },
-        new object[]
-        {
-            "MultiTypeAssemblyCollection",
-            TypePackage.Get(DemoTypes),
-            DemoTypes,
-        },
-        #endregion
-        #region nested type
-        new object[]
-        {
-            "NestedSingleArg",
+            }.CastTo<IReadOnlyCollection<Assembly>>()),
+        DemoAssemblyTypes.Concat(DemoAssembly2Types)
+);
+    #endregion
+    #region explicit type
+    [Fact]
+    public void SingleTypeAssembly()
+    => RunTest(
+        TypePackage.Get(typeof(DemoClassA)),
+        new[] { typeof(DemoClassA) }
+);
+    [Fact]
+    public void MultiTypeAssemblyParams()
+    => RunTest(
+        TypePackage.Get(DemoTypes.ToArray()),
+        DemoTypes
+);
+    [Fact]
+    public void MultiTypeAssemblyCollection()
+    => RunTest(
+        TypePackage.Get(DemoTypes),
+        DemoTypes
+);
+    #endregion
+    #region nested type
+
+    [Fact]
+    public void NestedSingleArg()
+        => RunTest(
             TypePackage.GetNested(typeof(NestingDemoClass)),
-            NestedTypes,
-        },
-        new object[]
-        {
-            "NestedSingleTypeArg",
+            NestedTypes
+        );
+    [Fact]
+    public void NestedSingleTypeArg()
+        => RunTest(
             TypePackage.GetNested<NestingDemoClass>(),
-            NestedTypes,
-        },
-        new object[]
-        {
-            "NestedMultiParams",
-            TypePackage.GetNested(typeof(NestingDemoClass),typeof(NestingDemoClass2)),
-            NestedTypes.Concat(NestedTypes2),
-        },
-        #endregion
-        #region Assembly and Types combined
-        new object[]
-        {
-            "CombinedAssembliesOnly",
-            TypePackage.Get(new []{DemoAssembly,DemoAssembly2},Enumerable.Empty<Type>()),
+            NestedTypes
+    );
+
+    [Fact]
+    public void NestedMultiParams()
+        => RunTest(
+            TypePackage.GetNested(typeof(NestingDemoClass), typeof(NestingDemoClass2)),
+            NestedTypes.Concat(NestedTypes2)
+        );
+    #endregion
+    #region Assembly and Types combined
+
+    [Fact]
+    public void CombinedAssembliesOnly()
+        => RunTest(
+            TypePackage.Get(new[] { DemoAssembly, DemoAssembly2 }, Enumerable.Empty<Type>()),
             DemoAssemblyTypes.Concat(DemoAssembly2Types)
-        },
-        new object[]
-        {
-            "CombinedTypesOnly",
-            TypePackage.Get(Enumerable.Empty<Assembly>(),DemoTypes),
-            DemoTypes
-        },
-        new object[]{
-            "CombinedSource",
-            TypePackage.Get(new []{DemoAssembly,DemoAssembly2},DemoTypes),
+        );
+    [Fact]
+    public void CombinedTypesOnly()
+        => RunTest(
+                TypePackage.Get(Enumerable.Empty<Assembly>(), DemoTypes),
+                DemoTypes
+            );
+
+    [Fact]
+    public void CombinedSource()
+        => RunTest(
+            TypePackage.Get(new[] { DemoAssembly, DemoAssembly2 }, DemoTypes),
             DemoAssemblyTypes.Concat(DemoAssembly2Types).Concat(DemoTypes)
-        },
-        #endregion
-        #region Merging
-        new object[]{
-            "Merged",
+        );
+    #endregion
+    [Fact]
+    public void Merged()
+        => RunTest(
             TypePackage.Get(
                 TypePackage.Get(typeof(DemoClassA)),
                 TypePackage.Get(typeof(DemoClassB), typeof(DemoClassC))
             ),
-            DemoTypes
-        },
-        #endregion
-        #region FileSystem
-        new object[]{
-            "ByFileSystem",
-            TypePackage.Get(null,new []{"JLib.Tests.Reflection.Demo"}),
-            DemoAssemblyTypes.Concat(DemoAssembly2Types)
-        },
-        #endregion
-    };
-    [Theory, MemberData(nameof(TestCases))]
-    public void PackageGeneration(
-        string name, ITypePackage package, IEnumerable<Type> expectedTypes)
+            DemoTypes);
+    [Fact]
+    public void ByFileSystem()
     {
-        package.GetContent().Should().OnlyContain(t => expectedTypes.Contains(t));
+        RunTest(
+            TypePackage.Get(null, new[] { "JLib.Reflection.Tests.Demo" }),
+            DemoAssemblyTypes.Concat(DemoAssembly2Types));
+    }
+
+    private void RunTest(
+         ITypePackage package, IEnumerable<Type> expectedTypes, [CallerMemberName] string name = "")
+    {
+        package
+            .GetContent()
+            .Should().OnlyContain(t => expectedTypes.Contains(t));
         expectedTypes.Should().OnlyContain(t => package.GetContent().Contains(t));
-        package.ToString().MatchSnapshot(new SnapshotNameExtension(name));
+        package.ToString(true).MatchSnapshot($"{nameof(TypePackageTests)}.{name}");
     }
 }

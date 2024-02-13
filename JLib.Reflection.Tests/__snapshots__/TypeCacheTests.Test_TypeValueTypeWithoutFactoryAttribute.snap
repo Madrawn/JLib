@@ -39,7 +39,7 @@
               {
                 "Type": "JLib.Exceptions.InvalidTypeException",
                 "message": [
-                  "JLib.Tests.Reflection.TypeCacheTests.TypeValueTypeWithoutFactoryAttribute.InvalidTypeValueType"
+                  "JLib.Reflection.Tests.TypeCacheTests.TypeValueTypeWithoutFactoryAttribute.InvalidTypeValueType"
                 ]
               }
             ]

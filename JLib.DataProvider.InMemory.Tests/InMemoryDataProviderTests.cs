@@ -32,7 +32,8 @@ public class InMemoryDataProviderTests
             .AddTypeCache(out var typeCache, exceptions, loggerFactory,
                 TypePackage.GetNested<InMemoryDataProviderTests>())
             .AddDataProvider<TestEntityType, InMemoryDataProvider<ITestEntity>, ITestEntity>(
-                typeCache, null, null, null, exceptions, loggerFactory);
+                typeCache, null, null, null, exceptions, loggerFactory)
+            .AddLogging(c=>c.AddXunit(testOutputHelper));
         ;
         exceptions.ThrowIfNotEmpty();
         var provider = services.BuildServiceProvider();

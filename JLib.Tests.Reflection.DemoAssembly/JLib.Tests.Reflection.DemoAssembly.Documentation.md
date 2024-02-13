@@ -1,1 +1,0 @@
-Assembly used by some JLib.Tests DataPackage tests to validate the type discovery of assemblies
