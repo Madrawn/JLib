@@ -2,21 +2,11 @@
   "TestName": "InconclusiveFactory",
   "Environment": {
     "Types": {
-      "IDemoTypeA": {
-        "Kind": "Interface",
-        "Attributes": [],
-        "ImplementedInterfaces": []
-      },
-      "IDemoTypeB": {
-        "Kind": "Interface",
-        "Attributes": [],
-        "ImplementedInterfaces": []
-      },
       "DemoTypeValueTypeA": {
         "Kind": "Class",
         "Attributes": [
-          "NullableContextAttribute",
           "NullableAttribute",
+          "NullableContextAttribute",
           "TvtFactoryAttribute.ImplementsAttribute",
           "UnmappedAttribute"
         ],
@@ -30,8 +20,8 @@
       "DemoTypeValueTypeB": {
         "Kind": "Class",
         "Attributes": [
-          "NullableContextAttribute",
           "NullableAttribute",
+          "NullableContextAttribute",
           "TvtFactoryAttribute.ImplementsAttribute",
           "UnmappedAttribute"
         ],
@@ -41,6 +31,16 @@
           "IEquatable<ValueType<Type>>",
           "ITypeValueType"
         ]
+      },
+      "IDemoTypeA": {
+        "Kind": "Interface",
+        "Attributes": [],
+        "ImplementedInterfaces": []
+      },
+      "IDemoTypeB": {
+        "Kind": "Interface",
+        "Attributes": [],
+        "ImplementedInterfaces": []
       },
       "InconclusiveType": {
         "Kind": "Class",
@@ -54,27 +54,28 @@
   },
   "Exceptions": {
     "Type": "JLib.Exceptions.JLibAggregateException",
-    "Message": [
+    "MessageLines": [
       "InconclusiveFactory"
     ],
     "InnerExceptions": [
       {
         "Type": "JLib.Exceptions.JLibAggregateException",
-        "Message": [
+        "MessageLines": [
           "Cache setup failed"
         ],
         "InnerExceptions": [
           {
             "Type": "JLib.Exceptions.JLibAggregateException",
-            "Message": [
+            "MessageLines": [
               "type discovery failed"
             ],
             "InnerExceptions": [
               {
                 "Type": "JLib.Exceptions.InvalidSetupException",
-                "message": [
+                "MessageLines": [
                   "multiple tvt candidates found for type InconclusiveType : [ DemoTypeValueTypeA(priority 10000), DemoTypeValueTypeB(priority 10000) ]"
-                ]
+                ],
+                "InnerExceptions": []
               }
             ]
           }

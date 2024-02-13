@@ -13,10 +13,17 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\JLib.Cqrs\JLib.Cqrs.csproj" />
         <ProjectReference Include="..\JLib.DataProvider\JLib.DataProvider.csproj" />
         <ProjectReference Include="..\JLib.DependencyInjection\JLib.DependencyInjection.csproj" />
         <ProjectReference Include="..\JLib.Reflection\JLib.Reflection.csproj" />
         <ProjectReference Include="..\JLib.Testing\JLib.Testing.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="FluentAssertions">
+        <HintPath>..\..\..\..\Users\MarcelRehkemper\.nuget\packages\fluentassertions\6.12.0\lib\net6.0\FluentAssertions.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

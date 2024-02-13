@@ -9,34 +9,35 @@
       "    An exception which tells the user to not provide the DataProvider as ReadOnly and informs that it is forced    "
     ],
     "includedTypes": [
-      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity",
-      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestDataProviderR<>",
-      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestInvalidRepositoryR"
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity",
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderR<>",
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestInvalidRepositoryR"
     ]
   },
   "exception": {
     "Type": "JLib.Exceptions.JLibAggregateException",
-    "Message": [
+    "MessageLines": [
       "AddDataProviderTests"
     ],
     "InnerExceptions": [
       {
         "Type": "JLib.Exceptions.JLibAggregateException",
-        "Message": [
+        "MessageLines": [
           "Cache setup failed"
         ],
         "InnerExceptions": [
           {
             "Type": "JLib.Exceptions.JLibAggregateException",
-            "Message": [
-              "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestInvalidRepositoryR is not a valid JLib.Reflection.RepositoryType"
+            "MessageLines": [
+              "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestInvalidRepositoryR is not a valid JLib.DataProvider.RepositoryType"
             ],
             "InnerExceptions": [
               {
                 "Type": "JLib.Exceptions.InvalidTypeException",
-                "message": [
-                  "Should not implement JLib.Data.ISourceDataProviderR<>"
-                ]
+                "MessageLines": [
+                  "Should not implement JLib.DataProvider.ISourceDataProviderR<>"
+                ],
+                "InnerExceptions": []
               }
             ]
           }

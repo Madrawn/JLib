@@ -5,8 +5,8 @@
       "InvalidTypeValueType": {
         "Kind": "Class",
         "Attributes": [
-          "NullableContextAttribute",
           "NullableAttribute",
+          "NullableContextAttribute",
           "UnmappedAttribute"
         ],
         "ImplementedInterfaces": [
@@ -20,27 +20,28 @@
   },
   "Exceptions": {
     "Type": "JLib.Exceptions.JLibAggregateException",
-    "Message": [
+    "MessageLines": [
       "TypeValueTypeWithoutFactoryAttribute"
     ],
     "InnerExceptions": [
       {
         "Type": "JLib.Exceptions.JLibAggregateException",
-        "Message": [
+        "MessageLines": [
           "Cache setup failed"
         ],
         "InnerExceptions": [
           {
             "Type": "JLib.Exceptions.JLibAggregateException",
-            "Message": [
+            "MessageLines": [
               "some Types have no filter attributes"
             ],
             "InnerExceptions": [
               {
                 "Type": "JLib.Exceptions.InvalidTypeException",
-                "message": [
+                "MessageLines": [
                   "JLib.Reflection.Tests.TypeCacheTests.TypeValueTypeWithoutFactoryAttribute.InvalidTypeValueType"
-                ]
+                ],
+                "InnerExceptions": []
               }
             ]
           }

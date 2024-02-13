@@ -9,33 +9,34 @@
       "    An exception which tells the user to implement the ISourceDataProviderR Interface    "
     ],
     "includedTypes": [
-      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestCommandEntity",
-      "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestInvalidDataProviderR<>"
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity",
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestInvalidDataProviderR<>"
     ]
   },
   "exception": {
     "Type": "JLib.Exceptions.JLibAggregateException",
-    "Message": [
+    "MessageLines": [
       "AddDataProviderTests"
     ],
     "InnerExceptions": [
       {
         "Type": "JLib.Exceptions.JLibAggregateException",
-        "Message": [
+        "MessageLines": [
           "Cache setup failed"
         ],
         "InnerExceptions": [
           {
             "Type": "JLib.Exceptions.JLibAggregateException",
-            "Message": [
-              "JLib.Tests.Reflection.ServiceCollection.AddDataProvider.AddDataProviderTests.TestInvalidDataProviderR<> is not a valid JLib.Reflection.SourceDataProviderType"
+            "MessageLines": [
+              "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestInvalidDataProviderR<> is not a valid JLib.DataProvider.SourceDataProviderType"
             ],
             "InnerExceptions": [
               {
                 "Type": "JLib.Exceptions.InvalidTypeException",
-                "message": [
-                  "Should implement any JLib.Data.ISourceDataProviderR<>"
-                ]
+                "MessageLines": [
+                  "Should implement any JLib.DataProvider.ISourceDataProviderR<>"
+                ],
+                "InnerExceptions": []
               }
             ]
           }

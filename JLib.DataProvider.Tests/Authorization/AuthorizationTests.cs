@@ -35,6 +35,7 @@ public class AuthorizationTests
                 out var typeCache, exceptions, loggerFactory,
                 JLibDataProviderTp.Instance,
                 JLibDataGenerationTp.Instance,
+                JLibCqrsTp.Instance,
                 TypePackage.GetNested<AuthorizationTests>()
                 )
             .AddSingleton<TestAuthorizationCondition>()

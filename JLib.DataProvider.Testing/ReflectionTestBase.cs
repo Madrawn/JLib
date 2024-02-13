@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using JLib.Cqrs;
 using JLib.DependencyInjection;
 using JLib.Exceptions;
 using JLib.Helper;
@@ -6,6 +7,7 @@ using JLib.Reflection;
 using JLib.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using FluentAssertions;
 using Serilog;
 using Snapshooter;
 using Snapshooter.Xunit;
@@ -14,16 +16,24 @@ using Xunit.Abstractions;
 
 namespace JLib.DataProvider.Testing;
 
+public interface ITestEntity : ICommandEntity
+{
+
+}
+
+
 public abstract class ReflectionTestBase
 {
     private readonly ITestOutputHelper _testOutput;
+    private readonly ITypePackage _typePackage;
     private readonly IExceptionManager _exceptions;
     private readonly ILoggerFactory _loggerFactory;
 
-    protected ReflectionTestBase(ITestOutputHelper testOutput)
+    protected ReflectionTestBase(ITestOutputHelper testOutput, ITypePackage typePackage)
     {
         _exceptions = new ExceptionManager(GetType().FullClassName());
         _testOutput = testOutput;
+        _typePackage = typePackage;
         _loggerFactory = new LoggerFactory()
             .AddXunit(testOutput);
     }
@@ -33,19 +43,19 @@ public abstract class ReflectionTestBase
 
     }
     protected void Test(string[] expectedBehavior, IReadOnlyCollection<Type> includedTypes,
-        Action<IServiceCollection, ITypeCache, ILoggerFactory, IExceptionManager> serviceFactory, bool testException = true,
+        Action<IServiceCollection, ITypeCache, ILoggerFactory, IExceptionManager> serviceFactory, bool expectException = true,
         bool testCache = true,
         bool testServices = true,
         [CallerMemberName] string testName = "")
-        => Test(new(testName, expectedBehavior, includedTypes, serviceFactory, testException, testCache, testServices));
+        => Test(new(testName, expectedBehavior, includedTypes, serviceFactory, expectException, testCache, testServices));
     protected virtual void Test(ReflectionTestOptions options)
     {
         _testOutput.WriteLine("TestName: {0}", options.TestName);
-        var (testName, expectedBehavior, content, serviceFactory, testExceptions, testCache, testServices) = options;
+        var (testName, expectedBehavior, content, serviceFactory, expectException, testCache, testServices) = options;
 
         IServiceCollection services = new ServiceCollection()
             .AddTypeCache(
-                out var cache, _exceptions, _loggerFactory, TypePackage.Get(content), JLibDataProviderTp.Instance);
+                out var cache, _exceptions, _loggerFactory, TypePackage.Get(content), JLibDataProviderTp.Instance, JLibCqrsTp.Instance, _typePackage);
 
         // group by namespace, then by typeValueType and use json objects for the grouping
         object cacheValidator;
@@ -57,13 +67,11 @@ public abstract class ReflectionTestBase
         }
         catch (Exception e)
         {
-            cacheValidator = e.PrepareSnapshot()?.As<object>() ?? "evaluation failed";
+            cacheValidator = e.PrepareSnapshot() as object ?? "evaluation failed";
         }
 
         AddServices(services, cache, _exceptions.CreateChild(nameof(AddServices)));
         serviceFactory(services, cache, _loggerFactory, _exceptions.CreateChild("Service Factory"));
-
-        var exceptionValidator = _exceptions.GetException().PrepareSnapshot();
 
         object serviceValidator;
         try
@@ -72,7 +80,7 @@ public abstract class ReflectionTestBase
         }
         catch (Exception e)
         {
-            serviceValidator = e.PrepareSnapshot()?.As<object>() ?? "evaluation failed";
+            serviceValidator = e.PrepareSnapshot() as object ?? "evaluation failed";
         }
 
         var maxDescriptionLength = expectedBehavior.Max(x => x.Length);
@@ -98,7 +106,7 @@ public abstract class ReflectionTestBase
             },
             {
                 "exception",
-                 testExceptions? exceptionValidator:"disabled"
+                _exceptions.GetException().PrepareSnapshot()
             },
             {
                 "cache",
@@ -109,5 +117,9 @@ public abstract class ReflectionTestBase
                 testServices? serviceValidator:"disabled"
             }
         }.MatchSnapshot();
+        if (expectException)
+            _exceptions.GetException().Should().NotBeNull();
+        else
+            _exceptions.GetException().Should().BeNull();
     }
 }

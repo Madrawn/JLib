@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Collections.Immutable;
+using FluentAssertions;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Testing;
@@ -81,11 +82,11 @@ public class TypeCacheTests : IDisposable
                     {
                         {
                             "Types",
-                            sut.GetNestedTypes().ToDictionary(t=>t.Name,
+                            sut.GetNestedTypes().ToImmutableSortedDictionary(t=>t.Name,
                                 t => new Dictionary<string, object?>()
                                     {
                                         { "Kind", t.IsClass?"Class":t.IsValueType?"struct":t.IsInterface?"Interface":"other"},
-                                        { "Attributes", t.GetCustomAttributes<Attribute>().Select(a=>a.GetType().FullClassName()) },
+                                        { "Attributes", t.GetCustomAttributes<Attribute>().Select(a=>a.GetType().FullClassName()).OrderBy(x=>x) },
                                         { "ImplementedInterfaces", t.GetInterfaces().Select(t2=>t2.FullClassName()).OrderBy(i=>i)},
                                     }
                                 )
