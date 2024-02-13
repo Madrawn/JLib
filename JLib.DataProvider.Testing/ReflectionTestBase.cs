@@ -1,4 +1,5 @@
-﻿using JLib.DependencyInjection;
+﻿using System.Runtime.CompilerServices;
+using JLib.DependencyInjection;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
@@ -31,14 +32,15 @@ public abstract class ReflectionTestBase
     {
 
     }
-    public virtual void Test(ReflectionTestOptions options, bool skipTest)
+    protected void Test(string[] expectedBehavior, IReadOnlyCollection<Type> includedTypes,
+        Action<IServiceCollection, ITypeCache, ILoggerFactory, IExceptionManager> serviceFactory, bool testException = true,
+        bool testCache = true,
+        bool testServices = true,
+        [CallerMemberName] string testName = "")
+        => Test(new(testName, expectedBehavior, includedTypes, serviceFactory, testException, testCache, testServices));
+    protected virtual void Test(ReflectionTestOptions options)
     {
         _testOutput.WriteLine("TestName: {0}", options.TestName);
-        if (skipTest)
-        {
-            Assert.Fail("skipped");
-            return;
-        }
         var (testName, expectedBehavior, content, serviceFactory, testExceptions, testCache, testServices) = options;
 
         IServiceCollection services = new ServiceCollection()
@@ -55,7 +57,7 @@ public abstract class ReflectionTestBase
         }
         catch (Exception e)
         {
-            cacheValidator = e.PrepareSnapshot() ?? "evaluation failed";
+            cacheValidator = e.PrepareSnapshot()?.As<object>() ?? "evaluation failed";
         }
 
         AddServices(services, cache, _exceptions.CreateChild(nameof(AddServices)));
@@ -70,7 +72,7 @@ public abstract class ReflectionTestBase
         }
         catch (Exception e)
         {
-            serviceValidator = e.PrepareSnapshot() ?? "evaluation failed";
+            serviceValidator = e.PrepareSnapshot()?.As<object>() ?? "evaluation failed";
         }
 
         var maxDescriptionLength = expectedBehavior.Max(x => x.Length);
@@ -106,6 +108,6 @@ public abstract class ReflectionTestBase
                 "services",
                 testServices? serviceValidator:"disabled"
             }
-        }.MatchSnapshot(new SnapshotNameExtension(testName));
+        }.MatchSnapshot();
     }
 }

@@ -4,6 +4,7 @@ using JLib.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Snapshooter;
 using Snapshooter.Xunit;
+using System;
 
 namespace JLib.Testing;
 public static class EnumerableSnapshotExtensions
@@ -17,7 +18,7 @@ public static class EnumerableSnapshotExtensions
             .OrderBy(x => x.Key)
             .ToDictionary(tvtGroup1 => tvtGroup1.Key, tvt => tvt
                 .ToLookup(tvt1 => tvt1.GetType().FullClassName(true))
-                .OrderBy(x=>x.Key)
+                .OrderBy(x => x.Key)
                 .ToDictionary(
                     tvtGroup2 => tvtGroup2.Key,
                     tvtGroup2 => tvtGroup2
@@ -91,28 +92,30 @@ public static class EnumerableSnapshotExtensions
         return res;
     }
 
-    public static object? PrepareSnapshot(this Exception? exception)
+    public static ExceptionSnapshotInfo? PrepareSnapshot(this Exception? exception) 
+        => exception is null
+            ? null
+            : new ExceptionSnapshotInfo(exception);
+}
+
+public struct ExceptionSnapshotInfo
+{
+    public string Type { get; }
+    public string Message { get; }
+    public IReadOnlyCollection<ExceptionSnapshotInfo> InnerExceptions { get; }
+
+    public ExceptionSnapshotInfo(Exception exception)
     {
-        return exception switch
-        {
-            null => null,
-            JLibAggregateException jLibAggregateException => new
-            {
-                Type = exception.GetType().FullClassName(true),
-                Message = jLibAggregateException.UserMessage.Split(Environment.NewLine),
-                InnerExceptions = jLibAggregateException.InnerExceptions.Select(PrepareSnapshot)
-            },
-            AggregateException aggregateException => new
-            {
-                Type = exception.GetType().FullClassName(true),
-                Message = aggregateException.Message.Split(Environment.NewLine),
-                InnerExceptions = aggregateException.InnerExceptions.Select(PrepareSnapshot)
-            },
-            _ => new
-            {
-                Type = exception.GetType().FullClassName(true),
-                message = exception.Message.Split(Environment.NewLine),
-            }
-        };
+        Type = exception.GetType().FullClassName(true);
+        Message = exception.As<JLibAggregateException>()
+            ?.UserMessage
+            ?? exception.Message;
+        InnerExceptions = exception.As<AggregateException>()
+            ?.InnerExceptions
+                .Select(e => new ExceptionSnapshotInfo(e))
+                .OrderBy(e => e.Type)
+                .ThenBy(e => e.Message)
+                .ToArray()
+            ?? Array.Empty<ExceptionSnapshotInfo>();
     }
 }

@@ -1,0 +1,92 @@
+﻿{
+  "Parameters": {
+    "TestName": "NoRepo_Prov_2_Ce2",
+    "ExpectedBehavior": [
+      "  Provided:                                          ",
+      "    DataProvider           : Read Only               ",
+      "    Repository             : -                       ",
+      "  Expected Implementations:                          ",
+      "    TestCommandEntity                                ",
+      "      IDataProviderR       : -                       ",
+      "      IDataProviderRw      : -                       ",
+      "      ISourceDataProviderR : -                       ",
+      "      ISourceDataProviderRw: -                       ",
+      "    TestCommandEntity2                               ",
+      "      DataProvider         : DataProvider<Ce,Ce2>    ",
+      "      IDataProviderR       : DataProvider            ",
+      "      IDataProviderRw      : -                       ",
+      "      ISourceDataProviderR : DataProvider            ",
+      "      ISourceDataProviderRw: -                       "
+    ],
+    "includedTypes": [
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity",
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity2",
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderR<>"
+    ]
+  },
+  "exception": {
+    "Type": "JLib.Exceptions.JLibAggregateException",
+    "Message": "AddDataProviderTests",
+    "InnerExceptions": [
+      {
+        "Type": "JLib.Exceptions.JLibAggregateException",
+        "Message": "Cache setup failed",
+        "InnerExceptions": [
+          {
+            "Type": "JLib.Exceptions.JLibAggregateException",
+            "Message": "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity is not a valid JLib.DataProvider.EntityType",
+            "InnerExceptions": [
+              {
+                "Type": "JLib.Exceptions.InvalidTypeException",
+                "Message": "You have to specify which type of entity this is by implementing a derivation of the IEntity interface",
+                "InnerExceptions": []
+              }
+            ]
+          },
+          {
+            "Type": "JLib.Exceptions.JLibAggregateException",
+            "Message": "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity2 is not a valid JLib.DataProvider.EntityType",
+            "InnerExceptions": [
+              {
+                "Type": "JLib.Exceptions.InvalidTypeException",
+                "Message": "You have to specify which type of entity this is by implementing a derivation of the IEntity interface",
+                "InnerExceptions": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "cache": {
+    "JLib.DataProvider": {
+      "JLib.DataProvider.SourceDataProviderType": [
+        "JLib.DataProvider.CastDataProviderR<>",
+        "JLib.DataProvider.InMemoryDataProvider<>"
+      ]
+    },
+    "JLib.DataProvider.Tests.AddDataProvider": {
+      "JLib.DataProvider.EntityType": [
+        "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity",
+        "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity2"
+      ],
+      "JLib.DataProvider.SourceDataProviderType": [
+        "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderR<>"
+      ]
+    }
+  },
+  "services": {
+    "non-generic": {
+      "JLib.Reflection.ITypeCache": [
+        {
+          "Lifetime": "Singleton",
+          "ImplementationSource": "Instance",
+          "ServiceType": "JLib.Reflection.ITypeCache",
+          "ServiceArguments": [],
+          "ImplementationType": "JLib.Reflection.TypeCache",
+          "ImplementationTypeArguments": []
+        }
+      ]
+    }
+  }
+}

@@ -10,17 +10,13 @@ namespace JLib.DataProvider.Tests.AddDataProvider;
 
 public class AddDataProviderTests : ReflectionTestBase
 {
-    public class TestArguments : ReflectionTestArguments
-    {
-        protected override string Filter { get; } = "";
 
-        protected override IEnumerable<ReflectionTestOptions> Options { get; }
-            = new ReflectionTestOptions[]
-        {
-        #region Repository: None       DataProvider: ReadOnly           NoRepo_ProvR
-        new(
-            "NoRepo_ProvR",
-            new []
+
+    #region Repository: None       DataProvider: ReadOnly           NoRepo_ProvR
+    [Fact]
+    public void NoRepo_ProvR()
+        => base.Test(
+            new[]
             {
                 "Provided:",
                 "  DataProvider         : Read Only",
@@ -36,16 +32,19 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestCommandEntity),
                 typeof(TestDataProviderR<>),
             },
-            (services,cache,loggerFactory,exceptions)=>
+            (services, cache, loggerFactory, exceptions) =>
                 services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
-                    cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
-            ),
-        #endregion
-        #region Repository: None       DataProvider: ReadWrite          NoRepo_ProvRw
-        new (
-            "NoRepo_ProvRw",
-            new []
-            {
+                    cache, null, null, null,
+                    exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),
+                    loggerFactory)
+        );
+    #endregion
+    #region Repository: None       DataProvider: ReadWrite          NoRepo_ProvRw
+    [Fact]
+    public void NoRepo_ProvRw()
+        => base.Test(
+            new[]
+        {
                 "Provided:",
                 "  DataProvider         : Read Write",
                 "  Repository           : -",
@@ -54,22 +53,23 @@ public class AddDataProviderTests : ReflectionTestBase
                 "  IDataProviderRw      : DataProvider",
                 "  ISourceDataProviderR : DataProvider",
                 "  ISourceDataProviderRw: DataProvider",
-            },
-            new[]
-            {
+        },
+        new[]
+        {
                 typeof(TestCommandEntity),
                 typeof(TestDataProviderRw<>),
-            },
-            (services,cache,loggerFactory,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
-                    cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
-        ),
-        #endregion
-        #region Repository: None       DataProvider: Forced ReadOnly    NoRepo_ProvFr
-        new
-        (
-            "NoRepo_ProvFr",
-            new[]{
+        },
+        (services, cache, loggerFactory, exceptions) =>
+            services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
+                cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)), loggerFactory)
+        );
+    #endregion
+    #region Repository: None       DataProvider: Forced ReadOnly    NoRepo_ProvFr
+    [Fact]
+    public void NoRepo_ProvFr()
+        => base.Test(
+            new[]
+        {
                 "Provided:",
                 "  DataProvider         : Forced Read Only",
                 "  Repository           : -",
@@ -78,22 +78,23 @@ public class AddDataProviderTests : ReflectionTestBase
                 "  IDataProviderRw      : -",
                 "  ISourceDataProviderR : DataProvider",
                 "  ISourceDataProviderRw: -",
-            },
-            new[]
-            {
+        },
+        new[]
+        {
                 typeof(TestCommandEntity),
                 typeof(TestDataProviderRw<>),
-            },
-            (services,cache,loggerFactory,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
-                    cache, null, _=>true, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
-        ),
-        #endregion
-        #region Repository: ReadOnly   DataProvider: ReadOnly           RepoR_ProvR
-        new (
-            "RepoR_ProvR",
+        },
+        (services, cache, loggerFactory, exceptions) =>
+            services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
+                cache, null, _ => true, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)), loggerFactory)
+        );
+    #endregion
+    #region Repository: ReadOnly   DataProvider: ReadOnly           RepoR_ProvR
+    [Fact]
+    public void RepoR_ProvR()
+        => base.Test(
             new[]
-            {
+        {
                 "Provided:",
                 "  DataProvider         : Read Only",
                 "  Repository           : Read Only",
@@ -102,23 +103,24 @@ public class AddDataProviderTests : ReflectionTestBase
                 "  IDataProviderRw      : -",
                 "  ISourceDataProviderR : DataProvider",
                 "  ISourceDataProviderRw: -",
-            },
-            new[]
-            {
+        },
+        new[]
+        {
                 typeof(TestCommandEntity),
                 typeof(TestDataProviderR<>),
                 typeof(TestRepositoryR)
-            },
-            (services,cache,loggerFactory,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
-                    cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
-        ),
-        #endregion
-        #region Repository: None       DataProvider: ReadOnly           NoRepo_ProvR_Filter
-        new (
-            "NoRepo_ProvR_Filter",
+        },
+        (services, cache, loggerFactory, exceptions) =>
+            services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
+                cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)), loggerFactory)
+        );
+    #endregion
+    #region Repository: None       DataProvider: ReadOnly           NoRepo_ProvR_Filter
+    [Fact]
+    public void NoRepo_ProvR_Filter()
+        => base.Test(
             new[]
-            {
+        {
                 "Provided:",
                 "  DataProvider         : Read Only",
                 "  Repository           : -",
@@ -134,23 +136,24 @@ public class AddDataProviderTests : ReflectionTestBase
                 "  IDataProviderRw      : -",
                 "  ISourceDataProviderR : DataProvider",
                 "  ISourceDataProviderRw: -",
-            },
-            new[]
-            {
+        },
+        new[]
+        {
                 typeof(TestCommandEntity),
                 typeof(TestCommandEntity2),
                 typeof(TestDataProviderR<>)
-            },
-            (services,cache,loggerFactory,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
-                    cache, tvt=>tvt.Value == typeof(TestCommandEntity2), null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
-        ),
-        #endregion
-        #region Repository: None       DataProvider: ReadOnly           NoRepo_ProvR_FilteredInv
-        new (
-            "NoRepo_ProvR_FilteredInv",
+        },
+        (services, cache, loggerFactory, exceptions) =>
+            services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
+                cache, tvt => tvt.Value == typeof(TestCommandEntity2), null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)), loggerFactory)
+        );
+    #endregion
+    #region Repository: None       DataProvider: ReadOnly           NoRepo_ProvR_FilteredInv
+    [Fact]
+    public void NoRepo_ProvR_FilteredInv()
+        => base.Test(
             new[]
-            {
+        {
                 "Provided:",
                 "  DataProvider         : Read Only",
                 "  Repository           : -",
@@ -166,24 +169,25 @@ public class AddDataProviderTests : ReflectionTestBase
                 "  IDataProviderRw      : -",
                 "  ISourceDataProviderR : DataProvider",
                 "  ISourceDataProviderRw: -",
-            },
-            new[]
-            {
+        },
+        new[]
+        {
                 typeof(TestCommandEntity),
                 typeof(TestCommandEntity2),
                 typeof(TestRepositoryRw),
                 typeof(TestDataProviderR<>)
-            },
-            (services,cache,loggerFactory,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
-                    cache, tvt=>tvt.Value == typeof(TestCommandEntity2), null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
-        ),
-        #endregion
-        #region Repository: None       DataProvider: ReadOnly           NoRepo_ProvR_2Ce
-        new (
-            "NoRepo_ProvR_2Ce",
+        },
+        (services, cache, loggerFactory, exceptions) =>
+            services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
+                cache, tvt => tvt.Value == typeof(TestCommandEntity2), null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)), loggerFactory)
+        );
+    #endregion
+    #region Repository: None       DataProvider: ReadOnly           NoRepo_ProvR_2Ce
+    [Fact]
+    public void NoRepo_ProvR_2Ce()
+        => base.Test(
             new[]
-            {
+        {
                 "Provided:",
                 "  DataProvider           : Read Only",
                 "  Repository             : -",
@@ -198,23 +202,24 @@ public class AddDataProviderTests : ReflectionTestBase
                 "    IDataProviderRw      : -",
                 "    ISourceDataProviderR : DataProvider",
                 "    ISourceDataProviderRw: -",
-            },
-            new[]
-            {
+        },
+        new[]
+        {
                 typeof(TestCommandEntity),
                 typeof(TestCommandEntity2),
                 typeof(TestDataProviderR<>)
-            },
-            (services,cache,loggerFactory,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
-                    cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
-        ),
-        #endregion
-        #region Repository: None       DataProvider: ReadOnly           NoRepo_Prov`2_Ce2
-        new (
-            "NoRepo_Prov`2_Ce2",
+        },
+        (services, cache, loggerFactory, exceptions) =>
+            services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
+                cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)), loggerFactory)
+        );
+    #endregion
+    #region Repository: None       DataProvider: ReadOnly           NoRepo_Prov`2_Ce2
+    [Fact]
+    public void NoRepo_Prov_2_Ce2()
+        => base.Test(
             new[]
-            {
+        {
                 "Provided:",
                 "  DataProvider           : Read Only",
                 "  Repository             : -",
@@ -230,29 +235,30 @@ public class AddDataProviderTests : ReflectionTestBase
                 "    IDataProviderRw      : -",
                 "    ISourceDataProviderR : DataProvider",
                 "    ISourceDataProviderRw: -",
-            },
-            new[]
-            {
+        },
+        new[]
+        {
                 typeof(TestCommandEntity),
                 typeof(TestCommandEntity2),
                 typeof(TestDataProviderR<,>)
-            },
-            (services,cache,loggerFactory,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderR<ITestEntity1,ITestEntity2>, ITestEntity2>(
-                    cache, ce=>ce.Value == typeof(TestCommandEntity), null,
-                    new Func<CommandEntityType,ITypeValueType>[]
-                    {
+        },
+        (services, cache, loggerFactory, exceptions) =>
+            services.AddDataProvider<CommandEntityType, TestDataProviderR<ITestEntity1, ITestEntity2>, ITestEntity2>(
+                cache, ce => ce.Value == typeof(TestCommandEntity), null,
+                new Func<CommandEntityType, ITypeValueType>[]
+                {
                         ce=>ce,
                         _=>cache.Get<CommandEntityType>(typeof(TestCommandEntity2)),
-                    },
-                    exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
-        ),
-        #endregion
-        #region Repository: None       DataProvider: Ce R, Ce2 Rw       NoRepo_ProvCeR_provCe2Rw
-        new (
-            "NoRepo_ProvR_SelRo",
+                },
+                exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)), loggerFactory)
+        );
+    #endregion
+    #region Repository: None       DataProvider: Ce R, Ce2 Rw       NoRepo_ProvCeR_provCe2Rw
+    [Fact]
+    public void NoRepo_ProvR_SelRo()
+        => base.Test(
             new[]
-            {
+        {
                 "Provided:",
                 "  DataProvider           : Read Only",
                 "  Repository             : -",
@@ -268,23 +274,24 @@ public class AddDataProviderTests : ReflectionTestBase
                 "    IDataProviderRw      : DataProvider",
                 "    ISourceDataProviderR : DataProvider",
                 "    ISourceDataProviderRw: DataProvider",
-            },
-            new[]
-            {
+        },
+        new[]
+        {
                 typeof(TestCommandEntity),
                 typeof(TestCommandEntity2),
                 typeof(TestDataProviderRw<>)
-            },
-            (services,cache,loggerFactory,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
-                    cache, null, tvt=>tvt.Value == typeof(TestCommandEntity), null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
-        ),
-        #endregion
-        #region Repository: ReadOnly   DataProvider: ReadWrite          RepoR_ProvRw
-        new
-        (
-            "RepoR_ProvRw",
-            new []
+        },
+        (services, cache, loggerFactory, exceptions) =>
+            services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
+                cache, null, tvt => tvt.Value == typeof(TestCommandEntity), null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)), loggerFactory)
+        );
+    #endregion
+    #region Repository: ReadOnly   DataProvider: ReadWrite          RepoR_ProvRw
+
+    [Fact]
+    public void RepoR_ProvRw()
+        => base.Test(
+            new[]
             {
                 "Provided:",
                 "  DataProvider         : Read Write",
@@ -298,41 +305,45 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestDataProviderRw<>),
                 typeof(TestRepositoryR)
             },
-            (services,cache,loggerFactory,exceptions)=>
+            (services, cache, loggerFactory, exceptions) =>
                 services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
-                        cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory),
-            true,false,false
-        ),
-        #endregion
-        #region Repository: ReadOnly   DataProvider: Forced ReadOnly    RepoR_ProvFr
-        new
-        (
-            "RepoR_ProvFr",
+                    cache, null, null, null,
+                    exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),
+                    loggerFactory),
+            true, false, false
+        );
+    #endregion
+    #region Repository: ReadOnly   DataProvider: Forced ReadOnly    RepoR_ProvFr
+    [Fact]
+    public void RepoR_ProvFr()
+        => base.Test(
             new[]{
-                    "Provided:",
-                    "  DataProvider         : Forced Read Only",
-                    "  Repository           : ReadOnly",
-                    "Expected Implementations:",
-                    "  IDataProviderR       : Repository",
-                    "  IDataProviderRw      : -",
-                    "  ISourceDataProviderR : DataProvider",
-                    "  ISourceDataProviderRw: -",
-            },
-            new[]
-            {
+                "Provided:",
+                "  DataProvider         : Forced Read Only",
+                "  Repository           : ReadOnly",
+                "Expected Implementations:",
+                "  IDataProviderR       : Repository",
+                "  IDataProviderRw      : -",
+                "  ISourceDataProviderR : DataProvider",
+                "  ISourceDataProviderRw: -",
+        },
+        new[]
+        {
                 typeof(TestCommandEntity),
                 typeof(TestDataProviderRw<>),
                 typeof(TestRepositoryR)
-            },
-            (services,cache,loggerFactory,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
-                    cache, null, _=>true, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
-        ),
-        #endregion
-        #region Repository: ReadWrite  DataProvider: ReadOnly           RepoRw_ProvR
-        new (
-            "RepoRw_ProvR",
-            new []
+        },
+        (services, cache, loggerFactory, exceptions) =>
+            services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
+                cache, null, _ => true, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)), loggerFactory)
+        );
+    #endregion
+    #region Repository: ReadWrite  DataProvider: ReadOnly           RepoRw_ProvR
+
+    [Fact]
+    public void RepoRw_ProvR()
+        => base.Test(
+            new[]
             {
                 "Provided:",
                 "  DataProvider         : Read Only",
@@ -346,17 +357,20 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestDataProviderR<>),
                 typeof(TestRepositoryRw)
             },
-            (services,cache,loggerFactory,exceptions)=>
+            (services, cache, loggerFactory, exceptions) =>
                 services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
-                    cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory),
-            true,false,false
-        ),
-        #endregion
-        #region Repository: ReadWrite  DataProvider: ReadWrite          RepoRw_ProvRw
-        new (
-            "RepoRw_ProvRw",
-            new []
-            {
+                    cache, null, null, null,
+                    exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),
+                    loggerFactory),
+            true, false, false
+        );
+    #endregion
+    #region Repository: ReadWrite  DataProvider: ReadWrite          RepoRw_ProvRw
+    [Fact]
+    public void RepoRw_ProvRw()
+        => base.Test(
+            new[]
+        {
                 "Provided:",
                 "  DataProvider         : Read Write",
                 "  Repository           : Read Write",
@@ -365,22 +379,24 @@ public class AddDataProviderTests : ReflectionTestBase
                 "  IDataProviderRw      : Repository",
                 "  ISourceDataProviderR : DataProvider",
                 "  ISourceDataProviderRw: DataProvider",
-            },
-            new[]
-            {
+        },
+        new[]
+        {
                 typeof(TestCommandEntity),
                 typeof(TestDataProviderRw<>),
                 typeof(TestRepositoryRw)
-            },
-            (services,cache,loggerFactory,exceptions)=>
-                services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
-                    cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory)
-        ),
-        #endregion
-        #region Repository: ReadWrite  DataProvider: Forced ReadOnly    RepoRw_ProvFr
-        new (
-            "RepoRw_ProvFr",
-            new []
+        },
+        (services, cache, loggerFactory, exceptions) =>
+            services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
+                cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)), loggerFactory)
+        );
+    #endregion
+    #region Repository: ReadWrite  DataProvider: Forced ReadOnly    RepoRw_ProvFr
+
+    [Fact]
+    public void RepoRw_ProvFr()
+        => base.Test(
+            new[]
             {
                 "Provided:",
                 "  DataProvider         : Forced ReadOnly",
@@ -394,16 +410,20 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestDataProviderRw<>),
                 typeof(TestRepositoryRw)
             },
-            (services,cache,loggerFactory,exceptions)=>
+            (services, cache, loggerFactory, exceptions) =>
                 services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
-                    cache, null, _=>true, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory),
-            true,false,false
-        ),
-        #endregion
-        #region Repository: InvalidRw  DataProvider: ReadWrite          RepoIrw_ProvRw
-        new (
-            "RepoIrw_ProvRw",
-            new []
+                    cache, null, _ => true, null,
+                    exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),
+                    loggerFactory),
+            true, false, false
+        );
+    #endregion
+    #region Repository: InvalidRw  DataProvider: ReadWrite          RepoIrw_ProvRw
+
+    [Fact]
+    public void RepoIrw_ProvRw()
+        => base.Test(
+            new[]
             {
                 "Provided:",
                 "  DataProvider         : Read Write",
@@ -417,16 +437,20 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestDataProviderRw<>),
                 typeof(TestInvalidRepositoryRw)
             },
-            (services,cache,loggerFactory,exceptions)=>
+            (services, cache, loggerFactory, exceptions) =>
                 services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
-                    cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory),
-            true,false,false
-        ),
-        #endregion
-        #region Repository: InvalidR   DataProvider: ReadOnly           RepoIr_ProvR
-        new (
-            "RepoIr_ProvR",
-            new []
+                    cache, null, null, null,
+                    exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),
+                    loggerFactory),
+            true, false, false
+        );
+    #endregion
+    #region Repository: InvalidR   DataProvider: ReadOnly           RepoIr_ProvR
+
+    [Fact]
+    public void RepoIr_ProvR()
+        => base.Test(
+            new[]
             {
                 "Provided:",
                 "  DataProvider         : ReadOnly",
@@ -440,16 +464,20 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestDataProviderR<>),
                 typeof(TestInvalidRepositoryR)
             },
-            (services,cache,loggerFactory,exceptions)=>
+            (services, cache, loggerFactory, exceptions) =>
                 services.AddDataProvider<CommandEntityType, TestDataProviderR<IEntity>, IEntity>(
-                    cache, null, _=>true, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory),
-            true,false,false
-        ),
-        #endregion
-        #region Repository: None       DataProvider: InvalidR           NoRepo_ProvIr
-        new (
-            "NoRepo_ProvIr",
-            new []
+                    cache, null, _ => true, null,
+                    exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),
+                    loggerFactory),
+            true, false, false
+        );
+    #endregion
+    #region Repository: None       DataProvider: InvalidR           NoRepo_ProvIr
+
+    [Fact]
+    public void NoRepo_ProvIr()
+        => base.Test(
+            new[]
             {
                 "Provided:",
                 "  DataProvider         : Invalid ReadOnly",
@@ -462,16 +490,20 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestCommandEntity),
                 typeof(TestInvalidDataProviderR<>),
             },
-            (services,cache,loggerFactory,exceptions)=>
+            (services, cache, loggerFactory, exceptions) =>
                 services.AddDataProvider<CommandEntityType, TestInvalidDataProviderR<IEntity>, IEntity>(
-                    cache, null, _=>true, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory),
-            true,false,false
-        ),
-        #endregion
-        #region Repository: None       DataProvider: InvalidRw          NoRepo_ProvIrw
-        new (
-            "NoRepo_ProvIrw",
-            new []
+                    cache, null, _ => true, null,
+                    exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),
+                    loggerFactory),
+            true, false, false
+        );
+    #endregion
+    #region Repository: None       DataProvider: InvalidRw          NoRepo_ProvIrw
+
+    [Fact]
+    public void NoRepo_ProvIrw()
+        => base.Test(
+            new[]
             {
                 "Provided:",
                 "  DataProvider         : Invalid ReadWrite",
@@ -484,16 +516,20 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestCommandEntity),
                 typeof(TestInvalidDataProviderRw<>),
             },
-            (services,cache,loggerFactory,exceptions)=>
+            (services, cache, loggerFactory, exceptions) =>
                 services.AddDataProvider<CommandEntityType, TestInvalidDataProviderRw<IEntity>, IEntity>(
-                    cache, null, _=>true, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory),
-            true,false,false
-        ),
-        #endregion
-        #region Repository: Multiple       DataProvider: InvalidRw      MultiRepo_ProvIrw
-        new (
-            "MultiRepo_ProvIrw",
-            new []
+                    cache, null, _ => true, null,
+                    exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),
+                    loggerFactory),
+            true, false, false
+        );
+    #endregion
+    #region Repository: Multiple       DataProvider: InvalidRw      MultiRepo_ProvIrw
+
+    [Fact]
+    public void MultiRepo_ProvIrw()
+        => base.Test(
+            new[]
             {
                 "Provided:",
                 "  DataProvider         : ReadWrite",
@@ -508,16 +544,20 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestRepositoryR),
                 typeof(TestRepositoryRw)
             },
-            (services,cache,loggerFactory,exceptions)=>
+            (services, cache, loggerFactory, exceptions) =>
                 services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
-                    cache, null, null, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory),
-            true,false,false
-        ),
-        #endregion
-        #region Repository: None       DataProvider: Invalid Interfaces NoRepo_ProvInvInt
-        new (
-            "NoRepo_ProvInvInt",
-            new []
+                    cache, null, null, null,
+                    exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),
+                    loggerFactory),
+            true, false, false
+        );
+    #endregion
+    #region Repository: None       DataProvider: Invalid Interfaces NoRepo_ProvInvInt
+
+    [Fact]
+    public void NoRepo_ProvInvInt()
+        => base.Test(
+            new[]
             {
                 "Provided:",
                 "  DataProvider         : Invalid Interfaces",
@@ -530,15 +570,31 @@ public class AddDataProviderTests : ReflectionTestBase
                 typeof(TestCommandEntity),
                 typeof(TestInvalidInterfaceDataProvider<>),
             },
-            (services,cache,loggerFactory,exceptions)=>
+            (services, cache, loggerFactory, exceptions) =>
                 services.AddDataProvider<CommandEntityType, TestDataProviderRw<IEntity>, IEntity>(
-                    cache, null, _=>true, null, exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),loggerFactory),
-            true,false,false
-        ),
-        #endregion
-        
-        };
-    }
+                    cache, null, _ => true, null,
+                    exceptions.CreateChild(nameof(DataProviderServiceCollectionExtensions.AddDataProvider)),
+                    loggerFactory),
+            true, false, false
+        );
+    #endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public AddDataProviderTests(ITestOutputHelper testOutput) : base(testOutput)
     {
@@ -547,10 +603,6 @@ public class AddDataProviderTests : ReflectionTestBase
     protected override void AddServices(IServiceCollection services, ITypeCache cache, IExceptionManager exceptions)
         => services.AddRepositories(cache, exceptions);
 
-
-    [Theory, ClassData(typeof(TestArguments))]
-    public override void Test(ReflectionTestOptions options, bool skipTest)
-        => base.Test(options, skipTest);
 
 
     #region test classes

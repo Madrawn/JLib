@@ -19,7 +19,7 @@ public class PropertyInfoValidator : ValueValidator<PropertyInfo>
     }
     public PropertyInfoValidator ShouldHaveNameSuffix(string nameSuffix)
     {
-        if (Value.Name.EndsWith(nameSuffix))
+        if (!Value.Name.EndsWith(nameSuffix))
             AddError($"must have the nameSuffix '{nameSuffix}'");
         return this;
     }
