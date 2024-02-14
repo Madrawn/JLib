@@ -8,10 +8,7 @@ using JLib.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using FluentAssertions;
-using Serilog;
-using Snapshooter;
 using Snapshooter.Xunit;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace JLib.DataProvider.Testing;

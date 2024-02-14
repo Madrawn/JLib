@@ -1,15 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-      <IsPackable>true</IsPackable>
-  </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.14" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.14" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\JLib.DataProvider\JLib.DataProvider.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\JLib.DataProvider\JLib.DataProvider.csproj" />
+    </ItemGroup>
 
 </Project>

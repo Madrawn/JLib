@@ -6,5 +6,5 @@ public static class JLibDataGenerationExamplesTypePackage
 {
     public static ITypePackage Instance { get; } =
         TypePackage.Get(typeof(JLibDataGenerationExamplesTypePackage).Assembly)
-            .Combine(JLibDataGenerationTypePackage.Instance);
+            .Combine(JLibDataGenerationTp.Instance);
 }

@@ -1,13 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <IsTestProject>true</IsTestProject>
     </PropertyGroup>
 
     <ItemGroup>
-    <ProjectReference Include="..\JLib.Reflection.Tests.DemoAssembly1\JLib.Reflection.Tests.DemoAssembly1.csproj" />
-    <ProjectReference Include="..\JLib.Reflection.Tests.DemoAssembly2\JLib.Reflection.Tests.DemoAssembly2.csproj" />
-    <ProjectReference Include="..\JLib.Reflection\JLib.Reflection.csproj" />
-    <ProjectReference Include="..\JLib.Testing\JLib.Testing.csproj" />
-  </ItemGroup>
+        <ProjectReference Include="..\JLib.Reflection.Tests.DemoAssembly1\JLib.Reflection.Tests.DemoAssembly1.csproj" />
+        <ProjectReference Include="..\JLib.Reflection.Tests.DemoAssembly2\JLib.Reflection.Tests.DemoAssembly2.csproj" />
+        <ProjectReference Include="..\JLib.Reflection\JLib.Reflection.csproj" />
+        <ProjectReference Include="..\JLib.Testing\JLib.Testing.csproj" />
+    </ItemGroup>
 </Project>

@@ -1,12 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-      <IsPackable>true</IsPackable>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\JLib.AutoMapper\JLib.AutoMapper.csproj" />
-    <ProjectReference Include="..\JLib.DataProvider\JLib.DataProvider.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\JLib.AutoMapper\JLib.AutoMapper.csproj" />
+        <ProjectReference Include="..\JLib.DataProvider\JLib.DataProvider.csproj" />
+    </ItemGroup>
 
 </Project>
