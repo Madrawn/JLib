@@ -64,8 +64,9 @@ public static class ServiceCollectionHelper
     /// </example>
     /// </summary>
     public static IServiceCollection AddAllConfigSections(this IServiceCollection services,
-        ITypeCache typeCache, IConfiguration config, ILogger logger, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        ITypeCache typeCache, IConfiguration config, ILoggerFactory loggerFactory, ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
+        var logger = loggerFactory.CreateLogger(typeof(ServiceCollectionHelper));
         var configMethod = typeof(OptionsConfigurationServiceCollectionExtensions)
                                .GetMethod(nameof(OptionsConfigurationServiceCollectionExtensions.Configure),
                                    new[] { typeof(IServiceCollection), typeof(IConfiguration) })
