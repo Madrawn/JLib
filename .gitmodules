@@ -1,0 +1,3 @@
+[submodule "wiki"]
+	path = JLib.wiki
+	url = https://github.com/JonnyIV/JLib.wiki.git

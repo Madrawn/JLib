@@ -1,0 +1,59 @@
+{
+  "__registry__": {
+    "IdIncrement": 0
+  },
+  "ArticleDp": {
+    "FirstArticle": "6301016c-881a-46b8-bcd2-b52719ac2144",
+    "FourthArticle": "5d62ffa5-7074-4d8b-ad51-6b9cb53ae9d4",
+    "SecondArticle": "8ad10ab5-350b-4a85-9c4c-ab41907b60ea",
+    "ThirdArticle": "bcb9ac33-ffb3-420c-84a6-c3c02fcabf62"
+  },
+  "CustomerCartDp<CustomerDp>": {
+    "Order": "5f68535d-13b3-461f-9703-f3ef2715ee75"
+  },
+  "CustomerDp:CustomerDpb": {
+    "Customer": "f4ad4cc6-fdb0-44b0-93a8-1fa942b23b95"
+  },
+  "JLib.DataGeneration.Examples.Dependencies.CustomerDp": {
+    "Customer": "e2ccadbe-e0d0-4776-9924-8b479aa21e96"
+  },
+  "JLib.DataGeneration.Examples.Dependencies.CustomerOrdersDp": {
+    "Cart": "fdb1b662-b6da-483b-b17a-999e73608771",
+    "Fulfilled": "e2f3e25b-ae81-446e-836a-5226e803d960"
+  },
+  "JLib.DataGeneration.Examples.MinimalCode.ArticleDp": {
+    "FirstArticle": "c6dbee79-24ad-41a0-8079-72b220b7841a",
+    "FourthArticle": "b6b12aaf-6303-44ae-83b9-aa86330738eb",
+    "SecondArticle": "e7bcd889-7e74-474d-afd5-793a59e87dd7",
+    "ThirdArticle": "bc4db502-8154-4ca6-897f-663ad33a9471"
+  },
+  "JLib.DataGeneration.Examples.ReusingData.CustomerDp": {
+    "Customer": "dab372fb-420e-44f7-aed7-616e85b031f6"
+  },
+  "JLib.DataGeneration.Examples.ReusingData.CustomerOrdersDp": {
+    "Cart": "2de49c2e-2ccb-4242-ae9c-6325aa890735",
+    "Fulfilled": "5dacf9a7-4370-4957-bd10-a5d54789e404"
+  },
+  "JLib.DataGeneration.Examples.Setup.ArticleDp": {
+    "FirstArticle": "0a8b3b9c-3cb9-44d5-a1fe-7f115500fdc3",
+    "SecondArticle": "776cb972-c662-4638-b7ec-7d380dc16f25"
+  },
+  "ShoppingServiceMock": {
+    "Guid [CustomerDp:CustomerDpb].[Customer] = f4ad4cc6-fdb0-44b0-93a8-1fa942b23b95": "25e92b87-c48f-490d-bf8a-490e9a7367c9",
+    "Guid [invalid].[value not found] = 00000001-0000-0000-0000-000000000000": "7728751b-2795-4e27-9eac-6994971f1c3e",
+    "Guid [invalid].[value not found] = 16578516-11fb-4b76-ba16-95c6a2bd12d6": "820ae875-1266-476d-9035-ee9578119ba7",
+    "Guid [invalid].[value not found] = 72e48df9-8d17-40f0-bab9-2274f9228f77": "94cd5859-8722-414f-b124-c06fddbad52f",
+    "Guid [invalid].[value not found] = 84da78ba-5d65-4597-8083-3eefe27c674b": "c85a6c33-44e7-4634-8284-e637f3ef640b",
+    "Guid [invalid].[value not found] = 9d7d72f2-3642-41c4-bfe9-8ecc047e2b96": "214c39aa-5772-4670-a4c8-a5d66b9e863d",
+    "Guid [invalid].[value not found] = c5b89c6b-677a-4d3c-a68f-7862814be781": "3bdd0c8d-52a5-49a7-a066-95ea38d7171a",
+    "Guid [invalid].[value not found] = cbacee53-1111-403a-aa3d-d08955d1f580": "2d44d4f7-1346-4a13-9698-f9759d1f85ab",
+    "Guid [invalid].[value not found] = f857d73d-c8d5-480a-ad16-a4c61aa0593a": "31a059f2-eba8-416e-9656-471ddc70adcd",
+    "Guid [invalid].[value not found] = fa731a95-88ba-4c40-84e1-646a19b90a19": "d33ed2d8-67cf-4cd5-a351-dd2ad79596b9"
+  },
+  "TwoOrderItemsDp<CustomerCartDp<CustomerDp>>": {
+    "FirstOrderItem": "4827ce8d-a737-4943-b3c3-39ae88defdcb",
+    "FirstOrderItemId": "c58182c7-8e83-4862-b5be-e3b99ce61d36",
+    "SecondOrderItem": "34a5ae49-0b04-44ca-bea7-53573e7bd763",
+    "SecondOrderItemId": "2da3e639-348e-4471-8821-1ae4af9f145f"
+  }
+}

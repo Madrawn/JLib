@@ -1,0 +1,50 @@
+﻿{
+  "Parameters": {
+    "TestName": "RepoIr_ProvR",
+    "ExpectedBehavior": [
+      "  Provided:                                                                                                        ",
+      "    DataProvider         : ReadOnly                                                                                ",
+      "    Repository           : Invalid ReadOnly                                                                        ",
+      "  Expected Exception:                                                                                              ",
+      "    An exception which tells the user to not provide the DataProvider as ReadOnly and informs that it is forced    "
+    ],
+    "includedTypes": [
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity",
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderR<>",
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestInvalidRepositoryR"
+    ]
+  },
+  "exception": {
+    "Type": "JLib.Exceptions.JLibAggregateException",
+    "MessageLines": [
+      "AddDataProviderTests"
+    ],
+    "InnerExceptions": [
+      {
+        "Type": "JLib.Exceptions.JLibAggregateException",
+        "MessageLines": [
+          "Cache setup failed"
+        ],
+        "InnerExceptions": [
+          {
+            "Type": "JLib.Exceptions.JLibAggregateException",
+            "MessageLines": [
+              "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestInvalidRepositoryR is not a valid JLib.DataProvider.RepositoryType"
+            ],
+            "InnerExceptions": [
+              {
+                "Type": "JLib.Exceptions.InvalidTypeException",
+                "MessageLines": [
+                  "Should not implement JLib.DataProvider.ISourceDataProviderR<>"
+                ],
+                "InnerExceptions": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "cache": "disabled",
+  "services": "disabled"
+}

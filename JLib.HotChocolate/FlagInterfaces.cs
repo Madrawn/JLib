@@ -1,4 +1,4 @@
-﻿using JLib.Data;
+﻿using JLib.DataProvider;
 
 namespace JLib.HotChocolate;
 

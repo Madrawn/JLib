@@ -1,0 +1,59 @@
+﻿{
+  "Parameters": {
+    "TestName": "RepoRw_ProvFr",
+    "ExpectedBehavior": [
+      "  Provided:                                                                                                        ",
+      "    DataProvider         : Forced ReadOnly                                                                         ",
+      "    Repository           : Read Write                                                                              ",
+      "  Expected Exception:                                                                                              ",
+      "    An exception which tells the user to not provide the DataProvider as ReadOnly and informs that it is forced    "
+    ],
+    "includedTypes": [
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity",
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderRw<>",
+      "JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestRepositoryRw"
+    ]
+  },
+  "exception": {
+    "Type": "JLib.Exceptions.JLibAggregateException",
+    "MessageLines": [
+      "AddDataProviderTests"
+    ],
+    "InnerExceptions": [
+      {
+        "Type": "JLib.Exceptions.JLibAggregateException",
+        "MessageLines": [
+          "Service Factory"
+        ],
+        "InnerExceptions": [
+          {
+            "Type": "JLib.Exceptions.JLibAggregateException",
+            "MessageLines": [
+              "AddDataProvider"
+            ],
+            "InnerExceptions": [
+              {
+                "Type": "JLib.Exceptions.JLibAggregateException",
+                "MessageLines": [
+                  "CommandEntityType"
+                ],
+                "InnerExceptions": [
+                  {
+                    "Type": "JLib.Exceptions.InvalidSetupException",
+                    "MessageLines": [
+                      "The data provider Implementation JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestDataProviderRw<JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestCommandEntity> is forced read only but the Repository JLib.DataProvider.Tests.AddDataProvider.AddDataProviderTests.TestRepositoryRw can write data. ",
+                      "Not forcing the DataProvider to be read only or implementing IDataProviderRw will solve this issue"
+                    ],
+                    "InnerExceptions": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "cache": "disabled",
+  "services": "disabled"
+}

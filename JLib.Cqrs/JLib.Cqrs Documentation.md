@@ -1,0 +1,1 @@
+﻿adds interfaces, types and automated mapping profiles for CQRS Architectures

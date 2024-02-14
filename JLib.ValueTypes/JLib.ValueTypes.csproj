@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\JLib.Exceptions\JLib.Exceptions.csproj" />
+    <ProjectReference Include="..\JLib.Helper\JLib.Helper.csproj" />
+  </ItemGroup>
+
+</Project>

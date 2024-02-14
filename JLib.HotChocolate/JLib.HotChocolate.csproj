@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <IsPackable>true</IsPackable>
     </PropertyGroup>
 
   <ItemGroup>
@@ -9,19 +9,12 @@
     <PackageReference Include="HotChocolate.Execution" Version="13.5.1" />
     <PackageReference Include="HotChocolate.Execution.Abstractions" Version="13.5.1" />
     <PackageReference Include="HotChocolate.Types" Version="13.5.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.14" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\JLib\JLib.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="LICENSE">
-      <PackagePath>\</PackagePath>
-      <Pack>True</Pack>
-    </None>
+    <ProjectReference Include="..\JLib.DataProvider\JLib.DataProvider.csproj" />
   </ItemGroup>
 
 </Project>

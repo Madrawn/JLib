@@ -1,0 +1,97 @@
+﻿{
+  "Customers": {
+    "CustomerId { Value = 84da78ba-5d65-4597-8083-3eefe27c674b }": {
+      "Id": {
+        "Value": "84da78ba-5d65-4597-8083-3eefe27c674b"
+      },
+      "UserName": "Customer"
+    }
+  },
+  "Orders": {
+    "OrderId { Value = da22a1bf-3a45-48a6-a5bf-60a48b0e9be2 }": {
+      "Id": {
+        "Value": "da22a1bf-3a45-48a6-a5bf-60a48b0e9be2"
+      },
+      "Customer": {
+        "Value": "84da78ba-5d65-4597-8083-3eefe27c674b"
+      },
+      "Status": "Cart"
+    }
+  },
+  "OrderItems": {
+    "OrderItemId { Value = f54a26ce-9379-4315-ada2-cee75368821a }": {
+      "Id": {
+        "Value": "f54a26ce-9379-4315-ada2-cee75368821a"
+      },
+      "OrderId": {
+        "Value": "da22a1bf-3a45-48a6-a5bf-60a48b0e9be2"
+      },
+      "ArticleId": {
+        "Value": "b891ecb1-f8bf-497e-863f-b01e94ea7bee"
+      },
+      "Quantity": 2,
+      "Price": 10.0
+    },
+    "OrderItemId { Value = a4ec7867-b16b-47b6-b2e5-f77ddfb447d1 }": {
+      "Id": {
+        "Value": "a4ec7867-b16b-47b6-b2e5-f77ddfb447d1"
+      },
+      "OrderId": {
+        "Value": "da22a1bf-3a45-48a6-a5bf-60a48b0e9be2"
+      },
+      "ArticleId": {
+        "Value": "d5669f72-0f88-40bf-b974-7572f0e2d62e"
+      },
+      "Quantity": 2,
+      "Price": 20.0
+    },
+    "OrderItemId { Value = c85a6c33-44e7-4634-8284-e637f3ef640b }": {
+      "Id": {
+        "Value": "c85a6c33-44e7-4634-8284-e637f3ef640b"
+      },
+      "OrderId": {
+        "Value": "da22a1bf-3a45-48a6-a5bf-60a48b0e9be2"
+      },
+      "ArticleId": {
+        "Value": "46f0eaa9-f354-46eb-b04f-a9804fd862d5"
+      },
+      "Quantity": 10,
+      "Price": 30.0
+    }
+  },
+  "Articles": {
+    "ArticleId { Value = b891ecb1-f8bf-497e-863f-b01e94ea7bee }": {
+      "Id": {
+        "Value": "b891ecb1-f8bf-497e-863f-b01e94ea7bee"
+      },
+      "Name": "firstArticle",
+      "Price": 10.0
+    },
+    "ArticleId { Value = d5669f72-0f88-40bf-b974-7572f0e2d62e }": {
+      "Id": {
+        "Value": "d5669f72-0f88-40bf-b974-7572f0e2d62e"
+      },
+      "Name": "secondArticle",
+      "Price": 20.2
+    },
+    "ArticleId { Value = 46f0eaa9-f354-46eb-b04f-a9804fd862d5 }": {
+      "Id": {
+        "Value": "46f0eaa9-f354-46eb-b04f-a9804fd862d5"
+      },
+      "Name": "thirdArticle",
+      "Price": 30.0
+    },
+    "ArticleId { Value = d8220558-73ac-4f0c-877a-ad268fc601c2 }": {
+      "Id": {
+        "Value": "d8220558-73ac-4f0c-877a-ad268fc601c2"
+      },
+      "Name": "fourthArticle",
+      "Price": 40.4
+    }
+  },
+  "Carts": {
+    "CustomerId { Value = 84da78ba-5d65-4597-8083-3eefe27c674b }": {
+      "Value": "da22a1bf-3a45-48a6-a5bf-60a48b0e9be2"
+    }
+  }
+}

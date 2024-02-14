@@ -1,27 +1,28 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <IsPackable>true</IsPackable>
     </PropertyGroup>
 
-
-    <ItemGroup>
-        <PackageReference Include="AutoMapper" Version="12.0.1" />
-        <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="6.0.4" />
-        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
-        <PackageReference Include="Serilog" Version="3.0.1" />
-    </ItemGroup>
-
-
-    <ItemGroup>
-      <None Update="JLib.Documentation.md">
-        <Pack>True</Pack>
-        <PackagePath>\</PackagePath>
-      </None>
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JLib.AutoMapper\JLib.AutoMapper.csproj" />
+    <ProjectReference Include="..\JLib.Configuration\JLib.Configuration.csproj" />
+    <ProjectReference Include="..\JLib.Cqrs\JLib.Cqrs.csproj" />
+    <ProjectReference Include="..\JLib.DataGeneration\JLib.DataGeneration.csproj" />
+    <ProjectReference Include="..\JLib.DataProvider.AutoMapper\JLib.DataProvider.AutoMapper.csproj" />
+    <ProjectReference Include="..\JLib.DataProvider.EfCore\JLib.DataProvider.EfCore.csproj" />
+    <ProjectReference Include="..\JLib.DataProvider.InMemory\JLib.DataProvider.InMemory.csproj" />
+    <ProjectReference Include="..\JLib.DataProvider\JLib.DataProvider.csproj" />
+    <ProjectReference Include="..\JLib.DependencyInjection\JLib.DependencyInjection.csproj" />
+    <ProjectReference Include="..\JLib.EfCore\JLib.EfCore.csproj" />
+    <ProjectReference Include="..\JLib.Exceptions\JLib.Exceptions.csproj" />
+    <ProjectReference Include="..\JLib.Helper\JLib.Helper.csproj" />
+    <ProjectReference Include="..\JLib.HotChocolate\JLib.HotChocolate.csproj" />
+    <ProjectReference Include="..\JLib.Reflection.DependencyInjection\JLib.Reflection.DependencyInjection.csproj" />
+    <ProjectReference Include="..\JLib.Reflection.HotChocolate.Query\JLib.Reflection.HotChocolate.Query.csproj" />
+    <ProjectReference Include="..\JLib.Reflection\JLib.Reflection.csproj" />
+    <ProjectReference Include="..\JLib.ValueTypes.Mapping\JLib.ValueTypes.Mapping.csproj" />
+    <ProjectReference Include="..\JLib.ValueTypes\JLib.ValueTypes.csproj" />
+  </ItemGroup>
 
 </Project>
