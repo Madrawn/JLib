@@ -27,7 +27,7 @@ public class InMemoryDataProviderTests
     {
         var loggerFactory = new LoggerFactory()
             .AddXunit(testOutputHelper);
-        IExceptionManager exceptions = new ExceptionManager("Test");
+        IExceptionBuilder exceptions = ExceptionBuilder.Create("Test");
         IServiceCollection services = new ServiceCollection()
             .AddTypeCache(out var typeCache, exceptions, loggerFactory,
                 TypePackage.GetNested<InMemoryDataProviderTests>())

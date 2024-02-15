@@ -70,27 +70,29 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "__Tools__", "__Tools__", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.Tools.TypePackageGenerator", "Tools\JLib.Tools.TypePackageGenerator\JLib.Tools.TypePackageGenerator.csproj", "{FB2C8A19-7E95-4A47-B288-8D12C5D7F32C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.Reflection.Tests", "JLib.Reflection.Tests\JLib.Reflection.Tests.csproj", "{51AFE916-CDE1-4299-A15B-24397D51D3A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.Reflection.Tests", "JLib.Reflection.Tests\JLib.Reflection.Tests.csproj", "{51AFE916-CDE1-4299-A15B-24397D51D3A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.DataProvider.Tests", "JLib.DataProvider.Tests\JLib.DataProvider.Tests.csproj", "{D261DC3F-E1A6-4799-8D92-E6FD796A2795}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.DataProvider.Tests", "JLib.DataProvider.Tests\JLib.DataProvider.Tests.csproj", "{D261DC3F-E1A6-4799-8D92-E6FD796A2795}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.DataProvider.AutoMapper.Tests", "JLib.DataProvider.AutoMapper.Tests\JLib.DataProvider.AutoMapper.Tests.csproj", "{2CA3D58C-4E95-4F1F-9F8D-7278CBF95F4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.DataProvider.AutoMapper.Tests", "JLib.DataProvider.AutoMapper.Tests\JLib.DataProvider.AutoMapper.Tests.csproj", "{2CA3D58C-4E95-4F1F-9F8D-7278CBF95F4D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.DataProvider.Testing", "JLib.DataProvider.Testing\JLib.DataProvider.Testing.csproj", "{AB46C007-E92F-4B52-B5A3-78AAA60EF99B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.DataProvider.Testing", "JLib.DataProvider.Testing\JLib.DataProvider.Testing.csproj", "{AB46C007-E92F-4B52-B5A3-78AAA60EF99B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.ValueTypes.Mapping.Tests", "JLib.ValueTypes.Mapping.Tests\JLib.ValueTypes.Mapping.Tests.csproj", "{9AA0D7D9-0A58-4210-BD2F-A3107E35354A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.ValueTypes.Mapping.Tests", "JLib.ValueTypes.Mapping.Tests\JLib.ValueTypes.Mapping.Tests.csproj", "{9AA0D7D9-0A58-4210-BD2F-A3107E35354A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.ValueTypes.Tests", "JLib.ValueTypes.Tests\JLib.ValueTypes.Tests.csproj", "{738C835E-C9D8-4CC0-97FD-06CC73A7CA5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.ValueTypes.Tests", "JLib.ValueTypes.Tests\JLib.ValueTypes.Tests.csproj", "{738C835E-C9D8-4CC0-97FD-06CC73A7CA5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.DependencyInjection.Tests", "JLib.DependencyInjection.Tests\JLib.DependencyInjection.Tests.csproj", "{6DA09851-B60F-4D6B-B1D0-1FEA78ABAC0E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.DependencyInjection.Tests", "JLib.DependencyInjection.Tests\JLib.DependencyInjection.Tests.csproj", "{6DA09851-B60F-4D6B-B1D0-1FEA78ABAC0E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.Reflection.Tests.DemoAssembly1", "JLib.Reflection.Tests.DemoAssembly1\JLib.Reflection.Tests.DemoAssembly1.csproj", "{81E218EB-6DD4-4ABE-99AF-6CEAD19D1093}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.Reflection.Tests.DemoAssembly1", "JLib.Reflection.Tests.DemoAssembly1\JLib.Reflection.Tests.DemoAssembly1.csproj", "{81E218EB-6DD4-4ABE-99AF-6CEAD19D1093}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.Reflection.Tests.DemoAssembly2", "JLib.Reflection.Tests.DemoAssembly2\JLib.Reflection.Tests.DemoAssembly2.csproj", "{58AFF51D-32F8-415E-918A-CF2691487776}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.Reflection.Tests.DemoAssembly2", "JLib.Reflection.Tests.DemoAssembly2\JLib.Reflection.Tests.DemoAssembly2.csproj", "{58AFF51D-32F8-415E-918A-CF2691487776}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JLib.DependencyInjection", "JLib.DependencyInjection", "{0F889BD3-36BF-446E-9327-8AACC3F7F455}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JLib.DataGeneration", "JLib.DataGeneration", "{003DF5C3-94DD-4AE6-BEB8-2691DA0BC14B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.Exceptions.Examples", "Examples\JLib.Exceptions.Examples\JLib.Exceptions.Examples.csproj", "{CB8F3474-022E-47CF-96F6-9A5BD03AC575}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -230,6 +232,10 @@ Global
 		{58AFF51D-32F8-415E-918A-CF2691487776}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58AFF51D-32F8-415E-918A-CF2691487776}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58AFF51D-32F8-415E-918A-CF2691487776}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB8F3474-022E-47CF-96F6-9A5BD03AC575}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB8F3474-022E-47CF-96F6-9A5BD03AC575}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB8F3474-022E-47CF-96F6-9A5BD03AC575}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB8F3474-022E-47CF-96F6-9A5BD03AC575}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -259,6 +265,7 @@ Global
 		{6DA09851-B60F-4D6B-B1D0-1FEA78ABAC0E} = {0F889BD3-36BF-446E-9327-8AACC3F7F455}
 		{81E218EB-6DD4-4ABE-99AF-6CEAD19D1093} = {EFA2EA40-BBFA-474F-894E-655FDF9A0EE4}
 		{58AFF51D-32F8-415E-918A-CF2691487776} = {EFA2EA40-BBFA-474F-894E-655FDF9A0EE4}
+		{CB8F3474-022E-47CF-96F6-9A5BD03AC575} = {B450BA69-F38B-4EF5-81A5-7551941524E4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9007D83B-9D61-4FD9-927F-EEAC8281BF90}

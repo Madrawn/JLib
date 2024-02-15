@@ -29,7 +29,7 @@ public class AttributeServicesTest : IDisposable
         => CreateSetup<T>(out exceptionProvider, out _);
     private IServiceProvider CreateSetup<T>(out IExceptionProvider exceptionProvider, out IServiceCollection services)
     {
-        var exceptions = new ExceptionManager("test");
+        var exceptions = ExceptionBuilder.Create("test");
         var typePackage = TypePackage.GetNested<T>();
         _output.WriteLine(typePackage.ToString(true));
         services = new ServiceCollection()

@@ -7,7 +7,16 @@ using System.Threading.Tasks;
 namespace JLib.Exceptions;
 public static class ExceptionExtensions
 {
+    public static void ThrowIfNotEmpty(this IExceptionProvider exceptionProvider, Action? onThrow = null)
+    {
+        var exception = exceptionProvider.GetException();
 
+        if (exception is null)
+            return;
+
+        onThrow?.Invoke();
+        throw exception;
+    }
     /// <summary>
     /// throws a <see cref="JLibAggregateException"/> with the given <paramref name="message"/> containing all <paramref name="exceptions"/> if <paramref name="exceptions"/> is not empty.
     /// </summary>
@@ -56,6 +65,34 @@ public static class ExceptionExtensions
         {
             masterExceptionList.Add(new JLibAggregateException(message, mat));
         }
+    }
+
+    /// <summary>
+    /// returns a string which visualized the exception as grouped tree
+    /// </summary>
+    public static string GetTreeInfo(this AggregateException exception)
+    {
+        return new StringBuilder()
+            .Append("│  ")
+            .AppendLine(exception is JLibAggregateException je ? je.UserMessage : exception.Message)
+            .Append("├─")
+            .AppendJoin(Environment.NewLine + "├─",
+                exception.InnerExceptions
+                    .ToLookup(ex => ex.GetType())
+                    .OrderBy(group => group.Key.Name)
+                    .Select(group =>
+                        " " + group.Count() + " " + group.Key.Name + Environment.NewLine +
+                        string.Join(Environment.NewLine,
+                            group.OrderBy(ex => ex.Message)
+                                .Select(ex =>
+                                    (ex is NullReferenceException
+                                        ? ex.ToString()
+                                        : ex.Message.Replace(Environment.NewLine, Environment.NewLine + "│  "))
+                                )
+                        ) + Environment.NewLine
+                    )
+            )
+            .ToString();
     }
 
 }

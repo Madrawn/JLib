@@ -25,7 +25,7 @@ public class ConverterTests : IDisposable
     public ConverterTests(ITestOutputHelper testOutputHelper)
     {
         var loggerFactory = new LoggerFactory().AddXunit(testOutputHelper);
-        var exceptions = new ExceptionManager("setup");
+        var exceptions = ExceptionBuilder.Create("setup");
         var services = new ServiceCollection()
             .AddTypeCache(out var typeCache, exceptions, loggerFactory, JLibReflectionTp.Instance, TypePackage.GetNested<ConverterTests>())
             .AddAutoMapper(m => m.AddProfiles(typeCache, loggerFactory));

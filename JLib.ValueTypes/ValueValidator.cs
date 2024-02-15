@@ -29,16 +29,7 @@ public abstract class ValueValidator<TValue> : IExceptionProvider
 
     Exception? IExceptionProvider.GetException()
         => BuildException(_messages, _subValidators);
-
-    public void ThrowIfNotEmpty(Action? onThrow = null)
-    {
-        var ex = this.CastTo<IExceptionProvider>().GetException();
-        if (ex is null)
-            return;
-        onThrow?.Invoke();
-        throw ex;
-    }
-
+    
     protected virtual Exception? BuildException(IReadOnlyCollection<string> messages, IReadOnlyCollection<IExceptionProvider> provider)
         => JLibAggregateException.ReturnIfNotEmpty(
             $"{ValueTypeName} validation failed: '{Value}' is not a valid Value.",

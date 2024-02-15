@@ -25,7 +25,7 @@ public class ExampleTests : IDisposable
 
     public ExampleTests(ITestOutputHelper testOutputHelper)
     {
-        var exceptions = new ExceptionManager("setup");
+        var exceptions = ExceptionBuilder.Create("setup");
 
         var loggerFactory = new LoggerFactory()
             .AddXunit(testOutputHelper);

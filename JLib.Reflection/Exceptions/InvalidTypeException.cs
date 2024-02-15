@@ -1,7 +1,6 @@
-﻿using System.Collections;
-using JLib.Helper;
+﻿using JLib.Exceptions;
 
-namespace JLib.Exceptions;
+namespace JLib.Reflection.Exceptions;
 
 public sealed class InvalidTypeException : InvalidSetupException
 {

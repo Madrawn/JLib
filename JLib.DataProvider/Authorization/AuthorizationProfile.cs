@@ -11,7 +11,7 @@ public record AuthorizationProfileType(Type Value) : TypeValueType(Value), IPost
 {
     public AuthorizationProfile Instance { get; private set; } = null!;
 
-    public void Initialize(ITypeCache cache, IExceptionManager exceptions)
+    public void Initialize(ITypeCache cache, IExceptionBuilder exceptions)
     {
         Instance = Activator.CreateInstance(Value, new object[] { cache })?.As<AuthorizationProfile>()
                    ?? throw new("instance could not be created");

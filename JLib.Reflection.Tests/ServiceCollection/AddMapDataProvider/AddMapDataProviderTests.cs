@@ -184,7 +184,7 @@
 //    public override void Test(ReflectionTestOptions options, bool skipTest)
 //        => base.Test(options, skipTest);
 
-//    public override void AddServices(IServiceCollection services, ITypeCache cache, IExceptionManager exceptions)
+//    public override void AddServices(IServiceCollection services, ITypeCache cache, IExceptionBuilder exceptions)
 //        => services
 //            .AddSingleton(new Mock<IMapper>().Object)
 //            .AddSingleton(new Mock<IConfigurationProvider>().Object)

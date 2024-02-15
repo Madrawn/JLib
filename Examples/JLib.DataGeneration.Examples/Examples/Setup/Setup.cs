@@ -22,7 +22,7 @@ public sealed class Setup : IDisposable
         var loggerFactory = new LoggerFactory()
             .AddXunit(testOutputHelper);
         // collects exceptions to be thrown later as aggregate
-        var exceptions = new ExceptionManager("setup");
+        var exceptions = ExceptionBuilder.Create("setup");
 
         var services = new ServiceCollection()
             // executes and caches reflection on all given types
