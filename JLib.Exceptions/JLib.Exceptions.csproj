@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
       <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\JLib.Helper\JLib.Helper.csproj" />
+      <ProjectReference Include="..\JLib.Helper\JLib.Helper.csproj" />
   </ItemGroup>
 
 </Project>

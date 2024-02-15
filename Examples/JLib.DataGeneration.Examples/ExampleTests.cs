@@ -3,13 +3,15 @@ using JLib.DataGeneration.Examples.DataPackages;
 using JLib.DataGeneration.Examples.Setup.Models;
 using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
 using JLib.DataGeneration.Examples.SnapshotInfo;
+using JLib.DependencyInjection;
 using JLib.Exceptions;
-using JLib.Helper;
+using JLib.AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Snapshooter;
-using Snapshooter.Exceptions;
 using Snapshooter.Xunit;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Sdk;
 
 namespace JLib.DataGeneration.Examples;
@@ -21,17 +23,20 @@ public class ExampleTests : IDisposable
     private readonly ShoppingServiceMock _shoppingService;
     private readonly IIdRegistry _idRegistry;
 
-    public ExampleTests()
+    public ExampleTests(ITestOutputHelper testOutputHelper)
     {
-        var exceptions = new ExceptionManager("setup");
+        var exceptions = ExceptionBuilder.Create("setup");
+
+        var loggerFactory = new LoggerFactory()
+            .AddXunit(testOutputHelper);
 
         var services = new ServiceCollection()
             // executes and caches reflection on all given types
-            .AddTypeCache(out var typeCache, exceptions, JLibDataGenerationExamplesTypePackage.Instance)
+            .AddTypeCache(out var typeCache, exceptions, loggerFactory, JLibDataGenerationExamplesTypePackage.Instance)
             // add all type packages
             .AddDataPackages(typeCache, new() { DefaultNamespace = "JLib.DataGeneration.Examples.DataPackages" })
             // add all automapper profiles (required profile: JLib.AutoMapper.ValueTypeProfile)
-            .AddAutoMapper(m => m.AddProfiles(typeCache))
+            .AddAutoMapper(m => m.AddProfiles(typeCache, loggerFactory))
             .AddSingleton<ShoppingServiceMock>()
             .AddAlias<IShoppingService, ShoppingServiceMock>(ServiceLifetime.Singleton);
 
@@ -96,8 +101,8 @@ public class ExampleTests : IDisposable
             );
 
         _shoppingService.AddArticleToCart(customerId, thirdArticle, 10);
-       
-        Action testFails = ()=> _shoppingService.MatchSnapshot();
+
+        Action testFails = () => _shoppingService.MatchSnapshot();
         testFails.Should().Throw<EqualException>();
     }
     [Fact]

@@ -1,13 +1,17 @@
 <Project>
     <PropertyGroup>
-        <Version>0.2$(VersionSuffix)</Version>
-        <AssemblyVersion>0.2$(VersionSuffix)</AssemblyVersion>
-        <FileVersion>0.2$(VersionSuffix)</FileVersion>
+
+
+
+        <Version>$(VersionSuffix)</Version>
+        <AssemblyVersion>$(VersionSuffix)</AssemblyVersion>
+        <FileVersion>$(VersionSuffix)</FileVersion>
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <WarningsAsErrors>Nullable</WarningsAsErrors>
         <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+        <!--<IsPackable>true</IsPackable>-->
 
         <Company>-</Company>
         <Authors>Marcel Rehkemper</Authors>
@@ -15,58 +19,82 @@
         <AssemblyName>$(MSBuildProjectName)</AssemblyName>
         <Title>$(MSBuildProjectName)</Title>
         <RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+
+        <IsPackage>false</IsPackage>
+        <IsPackage Condition="
+                   $(MSBuildProjectName) == 'JLib.DataGeneration'
+                   or $(MSBuildProjectName) == 'JLib.DataProvider'
+                   or $(MSBuildProjectName) == 'JLib.DataProvider.AutoMapper'
+                   or $(MSBuildProjectName) == 'JLib.DataProvider.EfCore'
+                   or $(MSBuildProjectName) == 'JLib.DataProvider.InMemory'
+                   or $(MSBuildProjectName) == 'JLib.DependencyInjection'
+                   or $(MSBuildProjectName) == 'JLib.Reflection'
+                   or $(MSBuildProjectName) == 'JLib.Reflection.DependencyInjection'
+                   or $(MSBuildProjectName) == 'JLib.Reflection.HotChocolate.Query'
+                   or $(MSBuildProjectName) == 'JLib.ValueTypes'
+                   or $(MSBuildProjectName) == 'JLib.ValueTypes.Mapping'
+                   or $(MSBuildProjectName) == 'JLib'
+                   or $(MSBuildProjectName) == 'JLib.AutoMapper'
+                   or $(MSBuildProjectName) == 'JLib.Configuration'
+                   or $(MSBuildProjectName) == 'JLib.Cqrs'
+                   or $(MSBuildProjectName) == 'JLib.EfCore'
+                   or $(MSBuildProjectName) == 'JLib.Exceptions'
+                   or $(MSBuildProjectName) == 'JLib.Helper'
+                   or $(MSBuildProjectName) == 'JLib.HotChocolate'
+                   or $(MSBuildProjectName) == 'JLib.Testing'
+                   ">true</IsPackage>
+
+        <CreatePackage >False</CreatePackage>
+        <CreatePackage Condition="$(Configuration) == 'Release' and $(VersionSuffix) != ''">True</CreatePackage>
     </PropertyGroup>
 
-    <!--Packed Projects-->
-    <PropertyGroup Condition="$(IsPackable)==true">
+    <PropertyGroup Condition="$(IsPackage)">
+        <IsPackable>true</IsPackable>
+        <GeneratePackageOnBuild Condition="$(Createpackage)">True</GeneratePackageOnBuild>
         <PackageProjectUrl>https://github.com/jonnyIV/jlib</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageReadmeFile>$(MSBuildProjectName) Documentation.md</PackageReadmeFile>
         <IncludeSymbols>True</IncludeSymbols>
         <RepositoryUrl>https://github.com/JonnyIV/JLib</RepositoryUrl>
-        <!--Generate package only on release builds-->
-        <GeneratePackageOnBuild Condition="$(Configuration) == 'Release'">True</GeneratePackageOnBuild>
+        <PackageReadmeFile>$(MSBuildProjectName) Documentation.md</PackageReadmeFile>
     </PropertyGroup>
 
     <!--Library Projects-->
 
-    <ItemGroup Condition="$(IsTestProject)!=true">
+
+    <ItemGroup>
         <!--Include documentation-->
-        <None Include="$(MSBuildProjectName) Documentation.md">
+        <None Condition="$(IsPackage)"
+              Include="$(MSBuildProjectName) Documentation.md">
             <Pack>True</Pack>
             <PackagePath>\</PackagePath>
         </None>
     </ItemGroup>
 
     <!--Test Projects-->
-    <PropertyGroup Condition="$(IsTestProject)==true or $(MSBuildProjectName.EndsWith('testing'))">
-        <IsPackable Condition="$(OutputType)==Library">false</IsPackable>
-    </PropertyGroup>
-
     <ItemGroup Condition="$(IsTestProject)==true or $(MSBuildProjectName.EndsWith('testing'))">
         <!--Setup-->
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
-        <PackageReference Include="xunit" Version="2.4.2" />
-        <PackageReference Include="xunit.abstractions" Version="2.0.3" />
-        <PackageReference Include="xunit.assert" Version="2.4.2" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.*" />
+        <PackageReference Include="xunit" Version="2.*" />
+        <PackageReference Include="xunit.abstractions" Version="2.*" />
+        <PackageReference Include="xunit.assert" Version="2.*" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.*">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="coverlet.collector" Version="3.2.0">
+        <PackageReference Include="coverlet.collector" Version="3.*">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <!--test methods-->
-        <PackageReference Include="Snapshooter.Xunit" Version="0.14.1" />
-        <PackageReference Include="FluentAssertions" Version="6.12.0" />
-        <PackageReference Include="Moq" Version="4.20.69" />
+        <PackageReference Include="Snapshooter.Xunit" Version="0.*" />
+        <PackageReference Include="FluentAssertions" Version="6.*" />
+        <PackageReference Include="Moq" Version="4.*" />
         <!--logging-->
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
-        <PackageReference Include="Xunit.Extensions.Logging" Version="1.1.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="8.*" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.*" />
+        <PackageReference Include="Xunit.Extensions.Logging" Version="1.*" />
         <!--dependency injection-->
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.*" />
     </ItemGroup>
 
 </Project>

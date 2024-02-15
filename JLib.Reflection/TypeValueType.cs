@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using JLib.Exceptions;
+using JLib.Reflection.Exceptions;
 using JLib.ValueTypes;
 
 namespace JLib.Reflection;
@@ -10,7 +11,7 @@ namespace JLib.Reflection;
 /// </summary>
 public interface IPostNavigationInitializedType : ITypeValueType
 {
-    void Initialize(ITypeCache cache, IExceptionManager exceptions);
+    void Initialize(ITypeCache cache, IExceptionBuilder exceptions);
 }
 
 public interface IValidatedType : ITypeValueType

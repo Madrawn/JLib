@@ -1,10 +1,13 @@
 ﻿using FluentAssertions;
 using JLib.DataGeneration.Examples.Setup.Models;
 using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
+using JLib.DependencyInjection;
 using JLib.Exceptions;
-using JLib.Helper;
+using JLib.AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace JLib.DataGeneration.Examples.ReusingData;
 
@@ -13,14 +16,17 @@ public sealed class MinimalCode : IDisposable
     private readonly ServiceProvider _provider;
     private readonly ShoppingServiceMock _shoppingService;
 
-    public MinimalCode()
+    public MinimalCode(ITestOutputHelper testOutputHelper)
     {
-        var exceptions = new ExceptionManager("setup");
+        var exceptions = ExceptionBuilder.Create("setup");
+
+        var loggerFactory = new LoggerFactory()
+            .AddXunit(testOutputHelper);
 
         var services = new ServiceCollection()
-            .AddTypeCache(out var typeCache, exceptions, JLibDataGenerationExamplesTypePackage.Instance)
+            .AddTypeCache(out var typeCache, exceptions, loggerFactory, JLibDataGenerationExamplesTypePackage.Instance)
             .AddDataPackages(typeCache)
-            .AddAutoMapper(m => m.AddProfiles(typeCache))
+            .AddAutoMapper(m => m.AddProfiles(typeCache, loggerFactory))
             .AddSingleton<ShoppingServiceMock>()
             .AddAlias<IShoppingService, ShoppingServiceMock>(ServiceLifetime.Singleton);
 
@@ -39,7 +45,7 @@ public sealed class MinimalCode : IDisposable
         _shoppingService.Orders.Should().HaveCount(2);
     }
 
-    public void Dispose() 
+    public void Dispose()
         => _provider.Dispose();
 }
 
@@ -70,7 +76,7 @@ public sealed class CustomerOrdersDp : DataPackage
     public OrderId Cart { get; init; } = default!;
 
     public CustomerOrdersDp(
-        IDataPackageManager packageManager, ShoppingServiceMock shoppingService, 
+        IDataPackageManager packageManager, ShoppingServiceMock shoppingService,
         // to use another DataPackage, you can inject it just like other services
         CustomerDp customer
     ) : base(packageManager)

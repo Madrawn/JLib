@@ -1,10 +1,14 @@
 ﻿using FluentAssertions;
 using JLib.DataGeneration.Examples.Setup.Models;
 using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
+using JLib.DependencyInjection;
 using JLib.Exceptions;
 using JLib.Helper;
+using JLib.AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace JLib.DataGeneration.Examples.Setup;
 
@@ -13,18 +17,20 @@ public sealed class Setup : IDisposable
     private readonly ServiceProvider _provider;
     private readonly ShoppingServiceMock _shoppingService;
 
-    public Setup()
+    public Setup(ITestOutputHelper testOutputHelper)
     {
+        var loggerFactory = new LoggerFactory()
+            .AddXunit(testOutputHelper);
         // collects exceptions to be thrown later as aggregate
-        var exceptions = new ExceptionManager("setup");
+        var exceptions = ExceptionBuilder.Create("setup");
 
         var services = new ServiceCollection()
             // executes and caches reflection on all given types
-            .AddTypeCache(out var typeCache, exceptions, JLibDataGenerationExamplesTypePackage.Instance)
+            .AddTypeCache(out var typeCache, exceptions, loggerFactory, JLibDataGenerationExamplesTypePackage.Instance)
             // add all type packages
             .AddDataPackages(typeCache)
             // add all automapper profiles (required profile: JLib.AutoMapper.ValueTypeProfile)
-            .AddAutoMapper(m => m.AddProfiles(typeCache))
+            .AddAutoMapper(m => m.AddProfiles(typeCache, loggerFactory))
             // the service we want to test
             .AddSingleton<ShoppingServiceMock>()
             // provides the same instance as above when you inject the interface

@@ -8,10 +8,7 @@ using JLib.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using FluentAssertions;
-using Serilog;
-using Snapshooter;
 using Snapshooter.Xunit;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace JLib.DataProvider.Testing;
@@ -26,24 +23,24 @@ public abstract class ReflectionTestBase
 {
     private readonly ITestOutputHelper _testOutput;
     private readonly ITypePackage _typePackage;
-    private readonly IExceptionManager _exceptions;
+    private readonly IExceptionBuilder _exceptions;
     private readonly ILoggerFactory _loggerFactory;
 
     protected ReflectionTestBase(ITestOutputHelper testOutput, ITypePackage typePackage)
     {
-        _exceptions = new ExceptionManager(GetType().FullClassName());
+        _exceptions = ExceptionBuilder.Create(GetType().FullClassName());
         _testOutput = testOutput;
         _typePackage = typePackage;
         _loggerFactory = new LoggerFactory()
             .AddXunit(testOutput);
     }
 
-    protected virtual void AddServices(IServiceCollection services, ITypeCache cache, IExceptionManager exceptions)
+    protected virtual void AddServices(IServiceCollection services, ITypeCache cache, IExceptionBuilder exceptions)
     {
 
     }
     protected void Test(string[] expectedBehavior, IReadOnlyCollection<Type> includedTypes,
-        Action<IServiceCollection, ITypeCache, ILoggerFactory, IExceptionManager> serviceFactory, bool expectException = true,
+        Action<IServiceCollection, ITypeCache, ILoggerFactory, IExceptionBuilder> serviceFactory, bool expectException = true,
         bool testCache = true,
         bool testServices = true,
         [CallerMemberName] string testName = "")

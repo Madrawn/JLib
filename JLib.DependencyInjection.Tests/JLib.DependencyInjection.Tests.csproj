@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <IsTestProject>true</IsTestProject>
-  </PropertyGroup>
+    <PropertyGroup>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\JLib.DependencyInjection\JLib.DependencyInjection.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\JLib.DependencyInjection\JLib.DependencyInjection.csproj" />
+    </ItemGroup>
 
 </Project>

@@ -28,7 +28,7 @@ public class AuthorizationTests
         using var loggerFactory = new LoggerFactory().AddXunit(testOutputHelper);
 
         var logger = new LoggerConfiguration().CreateLogger();
-        var exceptions = new ExceptionManager("test");
+        var exceptions = ExceptionBuilder.Create("test");
         var services = new ServiceCollection()
             .AddLogging()
             .AddTypeCache(
