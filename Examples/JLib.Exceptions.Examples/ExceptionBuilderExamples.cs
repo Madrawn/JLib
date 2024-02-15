@@ -16,6 +16,7 @@ public class ExceptionBuilderExamples
         // does nothing since no exception is added
         exceptions.ThrowIfNotEmpty();
     }
+
     [Fact]
     public void MinimalCodeWithError()
     {
@@ -25,6 +26,7 @@ public class ExceptionBuilderExamples
         Action act = () => exceptionBuilder.ThrowIfNotEmpty();
         act.Should().Throw<JLibAggregateException>();
     }
+
     [Fact]
     public void NestedExceptions()
     {
@@ -36,6 +38,7 @@ public class ExceptionBuilderExamples
         Action act = () => exceptionBuilder.ThrowIfNotEmpty();
         act.Should().Throw<JLibAggregateException>();
     }
+
     [Fact]
     public void GetExceptionWithoutThrowing()
     {
