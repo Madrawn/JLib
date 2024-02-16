@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 
 namespace JLib.Exceptions.Examples;
 public class ExceptionBuilderExamples
@@ -11,7 +6,7 @@ public class ExceptionBuilderExamples
     [Fact]
     public void MinimalCode()
     {
-        var exceptions = ExceptionBuilder.Create("Example");
+        var exceptions = new ExceptionBuilder("Example");
 
         // does nothing since no exception is added
         exceptions.ThrowIfNotEmpty();
@@ -20,7 +15,7 @@ public class ExceptionBuilderExamples
     [Fact]
     public void MinimalCodeWithError()
     {
-        var exceptionBuilder = ExceptionBuilder.Create("Example");
+        var exceptionBuilder = new ExceptionBuilder("Example");
         exceptionBuilder.Add(new Exception("Example Exception"));
 
         Action act = () => exceptionBuilder.ThrowIfNotEmpty();
@@ -30,7 +25,7 @@ public class ExceptionBuilderExamples
     [Fact]
     public void NestedExceptions()
     {
-        var exceptionBuilder = ExceptionBuilder.Create("Example");
+        var exceptionBuilder = new ExceptionBuilder("Example");
         exceptionBuilder.Add(new Exception("Example Exception"));
         var child = exceptionBuilder.CreateChild("Children");
         child.Add(new Exception("Exceptions of the child"));
@@ -42,7 +37,7 @@ public class ExceptionBuilderExamples
     [Fact]
     public void GetExceptionWithoutThrowing()
     {
-        var exceptionBuilder = ExceptionBuilder.Create("Example");
+        var exceptionBuilder = new ExceptionBuilder("Example");
         exceptionBuilder.Add(new Exception("Example Exception"));
 
         var exception = exceptionBuilder.GetException();
@@ -50,23 +45,48 @@ public class ExceptionBuilderExamples
         exception.Should().BeOfType<JLibAggregateException>();
     }
 
+    [Fact]
+    public void UsingDisposables()
+    {
+        var act = () =>
+        {
+            using var exceptionBuilder = new ExceptionBuilder("Example");
+            exceptionBuilder.Add(new Exception("ExampleException"));
+        };
+        act.Should().Throw<JLibAggregateException>();
+    }
+
+    [Fact]
+    public void UsingDisposablesWithNestedExceptions()
+    {
+        var act = () =>
+        {
+            using var exceptionBuilder = new ExceptionBuilder("Example");
+            exceptionBuilder.Add(new Exception("ExampleException"));
+            using var childBuilder = exceptionBuilder.CreateChild("child");
+            exceptionBuilder.Add(new Exception("ExampleChildException"));
+        };
+        act.Should().Throw<JLibAggregateException>();
+    }
 
     public class ExampleExceptionProvider : IExceptionProvider
     {
         private readonly bool _isValid;
 
-        public ExampleExceptionProvider(bool isValid) 
+        public ExampleExceptionProvider(bool isValid)
             => _isValid = isValid;
 
         public Exception? GetException()
             => _isValid
                 ? null
                 : new Exception("Data is Invalid");
+
+        public bool HasErrors() => !_isValid;
     }
     [Fact]
     public void CustomExceptionProviderFails()
     {
-        var exceptionBuilder = ExceptionBuilder.Create("Example");
+        var exceptionBuilder = new ExceptionBuilder("Example");
         var provider = new ExampleExceptionProvider(false);
         exceptionBuilder.AddChild(provider);
 
@@ -77,7 +97,7 @@ public class ExceptionBuilderExamples
     [Fact]
     public void CustomExceptionProviderSucceeds()
     {
-        var exceptionBuilder = ExceptionBuilder.Create("Example");
+        var exceptionBuilder = new ExceptionBuilder("Example");
         var provider = new ExampleExceptionProvider(true);
         exceptionBuilder.AddChild(provider);
 

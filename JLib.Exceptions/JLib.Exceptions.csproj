@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.ServiceModel.Primitives" Version="6.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
       <ProjectReference Include="..\JLib.Helper\JLib.Helper.csproj" />
   </ItemGroup>
 

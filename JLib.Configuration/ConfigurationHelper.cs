@@ -61,7 +61,7 @@ public static class ConfigurationHelper
     public static IConfigurationSection GetSection<T>(this IConfiguration config, string configSectionName, ILoggerFactory loggerFactory)
         where T : class, new()
     {
-        var logger = loggerFactory.CreateLogger(typeof(T));
+        var logger = loggerFactory.CreateLogger<T>();
         // code duplicated in ServiceCollectionHelper.AddAllConfigSections
         var topLevelEnvironment = config[ConfigurationSections.Environment];
         if (topLevelEnvironment != null)

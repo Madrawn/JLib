@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
-using System.Text;
-using System.Threading.Tasks;
-using JLib.Exceptions;
+﻿using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +19,7 @@ public static class DataProviderAutomapperExtensions
     public static IServiceCollection AddMapDataProvider(
         this IServiceCollection services,
         ITypeCache typeCache,
-        IExceptionBuilder exceptions)
+        ExceptionBuilder exceptions)
     {
         exceptions = exceptions.CreateChild(nameof(AddMapDataProvider));
         foreach (var mappedDataObjectType in typeCache.All<IMappedDataObjectType>())
@@ -79,7 +73,7 @@ public static class DataProviderAutomapperExtensions
         Func<TTvt, bool>? filter,
         Func<TTvt, ITypeValueType?> sourcePropertyReader,
         Func<TTvt, bool> isReadOnly,
-        IExceptionBuilder exceptions,
+        ExceptionBuilder exceptions,
         ILoggerFactory loggerFactory)
         where TTvt : class, IDataObjectType
     {
