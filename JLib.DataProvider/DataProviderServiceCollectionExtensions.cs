@@ -14,7 +14,7 @@ public static class DataProviderServiceCollectionExtensions
     /// adds all repositories to the service provider
     /// </summary>
     public static IServiceCollection AddRepositories(
-        this IServiceCollection services, ITypeCache typeCache, IExceptionBuilder exceptions)
+        this IServiceCollection services, ITypeCache typeCache, ExceptionBuilder exceptions)
     {
         // making sure that no two repos are provided for the same DataObject
         var groupedRepos = typeCache.All<RepositoryType>()
@@ -70,7 +70,7 @@ public static class DataProviderServiceCollectionExtensions
     /// <typeparam name="TImplementation">the implementation of the <see cref="IDataProviderR{TDataObject}"/> to be used. Generics will be ignored.</typeparam>
     /// <typeparam name="TIgnoredDataObject">the ignored type argument of <see cref="IDataProviderR{TDataObject}"/> implemented by <typeparamref name="TImplementation"/></typeparam>
     /// <param name="services"></param>
-    /// <param name="typeCache"><see cref="AddTypeCache(IServiceCollection,out ITypeCache, IExceptionBuilder, ITypePackage[])"/></param>
+    /// <param name="typeCache"><see cref="AddTypeCache(IServiceCollection,out ITypeCache, ExceptionBuilder, ITypePackage[])"/></param>
     /// <param name="filter">if the filter is provided and returns false, no <see cref="IDataProviderR{TDataObject}"/> will be created for the given <see cref="Reflection.TypeValueType"/><br/>
     /// null defaults to '_=>true'</param>
     /// <param name="forceReadOnly">if provided and true, only <see cref="IDataProviderR{TDataObject}"/> and <see cref="ISourceDataProviderR{TData}"/> will be provided but not <see cref="IDataProviderRw{TData}"/> or <see cref="ISourceDataProviderRw{TData}"/><br/>
@@ -97,7 +97,7 @@ public static class DataProviderServiceCollectionExtensions
         Func<TTvt, bool>? filter,
         Func<TTvt, bool>? forceReadOnly,
         Func<TTvt, ITypeValueType>[]? implementationTypeArgumentResolver,
-        IExceptionBuilder exceptions,
+        ExceptionBuilder exceptions,
         ILoggerFactory loggerFactory,
         ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TTvt : class, IDataObjectType

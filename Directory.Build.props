@@ -53,6 +53,7 @@
                 <IncludeSymbols>True</IncludeSymbols>
                 <RepositoryUrl>https://github.com/JonnyIV/JLib</RepositoryUrl>
                 <PackageReadmeFile>$(MSBuildProjectName) Documentation.md</PackageReadmeFile>
+                <GenerateDocumentationFile>True</GenerateDocumentationFile>
             </PropertyGroup>
             <ItemGroup>
                 <!--Include documentation-->

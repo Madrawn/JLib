@@ -23,24 +23,24 @@ public abstract class ReflectionTestBase
 {
     private readonly ITestOutputHelper _testOutput;
     private readonly ITypePackage _typePackage;
-    private readonly IExceptionBuilder _exceptions;
+    private readonly ExceptionBuilder _exceptions;
     private readonly ILoggerFactory _loggerFactory;
 
     protected ReflectionTestBase(ITestOutputHelper testOutput, ITypePackage typePackage)
     {
-        _exceptions = ExceptionBuilder.Create(GetType().FullClassName());
+        _exceptions = new ExceptionBuilder(GetType().FullClassName());
         _testOutput = testOutput;
         _typePackage = typePackage;
         _loggerFactory = new LoggerFactory()
             .AddXunit(testOutput);
     }
 
-    protected virtual void AddServices(IServiceCollection services, ITypeCache cache, IExceptionBuilder exceptions)
+    protected virtual void AddServices(IServiceCollection services, ITypeCache cache, ExceptionBuilder exceptions)
     {
 
     }
     protected void Test(string[] expectedBehavior, IReadOnlyCollection<Type> includedTypes,
-        Action<IServiceCollection, ITypeCache, ILoggerFactory, IExceptionBuilder> serviceFactory, bool expectException = true,
+        Action<IServiceCollection, ITypeCache, ILoggerFactory, ExceptionBuilder> serviceFactory, bool expectException = true,
         bool testCache = true,
         bool testServices = true,
         [CallerMemberName] string testName = "")

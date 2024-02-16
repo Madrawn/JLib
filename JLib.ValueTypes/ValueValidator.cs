@@ -28,7 +28,15 @@ public abstract class ValueValidator<TValue> : IExceptionProvider
 
     Exception? IExceptionProvider.GetException()
         => BuildException(_messages, _subValidators);
-    
+
+    /// <summary>
+    /// <inheritdoc cref="IExceptionProvider.HasErrors"/>
+    /// </summary>
+    public bool HasErrors() => _messages.Any() || _subValidators.Any(v => v.HasErrors());
+
+    /// <summary>
+    /// <inheritdoc cref="IExceptionProvider.GetException"/>
+    /// </summary>
     protected virtual Exception? BuildException(IReadOnlyCollection<string> messages, IReadOnlyCollection<IExceptionProvider> provider)
         => JLibAggregateException.ReturnIfNotEmpty(
             $"{ValueTypeName} validation failed: '{Value}' is not a valid Value.",

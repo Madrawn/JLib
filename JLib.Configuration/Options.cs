@@ -26,7 +26,7 @@ public sealed record ConfigurationSectionType(Type Value) : TypeValueType(Value)
 {
     public ConfigSectionName SectionName { get; private set; } = null!;
 
-    public void Initialize(ITypeCache cache, IExceptionBuilder exceptions)
+    public void Initialize(ITypeCache cache, ExceptionBuilder exceptions)
         => SectionName = Value.GetCustomAttribute<ConfigSectionNameAttribute>()?.SectionName
                          ?? throw NewInvalidTypeException("sectionName not found");
 }

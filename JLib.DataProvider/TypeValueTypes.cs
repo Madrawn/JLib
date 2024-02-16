@@ -10,7 +10,7 @@ public abstract record DataProviderType(Type Value) : NavigatingTypeValueType(Va
 {
     public bool CanWrite { get; private set; }
 
-    void IPostNavigationInitializedType.Initialize(ITypeCache _, IExceptionBuilder exceptions)
+    void IPostNavigationInitializedType.Initialize(ITypeCache _, ExceptionBuilder exceptions)
     {
         CanWrite = Value.ImplementsAny<IDataProviderRw<IEntity>>();
     }

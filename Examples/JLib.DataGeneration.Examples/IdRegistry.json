@@ -2,7 +2,13 @@
   "__registry__": {
     "IdIncrement": 0
   },
+  "JLib.DataGeneration.Examples.MinimumCodeNativeIds.CustomerDp": {
+    "CustomerId": "40c1b7be-d937-47c0-addb-b64807577470"
+  },
   "JLib.DataGeneration.Examples.MinimumCodeValueTypeIds.CustomerDp": {
     "CustomerId": "274fa88f-8946-41eb-b302-ade8a94624a5"
+  },
+  "JLib.DataGeneration.Examples.SnapshotInfoExample.CustomerDp": {
+    "CustomerId": "800f78c7-fa87-4038-a4b4-f8f25a418b21"
   }
 }

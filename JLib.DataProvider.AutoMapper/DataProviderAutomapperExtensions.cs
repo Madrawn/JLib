@@ -19,7 +19,7 @@ public static class DataProviderAutomapperExtensions
     public static IServiceCollection AddMapDataProvider(
         this IServiceCollection services,
         ITypeCache typeCache,
-        IExceptionBuilder exceptions)
+        ExceptionBuilder exceptions)
     {
         exceptions = exceptions.CreateChild(nameof(AddMapDataProvider));
         foreach (var mappedDataObjectType in typeCache.All<IMappedDataObjectType>())
@@ -73,7 +73,7 @@ public static class DataProviderAutomapperExtensions
         Func<TTvt, bool>? filter,
         Func<TTvt, ITypeValueType?> sourcePropertyReader,
         Func<TTvt, bool> isReadOnly,
-        IExceptionBuilder exceptions,
+        ExceptionBuilder exceptions,
         ILoggerFactory loggerFactory)
         where TTvt : class, IDataObjectType
     {

@@ -5,7 +5,7 @@ Provides a standardized way to create, aggregate and throw exceptions.
 
 # Issues with the current implementation
 - The ExceptionBuilder does not have any way to remove children if they have no content - leading to unneccessary memory allocations
-    - Solution: The IExceptionBuilder could derive from IDisposable. When disposed, it will freeze and, if empty, remove itself from the parent
+    - Solution: The ExceptionBuilder could derive from IDisposable. When disposed, it will freeze and, if empty, remove itself from the parent
 - The JLibException and JLibAggregateException sound similar but represent different UseCases: 
     - Exception:
         - JLibException: An exception thrown by the JLib itself
