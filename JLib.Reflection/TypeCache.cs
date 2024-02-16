@@ -109,13 +109,13 @@ public class TypeCache : ITypeCache
 
     #region constructor
 
-    public TypeCache(ITypePackage typePackage, IExceptionBuilder? parentExceptionManager, ILoggerFactory loggerFactory)
+    public TypeCache(ITypePackage typePackage, IExceptionBuilder? parentExceptionBuilder, ILoggerFactory loggerFactory)
     {
         _logger = loggerFactory.CreateLogger(typeof(ITypeCache)?.FullName ?? nameof(ITypeCache));
         using var _ = _logger.BeginScope(this);
         KnownTypes = typePackage.GetContent().ToArray();
         const string exceptionMessage = "Cache setup failed";
-        var exceptions = parentExceptionManager?.CreateChild(exceptionMessage)
+        var exceptions = parentExceptionBuilder?.CreateChild(exceptionMessage)
                          ?? ExceptionBuilder.Create(exceptionMessage);
 
         var availableTypeValueTypes = KnownTypes
@@ -240,7 +240,7 @@ public class TypeCache : ITypeCache
             }
         }
 
-        if (parentExceptionManager is null)
+        if (parentExceptionBuilder is null)
             exceptions.ThrowIfNotEmpty();
 
         WriteLog();

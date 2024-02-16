@@ -26,7 +26,7 @@ public class ExceptionBuilder : IExceptionBuilder
     public virtual Exception? GetException() => JLibAggregateException.ReturnIfNotEmpty(_message, BuildExceptionList().WhereNotNull());
 
     public static IExceptionBuilder Create(string message)
-        => new ExceptionBuilder(message);
+        => ExceptionBuilder.Create(message);
     protected ExceptionBuilder(string message) => _message = message;
 
     public virtual IExceptionBuilder CreateChild(string message)
