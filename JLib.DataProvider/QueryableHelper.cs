@@ -1,6 +1,4 @@
-﻿using JLib.ValueTypes;
-
-namespace JLib.DataProvider;
+﻿namespace JLib.DataProvider;
 
 public static class QueryableHelper
 {

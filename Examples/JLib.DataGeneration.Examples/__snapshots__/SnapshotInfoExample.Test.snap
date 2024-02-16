@@ -1,0 +1,11 @@
+﻿[
+  {
+    "Id": {
+      "IdGroupName": "JLib.DataGeneration.Examples.SnapshotInfoExample.CustomerDp",
+      "IdName": "CustomerId",
+      "Value": "800f78c7-fa87-4038-a4b4-f8f25a418b21",
+      "IdType": "CustomerId"
+    },
+    "UserName": "JLib.DataGeneration.Examples.SnapshotInfoExample.CustomerDp.CustomerId"
+  }
+]

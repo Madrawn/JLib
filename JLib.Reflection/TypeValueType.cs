@@ -11,7 +11,7 @@ namespace JLib.Reflection;
 /// </summary>
 public interface IPostNavigationInitializedType : ITypeValueType
 {
-    void Initialize(ITypeCache cache, IExceptionBuilder exceptions);
+    void Initialize(ITypeCache cache, ExceptionBuilder exceptions);
 }
 
 public interface IValidatedType : ITypeValueType

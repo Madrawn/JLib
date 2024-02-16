@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using HotChocolate.Resolvers;
+﻿using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using JLib.DataProvider;
 using Microsoft.EntityFrameworkCore;

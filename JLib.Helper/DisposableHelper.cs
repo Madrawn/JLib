@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace JLib.Helper;
+﻿namespace JLib.Helper;
 public static class DisposableHelper
 {
+    /// <summary>
+    /// adds the <paramref name="disposable"/> to the <paramref name="disposables"/> list and returns the <paramref name="disposable"/>
+    /// </summary>
+    /// <returns>the <paramref name="disposable"/> argument</returns>
     public static T DisposeWith<T>(this T disposable, IList<IDisposable> disposables)
         where T:IDisposable
     {
@@ -14,6 +12,9 @@ public static class DisposableHelper
         return disposable;
     }
 
+    /// <summary>
+    /// Disposes all <paramref name="disposables"/>
+    /// </summary>
     public static void DisposeAll(this IEnumerable<IDisposable> disposables)
     {
         foreach (var disposable in disposables)

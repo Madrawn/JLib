@@ -1,7 +1,5 @@
 ﻿
 
-using System.Diagnostics.Contracts;
-
 Console.WriteLine("Type Package Generator");
 Console.WriteLine("This code generates type packages for all projects in the given solution. Namespace fixes and class removal might be required afterwards");
 string? solutionDir;
