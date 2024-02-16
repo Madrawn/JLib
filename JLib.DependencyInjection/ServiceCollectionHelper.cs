@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices.ComTypes;
-using JLib.Configuration;
+﻿using JLib.Configuration;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;

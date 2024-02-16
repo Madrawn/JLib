@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using FluentAssertions;
 using JLib.Cqrs;
 using JLib.DependencyInjection;
 using JLib.Exceptions;
@@ -7,7 +8,6 @@ using JLib.Reflection;
 using JLib.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using FluentAssertions;
 using Snapshooter.Xunit;
 using Xunit.Abstractions;
 

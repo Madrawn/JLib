@@ -1,11 +1,11 @@
 using FluentAssertions;
+using JLib.AutoMapper;
 using JLib.DataGeneration.Examples.DataPackages;
 using JLib.DataGeneration.Examples.Setup.Models;
 using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
 using JLib.DataGeneration.Examples.SnapshotInfo;
 using JLib.DependencyInjection;
 using JLib.Exceptions;
-using JLib.AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Snapshooter;

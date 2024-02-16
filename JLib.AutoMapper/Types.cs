@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Reflection;
-using AutoMapper;
+﻿using AutoMapper;
 using JLib.Helper;
 using JLib.Reflection;
 using Microsoft.Extensions.Logging;

@@ -11,7 +11,6 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Xunit;
 using Xunit.Abstractions;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace JLib.DataProvider.Tests.Authorization;
 

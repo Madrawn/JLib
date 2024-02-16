@@ -1,6 +1,4 @@
 
-using JLib.Reflection;
-
 namespace JLib.Reflection.HotChocolate.Query;
 public static class JLibReflectionHotChocolateQueryTp
 {

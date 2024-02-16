@@ -3,7 +3,6 @@ using JLib.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Snapshooter;
 using Snapshooter.Xunit;
-using System;
 
 namespace JLib.Testing;
 public static class EnumerableSnapshotExtensions
