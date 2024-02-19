@@ -1,5 +1,7 @@
 <Project>
     <PropertyGroup>
+        <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <WarningsAsErrors>Nullable</WarningsAsErrors>
@@ -11,7 +13,6 @@
         <Version>$(VersionSuffix)</Version>
         <AssemblyVersion>$(VersionSuffix)</AssemblyVersion>
         <FileVersion>$(VersionSuffix)</FileVersion>
-        <TargetFramework>net6.0</TargetFramework>
         <Company>-</Company>
         <Authors>Marcel Rehkemper</Authors>
         <Title>$(MSBuildProjectName)</Title>
