@@ -1,9 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <
-    </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\JLib.AutoMapper\JLib.AutoMapper.csproj" />
     <ProjectReference Include="..\JLib.Configuration\JLib.Configuration.csproj" />

@@ -3,16 +3,6 @@
 namespace JLib.Exceptions;
 public static class ExceptionExtensions
 {
-    public static void ThrowIfNotEmpty(this IExceptionProvider exceptionProvider, Action? onThrow = null)
-    {
-        var exception = exceptionProvider.GetException();
-
-        if (exception is null)
-            return;
-
-        onThrow?.Invoke();
-        throw exception;
-    }
     /// <summary>
     /// throws a <see cref="JLibAggregateException"/> with the given <paramref name="message"/> containing all <paramref name="exceptions"/> if <paramref name="exceptions"/> is not empty.
     /// </summary>

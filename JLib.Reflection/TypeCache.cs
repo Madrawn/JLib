@@ -240,8 +240,7 @@ public class TypeCache : ITypeCache
             }
         }
 
-        if (parentExceptionBuilder is null)
-            exceptions.ThrowIfNotEmpty();
+        exceptions.ThrowIfNotEmpty();
 
         WriteLog();
     }
