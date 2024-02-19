@@ -28,12 +28,12 @@ public sealed class DataDerivationViaGenerics : IDisposable
     \*************************************************************/
     public abstract class CustomerDpb : DataPackage
     {
-        public CustomerId CustomerId { get; set; } = null!;
+        public CustomerId Id { get; set; } = null!;
         protected CustomerDpb(ShoppingServiceMock shoppingService, IDataPackageManager packageManager) : base(packageManager)
         {
-            shoppingService.AddCustomer(new(GetInfoText(nameof(CustomerId)))
+            shoppingService.AddCustomer(new(GetInfoText(nameof(Id)))
             {
-                Id = CustomerId
+                Id = Id
             });
         }
     }
@@ -52,6 +52,19 @@ public sealed class DataDerivationViaGenerics : IDisposable
         }
     }
 
+    public sealed class OrderDp<TCustomerDp> : DataPackage
+        where TCustomerDp : CustomerDpb
+    {
+        public OrderId Id { get; init; } = null!;
+        public OrderDp(TCustomerDp customerDp, ShoppingServiceMock shoppingServiceMock, IDataPackageManager packageManager) : base(packageManager)
+        {
+            shoppingServiceMock.AddOrders(new OrderEntity(customerDp.Id, OrderStatus.Fulfilled)
+            {
+                Id = Id,
+            });
+        }
+    }
+
     /*************************************************************\
     |                      Snapshot Infos                         |
     \*************************************************************/
@@ -63,6 +76,31 @@ public sealed class DataDerivationViaGenerics : IDisposable
         {
             Id = customer.Id.IdSnapshot(idRegistry);
             UserName = customer.UserName;
+        }
+    }
+
+    public class OrderSnapshotInfo
+    {
+        public IdSnapshotInformation Id { get; }
+        public IdSnapshotInformation CustomerId { get; }
+        public OrderStatus Status { get; }
+        public OrderSnapshotInfo(OrderEntity order, IIdRegistry idRegistry)
+        {
+            Id = order.Id.IdSnapshot(idRegistry);
+            CustomerId = order.Customer.IdSnapshot(idRegistry);
+            Status = order.Status;
+        }
+    }
+
+    public class ShoppingServiceSnapshotInfo
+    {
+        public IReadOnlyCollection<CustomerSnapshotInfo> Customers { get; }
+        public IReadOnlyCollection<OrderSnapshotInfo> Orders { get; }
+
+        public ShoppingServiceSnapshotInfo(ShoppingServiceMock service, IIdRegistry idRegistry)
+        {
+            Customers = service.Customers.Values.Select(customer => new CustomerSnapshotInfo(customer, idRegistry)).ToList();
+            Orders = service.Orders.Values.Select(order => new OrderSnapshotInfo(order, idRegistry)).ToList();
         }
     }
 
@@ -93,7 +131,7 @@ public sealed class DataDerivationViaGenerics : IDisposable
         var serviceProvider = serviceCollection
             .BuildServiceProvider()
             .DisposeWith(_disposables)
-            .IncludeDataPackages<CustomerDp, OtherCustomerDp>();
+            .IncludeDataPackages<OrderDp<CustomerDp>, OrderDp<OtherCustomerDp>>();
 
         _shoppingService = serviceProvider.GetRequiredService<ShoppingServiceMock>();
         _idRegistry = serviceProvider.GetRequiredService<IIdRegistry>();
@@ -107,11 +145,13 @@ public sealed class DataDerivationViaGenerics : IDisposable
     |                            Test                             |
     \*************************************************************/
     [Fact]
-    public void Test()
-        => _shoppingService.Customers
-            .Values
-            .Select(customer => new CustomerSnapshotInfo(customer, _idRegistry))
-            .Should().HaveCount(2)
-            .And.Subject
-            .MatchSnapshot();
+    public void SnapshotTest()
+        => new ShoppingServiceSnapshotInfo(_shoppingService, _idRegistry).MatchSnapshot();
+
+    [Fact]
+    public void ManualTest()
+    {
+        _shoppingService.Orders.Count.Should().Be(2);
+        _shoppingService.Customers.Count.Should().Be(2);
+    }
 }
