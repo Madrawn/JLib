@@ -1,25 +1,24 @@
-﻿#region
-// Third party packages
+﻿// Third party packages
+using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Snapshooter.Xunit;
 using Xunit;
 using Xunit.Abstractions;
-using Snapshooter.Xunit;
 
 // required JLib packages
+using JLib.AutoMapper;
 using JLib.DependencyInjection;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
-using JLib.AutoMapper;
 
-// referenced example setup code
+// referenced setup
 using JLib.DataGeneration.Examples.Setup.Models;
 using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
 
-namespace JLib.DataGeneration.Examples;
-#endregion
-public sealed class MinimumCodeValueTypeIds : IDisposable
+namespace JLib.DataGeneration.Examples.Getting_Started;
+public sealed class UsingTheDefaultNamespace : IDisposable
 {
     /*************************************************************\
     |                       Data Packages                         |
@@ -42,7 +41,7 @@ public sealed class MinimumCodeValueTypeIds : IDisposable
     private readonly List<IDisposable> _disposables = new();
     private readonly ShoppingServiceMock _shoppingService;
 
-    public MinimumCodeValueTypeIds(ITestOutputHelper testOutputHelper)
+    public UsingTheDefaultNamespace(ITestOutputHelper testOutputHelper)
     {
         using var exceptions = new ExceptionBuilder("setup");
 
@@ -51,11 +50,14 @@ public sealed class MinimumCodeValueTypeIds : IDisposable
         var serviceCollection = new ServiceCollection()
             .AddTypeCache(out var typeCache, exceptions, loggerFactory,
                 JLibDataGenerationTp.Instance,
-                TypePackage.GetNested<MinimumCodeValueTypeIds>())
+                TypePackage.GetNested<UsingTheDefaultNamespace>())
             .AddSingleton<ShoppingServiceMock>()
             .AddScopedAlias<IShoppingService, ShoppingServiceMock>()
             .AddAutoMapper(b => b.AddProfiles(typeCache, loggerFactory))
-            .AddDataPackages(typeCache);
+            .AddDataPackages(typeCache, new()
+            {
+                DefaultNamespace = $"{typeof(UsingTheDefaultNamespace).Namespace}.{nameof(UsingTheDefaultNamespace)}"
+            });
 
         var serviceProvider = serviceCollection
             .BuildServiceProvider()
@@ -72,6 +74,11 @@ public sealed class MinimumCodeValueTypeIds : IDisposable
     \*************************************************************/
     [Fact]
     public void Test()
-        => _shoppingService.Customers.MatchSnapshot();
+    {
+        var id = _shoppingService.Customers.Single().Key;
+        id.IdInfo().Should().Be($"CustomerId [CustomerDp].[CustomerId] = {id.Value}");
+        _shoppingService.Customers.MatchSnapshot();
+    }
+
     #endregion
 }

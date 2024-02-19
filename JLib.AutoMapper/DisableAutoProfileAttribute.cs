@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
+using JLib.Reflection;
 
-namespace JLib.Reflection;
+namespace JLib.AutoMapper;
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 public class DisableAutoProfileAttribute : Attribute, IDisableAutoProfileAttribute

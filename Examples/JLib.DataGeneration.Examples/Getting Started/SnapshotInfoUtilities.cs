@@ -1,25 +1,27 @@
-﻿#region
-// Third party packages
+﻿// Third party packages
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Snapshooter.Xunit;
 using Xunit;
 using Xunit.Abstractions;
-using Snapshooter.Xunit;
 
 // required JLib packages
+using JLib.AutoMapper;
 using JLib.DependencyInjection;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
-using JLib.AutoMapper;
 
-// referenced example setup code
+// referenced setup
 using JLib.DataGeneration.Examples.Setup.Models;
 using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
 
-namespace JLib.DataGeneration.Examples;
-#endregion
-public sealed class SnapshotInfoExample : IDisposable
+namespace JLib.DataGeneration.Examples.Getting_Started;
+
+/// <summary>
+/// this Example shows how to create a SnapshotInfo to improve snapshot readability
+/// </summary>
+public sealed class SnapshotInfoUtilities : IDisposable
 {
     /*************************************************************\
     |                       Data Packages                         |
@@ -58,7 +60,7 @@ public sealed class SnapshotInfoExample : IDisposable
     private readonly ShoppingServiceMock _shoppingService;
     private readonly IIdRegistry _idRegistry;
 
-    public SnapshotInfoExample(ITestOutputHelper testOutputHelper)
+    public SnapshotInfoUtilities(ITestOutputHelper testOutputHelper)
     {
         var exceptions = new ExceptionBuilder("setup");
         var loggerFactory = new LoggerFactory().AddXunit(testOutputHelper);
@@ -66,7 +68,7 @@ public sealed class SnapshotInfoExample : IDisposable
         var serviceCollection = new ServiceCollection()
             .AddTypeCache(out var typeCache, exceptions, loggerFactory,
                 JLibDataGenerationTp.Instance,
-                TypePackage.GetNested<SnapshotInfoExample>())
+                TypePackage.GetNested<SnapshotInfoUtilities>())
             .AddSingleton<ShoppingServiceMock>()
             .AddScopedAlias<IShoppingService, ShoppingServiceMock>()
             .AddAutoMapper(b => b.AddProfiles(typeCache, loggerFactory))
@@ -84,9 +86,9 @@ public sealed class SnapshotInfoExample : IDisposable
     }
     public void Dispose()
         => _disposables.DisposeAll();
-    
+
     #endregion
-    
+
     /*************************************************************\
     |                            Test                             |
     \*************************************************************/

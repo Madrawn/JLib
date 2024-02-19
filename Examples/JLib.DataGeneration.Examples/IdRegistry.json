@@ -2,13 +2,45 @@
   "__registry__": {
     "IdIncrement": 0
   },
-  "JLib.DataGeneration.Examples.MinimumCodeNativeIds.CustomerDp": {
-    "CustomerId": "40c1b7be-d937-47c0-addb-b64807577470"
+  "CustomerDp": {
+    "CustomerId": "5e384704-f4df-42a3-a062-9c17edca1952"
   },
-  "JLib.DataGeneration.Examples.MinimumCodeValueTypeIds.CustomerDp": {
-    "CustomerId": "274fa88f-8946-41eb-b302-ade8a94624a5"
+  "GenerateIdsManually": {
+    "Test": "188d46c2-ca66-424f-9669-93520ae0bc18"
   },
-  "JLib.DataGeneration.Examples.SnapshotInfoExample.CustomerDp": {
-    "CustomerId": "800f78c7-fa87-4038-a4b4-f8f25a418b21"
+  "JLib.DataGeneration.Examples.Data_Derivations.DataDerivationViaGenerics.CustomerDp": {
+    "CustomerId": "9e802126-74a3-4de1-9fc0-d7d5df8f4dbf"
+  },
+  "JLib.DataGeneration.Examples.Data_Derivations.DataDerivationViaGenerics.CustomerDp:JLib.DataGeneration.Examples.Data_Derivations.DataDerivationViaGenerics.CustomerDpb": {
+    "CustomerId": "2ad4e95f-c592-4bd9-bf0c-1c9a72df99d0",
+    "Id": "875e3b39-fa6d-41c5-9c37-3028ed486e86"
+  },
+  "JLib.DataGeneration.Examples.Data_Derivations.DataDerivationViaGenerics.OrderDp<JLib.DataGeneration.Examples.Data_Derivations.DataDerivationViaGenerics.CustomerDp>": {
+    "Id": "ea4c86cb-2f9d-4210-ad50-d71b20d03417"
+  },
+  "JLib.DataGeneration.Examples.Data_Derivations.DataDerivationViaGenerics.OrderDp<JLib.DataGeneration.Examples.Data_Derivations.DataDerivationViaGenerics.OtherCustomerDp>": {
+    "Id": "650311c7-47fa-4827-89ea-861dc7166ffd"
+  },
+  "JLib.DataGeneration.Examples.Data_Derivations.DataDerivationViaGenerics.OtherCustomerDp:JLib.DataGeneration.Examples.Data_Derivations.DataDerivationViaGenerics.CustomerDpb": {
+    "CustomerId": "402e4320-a993-4b23-9059-64e585ca789e",
+    "Id": "5f7ee886-25d3-42fb-bc12-e9e137f363bb"
+  },
+  "JLib.DataGeneration.Examples.Data_Derivations.DataDerivationViaInheritance.CustomerDp": {
+    "CustomerId": "580bdb08-cce0-405b-85f5-ed58d48f0399"
+  },
+  "JLib.DataGeneration.Examples.Getting_Started.DebugUtilities.CustomerDp": {
+    "CustomerId": "176d1d98-ed2f-468b-b262-c574b184fa5f"
+  },
+  "JLib.DataGeneration.Examples.Getting_Started.MinimumCodeNativeIds.CustomerDp": {
+    "CustomerId": "8fc4d93a-aa6c-4fb1-9550-017d64c7dbd9"
+  },
+  "JLib.DataGeneration.Examples.Getting_Started.MinimumCodeValueTypeIds.CustomerDp": {
+    "CustomerId": "968a719c-514a-4ca3-81b9-44c0c4da35b5"
+  },
+  "JLib.DataGeneration.Examples.Getting_Started.SnapshotInfoUtilities.CustomerDp": {
+    "CustomerId": "183b7b13-5824-49e1-bf0c-349e60b56392"
+  },
+  "UsingTheDefaultNamespace.CustomerDp": {
+    "CustomerId": "dbab7b54-6467-48ee-aa3c-96cac1a63370"
   }
 }

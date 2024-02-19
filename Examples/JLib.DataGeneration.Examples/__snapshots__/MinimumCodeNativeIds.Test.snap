@@ -1,8 +1,0 @@
-﻿{
-  "CustomerId { Value = 40c1b7be-d937-47c0-addb-b64807577470 }": {
-    "Id": {
-      "Value": "40c1b7be-d937-47c0-addb-b64807577470"
-    },
-    "UserName": "JLib.DataGeneration.Examples.MinimumCodeNativeIds.CustomerDp.CustomerId"
-  }
-}

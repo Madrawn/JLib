@@ -1,69 +1,64 @@
 ﻿// Third party packages
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Snapshooter.Xunit;
 using Xunit;
 using Xunit.Abstractions;
-using Snapshooter.Xunit;
 
 // required JLib packages
+using JLib.AutoMapper;
 using JLib.DependencyInjection;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
-using JLib.AutoMapper;
 
-// referenced example setup code
+// referenced setup
 using JLib.DataGeneration.Examples.Setup.Models;
 using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
 
-namespace JLib.DataGeneration.Examples;
-public sealed class MinimumCodeNativeIds : IDisposable
+namespace JLib.DataGeneration.Examples.Getting_Started;
+public sealed class MinimumCodeValueTypeIds : IDisposable
 {
     /*************************************************************\
     |                       Data Packages                         |
     \*************************************************************/
     public sealed class CustomerDp : DataPackage
     {
-        public Guid CustomerId { get; set; } = default!;
+        public CustomerId CustomerId { get; set; } = null!;
         public CustomerDp(ShoppingServiceMock shoppingService, IDataPackageManager packageManager) : base(packageManager)
         {
             shoppingService.AddCustomer(new(GetInfoText(nameof(CustomerId)))
             {
-                Id = new CustomerId(CustomerId)
+                Id = CustomerId
             });
         }
     }
-
+    #region
     /*************************************************************\
     |                           Setup                             |
     \*************************************************************/
     private readonly List<IDisposable> _disposables = new();
     private readonly ShoppingServiceMock _shoppingService;
 
-    public MinimumCodeNativeIds(ITestOutputHelper testOutputHelper)
+    public MinimumCodeValueTypeIds(ITestOutputHelper testOutputHelper)
     {
-        IServiceCollection serviceCollection;
+        using var exceptions = new ExceptionBuilder("setup");
 
-        using (var exceptions = new ExceptionBuilder("setup"))
-        {
-            var loggerFactory = new LoggerFactory().AddXunit(testOutputHelper);
+        var loggerFactory = new LoggerFactory().AddXunit(testOutputHelper);
 
-
-            serviceCollection = new ServiceCollection()
-                .AddTypeCache(out var typeCache, exceptions, loggerFactory,
-                    JLibDataGenerationTp.Instance,
-                    TypePackage.GetNested<MinimumCodeNativeIds>())
-                .AddSingleton<ShoppingServiceMock>()
-                .AddScopedAlias<IShoppingService, ShoppingServiceMock>()
-                .AddAutoMapper(b => b.AddProfiles(typeCache, loggerFactory))
-                .AddDataPackages(typeCache);
-        }
+        var serviceCollection = new ServiceCollection()
+            .AddTypeCache(out var typeCache, exceptions, loggerFactory,
+                JLibDataGenerationTp.Instance,
+                TypePackage.GetNested<MinimumCodeValueTypeIds>())
+            .AddSingleton<ShoppingServiceMock>()
+            .AddScopedAlias<IShoppingService, ShoppingServiceMock>()
+            .AddAutoMapper(b => b.AddProfiles(typeCache, loggerFactory))
+            .AddDataPackages(typeCache);
 
         var serviceProvider = serviceCollection
             .BuildServiceProvider()
             .DisposeWith(_disposables)
             .IncludeDataPackages<CustomerDp>();
-
         _shoppingService = serviceProvider.GetRequiredService<ShoppingServiceMock>();
     }
     public void Dispose()
@@ -76,4 +71,5 @@ public sealed class MinimumCodeNativeIds : IDisposable
     [Fact]
     public void Test()
         => _shoppingService.Customers.MatchSnapshot();
+    #endregion
 }
