@@ -1,13 +1,4 @@
-﻿#region
-// Third party packages
-
-using JLib.AutoMapper;
-using JLib.DataGeneration.Examples.Setup.Models;
-using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
-using JLib.DependencyInjection;
-using JLib.Exceptions;
-using JLib.Helper;
-using JLib.Reflection;
+﻿// Third party packages
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Snapshooter.Xunit;
@@ -15,21 +6,17 @@ using Xunit;
 using Xunit.Abstractions;
 
 // required JLib packages
+using JLib.AutoMapper;
+using JLib.DependencyInjection;
+using JLib.Exceptions;
+using JLib.Helper;
+using JLib.Reflection;
 
-// referenced example setup code
-/* Unmerged change from project 'JLib.DataGeneration.Examples (net6.0)'
-Before:
+// referenced setup
+using JLib.DataGeneration.Examples.Setup.Models;
 using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
-After:
-using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
-using JLib;
-using JLib.DataGeneration;
-using JLib.DataGeneration.Examples;
-using JLib.DataGeneration.Examples.EntryLevel;
-*/
 
 namespace JLib.DataGeneration.Examples.Getting_Started;
-#endregion
 public sealed class MinimumCodeValueTypeIds : IDisposable
 {
     /*************************************************************\
