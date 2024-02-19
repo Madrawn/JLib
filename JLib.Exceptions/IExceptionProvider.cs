@@ -8,13 +8,28 @@
 public interface IExceptionProvider
 {
     /// <summary>
-    /// builds the exception based on the current builder state.
+    /// Builds the exception based on the current builder state.
     /// </summary>
     /// <returns>null, if no error occured</returns>
     Exception? GetException();
 
     /// <summary>
-    /// indicates, whether this <see cref="ExceptionBuilder"/> or one of its Children has any errors
+    /// Indicates, whether this <see cref="ExceptionBuilder"/> or one of its Children has any errors
     /// </summary>
     bool HasErrors();
+
+    /// <summary>
+    /// Throws a <see cref="JLibAggregateException"/> if there are errors
+    /// </summary>
+    /// <param name="onThrow">Invoked before an exception is thrown</param>
+    public void ThrowIfNotEmpty(Action? onThrow = null)
+    {
+        var exception = GetException();
+
+        if (exception is null)
+            return;
+
+        onThrow?.Invoke();
+        throw exception;
+    }
 }

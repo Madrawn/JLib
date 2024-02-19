@@ -89,7 +89,7 @@ public static class ConfigurationHelper
 
     /// <summary>
     /// extracts the sectionName from the <see cref="ConfigSectionNameAttribute"/> of <typeparamref name="T"/>. if it is not found, a <see cref="InvalidSetupException"/> will be thrown<br/>
-    /// <inheritdoc cref="GetSection{T}(IConfiguration,string)"/>
+    /// <inheritdoc cref="GetSection{T}(IConfiguration,string, ILoggerFactory)"/>
     /// </summary>
     public static IConfigurationSection GetSection<T>(this IConfiguration config, ILoggerFactory loggerFactory)
         where T : class, new()
@@ -102,7 +102,7 @@ public static class ConfigurationHelper
 
     /// <summary>
     /// extracts the sectionName from the <see cref="ConfigSectionNameAttribute"/> of <typeparamref name="T"/>. if it is not found, a <see cref="InvalidSetupException"/> will be thrown<br/>
-    /// <inheritdoc cref="GetSection{T}(IConfiguration,string)"/>
+    /// <inheritdoc cref="GetSection{T}(IConfiguration,string,ILoggerFactory)"/>
     /// </summary>
     public static T GetSectionObject<T>(this IConfiguration config, ILoggerFactory loggerFactory)
         where T : class, new()

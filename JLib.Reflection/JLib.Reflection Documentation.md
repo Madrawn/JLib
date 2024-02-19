@@ -32,3 +32,8 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
     - SHOULD: be used as singleton
 - TypePackages
     - 
+
+
+Improvements
+- Consolidate (Dsiable-) Automapper Pfofile Attributes
+- Improve JLib.Automapper Separation from JLib.Reflection - a lot of separation of concern issues are not addressed (i.E. the HasCustomAutoMapperProfile Property of TypeValueType)

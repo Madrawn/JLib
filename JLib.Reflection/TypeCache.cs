@@ -14,7 +14,6 @@ namespace JLib.Reflection;
 /// <br/>- <seealso cref="NavigatingTypeValueType"/>
 /// <br/>- <seealso cref="IValidatedType"/>
 /// <br/>- <seealso cref="IPostNavigationInitializedType"/>
-/// <br/>- <seealso cref=""/>
 /// <br/>- <seealso cref="TvtFactoryAttribute"/>
 /// <br/>- <seealso cref="IgnoreInCache"/>
 /// </summary>
@@ -240,8 +239,7 @@ public class TypeCache : ITypeCache
             }
         }
 
-        if (parentExceptionManager is null)
-            exceptions.ThrowIfNotEmpty();
+        exceptions.ThrowIfNotEmpty();
 
         WriteLog();
     }

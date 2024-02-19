@@ -117,4 +117,19 @@ public sealed class ExceptionBuilder : IExceptionProvider, IDisposable
         else
             this.ThrowIfNotEmpty();
     }
+    /// <summary>
+    /// <inheritdoc cref="IExceptionProvider.ThrowIfNotEmpty"/>
+    /// </summary>
+    /// <param name="onThrow">Invoked before an Exception is thrown</param>
+    // overload required to enable it being used without having to cast the instance to IExceptionProvider
+    public void ThrowIfNotEmpty(Action? onThrow = null)
+    {
+        var exception = GetException();
+
+        if (exception is null)
+            return;
+
+        onThrow?.Invoke();
+        throw exception;
+    }
 }

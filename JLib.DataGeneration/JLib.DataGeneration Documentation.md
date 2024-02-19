@@ -102,7 +102,7 @@ public class UnitTest : IDisposable
     public UnitTest()
     {
         var id = Guid.NewGuid();
-        var exceptions = new ExceptionManager("test setup");
+        var exceptions = ExceptionBuilder.Create("test setup");
         var services = new ServiceCollection()
             .AddTypeCache(out _typeCache, exceptions,
                 BackendTestsTypePackage.Instance, JLibDataGenerationTypePackage.Instance)
