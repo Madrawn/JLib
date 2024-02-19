@@ -14,7 +14,6 @@ namespace JLib.Reflection;
 /// <br/>- <seealso cref="NavigatingTypeValueType"/>
 /// <br/>- <seealso cref="IValidatedType"/>
 /// <br/>- <seealso cref="IPostNavigationInitializedType"/>
-/// <br/>- <seealso cref=""/>
 /// <br/>- <seealso cref="TvtFactoryAttribute"/>
 /// <br/>- <seealso cref="IgnoreInCache"/>
 /// </summary>

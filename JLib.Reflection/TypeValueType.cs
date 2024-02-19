@@ -11,9 +11,15 @@ namespace JLib.Reflection;
 /// </summary>
 public interface IPostNavigationInitializedType : ITypeValueType
 {
+    /// <summary>
+    /// called, after <see cref="NavigatingTypeValueType.Navigate{T}"/> has been initialized
+    /// </summary>
     void Initialize(ITypeCache cache, ExceptionBuilder exceptions);
 }
 
+/// <summary>
+/// marks the <see cref="TypeValueType"/>
+/// </summary>
 public interface IValidatedType : ITypeValueType
 {
     void Validate(ITypeCache cache, TypeValidator value);
@@ -26,6 +32,15 @@ public interface ITypeValueType
     public bool HasCustomAutoMapperProfile { get; }
 }
 
+/// <summary>
+/// integrates with
+/// <list type="bullet">
+/// <item><seealso cref="NavigatingTypeValueType"/></item>
+/// <item><seealso cref="IPostNavigationInitializedType"/></item>
+/// <item><seealso cref="IValidatedType"/></item>
+/// <item><seealso cref="ITypeValueType"/></item>
+/// </list>
+/// </summary>
 [Unmapped]
 public abstract record TypeValueType(Type Value) : ValueType<Type>(Value), ITypeValueType
 {

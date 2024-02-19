@@ -1,12 +1,5 @@
 ﻿namespace JLib.Reflection;
 
-/// <summary>
-/// the <see cref="ValueTypeProfile"/> will not create a profile from <see cref="ValueTypeType{T}.Value"/> to the <see cref="ValueTypeType{T}"/>
-/// </summary>
-[AttributeUsage(AttributeTargets.Class)]
-public class UnmappedAttribute : Attribute
-{
-}
 
 public interface IDisableAutoProfileAttribute
 {
