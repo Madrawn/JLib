@@ -1,25 +1,26 @@
-﻿#region
+﻿// todo
+#region
 // Third party packages
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Xunit;
-using Xunit.Abstractions;
-using Snapshooter.Xunit;
 
-// required JLib packages
+using JLib.AutoMapper;
+using JLib.DataGeneration.Examples.Setup.Models;
+using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
 using JLib.DependencyInjection;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
-using JLib.AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Snapshooter.Xunit;
+using Xunit;
+using Xunit.Abstractions;
+// required JLib packages
 
 // referenced example setup code
-using JLib.DataGeneration.Examples.Setup.Models;
-using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
 
-namespace JLib.DataGeneration.Examples;
+namespace JLib.DataGeneration.Examples.Data_Derivations;
 #endregion
-public sealed class SnapshotInfoExample : IDisposable
+public sealed class DataDerivationViaInheritance : IDisposable
 {
     /*************************************************************\
     |                       Data Packages                         |
@@ -58,7 +59,7 @@ public sealed class SnapshotInfoExample : IDisposable
     private readonly ShoppingServiceMock _shoppingService;
     private readonly IIdRegistry _idRegistry;
 
-    public SnapshotInfoExample(ITestOutputHelper testOutputHelper)
+    public DataDerivationViaInheritance(ITestOutputHelper testOutputHelper)
     {
         var exceptions = new ExceptionBuilder("setup");
         var loggerFactory = new LoggerFactory().AddXunit(testOutputHelper);
@@ -66,7 +67,7 @@ public sealed class SnapshotInfoExample : IDisposable
         var serviceCollection = new ServiceCollection()
             .AddTypeCache(out var typeCache, exceptions, loggerFactory,
                 JLibDataGenerationTp.Instance,
-                TypePackage.GetNested<SnapshotInfoExample>())
+                TypePackage.GetNested<DataDerivationViaInheritance>())
             .AddSingleton<ShoppingServiceMock>()
             .AddScopedAlias<IShoppingService, ShoppingServiceMock>()
             .AddAutoMapper(b => b.AddProfiles(typeCache, loggerFactory))
@@ -84,9 +85,9 @@ public sealed class SnapshotInfoExample : IDisposable
     }
     public void Dispose()
         => _disposables.DisposeAll();
-    
+
     #endregion
-    
+
     /*************************************************************\
     |                            Test                             |
     \*************************************************************/

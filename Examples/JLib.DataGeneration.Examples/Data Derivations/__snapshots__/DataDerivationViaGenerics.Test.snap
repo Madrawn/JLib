@@ -1,0 +1,20 @@
+﻿[
+  {
+    "Id": {
+      "IdGroupName": "JLib.DataGeneration.Examples.Data_Derivations.DataDerivationViaGenerics.CustomerDp:JLib.DataGeneration.Examples.Data_Derivations.DataDerivationViaGenerics.CustomerDpb",
+      "IdName": "CustomerId",
+      "Value": "2ad4e95f-c592-4bd9-bf0c-1c9a72df99d0",
+      "IdType": "CustomerId"
+    },
+    "UserName": "JLib.DataGeneration.Examples.Data_Derivations.DataDerivationViaGenerics.CustomerDp:JLib.DataGeneration.Examples.Data_Derivations.DataDerivationViaGenerics.CustomerDpb.CustomerId"
+  },
+  {
+    "Id": {
+      "IdGroupName": "JLib.DataGeneration.Examples.Data_Derivations.DataDerivationViaGenerics.OtherCustomerDp:JLib.DataGeneration.Examples.Data_Derivations.DataDerivationViaGenerics.CustomerDpb",
+      "IdName": "CustomerId",
+      "Value": "402e4320-a993-4b23-9059-64e585ca789e",
+      "IdType": "CustomerId"
+    },
+    "UserName": "JLib.DataGeneration.Examples.Data_Derivations.DataDerivationViaGenerics.OtherCustomerDp:JLib.DataGeneration.Examples.Data_Derivations.DataDerivationViaGenerics.CustomerDpb.CustomerId"
+  }
+]

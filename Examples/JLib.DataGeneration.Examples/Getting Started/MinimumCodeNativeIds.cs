@@ -1,22 +1,27 @@
 ﻿// Third party packages
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Snapshooter.Xunit;
 using Xunit;
 using Xunit.Abstractions;
-using Snapshooter.Xunit;
 
 // required JLib packages
+using JLib.AutoMapper;
 using JLib.DependencyInjection;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
-using JLib.AutoMapper;
 
-// referenced example setup code
+// referenced setup
 using JLib.DataGeneration.Examples.Setup.Models;
 using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
+using JLib.ValueTypes;
 
-namespace JLib.DataGeneration.Examples;
+namespace JLib.DataGeneration.Examples.Getting_Started;
+
+/// <summary>
+/// This example contains the minimum code required to use a <see cref="DataPackage"/> without <see cref="ValueType{T}"/> Ids (i.e. <see cref="GuidValueType"/>)
+/// </summary>
 public sealed class MinimumCodeNativeIds : IDisposable
 {
     /*************************************************************\
