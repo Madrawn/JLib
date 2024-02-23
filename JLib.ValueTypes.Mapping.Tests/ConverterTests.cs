@@ -102,6 +102,36 @@ public class ConverterTests : IDisposable
             });
         value.Should().Be(raw.ToString());
     }
+    [Fact]
+    public void Dict_Serialize()
+    {
+        var raw = new Dictionary<IntVt, StringVt>()
+        {
+            {
+                new(1),
+                new("one")
+            }
+        };
+        var value = JsonSerializer.Serialize(raw,
+            new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                Converters = { new ValueTypeJsonConverterFactory(_mapper) }
+            });
+        value.Should().Be("{\"1\":\"one\"}");
+    }
+    [Fact]
+    public void Dict_Deserialize()
+    {
+        const string raw = "{\"1\":\"one\"}";
+        var value = JsonSerializer.Deserialize<Dictionary<IntVt,StringVt>>(raw,
+            new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                Converters = { new ValueTypeJsonConverterFactory(_mapper) }
+            });
+        value.Should().BeOfType<Dictionary<IntVt, StringVt>>();
+        value.Should().HaveCount(1);
+        value?[new(1)].Value.Should().Be("one");
+    }
 
 
     public void Dispose()

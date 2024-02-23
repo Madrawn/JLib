@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 using JLib.Helper;
 
 namespace JLib.Exceptions;
@@ -8,14 +9,20 @@ namespace JLib.Exceptions;
 /// </summary>
 public sealed class ExceptionBuilder : IExceptionProvider, IDisposable
 {
+    private readonly object _exceptionLock = new();
+    private readonly object _childrenLock = new();
     private readonly string _message;
-    private readonly SynchronizedCollection<Exception> _exceptions = new();
-    private readonly SynchronizedCollection<IExceptionProvider> _children = new();
+    private readonly List<Exception> _exceptions = new();
+    private readonly List<IExceptionProvider> _children = new();
     private readonly ExceptionBuilder? _parent;
     private bool _disposed;
 
     private IEnumerable<Exception?> BuildExceptionList()
-        => _exceptions.Concat(_children.Select(c => c.GetException()));
+    {
+        lock (_exceptionLock)
+            lock (_childrenLock)
+                return _exceptions.Concat(_children.Select(c => c.GetException()));
+    }
 
     /// <summary>
     /// adds the given <paramref name="exception"/> to <see cref="JLibAggregateException.InnerExceptions"/>
@@ -23,7 +30,8 @@ public sealed class ExceptionBuilder : IExceptionProvider, IDisposable
     public void Add(Exception exception)
     {
         CheckDisposed();
-        _exceptions.Add(exception);
+        lock (_exceptionLock)
+            _exceptions.Add(exception);
     }
 
     /// <summary>
@@ -31,7 +39,6 @@ public sealed class ExceptionBuilder : IExceptionProvider, IDisposable
     /// </summary>
     public void Add(IEnumerable<Exception> exceptions)
     {
-        CheckDisposed();
         foreach (var exception in exceptions)
             Add(exception);
     }
@@ -39,7 +46,12 @@ public sealed class ExceptionBuilder : IExceptionProvider, IDisposable
     /// <summary>
     /// <inheritdoc cref="IExceptionProvider.HasErrors"/>
     /// </summary>
-    public bool HasErrors() => _exceptions.Any() || _children.Any(c => c.HasErrors());
+    public bool HasErrors()
+    {
+        lock (_exceptionLock)
+            lock (_childrenLock)
+                return _exceptions.Count == 0 || _children.Any(c => c.HasErrors());
+    }
 
     /// <summary>
     /// builds the exception based on the current builder state.
@@ -68,7 +80,8 @@ public sealed class ExceptionBuilder : IExceptionProvider, IDisposable
     {
         CheckDisposed();
         var child = new ExceptionBuilder(message, this);
-        _children.Add(child);
+        lock (_childrenLock)
+            _children.Add(child);
         return child;
     }
 
@@ -100,7 +113,8 @@ public sealed class ExceptionBuilder : IExceptionProvider, IDisposable
     public void AddChild(IExceptionProvider exceptionProvider)
     {
         CheckDisposed();
-        _children.Add(exceptionProvider);
+        lock (_childrenLock)
+            _children.Add(exceptionProvider);
     }
 
     /// <summary>

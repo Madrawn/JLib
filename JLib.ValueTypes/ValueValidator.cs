@@ -3,6 +3,10 @@ using JLib.Exceptions;
 
 namespace JLib.ValueTypes;
 
+/// <summary>
+/// <see cref="IExceptionProvider"/> for validating values of type <typeparamref name="TValue"/><br/>
+/// often used to validate <see cref="ValueType{TValue}"/>s
+/// </summary>
 public abstract class ValueValidator<TValue> : IExceptionProvider
 {
     protected string ValueTypeName { get; }
