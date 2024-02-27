@@ -5,6 +5,7 @@ namespace JLib;
 /// <summary>
 /// Contains the <inheritdoc cref="Instance"/>
 /// </summary>
+[TypePackageProvider]
 public static class JLibTp
 {
     /// <summary>

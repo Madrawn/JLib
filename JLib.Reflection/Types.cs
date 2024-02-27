@@ -8,7 +8,7 @@ namespace JLib.Reflection;
 /// <see cref="ValueType"/> for <see cref="Type"/>s
 /// </summary>
 /// <param name="Value"></param>
-[IsDerivedFromAny(typeof(ValueType<>))]
+[DerivedFromAny(typeof(ValueType<>))]
 public record ValueTypeType(Type Value) : TypeValueType(Value), IValidatedType
 {
 

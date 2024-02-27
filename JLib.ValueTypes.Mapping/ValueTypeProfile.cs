@@ -4,10 +4,9 @@ using AutoMapper;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
-using JLib.ValueTypes;
 using Microsoft.Extensions.Logging;
 
-namespace JLib.AutoMapper;
+namespace JLib.ValueTypes.Mapping;
 
 /// <summary>
 /// Provides Mappings for all value types.<br/>
@@ -71,6 +70,8 @@ public class ValueTypeProfile : Profile
             logger.LogTrace("            {tvt} => {tNative}", typeof(TValueType).Name,
                 typeof(TNative).Name);
             profile.CreateMap<TValueType, TNative>().ConvertUsing(vt => vt.Value);
+
+
             logger.LogTrace("            {tNative} => {tvt}", typeof(TNative).Name,
                 typeof(TValueType).Name);
             profile.CreateMap<TNative, TValueType>().ConvertUsing(
@@ -79,10 +80,13 @@ public class ValueTypeProfile : Profile
                         CtorReplacementExpressionVisitor<TValueType, TNative>.CtorPlaceholder(v)
                 ));
 
-            logger.LogTrace("            {tvt} => {tNative}", typeof(TValueType).Name,
+
+            logger.LogTrace("            {tvt}? => {tNative}?", typeof(TValueType).Name,
                 typeof(TNative?).FullClassName());
             profile.CreateMap<TValueType, TNative?>().ConvertUsing(vt => vt == null ? null : vt.Value);
-            logger.LogTrace("            {tNative} => {tvt}",
+
+
+            logger.LogTrace("            {tNative}? => {tvt}?",
                 typeof(TNative?).FullClassName(), typeof(TValueType).Name);
             profile.CreateMap<TNative?, TValueType?>().ConvertUsing(
                 new CtorReplacementExpressionVisitor<TValueType?, TNative?>().Visit(
@@ -102,12 +106,14 @@ public class ValueTypeProfile : Profile
             {
                 logger.LogDebug("        adding map for class-valueType {valueType}", valueType.Name);
 
+
                 var addMapping = typeof(ClassValueTypeConversions<,>)
                                      .MakeGenericType(valueType.Value, valueType.NativeType)
                                      .GetMethod(nameof(ClassValueTypeConversions<ValueType<Ignored>, Ignored>.AddMapping)) ??
                                  throw new InvalidSetupException("AddProfileMethodNotFound");
 
                 addMapping.Invoke(null, new object?[] { this, logger });
+
             }
             else
             {
@@ -116,6 +122,9 @@ public class ValueTypeProfile : Profile
                                      .MakeGenericType(valueType.Value, valueType.NativeType)
                                      .GetMethod(nameof(StructValueTypeConversions<ValueType<int>, int>.AddMapping)) ??
                                  throw new InvalidSetupException("AddProfileMethodNotFound");
+
+
+
                 addMapping.Invoke(null, new object?[] { this, logger });
             }
         }

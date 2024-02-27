@@ -33,7 +33,7 @@ public record SourceDataProviderType(Type Value) : DataProviderType(Value)
             value.ShouldImplementAny<ISourceDataProviderR<IDataObject>>();
     }
 }
-[ImplementsAny(typeof(IDataProviderR<>)), NotBeGeneric, NotAbstract, IsClass]
+[ImplementsAny(typeof(IDataProviderR<>)), NotGeneric, NotAbstract, IsClass]
 public record RepositoryType(Type Value) : DataProviderType(Value)
 {
     public DataObjectType ProvidedDataObject

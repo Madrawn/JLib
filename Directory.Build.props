@@ -38,6 +38,7 @@
             JLib.Helper
             JLib.HotChocolate
             JLib.Testing
+            JLib.SystemTextJson
         </PackageAssemblies>
 
     </PropertyGroup>

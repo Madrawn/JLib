@@ -96,13 +96,15 @@ public sealed class TypePackage : ITypePackage
         Types = types ?? Enumerable.Empty<Type>();
         Children = children ?? Array.Empty<ITypePackage>();
         DescriptionTemplate = nameTemplate;
+        _content = new(() => GetContent(this).ToImmutableHashSet());
     }
 
 
     public IEnumerable<ITypePackage> Children { get; }
     public IEnumerable<Type> Types { get; }
     public string DescriptionTemplate { get; }
-    public ImmutableHashSet<Type> GetContent() => GetContent(this).ToImmutableHashSet();
+    private readonly Lazy<ImmutableHashSet<Type>> _content;
+    public ImmutableHashSet<Type> GetContent() => _content.Value;
 
     private static IEnumerable<Type> GetContent(ITypePackage package)
         => package.Children.SelectMany(GetContent).Concat(package.Types).Distinct();

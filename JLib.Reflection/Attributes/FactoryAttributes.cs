@@ -119,18 +119,18 @@ public abstract class TvtFactoryAttribute : Attribute
     }
 
     [AttributeUsage(AttributeTargets.Class)]
-    public class NotBeGenericAttribute : TvtFactoryAttribute
+    public class NotGenericAttribute : TvtFactoryAttribute
     {
         public override bool Filter(Type type)
             => !type.IsGenericType;
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public sealed class IsDerivedFromAnyAttribute : TvtFactoryAttribute
+    public sealed class DerivedFromAnyAttribute : TvtFactoryAttribute
     {
         private readonly Type _type;
 
-        public IsDerivedFromAnyAttribute(Type type)
+        public DerivedFromAnyAttribute(Type type)
         {
             _type = type;
         }
@@ -226,7 +226,7 @@ public abstract class TvtFactoryAttribute : Attribute
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public sealed class IsDerivedFromAnyAttribute<T> : TvtFactoryAttribute
+    public sealed class DerivedFromAnyAttribute<T> : TvtFactoryAttribute
         where T : class
     {
         public override bool Filter(Type type)
