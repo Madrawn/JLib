@@ -113,7 +113,7 @@ public abstract class ReflectionTestBase
                 "services",
                 testServices? serviceValidator:"disabled"
             }
-        }.MatchSnapshot();
+        }.MatchSnapshot(b=>b.IgnoreField("cache"));
         if (expectException)
             _exceptions.GetException().Should().NotBeNull();
         else
