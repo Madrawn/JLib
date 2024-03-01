@@ -1,10 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="AutoMapper" Version="13.*" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\JLib.AutoMapper\JLib.AutoMapper.csproj" />
     <ProjectReference Include="..\JLib.ValueTypes\JLib.ValueTypes.csproj" />
   </ItemGroup>
 

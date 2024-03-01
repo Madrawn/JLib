@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using FluentAssertions;
 using JLib.Cqrs;
 using JLib.DependencyInjection;
 using JLib.Exceptions;
@@ -7,7 +8,6 @@ using JLib.Reflection;
 using JLib.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using FluentAssertions;
 using Snapshooter.Xunit;
 using Xunit.Abstractions;
 
@@ -23,24 +23,24 @@ public abstract class ReflectionTestBase
 {
     private readonly ITestOutputHelper _testOutput;
     private readonly ITypePackage _typePackage;
-    private readonly IExceptionManager _exceptions;
+    private readonly ExceptionBuilder _exceptions;
     private readonly ILoggerFactory _loggerFactory;
 
     protected ReflectionTestBase(ITestOutputHelper testOutput, ITypePackage typePackage)
     {
-        _exceptions = new ExceptionManager(GetType().FullClassName());
+        _exceptions = new ExceptionBuilder(GetType().FullClassName());
         _testOutput = testOutput;
         _typePackage = typePackage;
         _loggerFactory = new LoggerFactory()
             .AddXunit(testOutput);
     }
 
-    protected virtual void AddServices(IServiceCollection services, ITypeCache cache, IExceptionManager exceptions)
+    protected virtual void AddServices(IServiceCollection services, ITypeCache cache, ExceptionBuilder exceptions)
     {
 
     }
     protected void Test(string[] expectedBehavior, IReadOnlyCollection<Type> includedTypes,
-        Action<IServiceCollection, ITypeCache, ILoggerFactory, IExceptionManager> serviceFactory, bool expectException = true,
+        Action<IServiceCollection, ITypeCache, ILoggerFactory, ExceptionBuilder> serviceFactory, bool expectException = true,
         bool testCache = true,
         bool testServices = true,
         [CallerMemberName] string testName = "")
@@ -113,7 +113,7 @@ public abstract class ReflectionTestBase
                 "services",
                 testServices? serviceValidator:"disabled"
             }
-        }.MatchSnapshot();
+        }.MatchSnapshot(b=>b.IgnoreField("cache"));
         if (expectException)
             _exceptions.GetException().Should().NotBeNull();
         else

@@ -1,4 +1,5 @@
-﻿using JLib.Exceptions;
+﻿using System.Reflection;
+using JLib.Exceptions;
 using JLib.Helper;
 
 namespace JLib.Reflection;
@@ -118,18 +119,18 @@ public abstract class TvtFactoryAttribute : Attribute
     }
 
     [AttributeUsage(AttributeTargets.Class)]
-    public class NotBeGenericAttribute : TvtFactoryAttribute
+    public class NotGenericAttribute : TvtFactoryAttribute
     {
         public override bool Filter(Type type)
             => !type.IsGenericType;
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public sealed class IsDerivedFromAnyAttribute : TvtFactoryAttribute
+    public sealed class DerivedFromAnyAttribute : TvtFactoryAttribute
     {
         private readonly Type _type;
 
-        public IsDerivedFromAnyAttribute(Type type)
+        public DerivedFromAnyAttribute(Type type)
         {
             _type = type;
         }
@@ -209,7 +210,7 @@ public abstract class TvtFactoryAttribute : Attribute
     }
 #if NET7_0_OR_GREATER
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public sealed class IsAssignableToAttribute<T> : Attribute, ITypeValueTypeFilterAttribute
+    public sealed class IsAssignableToAttribute<T> : TvtFactoryAttribute
         where T : class
     {
         public override bool Filter(Type type)
@@ -217,7 +218,7 @@ public abstract class TvtFactoryAttribute : Attribute
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public sealed class IsDerivedFromAttribute<T> : Attribute, ITypeValueTypeFilterAttribute
+    public sealed class IsDerivedFromAttribute<T> : TvtFactoryAttribute
         where T : class
     {
         public override bool Filter(Type type)
@@ -225,7 +226,7 @@ public abstract class TvtFactoryAttribute : Attribute
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public sealed class IsDerivedFromAnyAttribute<T> : Attribute, ITypeValueTypeFilterAttribute
+    public sealed class DerivedFromAnyAttribute<T> : TvtFactoryAttribute
         where T : class
     {
         public override bool Filter(Type type)
@@ -233,7 +234,7 @@ public abstract class TvtFactoryAttribute : Attribute
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public sealed class IsNotDerivedFromAny<T> : Attribute, ITypeValueTypeFilterAttribute
+    public sealed class IsNotDerivedFromAny<T> : TvtFactoryAttribute
         where T : class
     {
         public override bool Filter(Type type)
@@ -241,35 +242,38 @@ public abstract class TvtFactoryAttribute : Attribute
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public sealed class IsNotThisTvtAttribute<TTvt> : Attribute, ITypeValueTypeFilterAttribute
+    public sealed class IsNotThisTvtAttribute<TTvt> : TvtFactoryAttribute
     {
         public override bool Filter(Type type)
-            => typeof(TTvt).GetCustomAttributes().OfType<ITypeValueTypeFilterAttribute>().All(a => a.Filter(type)) is false;
+            => typeof(TTvt).GetCustomAttributes()
+                .OfType<TvtFactoryAttribute>()
+                .All(a => a.Filter(type))
+                    is false;
     }
 
     [AttributeUsage(AttributeTargets.Class)]
-    public class ImplementsAttribute<T> : Attribute, ITypeValueTypeFilterAttribute
+    public class ImplementsAttribute<T> : TvtFactoryAttribute
     {
         public override bool Filter(Type type)
             => type.Implements<T>();
     }
 
     [AttributeUsage(AttributeTargets.Class)]
-    public class ImplementsNot<T> : Attribute, ITypeValueTypeFilterAttribute
+    public class ImplementsNot<T> : TvtFactoryAttribute
     {
         public override bool Filter(Type type)
             => !type.Implements<T>();
     }
 
     [AttributeUsage(AttributeTargets.Class)]
-    public class ImplementsAnyAttribute<T> : Attribute, ITypeValueTypeFilterAttribute
+    public class ImplementsAnyAttribute<T> : TvtFactoryAttribute
     {
         public override bool Filter(Type type)
             => type.ImplementsAny<T>();
     }
 
     [AttributeUsage(AttributeTargets.Class)]
-    public class ImplementsNoneAttribute<T> : Attribute, ITypeValueTypeFilterAttribute
+    public class ImplementsNoneAttribute<T> : TvtFactoryAttribute
     {
         public override bool Filter(Type type)
             => !type.ImplementsAny<T>();

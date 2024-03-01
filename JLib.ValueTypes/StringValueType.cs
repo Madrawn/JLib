@@ -4,8 +4,17 @@ using JLib.Helper;
 
 namespace JLib.ValueTypes;
 
+/// <summary>
+/// Represents a base class for string value types.
+/// </summary>
+/// <typeparam name="T">The type of the string value.</typeparam>
 public abstract record StringValueType(string Value) : ValueType<string>(Value)
 {
+    /// <summary>
+    /// <inheritdoc cref="StringValueType"/>
+    /// </summary>
+    /// <param name="value">The value.</param>
+    /// <param name="validate">a validator which is executed when the value is created</param>
     protected StringValueType(string value, Action<StringValidator>? validate) : this(value)
     {
         var validator = new StringValidator(Value, GetType().FullClassName());
@@ -14,20 +23,30 @@ public abstract record StringValueType(string Value) : ValueType<string>(Value)
     }
 }
 
+/// <summary>
+/// Represents a validator for string values.
+/// </summary>
 public class StringValidator : ValueValidator<string?>
 {
     public StringValidator(string? value, string valueTypeName) : base(value, valueTypeName)
     {
     }
 
+    /// <summary>
+    /// Validates that the value is not null.
+    /// </summary>
+    /// <returns>The string validator instance.</returns>
     public StringValidator NotBeNull()
     {
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (Value is null)
             AddError("Value is null");
         return this;
     }
 
+    /// <summary>
+    /// Validates that the value is not null or empty.
+    /// </summary>
+    /// <returns>The string validator instance.</returns>
     public StringValidator NotBeNullOrEmpty()
     {
         if (Value.IsNullOrEmpty())
@@ -35,6 +54,11 @@ public class StringValidator : ValueValidator<string?>
         return this;
     }
 
+    /// <summary>
+    /// Validates that the value is one of the specified valid values.
+    /// </summary>
+    /// <param name="validValues">The collection of valid values.</param>
+    /// <returns>The string validator instance.</returns>
     public StringValidator BeOneOf(IReadOnlyCollection<string> validValues)
     {
         if (!validValues.Contains(Value))
@@ -42,14 +66,24 @@ public class StringValidator : ValueValidator<string?>
         return this;
     }
 
+    /// <summary>
+    /// Validates that the value is alphanumeric.
+    /// </summary>
+    /// <returns>The string validator instance.</returns>
     public StringValidator BeAlphanumeric()
         => SatisfyCondition(char.IsLetterOrDigit, nameof(BeAlphanumeric));
 
+    /// <summary>
+    /// Validates that the value satisfies the specified condition.
+    /// </summary>
+    /// <param name="validator">The condition to satisfy.</param>
+    /// <param name="name">The name of the condition.</param>
+    /// <returns>The string validator instance.</returns>
     public StringValidator SatisfyCondition(Func<char, bool> validator, string name)
     {
         if (Value is null)
         {
-            AddError(name + "failed: string is null");
+            AddError(name + " failed: string is null");
             return this;
         }
 
@@ -68,6 +102,10 @@ public class StringValidator : ValueValidator<string?>
         return this;
     }
 
+    /// <summary>
+    /// Validates that the value is not null or whitespace.
+    /// </summary>
+    /// <returns>The string validator instance.</returns>
     public StringValidator NotBeNullOrWhitespace()
     {
         if (Value.IsNullOrEmpty())
@@ -75,35 +113,35 @@ public class StringValidator : ValueValidator<string?>
         return this;
     }
 
+    /// <summary>
+    /// Validates that the value starts with the specified prefix.
+    /// </summary>
+    /// <param name="prefix">The prefix to check.</param>
+    /// <returns>The string validator instance.</returns>
     public StringValidator StartWith(string prefix)
     {
         NotBeNull();
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (Value == null || !Value.StartsWith(prefix))
             AddError($"Value does not start with {prefix}");
         return this;
     }
 
+    /// <summary>
+    /// Validates that the value does not contain the specified value.
+    /// </summary>
+    /// <param name="value">The value to check.</param>
+    /// <returns>The string validator instance.</returns>
     public StringValidator NotContain(string value)
     {
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (Value != null && Value.Contains(value))
             AddError($"Value does not contain {value}");
         return this;
     }
 
     /// <summary>
-    /// expects the string to be
-    /// <list type="bullet">
-    ///     <item><see cref="NotBeNullOrWhitespace"/></item>
-    ///     <item><see cref="NotContainWhitespace"/></item>
-    ///     <item><see cref="NotContain"/>("&lt;")</item>
-    ///     <item><see cref="NotContain"/>("&gt;")</item>
-    ///     <item><see cref="StartWith"/>("https://")</item>
-    ///     <item>be creatable with Uri.TryCreate(Value, UriCreationOptions.Absolute,out result)</item>
-    ///     <item>and return result.Scheme == <see cref="Uri.UriSchemeHttps"/></item>
-    /// </list>
+    /// Validates that the value is a valid HTTPS URL.
     /// </summary>
+    /// <returns>The string validator instance.</returns>
     public StringValidator BeHttpsUrl()
     {
         NotBeNullOrWhitespace();
@@ -118,6 +156,11 @@ public class StringValidator : ValueValidator<string?>
         return this;
     }
 
+    /// <summary>
+    /// Validates that the value matches the specified regular expression.
+    /// </summary>
+    /// <param name="expression">The regular expression to match.</param>
+    /// <returns>The string validator instance.</returns>
     public StringValidator MatchRegex(Regex expression)
     {
         NotBeNull();
@@ -129,33 +172,38 @@ public class StringValidator : ValueValidator<string?>
     }
 
     /// <summary>
-    /// expects <see cref="char.IsAscii(char)"/> to be true for all characters of the string.<br/>
-    /// <inheritdoc cref="char.IsAscii(char)"/>
+    /// Validates that the value contains only ASCII characters.
     /// </summary>
+    /// <returns>The string validator instance.</returns>
     public StringValidator BeAscii()
         => SatisfyCondition(char.IsAscii, nameof(BeAscii));
 
     /// <summary>
-    /// expects <see cref="char.IsLetterOrDigit(char)"/> to be true for all characters of the string.<br/>
-    /// <inheritdoc cref="char.IsLetterOrDigit(char)"/>
+    /// Validates that the value contains only alphanumeric characters.
     /// </summary>
+    /// <returns>The string validator instance.</returns>
     public StringValidator OnlyContainAlphaNumericCharacters()
         => SatisfyCondition(char.IsLetterOrDigit, nameof(OnlyContainAlphaNumericCharacters));
 
     /// <summary>
-    /// expects <see cref="char.IsWhiteSpace(char)"/> to be false for all characters of the string.<br/>
-    /// <inheritdoc cref="char.IsWhiteSpace(char)"/>
+    /// Validates that the value does not contain whitespace characters.
     /// </summary>
+    /// <returns>The string validator instance.</returns>
     public StringValidator NotContainWhitespace()
         => Value is null ? this : SatisfyCondition(c => !char.IsWhiteSpace(c), nameof(NotContainWhitespace));
 
     /// <summary>
-    /// expects <see cref="char.IsNumber(char)"/> to be true for all characters of the string.<br/>
-    /// <inheritdoc cref="char.IsNumber(char)"/>
+    /// Validates that the value contains only numeric characters.
     /// </summary>
+    /// <returns>The string validator instance.</returns>
     public StringValidator BeNumeric()
         => SatisfyCondition(char.IsNumber, nameof(BeNumeric));
 
+    /// <summary>
+    /// Validates that the value has a minimum length.
+    /// </summary>
+    /// <param name="length">The minimum length.</param>
+    /// <returns>The string validator instance.</returns>
     public StringValidator MinimumLength(int length)
     {
         NotBeNull();
@@ -164,6 +212,11 @@ public class StringValidator : ValueValidator<string?>
         return this;
     }
 
+    /// <summary>
+    /// Validates that the value has a maximum length.
+    /// </summary>
+    /// <param name="length">The maximum length.</param>
+    /// <returns>The string validator instance.</returns>
     public StringValidator MaximumLength(int length)
     {
         NotBeNull();
@@ -172,6 +225,11 @@ public class StringValidator : ValueValidator<string?>
         return this;
     }
 
+    /// <summary>
+    /// Validates that the value has a specific length.
+    /// </summary>
+    /// <param name="length">The expected length.</param>
+    /// <returns>The string validator instance.</returns>
     public StringValidator BeOfLength(int length)
     {
         NotBeNull();
@@ -180,6 +238,11 @@ public class StringValidator : ValueValidator<string?>
         return this;
     }
 
+    /// <summary>
+    /// Validates that the value ends with the specified value.
+    /// </summary>
+    /// <param name="value">The value to check.</param>
+    /// <returns>The string validator instance.</returns>
     public StringValidator EndWith(string value)
     {
         if (Value?.EndsWith(value) != true)

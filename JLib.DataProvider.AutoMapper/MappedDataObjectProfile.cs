@@ -14,6 +14,7 @@ public class MappedDataObjectProfile : Profile
     {
         logger.LogDebug("        Creating DataObjectMaps");
         foreach (var mapInfo in cache.All<IMappedDataObjectType>()
+                     .Where(x => !x.HasCustomAutoMapperProfile)
                      .SelectMany(tvt => tvt.MappingInfo)
                      .Where(mapInfo =>
                          !mapInfo.Source.HasCustomAutoMapperProfile

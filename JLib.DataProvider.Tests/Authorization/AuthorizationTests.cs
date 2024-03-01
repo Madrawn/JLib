@@ -8,10 +8,8 @@ using JLib.Reflection;
 using JLib.ValueTypes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Serilog;
 using Xunit;
 using Xunit.Abstractions;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace JLib.DataProvider.Tests.Authorization;
 
@@ -27,8 +25,7 @@ public class AuthorizationTests
 
         using var loggerFactory = new LoggerFactory().AddXunit(testOutputHelper);
 
-        var logger = new LoggerConfiguration().CreateLogger();
-        var exceptions = new ExceptionManager("test");
+        var exceptions = new ExceptionBuilder("test");
         var services = new ServiceCollection()
             .AddLogging()
             .AddTypeCache(

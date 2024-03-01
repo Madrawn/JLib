@@ -177,10 +177,30 @@ public class TypePackageTests
     private void RunTest(
          ITypePackage package, IEnumerable<Type> expectedTypes, [CallerMemberName] string name = "")
     {
+        // .net 7 adds some attributes which are not included in any other .net version,
+        // which means we have to remove them from the result to match all other versions
         package
             .GetContent()
-            .Should().OnlyContain(t => expectedTypes.Contains(t));
+            .Should().OnlyContain(t => expectedTypes.Contains(t)
+#if NET7_0
+                || new[] { "EmbeddedAttribute","RefSafetyRulesAttribute","RefSafetyRulesAttribute" }.Contains(t.Name)
+#endif
+            );
         expectedTypes.Should().OnlyContain(t => package.GetContent().Contains(t));
-        package.ToString(true).MatchSnapshot($"{nameof(TypePackageTests)}.{name}");
+        package.ToString(true)
+#if NET7_0
+            .Replace("├ Types:5", "├ Types:3")
+            .Replace(@"
+  │   EmbeddedAttribute", "")
+            .Replace(@"
+  │   RefSafetyRulesAttribute", "")
+            .Replace(@"
+│   EmbeddedAttribute", "")
+            .Replace(@"
+│   RefSafetyRulesAttribute", "")
+#endif
+            .MatchSnapshot($"{nameof(TypePackageTests)}.{name}"
+
+            );
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices.ComTypes;
-using JLib.Configuration;
+﻿using JLib.Configuration;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
@@ -64,8 +63,9 @@ public static class ServiceCollectionHelper
     /// </example>
     /// </summary>
     public static IServiceCollection AddAllConfigSections(this IServiceCollection services,
-        ITypeCache typeCache, IConfiguration config, ILogger logger, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        ITypeCache typeCache, IConfiguration config, ILoggerFactory loggerFactory, ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
+        var logger = loggerFactory.CreateLogger(typeof(ServiceCollectionHelper));
         var configMethod = typeof(OptionsConfigurationServiceCollectionExtensions)
                                .GetMethod(nameof(OptionsConfigurationServiceCollectionExtensions.Configure),
                                    new[] { typeof(IServiceCollection), typeof(IConfiguration) })
@@ -171,14 +171,14 @@ public static class ServiceCollectionHelper
     /// Adds the <see cref="ITypeCache"/> to your services, executes its Initialization and returns the ready-to-use instance.
     /// </summary>
     public static IServiceCollection AddTypeCache(this IServiceCollection services, out ITypeCache typeCache,
-        IExceptionManager exceptions, ILoggerFactory loggerFactory,
+        ExceptionBuilder exceptions, ILoggerFactory loggerFactory,
         params string[] includedPrefixes)
         => services.AddTypeCache(out typeCache, exceptions, loggerFactory, null, SearchOption.TopDirectoryOnly, includedPrefixes);
 
     public static IServiceCollection AddTypeCache(
         this IServiceCollection services,
         out ITypeCache typeCache,
-        IExceptionManager exceptions,
+        ExceptionBuilder exceptions,
         ILoggerFactory loggerFactory,
         string? assemblySearchDirectory = null,
         SearchOption searchOption = SearchOption.TopDirectoryOnly,
@@ -189,9 +189,9 @@ public static class ServiceCollectionHelper
     public static IServiceCollection AddTypeCache(
         this IServiceCollection services,
         out ITypeCache typeCache,
-        IExceptionManager exceptionManager, ILoggerFactory loggerFactory, params ITypePackage[] typePackages)
+        ExceptionBuilder exceptionBuilder, ILoggerFactory loggerFactory, params ITypePackage[] typePackages)
     {
-        typeCache = new TypeCache(TypePackage.Get(typePackages), exceptionManager, loggerFactory);
+        typeCache = new TypeCache(TypePackage.Get(typePackages), exceptionBuilder, loggerFactory);
         return services.AddSingleton(typeCache);
     }
 
@@ -206,7 +206,7 @@ public static class ServiceCollectionHelper
         this IServiceCollection services,
         ITypeCache typeCache,
         ServiceLifetime lifetime,
-        IExceptionManager exceptions,
+        ExceptionBuilder exceptions,
         ILoggerFactory loggerFactory,
         Func<TTvt, bool>? filter = null,
         Func<TTvt, ITypeValueType>[]? serviceTypeArgumentResolver = null,
@@ -227,7 +227,7 @@ public static class ServiceCollectionHelper
         Type aliasType,
         Type providedType,
         ServiceLifetime lifetime,
-        IExceptionManager exceptions,
+        ExceptionBuilder exceptions,
         ILoggerFactory loggerFactory,
         Func<TTvt, bool>? filter = null,
         Func<TTvt, ITypeValueType>[]? aliasTypeArgumentResolver = null,
@@ -281,7 +281,7 @@ public static class ServiceCollectionHelper
         this IServiceCollection services,
         ITypeCache typeCache,
         ServiceLifetime lifetime,
-        IExceptionManager exceptions,
+        ExceptionBuilder exceptions,
         ILoggerFactory loggerFactory,
         Func<TTvt, bool>? filter = null,
         Func<TTvt, ITypeValueType>[]? serviceTypeArgumentResolver = null,
@@ -301,7 +301,7 @@ public static class ServiceCollectionHelper
         Type serviceType,
         Type implementationType,
         ServiceLifetime lifetime,
-        IExceptionManager exceptions,
+        ExceptionBuilder exceptions,
         ILoggerFactory loggerFactory,
         Func<TTvt, bool>? filter = null,
         Func<TTvt, ITypeValueType>[]? serviceTypeArgumentResolver = null,
@@ -329,7 +329,7 @@ public static class ServiceCollectionHelper
 
         foreach (var valueType in typeCache.All(filter))
         {
-            exceptions.TryExecution(() =>
+            try
             {
                 var explicitImplementation = GetGenericService(implementationDefinition, valueType,
                     implementationTypeArgumentResolver);
@@ -340,7 +340,11 @@ public static class ServiceCollectionHelper
                 logger.LogTrace(
                     "    {valueType,-25}: {implementation,-65} as {service,-20}",
                     valueType.Name, explicitImplementation.FullClassName(), explicitService.FullClassName());
-            });
+            }
+            catch (Exception e)
+            {
+                exceptions.Add(e);
+            }
         }
 
         return services;

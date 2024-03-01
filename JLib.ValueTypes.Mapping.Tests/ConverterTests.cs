@@ -25,7 +25,7 @@ public class ConverterTests : IDisposable
     public ConverterTests(ITestOutputHelper testOutputHelper)
     {
         var loggerFactory = new LoggerFactory().AddXunit(testOutputHelper);
-        var exceptions = new ExceptionManager("setup");
+        var exceptions = new ExceptionBuilder("setup");
         var services = new ServiceCollection()
             .AddTypeCache(out var typeCache, exceptions, loggerFactory, JLibReflectionTp.Instance, TypePackage.GetNested<ConverterTests>())
             .AddAutoMapper(m => m.AddProfiles(typeCache, loggerFactory));
@@ -101,6 +101,36 @@ public class ConverterTests : IDisposable
                 Converters = { new ValueTypeJsonConverterFactory(_mapper) }
             });
         value.Should().Be(raw.ToString());
+    }
+    [Fact]
+    public void Dict_Serialize()
+    {
+        var raw = new Dictionary<IntVt, StringVt>()
+        {
+            {
+                new(1),
+                new("one")
+            }
+        };
+        var value = JsonSerializer.Serialize(raw,
+            new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                Converters = { new ValueTypeJsonConverterFactory(_mapper) }
+            });
+        value.Should().Be("{\"1\":\"one\"}");
+    }
+    [Fact]
+    public void Dict_Deserialize()
+    {
+        const string raw = "{\"1\":\"one\"}";
+        var value = JsonSerializer.Deserialize<Dictionary<IntVt,StringVt>>(raw,
+            new JsonSerializerOptions(JsonSerializerDefaults.General)
+            {
+                Converters = { new ValueTypeJsonConverterFactory(_mapper) }
+            });
+        value.Should().BeOfType<Dictionary<IntVt, StringVt>>();
+        value.Should().HaveCount(1);
+        value?[new(1)].Value.Should().Be("one");
     }
 
 

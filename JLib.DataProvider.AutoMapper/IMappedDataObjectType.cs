@@ -1,6 +1,4 @@
-﻿using JLib.AutoMapper;
-
-namespace JLib.DataProvider.AutoMapper;
+﻿namespace JLib.DataProvider.AutoMapper;
 
 /// <summary>
 /// the <see cref="MappedDataObjectProfile"/> will create a map for each <see cref="MappingInfo"/>

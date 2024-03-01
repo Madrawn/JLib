@@ -1,4 +1,5 @@
-﻿using AutoMapper.Internal;
+﻿using System.Reflection;
+using AutoMapper.Internal;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
@@ -21,9 +22,14 @@ public record DataPackageType(Type Value) : TypeValueType(Value), IValidatedType
 
 public abstract class DataPackage
 {
+    /// <summary>
+    /// contains the binding flags which will be used to discover id properties
+    /// </summary>
+    public const BindingFlags PropertyDiscoveryBindingFlags =
+        BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
     public string GetInfoText(string propertyName)
     {
-        var property = GetType().GetProperty(propertyName) ??
+        var property = GetType().GetProperty(propertyName, PropertyDiscoveryBindingFlags) ??
                        throw new InvalidSetupException(
                            $"property {propertyName} not found on {GetType().FullClassName()}");
         return new DataPackageValues.IdGroupName(property).Value + "." + property.Name;
@@ -45,7 +51,7 @@ public abstract class DataPackage
                 throw new IndexOutOfRangeException(nameof(packageManager.InitState));
         }
 
-        foreach (var propertyInfo in GetType().GetProperties())
+        foreach (var propertyInfo in GetType().GetProperties(PropertyDiscoveryBindingFlags))
             packageManager.SetIdPropertyValue(this, propertyInfo);
     }
 }

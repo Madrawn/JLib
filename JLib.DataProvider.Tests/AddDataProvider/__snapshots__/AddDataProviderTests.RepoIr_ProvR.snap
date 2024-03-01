@@ -33,7 +33,7 @@
             ],
             "InnerExceptions": [
               {
-                "Type": "JLib.Exceptions.InvalidTypeException",
+                "Type": "JLib.Reflection.Exceptions.InvalidTypeException",
                 "MessageLines": [
                   "Should not implement JLib.DataProvider.ISourceDataProviderR<>"
                 ],

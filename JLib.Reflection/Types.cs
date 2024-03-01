@@ -4,9 +4,14 @@ using static JLib.Reflection.TvtFactoryAttribute;
 
 namespace JLib.Reflection;
 
-[IsDerivedFromAny(typeof(ValueType<>))]
+/// <summary>
+/// <see cref="ValueType"/> for <see cref="Type"/>s
+/// </summary>
+/// <param name="Value"></param>
+[DerivedFromAny(typeof(ValueType<>))]
 public record ValueTypeType(Type Value) : TypeValueType(Value), IValidatedType
 {
+
     public Type NativeType
     {
         get

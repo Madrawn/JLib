@@ -122,7 +122,7 @@ public static class AttributeServiceCollectionExtension
     /// </code>
     /// </example>
     /// </summary>
-    public static IServiceCollection AddServicesWithAttributes(this IServiceCollection services, ITypeCache typeCache, IExceptionManager exceptions)
+    public static IServiceCollection AddServicesWithAttributes(this IServiceCollection services, ITypeCache typeCache, ExceptionBuilder exceptions)
     {
         exceptions = exceptions.CreateChild(nameof(AddServicesWithAttributes));
 

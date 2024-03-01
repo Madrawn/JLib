@@ -16,7 +16,7 @@ public static class ServiceCollectionInMemoryDataProviderExtensions
     public static IServiceCollection AddInMemoryDataProvider<TTvt>(
         this IServiceCollection services,
         ITypeCache typeCache,
-        IExceptionManager exceptions, ILoggerFactory loggerFactory)
+        ExceptionBuilder exceptions, ILoggerFactory loggerFactory)
         where TTvt : class, IDataObjectType
     {
         var logger = loggerFactory.CreateLogger(typeof(ServiceCollectionInMemoryDataProviderExtensions).FullName!);

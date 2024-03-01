@@ -1,9 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using JLib.Exceptions;
-using JLib.Helper;
 
 namespace JLib.ValueTypes;
 
+/// <summary>
+/// <see cref="IExceptionProvider"/> for validating values of type <typeparamref name="TValue"/><br/>
+/// often used to validate <see cref="ValueType{TValue}"/>s
+/// </summary>
 public abstract class ValueValidator<TValue> : IExceptionProvider
 {
     protected string ValueTypeName { get; }
@@ -30,15 +33,14 @@ public abstract class ValueValidator<TValue> : IExceptionProvider
     Exception? IExceptionProvider.GetException()
         => BuildException(_messages, _subValidators);
 
-    public void ThrowIfNotEmpty(Action? onThrow = null)
-    {
-        var ex = this.CastTo<IExceptionProvider>().GetException();
-        if (ex is null)
-            return;
-        onThrow?.Invoke();
-        throw ex;
-    }
+    /// <summary>
+    /// <inheritdoc cref="IExceptionProvider.HasErrors"/>
+    /// </summary>
+    public bool HasErrors() => _messages.Any() || _subValidators.Any(v => v.HasErrors());
 
+    /// <summary>
+    /// <inheritdoc cref="IExceptionProvider.GetException"/>
+    /// </summary>
     protected virtual Exception? BuildException(IReadOnlyCollection<string> messages, IReadOnlyCollection<IExceptionProvider> provider)
         => JLibAggregateException.ReturnIfNotEmpty(
             $"{ValueTypeName} validation failed: '{Value}' is not a valid Value.",

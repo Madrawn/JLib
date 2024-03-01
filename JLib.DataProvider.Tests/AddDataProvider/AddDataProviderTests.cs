@@ -610,7 +610,7 @@ public class AddDataProviderTests : ReflectionTestBase
     {
     }
 
-    protected override void AddServices(IServiceCollection services, ITypeCache cache, IExceptionManager exceptions)
+    protected override void AddServices(IServiceCollection services, ITypeCache cache, ExceptionBuilder exceptions)
         => services.AddRepositories(cache, exceptions);
 
 

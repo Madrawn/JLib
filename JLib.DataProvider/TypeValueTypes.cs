@@ -10,7 +10,7 @@ public abstract record DataProviderType(Type Value) : NavigatingTypeValueType(Va
 {
     public bool CanWrite { get; private set; }
 
-    void IPostNavigationInitializedType.Initialize(ITypeCache _, IExceptionManager exceptions)
+    void IPostNavigationInitializedType.Initialize(ITypeCache _, ExceptionBuilder exceptions)
     {
         CanWrite = Value.ImplementsAny<IDataProviderRw<IEntity>>();
     }
@@ -33,7 +33,7 @@ public record SourceDataProviderType(Type Value) : DataProviderType(Value)
             value.ShouldImplementAny<ISourceDataProviderR<IDataObject>>();
     }
 }
-[ImplementsAny(typeof(IDataProviderR<>)), NotBeGeneric, NotAbstract, IsClass]
+[ImplementsAny(typeof(IDataProviderR<>)), NotGeneric, NotAbstract, IsClass]
 public record RepositoryType(Type Value) : DataProviderType(Value)
 {
     public DataObjectType ProvidedDataObject
