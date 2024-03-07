@@ -24,7 +24,8 @@ public class UnitTest1
     {
         typeof(SubClassA<OtherGenericClass<OtherClass>>
             .SubClassB<OtherGenericClass<OtherClass>>
-            ).FullName().Should().Be("SubClassA<OtherGenericClass<OtherClass>>.SubClassB<OtherGenericClass<OtherClass>>");
+            ).FullName().Should().Be(
+            "UnitTest1.SubClassA<UnitTest1.OtherGenericClass<UnitTest1.OtherClass>, UnitTest1.OtherGenericClass<UnitTest1.OtherClass>>");
     }
     [Fact]
     public void Test2()
