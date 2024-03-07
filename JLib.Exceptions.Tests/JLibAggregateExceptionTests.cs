@@ -3,10 +3,10 @@ using Xunit;
 
 namespace JLib.Exceptions.Tests;
 
-public class UnitTest1
+public class JLibAggregateExceptionTests
 {
     [Fact]
-    public void Test1()
+    public void MessageGenerator()
     {
         var ex = new ExceptionBuilder("test");
         ex.Add(new Exception("ex"));
