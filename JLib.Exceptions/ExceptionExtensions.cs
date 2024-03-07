@@ -69,17 +69,6 @@ public static class ExceptionExtensions
     {
         const string indentTemplate = "│  ";
         const string branchTemplate = "├─ ";
-        const string subIndentTemplate = "│  ";
-
-
-        /******************************\
-        |        Exception Type        |
-        \******************************/
-        //if (indentCount >= 2)
-        //    sb.AppendMultiple(indentTemplate, indentCount - 1);
-        //if (indentCount >= 1)
-        //    sb.Append(branchTemplate);
-        //sb.AppendLine(ex.GetType().FullName());
 
         /******************************\
         |           Message            |
@@ -92,11 +81,7 @@ public static class ExceptionExtensions
                 sb.AppendMultiple(indentTemplate, indentCount - (lineIndex == 0 ? 1 : 0));
             if (indentCount >= 1 && lineIndex == 0)
                 sb.Append(branchTemplate);
-            sb
-                //.AppendMultiple(indentTemplate, indentCount )
-                //.Append(subIndentTemplate)
-                //.Append(' ')
-                .AppendLine(line);
+            sb.AppendLine(line);
             lineIndex++;
         }
 
@@ -131,6 +116,7 @@ public static class ExceptionExtensions
                 .AppendLine("Inner Exception");
             CreateExceptionInfo(sb, ex.InnerException, indentCount + 2);
         }
+
         /******************************\
         |        new line at end       |
         \******************************/
