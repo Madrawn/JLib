@@ -253,36 +253,23 @@ public static class TypeHelper
     /// <summary>
     /// the name of the class and its declaring type, excluding the namespace
     /// </summary>
-    public static string FullName(this Type type, bool includeNamespace = false, bool includeNestingParents = true)
+    public static string FullName(this Type type, bool includeNamespace = false)
     {
-        var result = new StringBuilder();
-
-        if (includeNamespace)
-            result.Append(type.Namespace)
-                .Append('.');
-
-        if (includeNestingParents)
-        {
-            result.AppendJoin('.', type.GetNestingParents().Select(t
-                => GetCleanName(t) +
-                   (t.IsGenericType
-                       ? $"<{new string(',', t.GenericTypeArguments.Length - 1)}>"
-                       : "")
-            ));
-            if (type.IsNested)
-                result.Append('.');
-        }
-
-        result.Append(GetCleanName(type));
+        var name = (type.FullName ?? type.Name);
+        string res = name
+            .Split("[")
+            .First();
+        ;
+        if (!includeNamespace)
+            res = res.Split(".").Last();
+        res = res
+            .Replace("+", ".")
+            .Split("`").First();
 
         if (type.IsGenericType)
-            result.Append('<')
-                .AppendJoin(", ", type.GenericTypeArguments.Select(a => a.FullName(includeNamespace)))
-                .Append('>');
+            res += $"<{string.Join(", ", type.GenericTypeArguments.Select(a => a.FullName(includeNamespace)))}>";
 
-        return result.ToString();
-
-        string GetCleanName(Type t) => t.Name.Split('`').First();
+        return res;
     }
 
 }
