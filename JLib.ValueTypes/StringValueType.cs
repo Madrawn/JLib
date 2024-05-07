@@ -125,6 +125,42 @@ public class StringValidator : ValueValidator<string?>
             AddError($"Value does not start with {prefix}");
         return this;
     }
+    /// <summary>
+    /// Validates that the value does not start with the specified prefix.
+    /// </summary>
+    /// <param name="prefix">The prefix to check.</param>
+    /// <returns>The string validator instance.</returns>
+    public StringValidator NotStartWith(string prefix)
+    {
+        NotBeNull();
+        if (Value == null || Value.StartsWith(prefix))
+            AddError($"Value does start with {prefix}");
+        return this;
+    }
+    /// <summary>
+    /// Validates that the value starts with the specified prefix.
+    /// </summary>
+    /// <param name="prefix">The prefix to check.</param>
+    /// <returns>The string validator instance.</returns>
+    public StringValidator StartWith(char prefix)
+    {
+        NotBeNull();
+        if (Value == null || !Value.StartsWith(prefix))
+            AddError($"Value does not start with {prefix}");
+        return this;
+    }
+    /// <summary>
+    /// Validates that the value does not start with the specified prefix.
+    /// </summary>
+    /// <param name="prefix">The prefix to check.</param>
+    /// <returns>The string validator instance.</returns>
+    public StringValidator NotStartWith(char prefix)
+    {
+        NotBeNull();
+        if (Value == null || Value.StartsWith(prefix))
+            AddError($"Value does start with {prefix}");
+        return this;
+    }
 
     /// <summary>
     /// Validates that the value does not contain the specified value.
@@ -160,7 +196,7 @@ public class StringValidator : ValueValidator<string?>
     {
         NotBeNullOrWhitespace()
         .NotContainWhitespace()
-        .MatchRegex(new (@"^[A-Za-z0-9-._~:/?#@\[\]!$&'()*+,;=%]*$"));
+        .MatchRegex(new(@"^[A-Za-z0-9-._~:/?#@\[\]!$&'()*+,;=%]*$"));
 
         if (!Uri.TryCreate(Value, kind, out var uriResult))
             AddError($"Value is not a valid {kind} URL");
@@ -176,44 +212,24 @@ public class StringValidator : ValueValidator<string?>
     public StringValidator BeBaseUrl()
         => BeUrl(UriKind.Absolute)
             .NotContain('?');
-
+    
     /// <summary>
-    /// Validates that the value is a valid HTTPS URL.
+    /// Checks whether the value is an absolute URL and has one of the specified schemes.
     /// </summary>
+    /// <param name="scheme">The supported schemes.</param>
     /// <returns>The string validator instance.</returns>
-    public StringValidator BeHttpsUrl() 
+    public StringValidator BeUrlWithScheme(params string[] scheme)
         => BeUrl(UriKind.Absolute, uri =>
         {
-            if (uri?.Scheme != "https")
-                AddError("Value is not a HTTPS URL");
-        });
-
-    /// <summary>
-    /// Validates that the value is a valid HTTP URL. this excludes https
-    /// </summary>
-    /// <returns>The string validator instance.</returns>
-    public StringValidator BeHttpUrl() 
-        => BeUrl(UriKind.Absolute, uri =>
-        {
-            if (uri?.Scheme != "http")
-                AddError("Value is not a HTTP URL");
-        });
-    /// <summary>
-    /// Validates that the value is a valid HTTP URL. this excludes https
-    /// </summary>
-    /// <returns>The string validator instance.</returns>
-    public StringValidator BeHttpOrHttpsUrl()
-        => BeUrl(UriKind.Absolute, uri =>
-        {
-            if (uri.Scheme != "http" && uri.Scheme != "https")
-                AddError("Value is not a HTTP or HTTPS URL");
+            if (scheme.Contains(uri?.Scheme) == false)
+                AddError("Url has an unsupported scheme. Supported schemes are: " + string.Join(", ", scheme));
         });
 
     /// <summary>
     /// Validates that the value is a valid HTTP URL.
     /// </summary>
     /// <returns>The string validator instance.</returns>
-    public StringValidator BeRelativeUrl() 
+    public StringValidator BeRelativeUrl()
         => BeUrl(UriKind.Relative);
 
     /// <summary>
@@ -306,6 +322,39 @@ public class StringValidator : ValueValidator<string?>
     public StringValidator EndWith(string value)
     {
         if (Value?.EndsWith(value) != true)
+            AddError($"the value has to end with '{value}'");
+        return this;
+    }
+    /// <summary>
+    /// Validates that the value ends with the specified value.
+    /// </summary>
+    /// <param name="value">The value to check.</param>
+    /// <returns>The string validator instance.</returns>
+    public StringValidator EndWith(char value)
+    {
+        if (Value?.EndsWith(value) != true)
+            AddError($"the value has to end with '{value}'");
+        return this;
+    }
+    /// <summary>
+    /// Validates that the value ends with the specified value.
+    /// </summary>
+    /// <param name="value">The value to check.</param>
+    /// <returns>The string validator instance.</returns>
+    public StringValidator NotEndWith(string value)
+    {
+        if (Value?.EndsWith(value) != false)
+            AddError($"the value has to end with '{value}'");
+        return this;
+    }
+    /// <summary>
+    /// Validates that the value ends with the specified value.
+    /// </summary>
+    /// <param name="value">The value to check.</param>
+    /// <returns>The string validator instance.</returns>
+    public StringValidator NotEndWith(char value)
+    {
+        if (Value?.EndsWith(value) != false)
             AddError($"the value has to end with '{value}'");
         return this;
     }

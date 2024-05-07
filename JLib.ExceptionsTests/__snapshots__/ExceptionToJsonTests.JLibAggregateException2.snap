@@ -1,0 +1,29 @@
+﻿{
+  "Message": "Test",
+  "2 Exception": [
+    "inner 1",
+    "inner 2"
+  ],
+  "3 IndexOutOfRangeException": [
+    "inner oor 1",
+    "inner oor 2",
+    {
+      "Message": "inner oor 3",
+      "InnerException": "sub nested oor"
+    }
+  ],
+  "JLibAggregateException": {
+    "Message": "sub ex",
+    "Exception": {
+      "Message": "inner",
+      "InnerException": {
+        "Message": "sub inner",
+        "Type": "IndexOutOfRangeException"
+      }
+    }
+  },
+  "AggregateException": {
+    "Message": "sub ex 2 (inner 2)",
+    "Exception": "inner 2"
+  }
+}

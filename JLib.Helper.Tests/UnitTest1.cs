@@ -16,7 +16,7 @@ public class UnitTest1
 
     public class OtherClass
     {
-        public class OtherSubClass{}
+        public class OtherSubClass { }
     }
     public class OtherGenericClass<T> { }
     [Fact]

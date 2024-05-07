@@ -91,7 +91,7 @@ public static class ServiceCollectionHelper
                 sectionInstance = sectionInstance.GetSection(environment);
             }
             else
-                logger.LogInformation("Loading section {section} ({sectionType})", sectionType.SectionName,
+                logger.LogInformation("Loading section {section} ({sectionType})", sectionType.SectionName.Value,
                     sectionType.Value.FullName(true));
 
             var specificConfig = configMethod.MakeGenericMethod(sectionType.Value);

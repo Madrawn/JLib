@@ -22,14 +22,14 @@ public interface IExceptionProvider
     /// Throws a <see cref="JLibAggregateException"/> if there are errors
     /// </summary>
     /// <param name="onThrow">Invoked before an exception is thrown</param>
-    public void ThrowIfNotEmpty(Action? onThrow = null)
+    public void ThrowIfNotEmpty(Action<Exception>? onThrow = null)
     {
         var exception = GetException();
 
         if (exception is null)
             return;
 
-        onThrow?.Invoke();
+        onThrow?.Invoke(exception);
         throw exception;
     }
 }

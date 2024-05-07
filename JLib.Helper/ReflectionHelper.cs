@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace JLib.Helper;
 
@@ -30,7 +31,6 @@ public static class ReflectionHelper
         // Init-only properties are marked with the IsExternalInit type.
         return setMethodReturnParameterModifiers?.Contains(typeof(IsExternalInit)) ?? false;
     }
-
     public static bool HasCustomAttribute(this MemberInfo type, Type attributeType, bool inherit = true)
         => type.GetCustomAttribute(attributeType, inherit) is not null;
 
@@ -52,6 +52,29 @@ public static class ReflectionHelper
         where T : MemberInfo
         where TAttribute : Attribute
         => src.Where(m => m.HasCustomAttribute<TAttribute>());
+
+    public static string ToInfoString(this MethodInfo mi, bool includeNamespace = false)
+    {
+        StringBuilder sb = new();
+        if (mi.ReflectedType != mi.DeclaringType && mi.ReflectedType is not null)
+            sb.Append(mi.ReflectedType.FullName(includeNamespace)).Append(':');
+        if (mi.DeclaringType is not null)
+            sb.Append(mi.DeclaringType.FullName(includeNamespace));
+
+        if (mi.IsGenericMethod)
+        {
+            sb.Append('<');
+            foreach (var typeArg in mi.GetGenericArguments())
+                sb.Append(typeArg.FullName(includeNamespace));
+            sb.Append('>');
+        }
+        sb.Append('(');
+        sb.AppendJoin(", ", mi.GetParameters().Select(p =>
+            $"{p.GetType().FullName(includeNamespace)} {p.Name} {(p.HasDefaultValue ? $" = {p.DefaultValue}" : "")}"));
+        sb.Append(')');
+
+        return sb.ToString();
+    }
 
     #region get property nullabillity
 

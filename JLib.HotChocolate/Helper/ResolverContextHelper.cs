@@ -1,6 +1,9 @@
-﻿using HotChocolate.Resolvers;
+﻿using System.Linq.Expressions;
+using System.Reflection;
+using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using JLib.DataProvider;
+using JLib.Helper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -38,4 +41,31 @@ public static class ResolverContextHelper
                 id.Value)
             : null;
     }
+    /// <summary>
+    /// <inheritdoc cref="GetOneDataObjectAsync{TDo}(IResolverContext,Guid)"/>
+    /// </summary>
+    public static async Task<TDo[]> GetManyDataObjectsAsync<TDo>(this IResolverContext context, Guid id, Expression<Func<TDo, Guid>> keySelector)
+        where TDo : class, IDataObject
+    {
+        // when the resolver is called a second time, the old context.services might be null. this ensures that we can still create a new scope.
+        var provider = context.Services;
+        var keySel = keySelector.Compile();
+        return await context.GroupAsync(
+                async (ids, token)
+                    =>
+                {
+                    using var scope = provider.CreateScope();
+                    var dataProvider = scope.ServiceProvider.GetRequiredService<IDataProviderR<TDo>>();
+                    var items = await dataProvider
+                        .Get()
+                        .Where(ExpressionHelper.ReplaceMethod<Func<TDo, bool>>(x => ids.Contains(IdSelectorPlaceholder(x)), IdSelectorPlaceholderMethod, keySelector))
+                        .ToListAsync(token);
+                    return items.ToLookup(keySel);
+                },
+                id);
+    }
+    private static readonly MethodInfo IdSelectorPlaceholderMethod = typeof(ResolverContextHelper).GetMethod(nameof(IdSelectorPlaceholder), BindingFlags.NonPublic | BindingFlags.Static)
+        ?? throw new("method not found");
+    private static Guid IdSelectorPlaceholder<T>(T from)
+        => throw new InvalidOperationException("this should have been replaced");
 }
