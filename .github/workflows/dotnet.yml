@@ -19,18 +19,18 @@ jobs:
     strategy:
       matrix:
         dotnet-version: ['6.0.x', '7.0.x', '8.0.x']
-    
-    steps:
-    # determine version from tag
-    - name: Extract version from Tag
-      id: version
-      run: |
-        echo "::set-output name=versionWithPrefix::${{ github.ref/refs\/tags\// }}"
-        echo "::set-output name=version::${{ github.ref/refs\/tags\/v/ }}"
-    # setup    
-    - uses: actions/checkout@v3
-    - name: Setup .NET 6
-      uses: actions/setup-dotnet@v3
+          
+          steps:
+          # determine version from tag
+          - name: Extract version from Tag
+            id: version
+            run: |
+              echo "::set-output name=versionWithPrefix::${{ github.ref.replace('refs/tags/', '') }}"
+              echo "::set-output name=version::${{ github.ref.replace('refs/tags/v', '') }}"
+          # setup    
+          - uses: actions/checkout@v3
+          - name: Setup .NET 6
+            uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ matrix.dotnet-version }}
     - name: Restore dependencies
