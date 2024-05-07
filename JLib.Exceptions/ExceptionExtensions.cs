@@ -1,5 +1,8 @@
-﻿using JLib.Helper;
+﻿using System.Runtime.CompilerServices;
+using JLib.Helper;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace JLib.Exceptions;
 public static class ExceptionExtensions
@@ -125,4 +128,79 @@ public static class ExceptionExtensions
             .AppendLine();
     }
 
+    /// <summary>
+    /// Converts the <paramref name="exception"/> object to a JSON string representation.
+    /// The content is optimized to be quickly readable by humans, and has no stable schema.
+    /// </summary>
+    /// <param name="exception">The <see cref="Exception"/> object to convert.</param>
+    /// <param name="options"></param>
+    /// <returns>A JSON string representation of the <paramref name="exception"/>.</returns>
+    public static string ToJson(this Exception exception, JsonSerializerOptions? options = null)
+        => JsonSerializer.Serialize(exception.ToHumanOptimizedJsonObject(), options);
+
+    /// <summary>
+    /// Converts the <see cref="Exception"/> object to a <see cref="JsonObject"/> representation.<br/>
+    /// The content is optimized to be quickly readable by humans, and has no stable schema.
+    /// </summary>
+    /// <param name="exception">The <see cref="Exception"/> object to convert.</param>
+    /// <param name="includeType">If false, the exception type will not be included in the resulting json (top level only)</param>
+    /// <returns>A <see cref="JsonObject"/> representation of the <paramref name="exception"/>.</returns>
+    public static JsonObject ToHumanOptimizedJsonObject(this Exception exception, bool includeType = true)
+    {
+        var json = new JsonObject();
+        json.Add("Message", GetJsonString(exception is JLibAggregateException jLibAgg ? jLibAgg.UserMessage : exception.Message));
+        if (includeType && new[] { typeof(Exception), typeof(JLibAggregateException), typeof(AggregateException) }.Contains(exception.GetType()) == false)
+            json.Add("Type", exception.GetType().Name);
+
+        if (exception is AggregateException aggregate)
+        {
+
+            foreach (var exGroup in aggregate.InnerExceptions.GroupBy(ex => ex.GetType()))
+            {
+                var exLst = new JsonArray();
+                Action<JsonNode?> add;
+                if (exGroup.Count() == 1)
+                    add = node => json.Add(exGroup.Key.FullName(), node);
+                else
+                {
+                    json.Add($"{exGroup.Count()} {exGroup.Key.FullName()}", exLst);
+                    add = node => exLst.Add(node);
+                }
+
+                foreach (var ex in exGroup)
+                {
+                    add(ex.InnerException is null
+                        ? GetJsonString(ex.Message)
+                        : ex.ToHumanOptimizedJsonObject(false)
+                        );
+                }
+            }
+
+        }
+        else
+        {
+            if (exception.InnerException is null) { }
+            else if (exception.InnerException.GetType() == typeof(Exception) && exception.InnerException.InnerException == null)
+                json.Add("InnerException", GetJsonString(exception.InnerException.Message));
+            else
+                json.Add("InnerException", exception.InnerException.ToHumanOptimizedJsonObject());
+        }
+
+        JsonNode? GetJsonString(string? text)
+        {
+            if (text is null)
+                return null;
+
+            if (!text.Contains(Environment.NewLine))
+                return JsonValue.Create(text);
+
+            var msg = new JsonArray();
+            foreach (var line in text.Split(Environment.NewLine))
+                msg.Add(line);
+            return msg;
+
+        }
+
+        return json;
+    }
 }
