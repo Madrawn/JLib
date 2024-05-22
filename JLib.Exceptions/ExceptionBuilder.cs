@@ -23,6 +23,12 @@ public sealed class ExceptionBuilder : IExceptionProvider, IDisposable
             lock (_childrenLock)
                 return _exceptions.Concat(_children.Select(c => c.GetException()));
     }
+    /// <summary>
+    /// adds the given <paramref name="message"/> as <see cref="Exception"/> to <see cref="AggregateException.InnerExceptions"/>
+    /// </summary>
+    /// <param name="message"></param>
+    public void Add(string message)
+        => Add(new Exception(message));
 
     /// <summary>
     /// adds the given <paramref name="exception"/> to <see cref="JLibAggregateException.InnerExceptions"/>
@@ -115,6 +121,16 @@ public sealed class ExceptionBuilder : IExceptionProvider, IDisposable
         CheckDisposed();
         lock (_childrenLock)
             _children.Add(exceptionProvider);
+    }
+    /// <summary>
+    /// adds the given <paramref name="exceptionProviders"/> as child<br/>
+    /// <see cref="IExceptionProvider.GetException"/> of the <paramref name="exceptionProviders"/> is called when <see cref="IExceptionProvider.GetException"/> is called, thereby enabling adding this child before the related process has been completed.
+    /// </summary>
+    public void AddChildren(IEnumerable<IExceptionProvider> exceptionProviders)
+    {
+        CheckDisposed();
+        lock (_childrenLock)
+            _children.AddRange(exceptionProviders);
     }
 
     /// <summary>

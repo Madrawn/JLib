@@ -1,7 +1,54 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using JLib.Exceptions;
+using JLib.Helper;
 
 namespace JLib.ValueTypes;
+
+public interface IValidationProfile<in T>
+{
+    public IExceptionProvider Validate(T? value);
+}
+
+public abstract class ValidationProfile<TValue> : IValidationProfile<TValue>
+{
+    private readonly Type _owner;
+
+    protected ValidationProfile(Type owner)
+    {
+        _owner = owner;
+    }
+    private List<Action<ExceptionBuilder, TValue?>> Validators { get; } = new();
+    protected void AddValidator(Action<ExceptionBuilder, TValue?> validator)
+        => Validators.Add(validator);
+    public IExceptionProvider Validate(TValue? value)
+    {
+        var ex = new ExceptionBuilder(_owner.FullName(true));
+        foreach (var validator in Validators)
+            validator(ex, value);
+
+        return ex;
+    }
+}
+
+public class StringValidationProfile<TVt> : ValidationProfile<string>
+    where TVt : ValueType<string>
+{
+    public StringValidationProfile(Action<StringValidator> validation) : base(typeof(TVt))
+    {
+
+    }
+}
+
+public record DemoVt : StringValueType
+{
+    [ValueTypeValidator]
+    private static readonly IValidationProfile<string> Validator = new StringValidationProfile<DemoVt>(v => v.NotBeNull());
+
+    public DemoVt(string Value) : base(Value)
+    {
+        ValueType.Validate<DemoVt, string>(Value).ThrowIfNotEmpty();
+    }
+}
 
 /// <summary>
 /// <see cref="IExceptionProvider"/> for validating values of type <typeparamref name="TValue"/><br/>

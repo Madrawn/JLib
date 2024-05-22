@@ -8,15 +8,7 @@ namespace JLib.DependencyInjection;
 public static class AttributeServiceCollectionExtension
 {
     /// <summary>
-    /// adds types with the <see cref="ServiceAttribute"/> to the service collection.<br/>
-    /// if it is a class, it will be treated as implementation and will always be provided with the <see cref="ServiceLifetime"/> of <see cref="ServiceAttribute.ServiceLifetime"/><br/>
-    /// if it is an interface, each class implementing this interface will be added.<br/>
-    /// If the implementation has no <see cref="ServiceAttribute"/>, the implementation will be provided with the <see cref="ServiceLifetime"/> of the interface.<br/>
-    /// If an implementation implements multiple Service Interfaces, all service interfaces and the implementation will be provided, all referring to the same instance<br/>
-    /// If there are multiple implementations for the same service interface, the implementation with the <see cref="ServiceImplementationOverrideAttribute"/> will be used<br/>
-    /// It is highly recommended to call<see cref="IExceptionProvider.ThrowIfNotEmpty"/> before building the service provider.
-    /// <br/><br/>
-    /// 
+    /// <inheritdoc cref="ServiceAttribute"/>>
     /// references:
     /// <list type="bullet">
     /// <item> <seealso cref="ServiceCollectionHelper.AddAlias"/> </item>
@@ -24,104 +16,11 @@ public static class AttributeServiceCollectionExtension
     /// <item><seealso cref="ServiceImplementationOverrideAttribute"/></item>
     /// </list>
     ///
-    /// Examples:
-    /// <example>
-    /// <code>
-    /// // provided as singleton
-    /// [Service(ServiceLifetime.Singleton)]
-    /// class ShoppingService { }
-    /// 
-    /// // provided as singleton
-    /// [Service(ServiceLifetime.Singleton)]
-    /// class ShoppingService : IShoppingService { }
-    /// // ignored
-    /// interface IShoppingService { }
-    /// 
-    /// // not provided
-    /// class ShoppingService : IShoppingService { }
-    /// // provided as singleton with ShoppingService as implementation (type)
-    /// [Service(ServiceLifetime.Singleton)]
-    /// interface IShoppingService { }
-    /// 
-    /// // provided as singleton
-    /// [Service(ServiceLifetime.Singleton)]
-    /// class ShoppingService : IShoppingService { }
-    /// // provided as singleton with ShoppingService as alias factory
-    /// [Service(ServiceLifetime.Singleton)]
-    /// interface IShoppingService { }
-    /// 
-    /// // throws exception, since the implementation has a lower lifetime than the interface
-    /// [Service(ServiceLifetime.Scoped)]
-    /// class ShoppingService : IShoppingService { }
-    /// [Service(ServiceLifetime.Singleton)]
-    /// interface IShoppingService { } 
-    /// 
-    /// // provided as singleton
-    /// [Service(ServiceLifetime.Singleton)]
-    /// class ShoppingService : IShoppingService { }
-    /// // provided as scoped with ShoppingService as alias factory - this means the service will act like a singleton but be injected as scoped
-    /// [Service(ServiceLifetime.Scoped)]
-    /// interface IShoppingService { }
-    /// 
-    /// // provided as singleton
-    /// class ShoppingService : IShoppingQueryService, IShoppingCommandService { }
-    /// // provided as singleton with ShoppingService as alias factory
-    /// [Service(ServiceLifetime.Singleton)]
-    /// interface IShoppingQueryService { }
-    /// // provided as scoped with ShoppingService as alias factory
-    /// [Service(ServiceLifetime.Scoped)]
-    /// interface IShoppingCommandService { }
-    ///
-    /// undesirable:
-    /// // provided as singleton
-    /// class ShoppingService : IShoppingQueryService, IShoppingCommandService { }
-    /// // provided as singleton
-    /// class MockShoppingService : IShoppingQueryService, IShoppingCommandService { }
-    /// // provided twice as singleton with ShoppingService as alias factory and MockShoppingService as alias factory
-    /// [Service(ServiceLifetime.Singleton)]
-    /// interface IShoppingQueryService { }
-    /// // provided twice as singleton with ShoppingService as alias factory and MockShoppingService as alias factory
-    /// [Service(ServiceLifetime.Singleton)]
-    /// interface IShoppingCommandService { }
-    /// 
-    ///  solution:
-    /// // provided as singleton
-    /// class ShoppingService : IShoppingQueryService, IShoppingCommandService { }
-    /// // provided as singleton
-    /// [ServiceImplementationOverride] // add this attribute to define implementation priority
-    /// class MockShoppingService : IShoppingQueryService, IShoppingCommandService { }
-    /// // provided as singleton with MockShoppingService as alias factory
-    /// [Service(ServiceLifetime.Singleton)]
-    /// interface IShoppingQueryService { }
-    /// // provided as singleton with MockShoppingService as alias factory
-    /// [Service(ServiceLifetime.Singleton)]
-    /// interface IShoppingCommandService { }
-    /// 
-    /// undesirable:
-    /// // provided as singleton
-    /// class ShoppingService : IShoppingQueryService, IShoppingCommandService { }
-    /// // provided as singleton
-    /// [ServiceImplementationOverride]
-    /// class MockShoppingService : IShoppingCommandService { }
-    /// // provided as singleton with ShoppingService as alias factory - the non-mock implementation will be used since the mock does not implement this interface
-    /// [Service(ServiceLifetime.Singleton)]
-    /// interface IShoppingQueryService { }
-    /// // provided as singleton with MockShoppingService as alias factory
-    /// [Service(ServiceLifetime.Singleton)]
-    /// interface IShoppingCommandService { }
-    /// 
-    /// solution:
-    /// class ShoppingService : IShoppingQueryService, IShoppingCommandService { }
-    /// [ServiceImplementationOverride(typeof(ShoppingService))] // causes an exception to be thrown indicating the missing interface
-    /// class MockShoppingService : IShoppingQueryService, IShoppingCommandService { }
-    /// [Service(ServiceLifetime.Singleton)]
-    /// interface IShoppingQueryService { }
-    /// [Service(ServiceLifetime.Singleton)]
-    /// interface IShoppingCommandService { }
-    /// 
-    /// </code>
-    /// </example>
     /// </summary>
+    /// <remarks>
+    /// <inheritdoc cref="ServiceAttribute"/>
+    /// <inheritdoc cref="ServiceImplementationOverrideAttribute"/>
+    /// </remarks>
     public static IServiceCollection AddServicesWithAttributes(this IServiceCollection services, ITypeCache typeCache, ExceptionBuilder exceptions)
     {
         exceptions = exceptions.CreateChild(nameof(AddServicesWithAttributes));

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using FluentAssertions;
+using Snapshooter.Xunit;
 using Xunit;
 
 namespace JLib.Exceptions.Tests;
@@ -72,25 +73,28 @@ public class ExceptionBuilderTests
     public void Build_Content()
     {
         _builder.Add(new Exception("content"));
-        JsonSerializer.Serialize(_builder.GetException(), new JsonSerializerOptions() { WriteIndented = true }).Should().Be(@"{
-  ""TargetSite"": null,
-  ""Message"": ""test\r\n\u251C\u2500 Inner Exceptions\r\n\u2502  \u251C\u2500 1 Exception\r\n\u2502  \u2502  \u251C\u2500 content\r\n\u2502  \u2502  \u2502  \r\n\r\n"",
-  ""Data"": {},
-  ""InnerException"": {
-    ""TargetSite"": null,
-    ""Message"": ""content"",
-    ""Data"": {},
-    ""InnerException"": null,
-    ""HelpLink"": null,
-    ""Source"": null,
-    ""HResult"": -2146233088,
-    ""StackTrace"": null
-  },
-  ""HelpLink"": null,
-  ""Source"": null,
-  ""HResult"": -2146233088,
-  ""StackTrace"": null
-}");
+        JsonSerializer.Serialize(_builder.GetException(), new JsonSerializerOptions() { WriteIndented = true })
+            .MatchSnapshot();
+            
+//            .Should().Be(@"{
+//  ""TargetSite"": null,
+//  ""Message"": ""test\r\n\u251C\u2500 Inner Exceptions\r\n\u2502  \u251C\u2500 1 Exception\r\n\u2502  \u2502  \u251C\u2500 content\r\n\u2502  \u2502  \u2502  \r\n\r\n"",
+//  ""Data"": {},
+//  ""InnerException"": {
+//    ""TargetSite"": null,
+//    ""Message"": ""content"",
+//    ""Data"": {},
+//    ""InnerException"": null,
+//    ""HelpLink"": null,
+//    ""Source"": null,
+//    ""HResult"": -2146233088,
+//    ""StackTrace"": null
+//  },
+//  ""HelpLink"": null,
+//  ""Source"": null,
+//  ""HResult"": -2146233088,
+//  ""StackTrace"": null
+//}");
     }
 
 }
