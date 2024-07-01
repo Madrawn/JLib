@@ -7,7 +7,7 @@ provides reflection based config section access either direct or via dependency 
 using JLib.Configuration;
 using JLib.Reflection.DependencyInjection;
 
-ICOnfiguration myConfig = ...;
+IConfiguration myConfig = ...;
 
 // ...
 var services = new ServiceCollection ()
@@ -41,5 +41,40 @@ var configSection myConfig.GetConfigSectionObject<MyConfigSection>();
 public class MyConfigSection
 {
     public string MyValue { get; init; }
+}
+```
+## Environment Behavior
+```json
+{
+    "Environment": "Dev1",
+    "SectionA":{
+        "Environment": "Dev2",
+        "Dev1":{
+            "MyValue":"Ignored"
+        },
+        "Dev2":{
+            "MyValue":"Used"
+        },
+        "MyValue":"Ignored"
+    },
+    "SectionB":{
+        "Dev1":{
+            "MyValue":"Used"
+        },
+        "Dev2":{
+            "MyValue":"Ignored"
+        },
+        "MyValue":"Ignored"
+    },
+    "SectionC":{
+        "Environment": "",
+        "Dev1":{
+            "MyValue":"Ignored"
+        },
+        "Dev2":{
+            "MyValue":"Ignored"
+        },
+        "MyValue":"Used"
+    }
 }
 ```
