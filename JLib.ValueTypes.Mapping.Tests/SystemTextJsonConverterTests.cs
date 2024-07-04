@@ -5,6 +5,7 @@ using JLib.AutoMapper;
 using JLib.DependencyInjection;
 using JLib.Exceptions;
 using JLib.Reflection;
+using JLib.Reflection.DependencyInjection;
 using JLib.ValueTypes.Mapping.SystemTextJson;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -13,7 +14,7 @@ using Xunit.Abstractions;
 
 namespace JLib.ValueTypes.Mapping.Tests;
 
-public class ConverterTests : IDisposable
+public class SystemTextJsonConverterTests : IDisposable
 {
     private readonly ServiceProvider _provider;
     private readonly IMapper _mapper;
@@ -22,12 +23,12 @@ public class ConverterTests : IDisposable
     record GuidVt(Guid Value) : GuidValueType(Value);
     record IntVt(int Value) : IntValueType(Value);
 
-    public ConverterTests(ITestOutputHelper testOutputHelper)
+    public SystemTextJsonConverterTests(ITestOutputHelper testOutputHelper)
     {
         var loggerFactory = new LoggerFactory().AddXunit(testOutputHelper);
         var exceptions = new ExceptionBuilder("setup");
         var services = new ServiceCollection()
-            .AddTypeCache(out var typeCache, exceptions, loggerFactory, JLibReflectionTp.Instance, TypePackage.GetNested<ConverterTests>())
+            .AddTypeCache(out var typeCache, exceptions, loggerFactory, JLibReflectionTp.Instance, TypePackage.GetNested<SystemTextJsonConverterTests>())
             .AddAutoMapper(m => m.AddProfiles(typeCache, loggerFactory));
 
         _provider = services.BuildServiceProvider();

@@ -10,17 +10,9 @@ namespace JLib.ValueTypes;
 /// <typeparam name="T">The type of the string value.</typeparam>
 public abstract record StringValueType(string Value) : ValueType<string>(Value)
 {
-    /// <summary>
-    /// <inheritdoc cref="StringValueType"/>
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <param name="validate">a validator which is executed when the value is created</param>
-    protected StringValueType(string value, Action<StringValidator>? validate) : this(value)
-    {
-        var validator = new StringValidator(Value, GetType().FullName());
-        validate?.Invoke(validator);
-        validator.CastTo<IExceptionProvider>().GetException()?.Throw();
-    }
+    [Validation]
+    private static void Validate(StringValidator v)
+        => v.NotBeNull();
 }
 
 /// <summary>
@@ -28,6 +20,7 @@ public abstract record StringValueType(string Value) : ValueType<string>(Value)
 /// </summary>
 public class StringValidator : ValueValidator<string?>
 {
+
     public StringValidator(string? value, string valueTypeName) : base(value, valueTypeName)
     {
     }
@@ -212,7 +205,7 @@ public class StringValidator : ValueValidator<string?>
     public StringValidator BeBaseUrl()
         => BeUrl(UriKind.Absolute)
             .NotContain('?');
-    
+
     /// <summary>
     /// Checks whether the value is an absolute URL and has one of the specified schemes.
     /// </summary>

@@ -5,3 +5,10 @@
 /// validates for not being null or whitespace
 /// </summary>
 /// <param name="Value"></param>
+public record JsonStringValueType(string Value)
+    : StringValueType(Value)
+{
+    [Validation]
+    private void Validator(StringValidator v)
+        => v.NotBeNullOrWhitespace();
+}

@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <IsTestProject>true</IsTestProject>
-  </PropertyGroup>
+    <PropertyGroup>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\JLib.ValueTypes\JLib.ValueTypes.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\JLib.ValueTypes\JLib.ValueTypes.csproj" />
+    </ItemGroup>
 
 </Project>

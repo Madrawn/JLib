@@ -38,7 +38,7 @@ internal class DataPackageManager : IDataPackageManager
         packages.Where(p => !p.IsAssignableTo<DataPackage>() || p.IsAbstract)
             .Select(p =>
                 new InvalidSetupException(p.FullName() +
-                                          "is not a valid typePackage. it must not be abstract and be Derived from DataPackage"))
+                                          " is not a valid typePackage. it must not be abstract and be Derived from DataPackage"))
             .ThrowExceptionIfNotEmpty("invalid DataPackages found");
 
         InitState = DataPackageInitState.Initializing;
