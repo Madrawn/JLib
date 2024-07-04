@@ -65,7 +65,7 @@ public static class ConfigurationServiceCollectionExtensions
     /// </example>
     /// </summary>
     public static IServiceCollection AddAllConfigSections(this IServiceCollection services,
-        ITypeCache typeCache, IConfiguration config, ILoggerFactory loggerFactory, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        ITypeCache typeCache, IConfiguration config, ILoggerFactory loggerFactory, ServiceLifetime lifetime = ServiceLifetime.Singleton)
     {
         var logger = loggerFactory.CreateLogger(typeof(ConfigurationServiceCollectionExtensions));
         var configMethod = typeof(OptionsConfigurationServiceCollectionExtensions)
