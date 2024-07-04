@@ -8,6 +8,7 @@
     <ItemGroup>
       <ProjectReference Include="..\JLib.Configuration\JLib.Configuration.csproj" />
       <ProjectReference Include="..\JLib.DependencyInjection\JLib.DependencyInjection.csproj" />
+      <ProjectReference Include="..\JLib.Reflection.DependencyInjection\JLib.Reflection.DependencyInjection.csproj" />
       <ProjectReference Include="..\JLib.Reflection\JLib.Reflection.csproj" />
     </ItemGroup>
 </Project>

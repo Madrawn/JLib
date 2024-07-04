@@ -5,6 +5,7 @@ using JLib.DependencyInjection;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
+using JLib.Reflection.DependencyInjection;
 using JLib.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -18,7 +19,9 @@ public interface ITestEntity : ICommandEntity
 
 }
 
-
+/// <summary>
+/// tests data by creating a comparison snapshot containing the data of all data providers
+/// </summary>
 public abstract class ReflectionTestBase
 {
     private readonly ITestOutputHelper _testOutput;

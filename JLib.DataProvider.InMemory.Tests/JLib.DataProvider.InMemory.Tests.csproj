@@ -6,6 +6,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\JLib.DataProvider\JLib.DataProvider.csproj" />
+        <ProjectReference Include="..\JLib.Reflection.DependencyInjection\JLib.Reflection.DependencyInjection.csproj" />
     </ItemGroup>
 
 </Project>
