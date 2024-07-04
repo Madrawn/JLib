@@ -3,6 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace JLib.DataProvider.EfCore;
 
+/// <summary>
+/// a data provider which connects to the natively provided <see cref="DbContext"/> pulling it via dependency injection.
+/// </summary>
+/// <typeparam name="TEntity"></typeparam>
 public class EfCoreDataProviderR<TEntity> : DataProviderRBase<TEntity>, ISourceDataProviderR<TEntity>
     where TEntity : class, IEntity
 {
@@ -18,6 +22,10 @@ public class EfCoreDataProviderR<TEntity> : DataProviderRBase<TEntity>, ISourceD
     public override IQueryable<TEntity> Get() => _dbContext.Set<TEntity>().Where(_authorize.Expression()).AsNoTracking();
 }
 
+/// <summary>
+/// <inheritdoc cref="EfCoreDataProviderR{TEntity}"/>
+/// </summary>
+/// <typeparam name="TEntity"></typeparam>
 public class EfCoreDataProviderRw<TEntity> : DataProviderRBase<TEntity>, ISourceDataProviderRw<TEntity>
     where TEntity : class, IEntity
 {

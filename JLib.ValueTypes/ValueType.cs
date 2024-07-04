@@ -13,6 +13,10 @@ namespace JLib.ValueTypes;
 [AttributeUsage(AttributeTargets.Field)]
 public class ValueTypeValidatorAttribute : Attribute { }
 
+
+/// <summary>
+/// Contains Utility methods to validate value types
+/// </summary>
 public static class ValueType
 {
     private class ConstantErrorValidationProfile<T> : IValidationProfile<T>

@@ -1,3 +1,7 @@
 ﻿namespace JLib.ValueTypes;
 
-public record JsonStringValueType(string Value) : StringValueType(Value, v => v.NotBeNullOrWhitespace());
+/// <summary>
+/// Indicates, that the value should be a json string. This is not confirmed, as it would lead to performance issues.<br/>
+/// validates for not being null or whitespace
+/// </summary>
+/// <param name="Value"></param>
