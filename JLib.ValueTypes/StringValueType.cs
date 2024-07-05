@@ -32,7 +32,7 @@ public class StringValidator : ValueValidator<string?>
     public StringValidator NotBeNull()
     {
         if (Value is null)
-            AddError("Value is null");
+            AddError("Value must not be null");
         return this;
     }
 
@@ -43,7 +43,7 @@ public class StringValidator : ValueValidator<string?>
     public StringValidator NotBeNullOrEmpty()
     {
         if (Value.IsNullOrEmpty())
-            AddError("Value is null or empty");
+            AddError("Value must neither be null nor empty");
         return this;
     }
 
@@ -55,7 +55,7 @@ public class StringValidator : ValueValidator<string?>
     public StringValidator BeOneOf(IReadOnlyCollection<string> validValues)
     {
         if (!validValues.Contains(Value))
-            AddError("Value is not one of the following: " + string.Join(", ", validValues));
+            AddError("Value must be one of the following: " + string.Join(", ", validValues));
         return this;
     }
 
@@ -64,7 +64,7 @@ public class StringValidator : ValueValidator<string?>
     /// </summary>
     /// <returns>The string validator instance.</returns>
     public StringValidator BeAlphanumeric()
-        => SatisfyCondition(char.IsLetterOrDigit, nameof(BeAlphanumeric));
+        => SatisfyCondition(char.IsLetterOrDigit, "value must be alphanumeric");
 
     /// <summary>
     /// Validates that the value satisfies the specified condition.
@@ -85,8 +85,16 @@ public class StringValidator : ValueValidator<string?>
             .Where(x => !validator(x.Item1))
             .Select(x => x.Item2)
             .ToArray();
-        if (errorIndices.Any())
-            AddError($"{name} failed at index [{string.Join(", ", errorIndices)}]");
+        foreach (var errorIndex in errorIndices)
+        {
+            int minLength = 10;
+
+            int start = Math.Max(0, errorIndex - minLength / 2);
+            int end = Math.Min(Value.Length, errorIndex + minLength / 2);
+
+            string errorPart = Value.Substring(start, end - start);
+            AddError($"{name} failed at index {errorIndex}. \"{errorPart}\"");
+        }
 
         if (Value.All(validator))
             return this;
@@ -102,7 +110,7 @@ public class StringValidator : ValueValidator<string?>
     public StringValidator NotBeNullOrWhitespace()
     {
         if (Value.IsNullOrEmpty())
-            AddError("Value is null or whitespace");
+            AddError("Value must neither be null nor whitespace");
         return this;
     }
 
@@ -115,7 +123,7 @@ public class StringValidator : ValueValidator<string?>
     {
         NotBeNull();
         if (Value == null || !Value.StartsWith(prefix))
-            AddError($"Value does not start with {prefix}");
+            AddError($"Value must start with {prefix}");
         return this;
     }
     /// <summary>
@@ -127,7 +135,7 @@ public class StringValidator : ValueValidator<string?>
     {
         NotBeNull();
         if (Value == null || Value.StartsWith(prefix))
-            AddError($"Value does start with {prefix}");
+            AddError($"Value must not start with {prefix}");
         return this;
     }
     /// <summary>
@@ -139,7 +147,7 @@ public class StringValidator : ValueValidator<string?>
     {
         NotBeNull();
         if (Value == null || !Value.StartsWith(prefix))
-            AddError($"Value does not start with {prefix}");
+            AddError($"Value must start with {prefix}");
         return this;
     }
     /// <summary>
@@ -151,7 +159,7 @@ public class StringValidator : ValueValidator<string?>
     {
         NotBeNull();
         if (Value == null || Value.StartsWith(prefix))
-            AddError($"Value does start with {prefix}");
+            AddError($"Value must not start with {prefix}");
         return this;
     }
 
@@ -160,10 +168,33 @@ public class StringValidator : ValueValidator<string?>
     /// </summary>
     /// <param name="value">The value to check.</param>
     /// <returns>The string validator instance.</returns>
+    public StringValidator Contain(string value)
+    {
+        if (Value != null && Value.Contains(value) == false)
+            AddError($"Value must contain {value}");
+        return this;
+    }
+
+    /// <summary>
+    /// Validates that the value does not contain the specified value.
+    /// </summary>
+    /// <param name="value">The value to check.</param>
+    /// <returns>The string validator instance.</returns>
+    public StringValidator Contain(char value)
+    {
+        if (Value != null && Value.Contains(value) == false)
+            AddError($"Value must contain {value}");
+        return this;
+    }
+    /// <summary>
+    /// Validates that the value does not contain the specified value.
+    /// </summary>
+    /// <param name="value">The value to check.</param>
+    /// <returns>The string validator instance.</returns>
     public StringValidator NotContain(string value)
     {
         if (Value != null && Value.Contains(value))
-            AddError($"Value does not contain {value}");
+            AddError($"Value must not contain {value}");
         return this;
     }
 
@@ -175,7 +206,7 @@ public class StringValidator : ValueValidator<string?>
     public StringValidator NotContain(char value)
     {
         if (Value != null && Value.Contains(value))
-            AddError($"Value does not contain {value}");
+            AddError($"Value must not contain {value}");
         return this;
     }
 
@@ -192,7 +223,7 @@ public class StringValidator : ValueValidator<string?>
         .MatchRegex(new(@"^[A-Za-z0-9-._~:/?#@\[\]!$&'()*+,;=%]*$"));
 
         if (!Uri.TryCreate(Value, kind, out var uriResult))
-            AddError($"Value is not a valid {kind} URL");
+            AddError($"Value must be a valid {kind} URL");
         else
             uriValidator?.Invoke(uriResult);
         return this;
@@ -214,8 +245,10 @@ public class StringValidator : ValueValidator<string?>
     public StringValidator BeUrlWithScheme(params string[] scheme)
         => BeUrl(UriKind.Absolute, uri =>
         {
-            if (scheme.Contains(uri?.Scheme) == false)
-                AddError("Url has an unsupported scheme. Supported schemes are: " + string.Join(", ", scheme));
+            if (uri is null)
+                AddError("Uri must not be null");
+            else if (scheme.Contains(uri.Scheme) == false)
+                AddError($"Url has scheme {uri.Scheme} but must have one of the following: " + string.Join(", ", scheme));
         });
 
     /// <summary>
@@ -236,7 +269,7 @@ public class StringValidator : ValueValidator<string?>
         if (Value is null)
             return this;
         if (expression.IsMatch(Value) == false)
-            AddError($"value does not match regex {expression}");
+            AddError($"value must match regex {expression}");
         return this;
     }
 
@@ -277,7 +310,7 @@ public class StringValidator : ValueValidator<string?>
     {
         NotBeNull();
         if (Value?.Length < length)
-            AddError($"the value has to be at least {length} characters long but got length {Value.Length}");
+            AddError($"the value must be at least {length} characters long but has a length of {Value.Length}");
         return this;
     }
 
@@ -290,7 +323,7 @@ public class StringValidator : ValueValidator<string?>
     {
         NotBeNull();
         if (Value?.Length > length)
-            AddError($"the value has to be at most {length} characters long but got length {Value.Length}");
+            AddError($"the value must be at most {length} characters long but has a length of {Value.Length}");
         return this;
     }
 
@@ -303,7 +336,7 @@ public class StringValidator : ValueValidator<string?>
     {
         NotBeNull();
         if (Value?.Length != length)
-            AddError($"the value has to be exactly {length} characters long but got length {Value?.Length}");
+            AddError($"the value must be exactly {length} characters long but has a length of {Value?.Length}");
         return this;
     }
 
@@ -315,7 +348,7 @@ public class StringValidator : ValueValidator<string?>
     public StringValidator EndWith(string value)
     {
         if (Value?.EndsWith(value) != true)
-            AddError($"the value has to end with '{value}'");
+            AddError($"the value must end with '{value}'");
         return this;
     }
     /// <summary>
@@ -326,7 +359,7 @@ public class StringValidator : ValueValidator<string?>
     public StringValidator EndWith(char value)
     {
         if (Value?.EndsWith(value) != true)
-            AddError($"the value has to end with '{value}'");
+            AddError($"the value must end with '{value}'");
         return this;
     }
     /// <summary>
@@ -337,7 +370,7 @@ public class StringValidator : ValueValidator<string?>
     public StringValidator NotEndWith(string value)
     {
         if (Value?.EndsWith(value) != false)
-            AddError($"the value has to end with '{value}'");
+            AddError($"the value must not end with '{value}'");
         return this;
     }
     /// <summary>
@@ -348,7 +381,7 @@ public class StringValidator : ValueValidator<string?>
     public StringValidator NotEndWith(char value)
     {
         if (Value?.EndsWith(value) != false)
-            AddError($"the value has to end with '{value}'");
+            AddError($"the value must not end with '{value}'");
         return this;
     }
 }
