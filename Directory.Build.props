@@ -69,6 +69,10 @@
 
         <!--Test Projects-->
         <When  Condition="$(MSBuildProjectName.EndsWith('Tests')) or $(MSBuildProjectName.EndsWith('Testing'))">
+            <PropertyGroup>
+                <IsPackable>false</IsPackable>
+                <IsTestProject>true</IsTestProject>
+            </PropertyGroup>
             <ItemGroup>
                 <!--Setup-->
                 <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.*" />
@@ -96,4 +100,11 @@
             </ItemGroup>
         </When>
     </Choose>
+
+    <!--makes the internals of a project visible to its tests-->
+    <ItemGroup Condition="!$(AssemblyName.EndsWith('.Tests'))">
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+            <_Parameter1>$(AssemblyName).Tests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
 </Project>
