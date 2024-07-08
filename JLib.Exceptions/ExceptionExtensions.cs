@@ -60,7 +60,7 @@ public static class ExceptionExtensions
     /// <summary>
     /// returns a string which visualized the exception as grouped tree
     /// </summary>
-    public static string GetTreeInfo(this AggregateException exception)
+    public static string GetHierarchyInfo(this AggregateException exception)
     {
         var sb = new StringBuilder();
         CreateExceptionInfo(sb, exception);
@@ -128,6 +128,8 @@ public static class ExceptionExtensions
             .AppendLine();
     }
 
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.General) { WriteIndented = true };
+
     /// <summary>
     /// Converts the <paramref name="exception"/> object to a JSON string representation.
     /// The content is optimized to be quickly readable by humans, and has no stable schema.
@@ -135,8 +137,8 @@ public static class ExceptionExtensions
     /// <param name="exception">The <see cref="Exception"/> object to convert.</param>
     /// <param name="options"></param>
     /// <returns>A JSON string representation of the <paramref name="exception"/>.</returns>
-    public static string ToJson(this Exception exception, JsonSerializerOptions? options = null)
-        => JsonSerializer.Serialize(exception.ToHumanOptimizedJsonObject(), options);
+    public static string GetHierarchyInfoJson(this Exception exception, JsonSerializerOptions? options = null)
+        => JsonSerializer.Serialize(exception.ToHumanOptimizedJsonObject(), options ?? JsonOptions);
 
     /// <summary>
     /// Converts the <see cref="Exception"/> object to a <see cref="JsonObject"/> representation.<br/>

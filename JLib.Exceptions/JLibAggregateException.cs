@@ -25,7 +25,7 @@ namespace JLib.Exceptions
         public JLibAggregateException(string userMessage, Exception[] innerExceptions) : base(userMessage, innerExceptions)
         {
             UserMessage = userMessage;
-            _message = new Lazy<string>(this.GetTreeInfo);
+            _message = new Lazy<string>(this.GetHierarchyInfo);
         }
 
         /// <summary>
