@@ -17,11 +17,13 @@ public sealed class ExceptionBuilder : IExceptionProvider, IDisposable
     private readonly ExceptionBuilder? _parent;
     private bool _disposed;
 
-    private IEnumerable<Exception?> BuildExceptionList()
+    private IReadOnlyCollection<Exception?> BuildExceptionList()
     {
         lock (_exceptionLock)
             lock (_childrenLock)
-                return _exceptions.Concat(_children.Select(c => c.GetException()));
+                return _exceptions
+                    .Concat(_children.Select(c => c.GetException()))
+                    .ToReadOnlyCollection();
     }
     /// <summary>
     /// adds the given <paramref name="message"/> as <see cref="Exception"/> to <see cref="AggregateException.InnerExceptions"/>
