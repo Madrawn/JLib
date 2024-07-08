@@ -7,8 +7,25 @@ namespace JLib.ValueTypes;
 /// represents a class which validates a value of type <typeparamref name="TValue"/><br/>
 /// requires a constructor with the signature <code>public <see cref="ValueValidator{TValue}"/>(<typeparamref name="TValue"/> value, <see cref="string"/> valueTypeName)</code>
 /// </summary>
-/// <typeparam name="TValue"></typeparam>
-public interface IValueValidator<TValue> : IExceptionProvider { }
+/// <typeparam name="TValue">the type of the <see cref="Value"/> to be validated</typeparam>
+public interface IValueValidator<out TValue> : IExceptionProvider
+{
+    /// <summary>
+    /// the value which is being validated
+    /// </summary>
+    public TValue Value { get; }
+    /// <summary>
+    /// all currently added messages
+    /// </summary>
+    public IReadOnlyCollection<string> Messages { get; }
+    /// <summary>
+    /// adds the <paramref name="message"/> and <paramref name="hint"/> to the <see cref="Messages"/>
+    /// </summary>
+    /// <param name="message">the message to be added</param>
+    /// <param name="hint"></param>
+    public void AddError(string message, string? hint = null);
+
+}
 
 /// <summary>
 /// <see cref="IExceptionProvider"/> for validating values of type <typeparamref name="TValue"/><br/>
@@ -16,6 +33,8 @@ public interface IValueValidator<TValue> : IExceptionProvider { }
 /// </summary>
 public abstract class ValueValidator<TValue> : IValueValidator<TValue>
 {
+
+
     /// <summary>
     /// The name of the ValueType which is currently being validated
     /// </summary>
@@ -23,7 +42,7 @@ public abstract class ValueValidator<TValue> : IValueValidator<TValue>
     /// <summary>
     /// the value which is currently being validated
     /// </summary>
-    protected TValue Value { get; }
+    public TValue Value { get; }
     private readonly List<string> _messages = new();
     private readonly List<IExceptionProvider> _subValidators = new();
     /// <summary>
@@ -59,6 +78,7 @@ public abstract class ValueValidator<TValue> : IValueValidator<TValue>
     Exception? IExceptionProvider.GetException()
         => BuildException(_messages, _subValidators);
 
+    // todo: lazy validation (do not run the entire validation if we just need to check if anything failed, instead abort validation once one validator failed)
     /// <summary>
     /// <inheritdoc cref="IExceptionProvider.HasErrors"/>
     /// </summary>
