@@ -21,7 +21,7 @@ namespace Examples.ExtensionMethods
         public static StringValidator ContainAt(this StringValidator validator)
         {
             var testString = "@";
-            if (!validator.Value?.Contains(testString) != true)
+            if (validator.Value?.Contains(testString) != true)
                 validator.AddError($"'{validator.Value}' must contain '{testString}'");
             return validator;
         }
@@ -40,7 +40,7 @@ namespace Examples.ExtensionMethods
         public static IValueValidator<string?> NotEndWithDot(this IValueValidator<string?> validator)
         {
             var testString = ".";
-            if (validator.Value?.EndsWith(testString) != true)
+            if (validator.Value?.EndsWith(testString) != false)
                 validator.AddError($"'{validator.Value}' must not end with '{testString}'");
             return validator;
         }
@@ -85,8 +85,8 @@ namespace Examples.ExtensionMethods
     ""JLibAggregateException"": {
       ""Message"": ""Value Validation Failed"",
       ""2 ValidationException"": [
-        ""\u0027invalid mail\u0027 must contain with \u0027.\u0027"",
-        ""\u0027invalid mail\u0027 must not end with \u0027.\u0027""
+        ""\u0027invalid mail\u0027 must contain \u0027@\u0027"",
+        ""\u0027invalid mail\u0027 must contain with \u0027.\u0027""
       ]
     }
   }
