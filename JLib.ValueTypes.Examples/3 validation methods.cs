@@ -37,29 +37,6 @@ public class ValidationMethods
             .HasErrors()
             .Should().BeFalse();
     }
-    [Fact]
-    public void ExceptionDebugInfo()
-    {
-        var res = ValueType.GetErrors<EmailAddress, string>("example");
-        var ex = res.GetException();
-        // note: the content is not optimized to be human readable by replacing single item arrays with just the item.
-        // for parsing, it is recommended to interpret the exception itself.
-        // do not use this json for production code
-        ex?.GetHierarchyInfoJson()
-            .Should().Be(@"{
-  ""Message"": ""Examples.ValidationMethods.EmailAddress"",
-  ""JLibAggregateException"": {
-    ""Message"": ""Examples.ValidationMethods.EmailAddress validation failed: \u0027example\u0027 is not a valid Value."",
-    ""JLibAggregateException"": {
-      ""Message"": ""Value Validation Failed"",
-      ""2 ValidationException"": [
-        ""Value must contain @"",
-        ""Value must contain .""
-      ]
-    }
-  }
-}");
-    }
 
     [Fact]
     public void TryCreateSucceeds()

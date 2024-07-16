@@ -37,7 +37,7 @@ public static class ValueType
     /// <typeparam name="T">The native value of the <see cref="ValueType{T}"/></typeparam>
     /// <param name="value">the value to validate</param>
     /// <returns>an <see cref="IExceptionProvider"/> containing all validation errors. Use <see cref="IExceptionProvider.HasErrors"/> to check if the value is valid</returns>
-    public static IExceptionProvider GetErrors<TVt, T>(T value)
+    public static IExceptionProvider GetErrors<TVt, T>(T? value)
         where TVt : ValueType<T>
         => ValidationProfile<T>.Get(typeof(TVt)).Validate(value);
 
@@ -49,10 +49,34 @@ public static class ValueType
     /// <param name="value">the value to create to a new <typeparamref name="TVt"/></param>
     /// <param name="validationErrors">the errors, if any when tryCreate failed.</param>
     /// <returns>a new instance of <typeparamref name="TVt"/> containing <paramref name="value"/> as it's value ot null, if the validation failed.</returns>
-    public static TVt? TryCreate<TVt, T>(T value, out IExceptionProvider validationErrors)
+    public static TVt? TryCreate<TVt, T>(T? value, out IExceptionProvider validationErrors)
         where TVt : ValueType<T>
     {
+        validationErrors = EmptyExceptionProvider.Instance;
+        if (value is null)
+            return null;
         validationErrors = GetErrors<TVt, T>(value);
+        if (validationErrors.HasErrors())
+            return null;
+        // todo: use compiled expression to improve runtime performance
+        return Activator.CreateInstance(typeof(TVt), value) as TVt;
+    }
+    /// <summary>
+    /// Checks whether <paramref name="value"/> is a valid <typeparamref name="TVt"/> and returns the value if it is valid, otherwise null and the validation errors via <paramref name="validationErrors"/>.
+    /// </summary>
+    /// <typeparam name="TVt">The specific <see cref="ValueType{T}"/> to create the <paramref name="value"/> for</typeparam>
+    /// <typeparam name="T">The native value of the <typeparamref name="TVt"/></typeparam>
+    /// <param name="value">the value to create to a new <typeparamref name="TVt"/></param>
+    /// <param name="validationErrors">the errors, if any when tryCreate failed.</param>
+    /// <returns>a new instance of <typeparamref name="TVt"/> containing <paramref name="value"/> as it's value ot null, if the validation failed.</returns>
+    public static TVt? TryCreate<TVt, T>(T? value, out IExceptionProvider validationErrors)
+        where TVt : ValueType<T>
+        where T:struct
+    {
+        validationErrors = EmptyExceptionProvider.Instance;
+        if (value.HasValue is false)
+            return null;
+        validationErrors = GetErrors<TVt, T>(value.Value);
         if (validationErrors.HasErrors())
             return null;
         // todo: use compiled expression to improve runtime performance

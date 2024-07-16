@@ -4,10 +4,10 @@ using JLib.ValueTypes;
 
 namespace JLib.Reflection;
 
-public class PropertyInfoValidator : ValueValidator<PropertyInfo>
+public class PropertyInfoValidator : ValidationContext<PropertyInfo>
 {
-    public PropertyInfoValidator(PropertyInfo value, string valueTypeName) 
-        : base(value, valueTypeName)
+    public PropertyInfoValidator(PropertyInfo value, Type targetType) 
+        : base(value, targetType)
     {
     }
 

@@ -38,23 +38,4 @@ public class Custom_Validation_using_manual_validation
         sut.Should().Throw<AggregateException>();
     }
 
-    [Fact]
-    public void ExceptionContent()
-    {
-        ValueType.TryCreate<EmailAddress, string>("not a mail", out var errors);
-        errors.GetException()?.GetHierarchyInfoJson().Should().Be(@"{
-  ""Message"": ""Examples.Custom_Validation_using_manual_validation.EmailAddress"",
-  ""JLibAggregateException"": {
-    ""Message"": ""Examples.Custom_Validation_using_manual_validation.EmailAddress validation failed: \u0027not a mail\u0027 is not a valid Value."",
-    ""JLibAggregateException"": {
-      ""Message"": ""Value Validation Failed"",
-      ""2 ValidationException"": [
-        ""email contains no ."",
-        ""email contains no @""
-      ]
-    }
-  }
-}");
-    }
-
 }

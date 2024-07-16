@@ -4,7 +4,7 @@ using JLib.Helper;
 using Xunit;
 
 namespace JLib.ValueTypes.Tests;
-public class StringValueTypeTests
+public class StringValidatorTests
 {
     public record TestArgument(string? TestString, string ValidatorName, Action<StringValidator> Validator,
         bool ErrorExpected);
@@ -328,7 +328,7 @@ public class StringValueTypeTests
     [MemberData(nameof(Arguments))]
     public void Test(TestArgument argument)
     {
-        var val = new StringValidator(argument.TestString!, "Test");
+        var val = new StringValidator(argument.TestString, GetType());
         argument.Validator(val);
         var exProv = val.CastTo<IExceptionProvider>();
         var ex = exProv.GetException();

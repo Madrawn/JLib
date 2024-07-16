@@ -100,7 +100,7 @@ internal class IdRegistry : IIdRegistry, IDisposable
         {
             _isDirty = true;
             return
-                $"{identifier.IdGroupName.Value}.{identifier.IdName.Value}:{Interlocked.Increment(ref _idIncrement)}";
+                $"{identifier.IdGroupName.Value}.{identifier.IdName.Value}[{Interlocked.Increment(ref _idIncrement)}]";
         }).CastTo<string>();
     }
 

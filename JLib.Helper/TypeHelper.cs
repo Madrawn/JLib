@@ -195,7 +195,16 @@ public static class TypeHelper
         => collection.Where(t => t.IsAssignableTo(type));
 
     public static IEnumerable<Type> WhichAreInstantiable(this IEnumerable<Type> collection)
-        => collection.Where(t => t is { IsAbstract: false, IsInterface: false });
+        => collection.Where(t => t.IsInstantiable());
+
+    /// <summary>
+    /// returns true, if a instance of the given type can be created (e.g. it is neither static, nor abstract nor an interface)
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public static bool IsInstantiable(this Type type)
+        // abstract results the type in being abstract sealed, therefore it is contained in this check
+        => type is { IsAbstract: false, IsInterface: false };
 
     public static Type? GetInterface<TInterface>(this Type type)
     {

@@ -3,14 +3,14 @@
 /// <summary>
 /// validates values of type <see cref="int"/>
 /// </summary>
-public class IntValidator : ValueValidator<int>
+public class IntValidator : ValidationContext<int>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="IntValidator"/> class.
     /// </summary>
     /// <param name="value">The value to validate.</param>
-    /// <param name="valueTypeName">The name of the value type.</param>
-    public IntValidator(int value, string valueTypeName) : base(value, valueTypeName)
+    /// <param name="targetType">The <see cref="Type"/> which <paramref name="value"/> is being validated for</param>
+    public IntValidator(int value, Type targetType) : base(value, targetType)
     {
     }
 

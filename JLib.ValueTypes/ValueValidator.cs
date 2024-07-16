@@ -1,15 +1,20 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using JLib.Exceptions;
+using JLib.Helper;
 
 namespace JLib.ValueTypes;
 
 /// <summary>
 /// represents a class which validates a value of type <typeparamref name="TValue"/><br/>
-/// requires a constructor with the signature <code>public <see cref="ValueValidator{TValue}"/>(<typeparamref name="TValue"/> value, <see cref="string"/> valueTypeName)</code>
+/// requires a constructor with the signature <code>public <see cref="ValidationContext{TValue}"/>(<typeparamref name="TValue"/> value, <see cref="string"/> valueTypeName)</code>
 /// </summary>
 /// <typeparam name="TValue">the type of the <see cref="Value"/> to be validated</typeparam>
-public interface IValueValidator<out TValue> : IExceptionProvider
+public interface IValidationContext<out TValue> : IExceptionProvider
 {
+    /// <summary>
+    /// the type this value will be assigned to
+    /// </summary>
+    public Type TargetType { get; }
     /// <summary>
     /// the value which is being validated
     /// </summary>
@@ -23,7 +28,13 @@ public interface IValueValidator<out TValue> : IExceptionProvider
     /// </summary>
     /// <param name="message">the message to be added</param>
     /// <param name="hint"></param>
-    public void AddError(string message, string? hint = null);
+    void AddError(string message, string? hint = null);
+    /// <summary>
+    /// Adds the given <paramref name="subProvider"/> as a validator to this one.<br/>
+    /// This might be used to validate complex types (like <see cref="Type"/>)
+    /// </summary>
+    /// <param name="subProvider"></param>
+    void AddSubValidators(IExceptionProvider subProvider);
 
 }
 
@@ -31,14 +42,12 @@ public interface IValueValidator<out TValue> : IExceptionProvider
 /// <see cref="IExceptionProvider"/> for validating values of type <typeparamref name="TValue"/><br/>
 /// often used to validate <see cref="ValueType{TValue}"/>s
 /// </summary>
-public abstract class ValueValidator<TValue> : IValueValidator<TValue>
+public class ValidationContext<TValue> : IValidationContext<TValue>
 {
-
-
     /// <summary>
-    /// The name of the ValueType which is currently being validated
+    /// <inheritdoc cref="IValidationContext{TValue}.TargetType"/>
     /// </summary>
-    protected string ValueTypeName { get; }
+    public Type TargetType { get; }
     /// <summary>
     /// the value which is currently being validated
     /// </summary>
@@ -50,9 +59,9 @@ public abstract class ValueValidator<TValue> : IValueValidator<TValue>
     /// </summary>
     public IReadOnlyCollection<string> Messages => _messages;
 
-    protected ValueValidator(TValue value, string valueTypeName)
+    protected ValidationContext(TValue value, Type targetType)
     {
-        ValueTypeName = valueTypeName;
+        TargetType = targetType;
         Value = value;
     }
 
@@ -87,9 +96,9 @@ public abstract class ValueValidator<TValue> : IValueValidator<TValue>
     /// <summary>
     /// <inheritdoc cref="IExceptionProvider.GetException"/>
     /// </summary>
-    protected virtual Exception? BuildException(IReadOnlyCollection<string> messages, IReadOnlyCollection<IExceptionProvider> provider)
+     protected virtual Exception? BuildException(IReadOnlyCollection<string> messages, IReadOnlyCollection<IExceptionProvider> provider)
         => JLibAggregateException.ReturnIfNotEmpty(
-            $"{ValueTypeName} validation failed: '{Value}' is not a valid Value.",
+            $"{TargetType.FullName()} validation failed: '{Value}' is not a valid Value.",
             provider
                 .Select(p => p.GetException())
                 .Prepend(

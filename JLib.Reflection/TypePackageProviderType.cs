@@ -38,7 +38,7 @@ public record TypePackageProviderType(Type Value) : TypeValueType(Value), IValid
             .Select(GetInstance)
             .WhereNotNull();
 
-    public void Validate(ITypeCache cache, TypeValidator value)
+    public void Validate(ITypeCache cache, TypeValidationContext value)
     {
         value.ShouldBeStatic()
             .ShouldHaveNameSuffix("Tp")

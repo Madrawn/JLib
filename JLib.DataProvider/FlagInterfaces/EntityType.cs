@@ -11,7 +11,7 @@ public record EntityType(Type Value) : DataObjectType(Value), IValidatedType
 {
     public new const int NextPriority = DataObjectType.NextPriority - 1_000;
 
-    public virtual void Validate(ITypeCache cache, TypeValidator value)
+    public virtual void Validate(ITypeCache cache, TypeValidationContext value)
     {
         if (GetType() == typeof(EntityType))
             value.AddError(

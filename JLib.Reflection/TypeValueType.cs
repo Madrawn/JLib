@@ -22,7 +22,7 @@ public interface IPostNavigationInitializedType : ITypeValueType
 /// </summary>
 public interface IValidatedType : ITypeValueType
 {
-    void Validate(ITypeCache cache, TypeValidator value);
+    void Validate(ITypeCache cache, TypeValidationContext value);
 }
 
 public interface ITypeValueType

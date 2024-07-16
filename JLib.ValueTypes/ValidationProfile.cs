@@ -43,7 +43,7 @@ internal sealed class ValidationProfile<TValue> : IValidationProfile<TValue>
     /// <inheritdoc cref="IValidationProfile{T}.TargetType"/>
     /// </summary>
     public Type TargetType { get; }
-    private readonly IReadOnlyCollection<Func<TValue, IValueValidator<TValue>>> _validatorFactories;
+    private readonly IReadOnlyCollection<Func<TValue, IValidationContext<TValue>>> _validatorFactories;
 
     private static readonly ConcurrentDictionary<Type, ValidationProfile<TValue>> ProfileCache = new();
 
@@ -84,14 +84,14 @@ internal sealed class ValidationProfile<TValue> : IValidationProfile<TValue>
                 && method.DeclaringType == method.ReflectedType)
             .ToReadOnlyCollection();
 
-        // todo: validate method signature
         using var signatureErrors = new ExceptionBuilder($"Signature for validator in {targetValueType.FullName()}");
         foreach (var method in validationMethods)
         {
             using var methodErrors = signatureErrors.CreateChild(
                 method.FullName(true, true, false));
-
-            if (method.GetParameters().Length != 1)
+            var parameters = method.GetParameters();
+            var validationContextType = parameters.FirstOrDefault()?.ParameterType;
+            if (parameters.Length != 1)
                 methodErrors.Add("must have exactly one parameter");
             if (method.ReturnType != typeof(void))
                 methodErrors.Add("must have a void return type");
@@ -100,10 +100,23 @@ internal sealed class ValidationProfile<TValue> : IValidationProfile<TValue>
             if (method.IsStatic == false)
                 methodErrors.Add("must be static");
             if (method.GetGenericArguments().FirstOrDefault()
-                    ?.ImplementsAny<IValueValidator<Ignored>>() == false)
-                methodErrors.Add("must have a single parameter assignable to " + typeof(IValueValidator<TValue>).FullName(true));
-            // todo: missing: parameter is actually instantiable
-            // todo: missing: ctor parameter of validator
+                    ?.ImplementsAny<IValidationContext<Ignored>>() == false)
+                methodErrors.Add("must have a single parameter assignable to " + typeof(IValidationContext<TValue>).FullName(true));
+
+            if (validationContextType?.Implements<IValidationContext<TValue>>() is false or null)
+                methodErrors.Add("parameter is not assignable to " + typeof(IValidationContext<TValue>).FullName(true));
+            if (validationContextType?.IsInstantiable() is false or null)
+                methodErrors.Add("parameter can not be created (it is either static or an interface)");
+            var validationContextCtors = validationContextType?.GetConstructors() ?? Array.Empty<ConstructorInfo>();
+            if (validationContextCtors.Length != 1)
+                methodErrors.Add($"the ValidationContext {validationContextType?.FullName()} should have only one constructor");
+            var validationContextCtorParameters = validationContextCtors.FirstOrDefault()?.GetParameters() ?? Array.Empty<ParameterInfo>();
+            if (validationContextCtorParameters.Length != 2)
+                methodErrors.Add($"the ValidationContext {validationContextType?.FullName()} requires exactly 2 parameters");
+            if (validationContextCtorParameters.ElementAtOrDefault(0)?.ParameterType != typeof(TValue))
+                methodErrors.Add($"the first ctor parameter of ValidationContext {validationContextType?.FullName()} must be of type {typeof(TValue).FullName()}");
+            if (validationContextCtorParameters.ElementAtOrDefault(1)?.ParameterType != typeof(Type))
+                methodErrors.Add($"the second ctor parameter of ValidationContext {validationContextType?.FullName()} must be of type {typeof(Type).FullName()}");
         }
 
         _validatorFactories = validationMethods.Select(method =>
@@ -122,14 +135,14 @@ internal sealed class ValidationProfile<TValue> : IValidationProfile<TValue>
                 Expression.Assign(validatorVariable,
                     Expression.New(validatorType.GetConstructors().Single(),
                             valueParameter,
-                            Expression.Constant(targetValueType.FullName(true), typeof(string))
+                            Expression.Constant(targetValueType, typeof(Type))
                         )
                 ),
                 Expression.Call(null, method, validatorVariable),
                 validatorVariable
             );
 
-            var lambda = Expression.Lambda<Func<TValue, IValueValidator<TValue>>>(doCheck, valueParameter);
+            var lambda = Expression.Lambda<Func<TValue, IValidationContext<TValue>>>(doCheck, valueParameter);
 
             return lambda.Compile();
         }).ToReadOnlyCollection();

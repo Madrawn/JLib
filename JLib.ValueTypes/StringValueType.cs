@@ -18,10 +18,14 @@ public abstract record StringValueType(string Value) : ValueType<string>(Value)
 /// <summary>
 /// Represents a validator for string values.
 /// </summary>
-public class StringValidator : ValueValidator<string?>
+public class StringValidator : ValidationContext<string?>
 {
-
-    public StringValidator(string? value, string valueTypeName) : base(value, valueTypeName)
+    /// <summary>
+    /// creates a validator for <paramref name="targetType"/> and the specified <paramref name="value"/> of type <see cref="string"/>
+    /// </summary>
+    /// <param name="value">the value which should be validated</param>
+    /// <param name="targetType">the <see cref="Type"/> this <paramref name="value"/> is being validated for</param>
+    public StringValidator(string? value, Type targetType) : base(value, targetType)
     {
     }
 

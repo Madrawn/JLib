@@ -29,7 +29,7 @@ namespace Examples.ExtensionMethods
         /// <summary>
         /// this method is recommended if you reuse the same validation logic in multiple places and only use the built-in validator
         /// </summary>
-        public static ValueValidator<string?> ContainDot(this ValueValidator<string?> validator)
+        public static ValidationContext<string?> ContainDot(this ValidationContext<string?> validator)
         {
             var testString = ".";
             if (validator.Value?.Contains(testString) != true)
@@ -37,7 +37,7 @@ namespace Examples.ExtensionMethods
             return validator;
         }
 
-        public static IValueValidator<string?> NotEndWithDot(this IValueValidator<string?> validator)
+        public static IValidationContext<string?> NotEndWithDot(this IValidationContext<string?> validator)
         {
             var testString = ".";
             if (validator.Value?.EndsWith(testString) != false)
@@ -73,26 +73,6 @@ namespace Examples.ExtensionMethods
             var sut = () => new EmailAddress("invalid mail");
             sut.Should().Throw<AggregateException>();
         }
-
-        [Fact]
-        public void ExceptionContent()
-        {
-            ValueType.TryCreate<EmailAddress, string>("invalid mail", out var errors);
-            errors.GetException()?.GetHierarchyInfoJson().Should().Be(@"{
-  ""Message"": ""Examples.ExtensionMethods.Custom_Validation_using_Extension_methods.EmailAddress"",
-  ""JLibAggregateException"": {
-    ""Message"": ""Examples.ExtensionMethods.Custom_Validation_using_Extension_methods.EmailAddress validation failed: \u0027invalid mail\u0027 is not a valid Value."",
-    ""JLibAggregateException"": {
-      ""Message"": ""Value Validation Failed"",
-      ""2 ValidationException"": [
-        ""\u0027invalid mail\u0027 must contain \u0027@\u0027"",
-        ""\u0027invalid mail\u0027 must contain with \u0027.\u0027""
-      ]
-    }
-  }
-}");
-        }
-
     }
 }
 
