@@ -59,7 +59,7 @@ public class ValidationContext<TValue> : IValidationContext<TValue>
     /// </summary>
     public IReadOnlyCollection<string> Messages => _messages;
 
-    protected ValidationContext(TValue value, Type targetType)
+    public ValidationContext(TValue value, Type targetType)
     {
         TargetType = targetType;
         Value = value;

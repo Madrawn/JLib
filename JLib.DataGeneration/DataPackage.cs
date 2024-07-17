@@ -15,8 +15,8 @@ public record DataPackageType(Type Value) : TypeValueType(Value), IValidatedType
         value.ShouldBeSealed("a DataPackage has to be either Sealed or Abstract.");
 
         value.ValidateProperties(p => p.IsPublic(), p => p
-            .ShouldHavePublicInit()
-            .ShouldHavePublicGet());
+            .HavePublicInit()
+            .HavePublicGet());
     }
 }
 

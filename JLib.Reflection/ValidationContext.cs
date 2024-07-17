@@ -1,8 +1,10 @@
-﻿using System.Reflection;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection.Exceptions;
 using JLib.ValueTypes;
+using ValueType = JLib.ValueTypes.ValueType;
 
 namespace JLib.Reflection;
 
@@ -20,11 +22,11 @@ public class TypeValidationContext : ValidationContext<Type>
             $"{_valueType.Value.FullName(true)} is not a valid {_valueType.GetType().FullName(true)}",
             messages.Select(msg => new InvalidTypeException(_valueType.GetType(), _valueType.Value, msg)));
 
-    public TypeValidationContext ValidateProperties(Func<PropertyInfo, bool> filter, Action<PropertyInfoValidator> validator)
+    public TypeValidationContext ValidateProperties(Func<PropertyInfo, bool> filter, Action<ValidationContext<PropertyInfo>> validator)
     {
         foreach (var property in Value.GetProperties().Where(filter))
         {
-            var val = new PropertyInfoValidator(property, TargetType);
+            var val = new ValidationContext<PropertyInfo>(property, TargetType);
             validator(val);
             AddSubValidators(val);
         }

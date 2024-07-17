@@ -43,12 +43,12 @@ public record TypePackageProviderType(Type Value) : TypeValueType(Value), IValid
         value.ShouldBeStatic()
             .ShouldHaveNameSuffix("Tp")
             .ValidateProperties(_ => true, p => p
-                .ShouldHaveName(InstancePropertyName)
-                .ShouldHavePublicGet()
-                .ShouldHaveNoSet()
-                .ShouldBeOfType<ITypePackage>()
-                .ShouldBeTheOnlyProperty()
-                .ShouldBeStatic()
+                .HaveName(InstancePropertyName)
+                .HavePublicGet()
+                .HaveNoSet()
+                .BeOfType<ITypePackage>()
+                .BeTheOnlyProperty()
+                .BeStatic()
             );
     }
 }
