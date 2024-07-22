@@ -9,6 +9,6 @@ public record JsonStringValueType(string Value)
     : StringValueType(Value)
 {
     [Validation]
-    private void Validator(StringValidator v)
+    private void Validator(ValidationContext<string?> v)
         => v.NotBeNullOrWhitespace();
 }

@@ -13,7 +13,7 @@ public class TryCreateTests
     public record FiveCharacterString(string Value) : StringValueType(Value)
     {
         [Validation]
-        private static void Validate(StringValidator must)
+        private static void Validate(ValidationContext<string?> must)
             => must.BeOfLength(5);
     }
 

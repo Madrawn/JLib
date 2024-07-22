@@ -21,7 +21,7 @@ public class Creating_a_ValueType
         /// </summary>
         [Validation]
         // ReSharper disable once UnusedMember.Local
-        private static void Validate(StringValidator must)
+        private static void Validate(ValidationContext<string?> must)
             => must.Contain("@").Contain(".");
     }
 

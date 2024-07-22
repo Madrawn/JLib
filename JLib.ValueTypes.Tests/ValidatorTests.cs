@@ -12,14 +12,14 @@ public class ValidatorTests
     public record DemoAsciiString(string Value) : StringValueType(Value)
     {
         [Validation]
-        private static void Validate(StringValidator must)
+        private static void Validate(ValidationContext<string?> must)
             => must.BeAscii();
     }
 
     public record DemoAlphanumericString(string Value) : DemoAsciiString(Value)
     {
         [Validation]
-        private static void Validate(StringValidator must)
+        private static void Validate(ValidationContext<string?> must)
             => must.BeAlphanumeric();
     }
 

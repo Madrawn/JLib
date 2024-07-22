@@ -11,80 +11,71 @@ namespace JLib.ValueTypes;
 public abstract record StringValueType(string Value) : ValueType<string>(Value)
 {
     [Validation]
-    private static void Validate(StringValidator v)
+    private static void Validate(ValidationContext<string?> v)
         => v.NotBeNull();
 }
 
 /// <summary>
-/// Represents a validator for string values.
+/// Represents a validator for string Values.
 /// </summary>
-public class StringValidator : ValidationContext<string?>
+public static class StringValidationContextExtensions
 {
     /// <summary>
-    /// creates a validator for <paramref name="targetType"/> and the specified <paramref name="value"/> of type <see cref="string"/>
+    /// Validates that the context.Value is not null.
     /// </summary>
-    /// <param name="value">the value which should be validated</param>
-    /// <param name="targetType">the <see cref="Type"/> this <paramref name="value"/> is being validated for</param>
-    public StringValidator(string? value, Type targetType) : base(value, targetType)
+    /// <returns>The string validator instance.</returns>
+    public static IValidationContext<string?> NotBeNull(this IValidationContext<string?> context)
     {
+        if (context.Value is null)
+            context.AddError("context.Value must not be null");
+        return context;
     }
 
     /// <summary>
-    /// Validates that the value is not null.
+    /// Validates that the context.Value is not null or empty.
     /// </summary>
     /// <returns>The string validator instance.</returns>
-    public StringValidator NotBeNull()
+    public static IValidationContext<string?> NotBeNullOrEmpty(this IValidationContext<string?> context)
     {
-        if (Value is null)
-            AddError("Value must not be null");
-        return this;
+        if (context.Value.IsNullOrEmpty())
+            context.AddError("context.Value must neither be null nor empty");
+        return context;
     }
 
     /// <summary>
-    /// Validates that the value is not null or empty.
+    /// Validates that the context.Value is one of the specified valid context.Values.
     /// </summary>
+    /// <param name="validValues.Values">The collection of valid context.Values.</param>
     /// <returns>The string validator instance.</returns>
-    public StringValidator NotBeNullOrEmpty()
+    public static IValidationContext<string?> BeOneOf(this IValidationContext<string?> context, IReadOnlyCollection<string> validValues)
     {
-        if (Value.IsNullOrEmpty())
-            AddError("Value must neither be null nor empty");
-        return this;
+        if (!validValues.Contains(context.Value))
+            context.AddError("context.Value must be one of the following: " + string.Join(", ", validValues));
+        return context;
     }
 
     /// <summary>
-    /// Validates that the value is one of the specified valid values.
-    /// </summary>
-    /// <param name="validValues">The collection of valid values.</param>
-    /// <returns>The string validator instance.</returns>
-    public StringValidator BeOneOf(IReadOnlyCollection<string> validValues)
-    {
-        if (!validValues.Contains(Value))
-            AddError("Value must be one of the following: " + string.Join(", ", validValues));
-        return this;
-    }
-
-    /// <summary>
-    /// Validates that the value is alphanumeric.
+    /// Validates that the context.Value is alphanumeric.
     /// </summary>
     /// <returns>The string validator instance.</returns>
-    public StringValidator BeAlphanumeric()
-        => SatisfyCondition(char.IsLetterOrDigit, "value must be alphanumeric");
+    public static IValidationContext<string?> BeAlphanumeric(this IValidationContext<string?> context)
+        => context.SatisfyCondition(char.IsLetterOrDigit, "context.Value must be alphanumeric");
 
     /// <summary>
-    /// Validates that the value satisfies the specified condition.
+    /// Validates that the context.Value satisfies the specified condition.
     /// </summary>
     /// <param name="validator">The condition to satisfy.</param>
     /// <param name="name">The name of the condition.</param>
     /// <returns>The string validator instance.</returns>
-    public StringValidator SatisfyCondition(Func<char, bool> validator, string name)
+    public static IValidationContext<string?> SatisfyCondition(this IValidationContext<string?> context, Func<char, bool> validator, string name)
     {
-        if (Value is null)
+        if (context.Value is null)
         {
-            AddError(name + " failed: string is null");
-            return this;
+            context.AddError(name + " failed: string is null");
+            return context;
         }
 
-        var errorIndices = Value
+        var errorIndices = context.Value
             .AddIndex()
             .Where(x => !validator(x.Item1))
             .Select(x => x.Item2)
@@ -94,298 +85,297 @@ public class StringValidator : ValidationContext<string?>
             int minLength = 10;
 
             int start = Math.Max(0, errorIndex - minLength / 2);
-            int end = Math.Min(Value.Length, errorIndex + minLength / 2);
+            int end = Math.Min(context.Value.Length, errorIndex + minLength / 2);
 
-            string errorPart = Value.Substring(start, end - start);
-            AddError($"{name} failed at index {errorIndex}. \"{errorPart}\"");
+            string errorPart = context.Value.Substring(start, end - start);
+            context.AddError($"{name} failed at index {errorIndex}. \"{errorPart}\"");
         }
 
-        if (Value.All(validator))
-            return this;
+        if (context.Value.All(validator))
+            return context;
 
-        AddError(name + " failed");
-        return this;
+        context.AddError(name + " failed");
+        return context;
     }
 
     /// <summary>
-    /// Validates that the value is not null or whitespace.
+    /// Validates that the context.Value is not null or whitespace.
     /// </summary>
     /// <returns>The string validator instance.</returns>
-    public StringValidator NotBeNullOrWhitespace()
+    public static IValidationContext<string?> NotBeNullOrWhitespace(this IValidationContext<string?> context)
     {
-        if (Value.IsNullOrEmpty())
-            AddError("Value must neither be null nor whitespace");
-        return this;
+        if (context.Value.IsNullOrEmpty())
+            context.AddError("context.Value must neither be null nor whitespace");
+        return context;
     }
 
     /// <summary>
-    /// Validates that the value starts with the specified prefix.
+    /// Validates that the context.Value starts with the specified prefix.
     /// </summary>
     /// <param name="prefix">The prefix to check.</param>
     /// <returns>The string validator instance.</returns>
-    public StringValidator StartWith(string prefix)
+    public static IValidationContext<string?> StartWith(this IValidationContext<string?> context, string prefix)
     {
-        NotBeNull();
-        if (Value == null || !Value.StartsWith(prefix))
-            AddError($"Value must start with {prefix}");
-        return this;
+        if (context.Value == null || !context.Value.StartsWith(prefix))
+            context.AddError($"context.Value must start with {prefix}");
+        return context;
     }
     /// <summary>
-    /// Validates that the value does not start with the specified prefix.
+    /// Validates that the context.Value does not start with the specified prefix.
     /// </summary>
     /// <param name="prefix">The prefix to check.</param>
     /// <returns>The string validator instance.</returns>
-    public StringValidator NotStartWith(string prefix)
+    public static IValidationContext<string?> NotStartWith(this IValidationContext<string?> context, string prefix)
     {
-        NotBeNull();
-        if (Value == null || Value.StartsWith(prefix))
-            AddError($"Value must not start with {prefix}");
-        return this;
+        if (context.Value == null || context.Value.StartsWith(prefix))
+            context.AddError($"context.Value must not start with {prefix}");
+        return context;
     }
     /// <summary>
-    /// Validates that the value starts with the specified prefix.
+    /// Validates that the context.Value starts with the specified prefix.
     /// </summary>
     /// <param name="prefix">The prefix to check.</param>
     /// <returns>The string validator instance.</returns>
-    public StringValidator StartWith(char prefix)
+    public static IValidationContext<string?> StartWith(this IValidationContext<string?> context, char prefix)
     {
-        NotBeNull();
-        if (Value == null || !Value.StartsWith(prefix))
-            AddError($"Value must start with {prefix}");
-        return this;
+        if (context.Value == null || !context.Value.StartsWith(prefix))
+            context.AddError($"context.Value must start with {prefix}");
+        return context;
     }
     /// <summary>
-    /// Validates that the value does not start with the specified prefix.
+    /// Validates that the context.Value does not start with the specified prefix.
     /// </summary>
     /// <param name="prefix">The prefix to check.</param>
     /// <returns>The string validator instance.</returns>
-    public StringValidator NotStartWith(char prefix)
+    public static IValidationContext<string?> NotStartWith(this IValidationContext<string?> context, char prefix)
     {
-        NotBeNull();
-        if (Value == null || Value.StartsWith(prefix))
-            AddError($"Value must not start with {prefix}");
-        return this;
+        if (context.Value == null || context.Value.StartsWith(prefix))
+            context.AddError($"context.Value must not start with {prefix}");
+        return context;
     }
 
     /// <summary>
-    /// Validates that the value does not contain the specified value.
+    /// Validates that the context.Value does not contain the specified context.Value.
     /// </summary>
-    /// <param name="value">The value to check.</param>
+    /// <param name="value">The context.Value to check.</param>
     /// <returns>The string validator instance.</returns>
-    public StringValidator Contain(string value)
+    public static IValidationContext<string?> Contain(this IValidationContext<string?> context, string value)
     {
-        if (Value != null && Value.Contains(value) == false)
-            AddError($"Value must contain {value}");
-        return this;
+        if (context.Value != null && context.Value.Contains(value) == false)
+            context.AddError($"context.Value must contain {value}");
+        return context;
     }
 
     /// <summary>
-    /// Validates that the value does not contain the specified value.
+    /// Validates that the context.Value does not contain the specified context.Value.
     /// </summary>
-    /// <param name="value">The value to check.</param>
+    /// <param name="value">The Value to check.</param>
     /// <returns>The string validator instance.</returns>
-    public StringValidator Contain(char value)
+    public static IValidationContext<string?> Contain(this IValidationContext<string?> context, char value)
     {
-        if (Value != null && Value.Contains(value) == false)
-            AddError($"Value must contain {value}");
-        return this;
+        if (context.Value != null && context.Value.Contains(value) == false)
+            context.AddError($"context.Value must contain {value}");
+        return context;
     }
     /// <summary>
-    /// Validates that the value does not contain the specified value.
+    /// Validates that the context.Value does not contain the specified context.Value.
     /// </summary>
-    /// <param name="value">The value to check.</param>
+    /// <param name="value">The context.Value to check.</param>
     /// <returns>The string validator instance.</returns>
-    public StringValidator NotContain(string value)
+    public static IValidationContext<string?> NotContain(this IValidationContext<string?> context, string value)
     {
-        if (Value != null && Value.Contains(value))
-            AddError($"Value must not contain {value}");
-        return this;
-    }
-
-    /// <summary>
-    /// Validates that the value does not contain the specified value.
-    /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <returns>The string validator instance.</returns>
-    public StringValidator NotContain(char value)
-    {
-        if (Value != null && Value.Contains(value))
-            AddError($"Value must not contain {value}");
-        return this;
+        if (context.Value != null && context.Value.Contains(value))
+            context.AddError($"context.Value must not contain {value}");
+        return context;
     }
 
     /// <summary>
-    /// Validates that the value is a URL of the specified kind.
+    /// Validates that the context.Value does not contain the specified context.Value.
+    /// </summary>
+    /// <param name="value">The context.Value to check.</param>
+    /// <returns>The string validator instance.</returns>
+    public static IValidationContext<string?> NotContain(this IValidationContext<string?> context, char value)
+    {
+        if (context.Value != null && context.Value.Contains(value))
+            context.AddError($"context.Value must not contain {value}");
+        return context;
+    }
+
+    /// <summary>
+    /// Validates that the context.Value is a URL of the specified kind.
     /// </summary>
     /// <param name="kind">The kind of URL to validate.</param>
     /// <param name="uriValidator">An optional validator for the created Uri object.</param>
     /// <returns>The string validator instance.</returns>
-    public StringValidator BeUrl(UriKind kind, Action<Uri>? uriValidator = null)
+    public static IValidationContext<string?> BeUrl(this IValidationContext<string?> context, UriKind kind, Action<Uri>? uriValidator = null)
     {
-        NotBeNullOrWhitespace()
+        context.NotBeNullOrWhitespace()
         .NotContainWhitespace()
         .MatchRegex(new(@"^[A-Za-z0-9-._~:/?#@\[\]!$&'()*+,;=%]*$"));
 
-        if (!Uri.TryCreate(Value, kind, out var uriResult))
-            AddError($"Value must be a valid {kind} URL");
+        if (!Uri.TryCreate(context.Value, kind, out var uriResult))
+            context.AddError($"context.Value must be a valid {kind} URL");
         else
             uriValidator?.Invoke(uriResult);
-        return this;
+        return context;
     }
 
     /// <summary>
     /// must be an absolute url without query parameters
     /// </summary>
     /// <returns></returns>
-    public StringValidator BeBaseUrl()
-        => BeUrl(UriKind.Absolute)
+    public static IValidationContext<string?> BeBaseUrl(this IValidationContext<string?> context)
+        => context.BeUrl(UriKind.Absolute)
             .NotContain('?');
 
     /// <summary>
-    /// Checks whether the value is an absolute URL and has one of the specified schemes.
+    /// Checks whether the context.Value is an absolute URL and has one of the specified schemes.
     /// </summary>
     /// <param name="scheme">The supported schemes.</param>
     /// <returns>The string validator instance.</returns>
-    public StringValidator BeUrlWithScheme(params string[] scheme)
-        => BeUrl(UriKind.Absolute, uri =>
+    public static IValidationContext<string?> BeUrlWithScheme(this IValidationContext<string?> context, params string[] scheme)
+        => context.BeUrl(UriKind.Absolute, uri =>
         {
             if (uri is null)
-                AddError("Uri must not be null");
+                context.AddError("Uri must not be null");
             else if (scheme.Contains(uri.Scheme) == false)
-                AddError($"Url has scheme {uri.Scheme} but must have one of the following: " + string.Join(", ", scheme));
+                context.AddError($"Url has scheme {uri.Scheme} but must have one of the following: " + string.Join(", ", scheme));
         });
 
     /// <summary>
-    /// Validates that the value is a valid HTTP URL.
+    /// Validates that the context.Value is a valid HTTP URL.
     /// </summary>
     /// <returns>The string validator instance.</returns>
-    public StringValidator BeRelativeUrl()
-        => BeUrl(UriKind.Relative);
+    public static IValidationContext<string?> BeRelativeUrl(this IValidationContext<string?> context)
+        => context.BeUrl(UriKind.Relative);
 
     /// <summary>
-    /// Validates that the value matches the specified regular expression.
+    /// Validates that the context.Value matches the specified regular expression.
     /// </summary>
     /// <param name="expression">The regular expression to match.</param>
     /// <returns>The string validator instance.</returns>
-    public StringValidator MatchRegex(Regex expression)
+    public static IValidationContext<string?> MatchRegex(this IValidationContext<string?> context, Regex expression)
     {
-        NotBeNull();
-        if (Value is null)
-            return this;
-        if (expression.IsMatch(Value) == false)
-            AddError($"value must match regex {expression}");
-        return this;
+        context.NotBeNull();
+        if (context.Value is null)
+            return context;
+        if (expression.IsMatch(context.Value) == false)
+            context.AddError($"context.Value must match regex {expression}");
+        return context;
     }
 
     /// <summary>
-    /// Validates that the value contains only ASCII characters.
+    /// Validates that the context.Value contains only ASCII characters.
     /// </summary>
     /// <returns>The string validator instance.</returns>
-    public StringValidator BeAscii()
-        => SatisfyCondition(char.IsAscii, nameof(BeAscii));
+    public static IValidationContext<string?> BeAscii(this IValidationContext<string?> context)
+        => context.SatisfyCondition(char.IsAscii, nameof(BeAscii));
 
     /// <summary>
-    /// Validates that the value contains only alphanumeric characters.
+    /// Validates that the context.Value contains only alphanumeric characters.
     /// </summary>
     /// <returns>The string validator instance.</returns>
-    public StringValidator OnlyContainAlphaNumericCharacters()
-        => SatisfyCondition(char.IsLetterOrDigit, nameof(OnlyContainAlphaNumericCharacters));
+    public static IValidationContext<string?> OnlyContainAlphaNumericCharacters(this IValidationContext<string?> context)
+        => context.SatisfyCondition(char.IsLetterOrDigit, nameof(OnlyContainAlphaNumericCharacters));
 
     /// <summary>
-    /// Validates that the value does not contain whitespace characters.
+    /// Validates that the context.Value does not contain whitespace characters.
     /// </summary>
     /// <returns>The string validator instance.</returns>
-    public StringValidator NotContainWhitespace()
-        => Value is null ? this : SatisfyCondition(c => !char.IsWhiteSpace(c), nameof(NotContainWhitespace));
+    public static IValidationContext<string?> NotContainWhitespace(this IValidationContext<string?> context)
+    {
+        return context.Value is null 
+            ? context 
+            : context.SatisfyCondition(c => !char.IsWhiteSpace(c), nameof(NotContainWhitespace));
+    }
 
     /// <summary>
-    /// Validates that the value contains only numeric characters.
+    /// Validates that the context.Value contains only numeric characters.
     /// </summary>
     /// <returns>The string validator instance.</returns>
-    public StringValidator BeNumeric()
-        => SatisfyCondition(char.IsNumber, nameof(BeNumeric));
+    public static IValidationContext<string?> BeNumeric(this IValidationContext<string?> context)
+        => context.SatisfyCondition(char.IsNumber, nameof(BeNumeric));
 
     /// <summary>
-    /// Validates that the value has a minimum length.
+    /// Validates that the context.Value has a minimum length.
     /// </summary>
     /// <param name="length">The minimum length.</param>
     /// <returns>The string validator instance.</returns>
-    public StringValidator MinimumLength(int length)
+    public static IValidationContext<string?> MinimumLength(this IValidationContext<string?> context, int length)
     {
-        NotBeNull();
-        if (Value?.Length < length)
-            AddError($"the value must be at least {length} characters long but has a length of {Value.Length}");
-        return this;
+        context.NotBeNull();
+        if (context.Value?.Length < length)
+            context.AddError($"the context.Value must be at least {length} characters long but has a length of {context.Value.Length}");
+        return context;
     }
 
     /// <summary>
-    /// Validates that the value has a maximum length.
+    /// Validates that the context.Value has a maximum length.
     /// </summary>
     /// <param name="length">The maximum length.</param>
     /// <returns>The string validator instance.</returns>
-    public StringValidator MaximumLength(int length)
+    public static IValidationContext<string?> MaximumLength(this IValidationContext<string?> context, int length)
     {
-        NotBeNull();
-        if (Value?.Length > length)
-            AddError($"the value must be at most {length} characters long but has a length of {Value.Length}");
-        return this;
+        context.NotBeNull();
+        if (context.Value?.Length > length)
+            context.AddError($"the context.Value must be at most {length} characters long but has a length of {context.Value.Length}");
+        return context;
     }
 
     /// <summary>
-    /// Validates that the value has a specific length.
+    /// Validates that the context.Value has a specific length.
     /// </summary>
     /// <param name="length">The expected length.</param>
     /// <returns>The string validator instance.</returns>
-    public StringValidator BeOfLength(int length)
+    public static IValidationContext<string?> BeOfLength(this IValidationContext<string?> context, int length)
     {
-        NotBeNull();
-        if (Value?.Length != length)
-            AddError($"the value must be exactly {length} characters long but has a length of {Value?.Length}");
-        return this;
+        if (context.Value?.Length != length)
+            context.AddError($"the context.Value must be exactly {length} characters long but has a length of {context.Value?.Length}");
+        return context;
     }
 
     /// <summary>
-    /// Validates that the value ends with the specified value.
+    /// Validates that the context.Value ends with the specified context.Value.
     /// </summary>
-    /// <param name="value">The value to check.</param>
+    /// <param name="value">The context.Value to check.</param>
     /// <returns>The string validator instance.</returns>
-    public StringValidator EndWith(string value)
+    public static IValidationContext<string?> EndWith(this IValidationContext<string?> context, string value)
     {
-        if (Value?.EndsWith(value) != true)
-            AddError($"the value must end with '{value}'");
-        return this;
+        if (context.Value?.EndsWith(value) != true)
+            context.AddError($"the context.Value must end with '{value}'");
+        return context;
     }
     /// <summary>
-    /// Validates that the value ends with the specified value.
+    /// Validates that the context.Value ends with the specified context.Value.
     /// </summary>
-    /// <param name="value">The value to check.</param>
+    /// <param name="value">The context.Value to check.</param>
     /// <returns>The string validator instance.</returns>
-    public StringValidator EndWith(char value)
+    public static IValidationContext<string?> EndWith(this IValidationContext<string?> context, char value)
     {
-        if (Value?.EndsWith(value) != true)
-            AddError($"the value must end with '{value}'");
-        return this;
+        if (context.Value?.EndsWith(value) != true)
+            context.AddError($"the context.Value must end with '{value}'");
+        return context;
     }
     /// <summary>
-    /// Validates that the value ends with the specified value.
+    /// Validates that the context.Value ends with the specified context.Value.
     /// </summary>
-    /// <param name="value">The value to check.</param>
+    /// <param name="value">The context.Value to check.</param>
     /// <returns>The string validator instance.</returns>
-    public StringValidator NotEndWith(string value)
+    public static IValidationContext<string?> NotEndWith(this IValidationContext<string?> context, string value)
     {
-        if (Value?.EndsWith(value) != false)
-            AddError($"the value must not end with '{value}'");
-        return this;
+        if (context.Value?.EndsWith(value) != false)
+            context.AddError($"the context.Value must not end with '{value}'");
+        return context;
     }
     /// <summary>
-    /// Validates that the value ends with the specified value.
+    /// Validates that the context.Value ends with the specified context.Value.
     /// </summary>
-    /// <param name="value">The value to check.</param>
+    /// <param name="value">The context.Value to check.</param>
     /// <returns>The string validator instance.</returns>
-    public StringValidator NotEndWith(char value)
+    public static IValidationContext<string?> NotEndWith(this IValidationContext<string?> context, char value)
     {
-        if (Value?.EndsWith(value) != false)
-            AddError($"the value must not end with '{value}'");
-        return this;
+        if (context.Value?.EndsWith(value) != false)
+            context.AddError($"the context.Value must not end with '{value}'");
+        return context;
     }
 }

@@ -11,7 +11,7 @@ namespace Examples;
 // ReSharper disable once InconsistentNaming
 public class Custom_Validation_using_custom_validator_derivation
 {// todo
-    public class EmailValidator : StringValidator
+    public class EmailValidator : ValidationContext<string?>
     {
         public EmailValidator(string? value, Type targetType) : base(value, targetType)
         {
@@ -19,9 +19,9 @@ public class Custom_Validation_using_custom_validator_derivation
 
         public EmailValidator BeAnEmail()
         {
-            Contain('@');
-            Contain('.');
-            NotEndWith('.');
+            this.Contain('@');
+            this.Contain('.');
+            this.NotEndWith('.');
             return this;
         }
     }

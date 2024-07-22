@@ -11,14 +11,14 @@ public class ValidatorSignatureConstraintTests
     public record DemoAsciiString(string Value) : StringValueType(Value)
     {
         [Validation]
-        private static void Validate(StringValidator must)
+        private static void Validate(ValidationContext<string?> must)
             => must.BeAscii();
     }
 
     public record DemoAlphanumericString(string Value) : DemoAsciiString(Value)
     {
         [Validation]
-        private static void Validate(StringValidator must)
+        private static void Validate(ValidationContext<string?> must)
             => must.BeAlphanumeric();
     }
 
@@ -28,25 +28,25 @@ public class ValidatorSignatureConstraintTests
         public record PublicValidator(string Value) : DemoAsciiString(Value)
         {
             [Validation]
-            public static void Validate(StringValidator v)
+            public static void Validate(ValidationContext<string?> v)
                 => v.BeAlphanumeric();
         }
         public record ProtectedValidator(string Value) : DemoAsciiString(Value)
         {
             [Validation]
-            protected static void Validate(StringValidator v)
+            protected static void Validate(ValidationContext<string?> v)
                 => v.BeAlphanumeric();
         }
         public record NonStaticValidator(string Value) : DemoAsciiString(Value)
         {
             [Validation]
-            private void Validate(StringValidator v)
+            private void Validate(ValidationContext<string?> v)
                 => v.BeAlphanumeric();
         }
         public record InvalidReturnType(string Value) : DemoAsciiString(Value)
         {
             [Validation]
-            private static int Validate(StringValidator v)
+            private static int Validate(ValidationContext<string?> v)
             {
                 v.BeAlphanumeric();
                 return 0;
@@ -56,7 +56,7 @@ public class ValidatorSignatureConstraintTests
         public record TooManyParameters(string Value) : DemoAsciiString(Value)
         {
             [Validation]
-            private static void Validate(StringValidator v, int invalid)
+            private static void Validate(ValidationContext<string?> v, int invalid)
                 => v.BeAlphanumeric();
         }
         public record InvalidParameter(string Value) : DemoAsciiString(Value)
@@ -69,7 +69,7 @@ public class ValidatorSignatureConstraintTests
         public record InterfaceContext(string Value) : StringValueType(Value)
         {
             [Validation]
-            private static void Validate(IValidationContext<string> v)
+            private static void Validate(IValidationContext<string?> v)
             { }
         }
 
@@ -79,7 +79,7 @@ public class ValidatorSignatureConstraintTests
             private static void Validate(InvalidValidator v)
                 => v.BeAlphanumeric();
 
-            private abstract class InvalidValidator : StringValidator
+            private abstract class InvalidValidator : ValidationContext<string?>
             {
                 protected InvalidValidator(string? value, Type targetType) : base(value, targetType)
                 {
@@ -92,7 +92,7 @@ public class ValidatorSignatureConstraintTests
             private static void Validate(InvalidValidator v)
                 => v.BeAlphanumeric();
 
-            private class InvalidValidator : StringValidator
+            private class InvalidValidator : ValidationContext<string?>
             {
                 protected InvalidValidator(string? value, Type targetType, string tooManyPars) : base(value, targetType)
                 {
@@ -105,7 +105,7 @@ public class ValidatorSignatureConstraintTests
             private static void Validate(InvalidValidator v)
                 => v.BeAlphanumeric();
 
-            private class InvalidValidator : StringValidator
+            private class InvalidValidator : ValidationContext<string?>
             {
                 protected InvalidValidator() : base(null!, null!)
                 {
@@ -118,7 +118,7 @@ public class ValidatorSignatureConstraintTests
             private static void Validate(InvalidValidator v)
                 => v.BeAlphanumeric();
 
-            private abstract class InvalidValidator : StringValidator
+            private abstract class InvalidValidator : ValidationContext<string?>
             {
                 protected InvalidValidator(int? value, Type targetType) : base(value.ToString(), targetType)
                 {
@@ -131,7 +131,7 @@ public class ValidatorSignatureConstraintTests
             private static void Validate(InvalidValidator v)
                 => v.BeAlphanumeric();
 
-            private abstract class InvalidValidator : StringValidator
+            private abstract class InvalidValidator : ValidationContext<string?>
             {
                 protected InvalidValidator(string? value, int targetType) : base(value, targetType.GetType())
                 {

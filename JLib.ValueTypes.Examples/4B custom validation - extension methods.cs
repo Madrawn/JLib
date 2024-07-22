@@ -18,7 +18,7 @@ namespace Examples.ExtensionMethods
         /// </summary>
         /// <param name="validator"></param>
         /// <returns></returns>
-        public static StringValidator ContainAt(this StringValidator validator)
+        public static ValidationContext<string?> ContainAt(this ValidationContext<string?> validator)
         {
             var testString = "@";
             if (validator.Value?.Contains(testString) != true)
@@ -57,7 +57,7 @@ namespace Examples.ExtensionMethods
             /// it will be called when this value type or any derivation of it is created.
             /// </summary>
             [JLib.ValueTypes.Validation]
-            private static void Validate(StringValidator must)
+            private static void Validate(ValidationContext<string?> must)
                 => must.ContainAt().ContainDot().NotEndWithDot();
         }
         [Fact]

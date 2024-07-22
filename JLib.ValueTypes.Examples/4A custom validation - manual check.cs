@@ -15,7 +15,7 @@ public class Custom_Validation_using_manual_validation
         /// it will be called when this value type or any derivation of it is created.
         /// </summary>
         [Validation]
-        private static void Validate(StringValidator validator)
+        private static void Validate(ValidationContext<string?> validator)
         {
             if (validator.Value?.Contains('.') == false)
                 validator.AddError("email contains no .");

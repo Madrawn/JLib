@@ -27,7 +27,7 @@ public record DemoAlphanumericString(string Value, value=>value.BeAlphanumeric()
 ```cs
 public record DemoAlphanumericString(string Value, value=>value.BeAlphanumeric()) : StringValueType(Value)
 {
-    protected override void Validate(StringValidator validator)
+    protected override void Validate(ValidationContext<string?> validator)
     {
         validator.BeAlphanumeric();
         base.
