@@ -1,19 +1,7 @@
 ﻿using System.Text.RegularExpressions;
-using JLib.Exceptions;
 using JLib.Helper;
 
 namespace JLib.ValueTypes;
-
-/// <summary>
-/// Represents a base class for string value types.
-/// </summary>
-/// <typeparam name="T">The type of the string value.</typeparam>
-public abstract record StringValueType(string Value) : ValueType<string>(Value)
-{
-    [Validation]
-    private static void Validate(ValidationContext<string?> v)
-        => v.NotBeNull();
-}
 
 /// <summary>
 /// Represents a validator for string Values.
@@ -210,8 +198,8 @@ public static class StringValidationContextExtensions
     public static IValidationContext<string?> BeUrl(this IValidationContext<string?> context, UriKind kind, Action<Uri>? uriValidator = null)
     {
         context.NotBeNullOrWhitespace()
-        .NotContainWhitespace()
-        .MatchRegex(new(@"^[A-Za-z0-9-._~:/?#@\[\]!$&'()*+,;=%]*$"));
+            .NotContainWhitespace()
+            .MatchRegex(new(@"^[A-Za-z0-9-._~:/?#@\[\]!$&'()*+,;=%]*$"));
 
         if (!Uri.TryCreate(context.Value, kind, out var uriResult))
             context.AddError($"context.Value must be a valid {kind} URL");
