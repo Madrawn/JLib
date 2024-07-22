@@ -30,7 +30,7 @@ public static class TypeHelper
     public static bool IsNumber(this Type type)
     {
         var code = Type.GetTypeCode(type);
-        return code is >= TypeCode.SByte and <= TypeCode.Decimal;
+        return code is >= TypeCode.Char and <= TypeCode.Decimal;
         // Char = 4,
         // SByte = 5,
         // Byte = 6,
