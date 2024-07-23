@@ -31,6 +31,13 @@ public static class ReflectionHelper
         // Init-only properties are marked with the IsExternalInit type.
         return setMethodReturnParameterModifiers?.Contains(typeof(IsExternalInit)) ?? false;
     }
+    /// <summary>
+    /// Checks, whether the given <paramref name="type"/> is decorated with the given <paramref name="attributeType"/>
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="attributeType"></param>
+    /// <param name="inherit"></param>
+    /// <returns></returns>
     public static bool HasCustomAttribute(this MemberInfo type, Type attributeType, bool inherit = true)
         => type.GetCustomAttribute(attributeType, inherit) is not null;
 
@@ -118,8 +125,7 @@ public static class ReflectionHelper
             var context = type.CustomAttributes
                 .FirstOrDefault(x =>
                     x.AttributeType.FullName == "System.Runtime.CompilerServices.NullableContextAttribute");
-            if (context != null &&
-                context.ConstructorArguments.Count == 1 &&
+            if (context is { ConstructorArguments.Count: 1 } &&
                 context.ConstructorArguments[0].ArgumentType == typeof(byte))
             {
                 return (byte)context.ConstructorArguments[0].Value! == 2;
@@ -131,4 +137,5 @@ public static class ReflectionHelper
     }
 
     #endregion
+
 }

@@ -10,7 +10,7 @@ namespace JLib.HotChocolate;
 [Implements(typeof(IQueryDataObject)), IsClass, NotAbstract]
 public record QueryDataObjectType(Type Value) : DataObjectType(Value), IValidatedType
 {
-    public void Validate(ITypeCache cache, TypeValidator value)
+    public void Validate(ITypeCache cache, TypeValidationContext value)
     {
         var ctors = Value.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
         if (ctors.Length == 1)

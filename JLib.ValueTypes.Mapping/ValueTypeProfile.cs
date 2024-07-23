@@ -105,8 +105,7 @@ public class ValueTypeProfile : Profile
             if (valueType.NativeType.IsClass)
             {
                 logger.LogDebug("        adding map for class-valueType {valueType}", valueType.Name);
-
-
+                
                 var addMapping = typeof(ClassValueTypeConversions<,>)
                                      .MakeGenericType(valueType.Value, valueType.NativeType)
                                      .GetMethod(nameof(ClassValueTypeConversions<ValueType<Ignored>, Ignored>.AddMapping)) ??
@@ -122,9 +121,7 @@ public class ValueTypeProfile : Profile
                                      .MakeGenericType(valueType.Value, valueType.NativeType)
                                      .GetMethod(nameof(StructValueTypeConversions<ValueType<int>, int>.AddMapping)) ??
                                  throw new InvalidSetupException("AddProfileMethodNotFound");
-
-
-
+                
                 addMapping.Invoke(null, new object?[] { this, logger });
             }
         }

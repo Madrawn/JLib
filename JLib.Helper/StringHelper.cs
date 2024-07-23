@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace JLib.Helper;
 
@@ -12,7 +13,7 @@ public static class StringHelper
     /// </summary>
     /// <param name="value">The string to test.</param>
     /// <returns>true if the value parameter is null or <see cref="string.Empty"/>, or if value consists exclusively of white-space characters; otherwise, false.</returns>
-    public static bool IsNullOrWhitespace(this string? value)
+    public static bool IsNullOrWhitespace([NotNullWhen(false)] this string? value)
         => string.IsNullOrWhiteSpace(value);
 
     /// <summary>
@@ -20,7 +21,7 @@ public static class StringHelper
     /// </summary>
     /// <param name="value">The string to test.</param>
     /// <returns>true if the value parameter is null or an empty string (""); otherwise, false.</returns>
-    public static bool IsNullOrEmpty(this string? value)
+    public static bool IsNullOrEmpty([NotNullWhen(false)] this string? value)
         => string.IsNullOrEmpty(value);
 
     /// <summary>

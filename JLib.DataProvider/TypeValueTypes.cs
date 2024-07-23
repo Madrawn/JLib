@@ -15,7 +15,7 @@ public abstract record DataProviderType(Type Value) : NavigatingTypeValueType(Va
         CanWrite = Value.ImplementsAny<IDataProviderRw<IEntity>>();
     }
 
-    public virtual void Validate(ITypeCache cache, TypeValidator value)
+    public virtual void Validate(ITypeCache cache, TypeValidationContext value)
     {
     }
 }
@@ -24,7 +24,7 @@ public abstract record DataProviderType(Type Value) : NavigatingTypeValueType(Va
 [ImplementsAny(typeof(IDataProviderR<>)), BeGeneric, NotAbstract, IsClass]
 public record SourceDataProviderType(Type Value) : DataProviderType(Value)
 {
-    public override void Validate(ITypeCache cache, TypeValidator value)
+    public override void Validate(ITypeCache cache, TypeValidationContext value)
     {
         base.Validate(cache, value);
         if (Value.ImplementsAny<IDataProviderRw<IEntity>>())
@@ -40,7 +40,7 @@ public record RepositoryType(Type Value) : DataProviderType(Value)
         => Navigate(cache => Value.GetAnyInterface<IDataProviderR<IDataObject>>()?.GenericTypeArguments.First()
             .AsValueType<DataObjectType>(cache)!);
 
-    public override void Validate(ITypeCache cache, TypeValidator value)
+    public override void Validate(ITypeCache cache, TypeValidationContext value)
     {
         base.Validate(cache, value);
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract

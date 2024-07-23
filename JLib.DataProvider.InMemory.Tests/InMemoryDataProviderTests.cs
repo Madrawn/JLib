@@ -2,6 +2,7 @@
 using JLib.DependencyInjection;
 using JLib.Exceptions;
 using JLib.Reflection;
+using JLib.Reflection.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;

@@ -15,21 +15,21 @@ public class ExceptionToJsonTests
     public void OnException()
     {
         new Exception("Test")
-            .ToJson(Options)
+            .GetHierarchyInfoJson(Options)
             .MatchSnapshot();
     }
     [Fact]
     public void OnDerivedException()
     {
         new IndexOutOfRangeException("Test")
-            .ToJson(Options)
+            .GetHierarchyInfoJson(Options)
             .MatchSnapshot();
     }
     [Fact]
     public void WithInnerException()
     {
         new Exception("Test", new("inner"))
-            .ToJson(Options)
+            .GetHierarchyInfoJson(Options)
             .MatchSnapshot();
     }
 
@@ -37,7 +37,7 @@ public class ExceptionToJsonTests
     public void EmptyAggregateException()
     {
         new AggregateException("Test")
-            .ToJson(Options)
+            .GetHierarchyInfoJson(Options)
             .MatchSnapshot();
     }
 
@@ -45,14 +45,14 @@ public class ExceptionToJsonTests
     public void AggregateException1()
     {
         new AggregateException("Test", new Exception("inner"))
-            .ToJson(Options)
+            .GetHierarchyInfoJson(Options)
             .MatchSnapshot();
     }
     [Fact]
     public void JLibAggregateException1()
     {
         new JLibAggregateException("Test", new[] { new Exception("inner") })
-            .ToJson(Options)
+            .GetHierarchyInfoJson(Options)
             .MatchSnapshot();
     }
     [Fact]
@@ -75,7 +75,7 @@ public class ExceptionToJsonTests
                     new Exception("inner 2")
                 })
             })
-            .ToJson(Options)
+            .GetHierarchyInfoJson(Options)
             .MatchSnapshot();
     }
 }

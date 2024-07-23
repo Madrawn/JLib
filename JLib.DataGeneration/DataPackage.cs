@@ -10,13 +10,13 @@ namespace JLib.DataGeneration;
 [IsDerivedFrom(typeof(DataPackage)), NotAbstract]
 public record DataPackageType(Type Value) : TypeValueType(Value), IValidatedType
 {
-    public void Validate(ITypeCache cache, TypeValidator value)
+    public void Validate(ITypeCache cache, TypeValidationContext value)
     {
         value.ShouldBeSealed("a DataPackage has to be either Sealed or Abstract.");
 
         value.ValidateProperties(p => p.IsPublic(), p => p
-            .ShouldHavePublicInit()
-            .ShouldHavePublicGet());
+            .HavePublicInit()
+            .HavePublicGet());
     }
 }
 

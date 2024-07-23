@@ -5,6 +5,7 @@
         <ProjectReference Include="..\JLib.Cqrs\JLib.Cqrs.csproj" />
         <ProjectReference Include="..\JLib.DataProvider\JLib.DataProvider.csproj" />
         <ProjectReference Include="..\JLib.DependencyInjection\JLib.DependencyInjection.csproj" />
+        <ProjectReference Include="..\JLib.Reflection.DependencyInjection\JLib.Reflection.DependencyInjection.csproj" />
         <ProjectReference Include="..\JLib.Reflection\JLib.Reflection.csproj" />
         <ProjectReference Include="..\JLib.Testing\JLib.Testing.csproj" />
     </ItemGroup>

@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\JLib.DependencyInjection\JLib.DependencyInjection.csproj" />
+    <ProjectReference Include="..\JLib.Reflection.DependencyInjection\JLib.Reflection.DependencyInjection.csproj" />
     <ProjectReference Include="..\JLib.Reflection\JLib.Reflection.csproj" />
     <ProjectReference Include="..\JLib.ValueTypes.Mapping\JLib.ValueTypes.Mapping.csproj" />
     <ProjectReference Include="..\JLib.ValueTypes\JLib.ValueTypes.csproj" />

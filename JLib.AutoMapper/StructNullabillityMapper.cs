@@ -2,9 +2,15 @@
 
 namespace JLib.AutoMapper;
 
-public class StructNullabillityMapper : Profile
+/// <summary>
+/// contains a map from bool? to bool with null => false
+/// </summary>
+public class StructNullabilityMapper : Profile
 {
-    public StructNullabillityMapper()
+    /// <summary>
+    /// Creates the instance
+    /// </summary>
+    public StructNullabilityMapper()
     {
         CreateMap<bool?, bool>().ConvertUsing(x => x ?? false);
     }

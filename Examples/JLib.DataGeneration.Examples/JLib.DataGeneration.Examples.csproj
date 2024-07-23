@@ -34,6 +34,7 @@
         <ProjectReference Include="..\..\JLib.AutoMapper\JLib.AutoMapper.csproj" />
         <ProjectReference Include="..\..\JLib.DataGeneration\JLib.DataGeneration.csproj" />
         <ProjectReference Include="..\..\JLib.DependencyInjection\JLib.DependencyInjection.csproj" />
+        <ProjectReference Include="..\..\JLib.Reflection.DependencyInjection\JLib.Reflection.DependencyInjection.csproj" />
     </ItemGroup>
 
 </Project>

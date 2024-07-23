@@ -16,6 +16,7 @@ using JLib.Reflection;
 // referenced setup
 using JLib.DataGeneration.Examples.Setup.Models;
 using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
+using JLib.Reflection.DependencyInjection;
 
 namespace JLib.DataGeneration.Examples.Getting_Started;
 public sealed class UsingTheDefaultNamespace : IDisposable

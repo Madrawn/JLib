@@ -106,10 +106,13 @@ public class TypeCache : ITypeCache
 
     public IReadOnlyCollection<Type> KnownTypes { get; }
 
+    public ITypePackage TypePackage { get; }
+
     #region constructor
 
     public TypeCache(ITypePackage typePackage, ExceptionBuilder parentExceptionManager, ILoggerFactory loggerFactory)
     {
+        TypePackage = typePackage;
         _logger = loggerFactory.CreateLogger(typeof(ITypeCache)?.FullName ?? nameof(ITypeCache));
         using var _ = _logger.BeginScope(this);
         KnownTypes = typePackage.GetContent().ToArray();
@@ -227,8 +230,8 @@ public class TypeCache : ITypeCache
         {
             try
             {
-                var tvtValidator = new TypeValidator(typeValueType.CastTo<TypeValueType>(),
-                    typeValueType.GetType().FullName());
+                var tvtValidator = new TypeValidationContext(typeValueType.CastTo<TypeValueType>(),
+                    typeValueType.GetType());
                 typeValueType.Validate(this, tvtValidator);
                 exceptions.AddChild(tvtValidator);
             }

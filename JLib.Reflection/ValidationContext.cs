@@ -1,16 +1,18 @@
-﻿using System.Reflection;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection.Exceptions;
 using JLib.ValueTypes;
+using ValueType = JLib.ValueTypes.ValueType;
 
 namespace JLib.Reflection;
 
-public class TypeValidator : ValueValidator<Type>
+public class TypeValidationContext : ValidationContext<Type>
 {
     private readonly TypeValueType _valueType;
 
-    public TypeValidator(TypeValueType valueType, string valueTypeName) : base(valueType.Value, valueTypeName)
+    public TypeValidationContext(TypeValueType valueType, Type targetType) : base(valueType.Value, targetType)
     {
         _valueType = valueType;
     }
@@ -20,45 +22,45 @@ public class TypeValidator : ValueValidator<Type>
             $"{_valueType.Value.FullName(true)} is not a valid {_valueType.GetType().FullName(true)}",
             messages.Select(msg => new InvalidTypeException(_valueType.GetType(), _valueType.Value, msg)));
 
-    public TypeValidator ValidateProperties(Func<PropertyInfo, bool> filter, Action<PropertyInfoValidator> validator)
+    public TypeValidationContext ValidateProperties(Func<PropertyInfo, bool> filter, Action<ValidationContext<PropertyInfo>> validator)
     {
         foreach (var property in Value.GetProperties().Where(filter))
         {
-            var val = new PropertyInfoValidator(property, ValueTypeName);
+            var val = new ValidationContext<PropertyInfo>(property, TargetType);
             validator(val);
             AddSubValidators(val);
         }
         return this;
     }
 
-    public TypeValidator ShouldBeGeneric(string? hint = null)
+    public TypeValidationContext ShouldBeGeneric(string? hint = null)
     {
         if (!Value.IsGenericType)
             AddError(string.Join(Environment.NewLine, "Must be Generic", hint));
         return this;
     }
-    public TypeValidator ShouldBeStatic(string? hint = null)
+    public TypeValidationContext ShouldBeStatic(string? hint = null)
     {
         if (!Value.IsStatic())
             AddError(string.Join(Environment.NewLine, "Must be Static", hint));
         return this;
     }
 
-    public TypeValidator ShouldBeSealed(string? hint = null)
+    public TypeValidationContext ShouldBeSealed(string? hint = null)
     {
         if (!Value.IsSealed)
             AddError(string.Join(Environment.NewLine, "Must be Sealed", hint));
         return this;
     }
 
-    public TypeValidator ShouldNotBeGeneric(string? hint = null)
+    public TypeValidationContext ShouldNotBeGeneric(string? hint = null)
     {
         if (Value.IsGenericType)
             AddError(string.Join(Environment.NewLine, "Must not be Generic", hint));
         return this;
     }
 
-    public TypeValidator ShouldHaveNTypeArguments(int argumentCount)
+    public TypeValidationContext ShouldHaveNTypeArguments(int argumentCount)
     {
         ShouldBeGeneric();
 
@@ -70,7 +72,7 @@ public class TypeValidator : ValueValidator<Type>
         return this;
     }
     
-    public TypeValidator ShouldImplementAny<TInterface>(string? hint = null)
+    public TypeValidationContext ShouldImplementAny<TInterface>(string? hint = null)
     {
         if (!Value.ImplementsAny<TInterface>())
             AddError($"Should implement any {typeof(TInterface).TryGetGenericTypeDefinition().FullName(true)}",
@@ -78,21 +80,21 @@ public class TypeValidator : ValueValidator<Type>
         return this;
     }
 
-    public TypeValidator ShouldImplement<TInterface>(string? hint = null)
+    public TypeValidationContext ShouldImplement<TInterface>(string? hint = null)
     {
         if (!Value.ImplementsAny<TInterface>())
             AddError($"Should implement {typeof(TInterface).FullName(true)}", hint);
         return this;
     }
 
-    public TypeValidator ShouldNotImplementAny<TInterface>(string? hint = null)
+    public TypeValidationContext ShouldNotImplementAny<TInterface>(string? hint = null)
     {
         if (Value.ImplementsAny<TInterface>())
             AddError($"Should not implement {typeof(TInterface).TryGetGenericTypeDefinition().FullName(true)}",
                 hint);
         return this;
     }
-    public TypeValidator ShouldHaveAttribute<TAttribute>(string hint)
+    public TypeValidationContext ShouldHaveAttribute<TAttribute>(string hint)
         where TAttribute : Attribute
     {
         if (!Value.HasCustomAttribute<TAttribute>())
@@ -100,13 +102,13 @@ public class TypeValidator : ValueValidator<Type>
         return this;
     }
 
-    public TypeValidator ShouldHaveName(string name)
+    public TypeValidationContext ShouldHaveName(string name)
     {
         if (Value.Name != name)
             AddError($"must have the name '{name}'");
         return this;
     }
-    public TypeValidator ShouldHaveNameSuffix(string nameSuffix)
+    public TypeValidationContext ShouldHaveNameSuffix(string nameSuffix)
     {
         if (!Value.Name.EndsWith(nameSuffix))
             AddError($"must have the nameSuffix '{nameSuffix}'");

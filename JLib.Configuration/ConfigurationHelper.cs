@@ -7,6 +7,9 @@ using Microsoft.Extensions.Logging;
 
 namespace JLib.Configuration;
 
+/// <summary>
+/// Helper functions enabling the access of config sections which are marked with the <see cref="ConfigSectionNameAttribute"/>
+/// </summary>
 public static class ConfigurationHelper
 {
     /// <summary>
