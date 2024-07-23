@@ -19,7 +19,7 @@ public class ConstructorTests
     public record PositiveInt(int Value) : IntValueType(Value)
     {
         [Validation]
-        private static void Validate(IntValidator must)
+        private static void Validate(ValidationContext<int> must)
             => must.BePositive();
     }
 

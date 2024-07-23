@@ -20,7 +20,7 @@ public class TryCreateTests
     public record PositiveInt(int Value) : IntValueType(Value)
     {
         [Validation]
-        private static void Validate(IntValidator must)
+        private static void Validate(ValidationContext<int> must)
             => must.BePositive();
     }
 
