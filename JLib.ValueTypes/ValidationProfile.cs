@@ -96,7 +96,7 @@ internal sealed class ValidationProfile<TValue> : IValidationProfile<TValue>
             if (method.ReturnType != typeof(void))
                 methodErrors.Add("must have a void return type");
             if (method.IsPrivate == false)
-                methodErrors.Add("must have be private");
+                methodErrors.Add("must be private");
             if (method.IsStatic == false)
                 methodErrors.Add("must be static");
             if (method.GetGenericArguments().FirstOrDefault()
