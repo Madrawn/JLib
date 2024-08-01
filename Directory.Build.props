@@ -30,6 +30,7 @@
             JLib.Reflection.HotChocolate.Query
             JLib.ValueTypes
             JLib.ValueTypes.Mapping
+            JLib.ValueTypes.Implementations.FileSystem
             JLib
             JLib.AutoMapper
             JLib.Configuration

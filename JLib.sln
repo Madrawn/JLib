@@ -104,6 +104,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.Configuration.Tests", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.ValueTypes.Examples", "JLib.ValueTypes.Examples\JLib.ValueTypes.Examples.csproj", "{FE000CC5-9E55-4729-9ED5-28CEDA1ECCFB}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.ValueTypes.Implementations.FileSystem", "JLib.ValueTypes.Implementations.FileSystem\JLib.ValueTypes.Implementations.FileSystem.csproj", "{F3F9EFA8-6DEF-4557-B00C-87901C6D010C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Implementations", "Implementations", "{7F914D27-9431-4AC4-A0C2-1A5775E001B4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -266,6 +270,10 @@ Global
 		{FE000CC5-9E55-4729-9ED5-28CEDA1ECCFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE000CC5-9E55-4729-9ED5-28CEDA1ECCFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE000CC5-9E55-4729-9ED5-28CEDA1ECCFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3F9EFA8-6DEF-4557-B00C-87901C6D010C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3F9EFA8-6DEF-4557-B00C-87901C6D010C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3F9EFA8-6DEF-4557-B00C-87901C6D010C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3F9EFA8-6DEF-4557-B00C-87901C6D010C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -297,6 +305,8 @@ Global
 		{CB8F3474-022E-47CF-96F6-9A5BD03AC575} = {B450BA69-F38B-4EF5-81A5-7551941524E4}
 		{069B96FC-8880-4E90-92F6-573652BC245C} = {003DF5C3-94DD-4AE6-BEB8-2691DA0BC14B}
 		{FE000CC5-9E55-4729-9ED5-28CEDA1ECCFB} = {B450BA69-F38B-4EF5-81A5-7551941524E4}
+		{F3F9EFA8-6DEF-4557-B00C-87901C6D010C} = {7F914D27-9431-4AC4-A0C2-1A5775E001B4}
+		{7F914D27-9431-4AC4-A0C2-1A5775E001B4} = {80BEDE7B-0252-461E-B890-C652AA9F0A01}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9007D83B-9D61-4FD9-927F-EEAC8281BF90}
