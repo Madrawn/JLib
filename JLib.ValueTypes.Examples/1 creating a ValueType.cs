@@ -21,7 +21,7 @@ public class Creating_a_ValueType
         /// </summary>
         [Validation]
         // ReSharper disable once UnusedMember.Local
-        private static void Validate(ValidationContext<string?> must)
+        private static void Validate(IValidationContext<string?> must)
             => must.Contain("@").Contain(".");
     }
 
@@ -29,7 +29,7 @@ public class Creating_a_ValueType
     public void SuccessfulInstantiation()
     {
         var sut = () => new EmailAddress("my@example.com");
-        sut.Should().NotThrow();
+<        sut.Should().NotThrow();
     }
     [Fact]
     public void FailingInstantiation()

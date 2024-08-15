@@ -55,9 +55,7 @@ public class ValueTypeProfile : Profile
             logger.LogTrace("            {tNative}? => {tvt}?", typeof(TNative).Name,
                 typeof(TValueType).Name);
             profile.CreateMap<TNative?, TValueType?>().ConvertUsing(
-                new CtorReplacementExpressionVisitor<TValueType?, TNative?>().Visit(
-                    v => v == null ? null : CtorReplacementExpressionVisitor<TValueType?, TNative?>.CtorPlaceholder(v)
-                ));
+                ValueType.FactoryExpressions.ForNullableClass<TValueType, TNative>());
         }
     }
 
@@ -75,10 +73,7 @@ public class ValueTypeProfile : Profile
             logger.LogTrace("            {tNative} => {tvt}", typeof(TNative).Name,
                 typeof(TValueType).Name);
             profile.CreateMap<TNative, TValueType>().ConvertUsing(
-                new CtorReplacementExpressionVisitor<TValueType, TNative>().Visit(
-                    v =>
-                        CtorReplacementExpressionVisitor<TValueType, TNative>.CtorPlaceholder(v)
-                ));
+                ValueType.FactoryExpressions.ForNonNullableStruct<TValueType, TNative>());
 
 
             logger.LogTrace("            {tvt}? => {tNative}?", typeof(TValueType).Name,
@@ -88,12 +83,9 @@ public class ValueTypeProfile : Profile
 
             logger.LogTrace("            {tNative}? => {tvt}?",
                 typeof(TNative?).FullName(), typeof(TValueType).Name);
-            profile.CreateMap<TNative?, TValueType?>().ConvertUsing(
-                new CtorReplacementExpressionVisitor<TValueType?, TNative?>().Visit(
-                    v => v.HasValue
-                        ? CtorReplacementExpressionVisitor<TValueType, TNative>.CtorPlaceholder(v.Value)
-                        : null
-                ));
+
+            profile.CreateMap<TNative?, TValueType?>()
+                .ConvertUsing(ValueType.FactoryExpressions.ForNullableStruct<TValueType, TNative>());
         }
     }
 
@@ -105,7 +97,7 @@ public class ValueTypeProfile : Profile
             if (valueType.NativeType.IsClass)
             {
                 logger.LogDebug("        adding map for class-valueType {valueType}", valueType.Name);
-                
+
                 var addMapping = typeof(ClassValueTypeConversions<,>)
                                      .MakeGenericType(valueType.Value, valueType.NativeType)
                                      .GetMethod(nameof(ClassValueTypeConversions<ValueType<Ignored>, Ignored>.AddMapping)) ??
@@ -121,7 +113,7 @@ public class ValueTypeProfile : Profile
                                      .MakeGenericType(valueType.Value, valueType.NativeType)
                                      .GetMethod(nameof(StructValueTypeConversions<ValueType<int>, int>.AddMapping)) ??
                                  throw new InvalidSetupException("AddProfileMethodNotFound");
-                
+
                 addMapping.Invoke(null, new object?[] { this, logger });
             }
         }

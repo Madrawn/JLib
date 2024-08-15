@@ -5,8 +5,9 @@ using System.Text;
 
 namespace JLib.Helper;
 
-public record TypeAttributeInfo(Type Type, Attribute Attribute);
-
+/// <summary>
+/// Extension methods for reflection
+/// </summary>
 public static class ReflectionHelper
 {
     // https://alistairevans.co.uk/2020/11/01/detecting-init-only-properties-with-reflection-in-c-9/
@@ -34,49 +35,71 @@ public static class ReflectionHelper
     /// <summary>
     /// Checks, whether the given <paramref name="type"/> is decorated with the given <paramref name="attributeType"/>
     /// </summary>
-    /// <param name="type"></param>
-    /// <param name="attributeType"></param>
-    /// <param name="inherit"></param>
-    /// <returns></returns>
     public static bool HasCustomAttribute(this MemberInfo type, Type attributeType, bool inherit = true)
         => type.GetCustomAttribute(attributeType, inherit) is not null;
 
+    /// <summary>
+    /// Checks, whether the given <paramref name="type"/> is decorated with the given <typeparamref name="T"/>
+    /// </summary>
     public static bool HasCustomAttribute<T>(this MemberInfo type, bool inherit = true)
         where T : Attribute =>
         type.HasCustomAttribute(typeof(T), inherit);
 
+    /// <summary>
+    /// <inheritdoc cref="Attribute.GetCustomAttributes(MemberInfo, Type, bool)"/>
+    /// </summary>
+    /// <typeparam name="T">the AttributeType to search for</typeparam>
     public static T[] GetCustomAttributes<T>(this MemberInfo type, bool inherit = true)
-        where T : Attribute =>
-        Attribute.GetCustomAttributes(type, typeof(T), inherit).Cast<T>().ToArray();
+        where T : Attribute
+        => Attribute.GetCustomAttributes(type, typeof(T), inherit).Cast<T>().ToArray();
 
+    /// <summary>
+    /// <inheritdoc cref="Attribute.GetCustomAttributes(MemberInfo, Type, bool)"/>
+    /// </summary>
     public static Attribute[] GetCustomAttributes(this MemberInfo type, Type attributeType, bool inherit = true)
         => Attribute.GetCustomAttributes(type, attributeType, inherit).ToArray();
 
+    /// <summary>
+    /// <inheritdoc cref="Type.GetGenericTypeDefinition"/>
+    /// </summary>
     public static Type TryGetGenericTypeDefinition(this Type type)
         => type.IsGenericType ? type.GetGenericTypeDefinition() : type;
 
+    /// <summary>
+    /// filters the given <paramref name="src"/> for <see cref="Type"/>s decorated with the given <typeparamref name="TAttribute"/>
+    /// </summary>
+    /// <typeparam name="T">The type of the collection</typeparam>
+    /// <typeparam name="TAttribute">The type of the attribute</typeparam>
+    /// <param name="src">The source enumerable</param>
+    /// <returns>The filtered enumerable</returns>
     public static IEnumerable<T> WithAttribute<T, TAttribute>(this IEnumerable<T> src)
         where T : MemberInfo
         where TAttribute : Attribute
         => src.Where(m => m.HasCustomAttribute<TAttribute>());
 
-    public static string ToInfoString(this MethodInfo mi, bool includeNamespace = false)
+    /// <summary>
+    /// formats the given <paramref name="methodInfo"/> signature to a string representing its prototype
+    /// </summary>
+    /// <param name="methodInfo"></param>
+    /// <param name="includeNamespace">whether to include the namespaces of all types</param>
+    /// <returns>a string containing the <paramref name="methodInfo"/>'s prototype</returns>
+    public static string ToInfoString(this MethodInfo methodInfo, bool includeNamespace = false)
     {
         StringBuilder sb = new();
-        if (mi.ReflectedType != mi.DeclaringType && mi.ReflectedType is not null)
-            sb.Append(mi.ReflectedType.FullName(includeNamespace)).Append(':');
-        if (mi.DeclaringType is not null)
-            sb.Append(mi.DeclaringType.FullName(includeNamespace));
+        if (methodInfo.ReflectedType != methodInfo.DeclaringType && methodInfo.ReflectedType is not null)
+            sb.Append(methodInfo.ReflectedType.FullName(includeNamespace)).Append(':');
+        if (methodInfo.DeclaringType is not null)
+            sb.Append(methodInfo.DeclaringType.FullName(includeNamespace));
 
-        if (mi.IsGenericMethod)
+        if (methodInfo.IsGenericMethod)
         {
             sb.Append('<');
-            foreach (var typeArg in mi.GetGenericArguments())
+            foreach (var typeArg in methodInfo.GetGenericArguments())
                 sb.Append(typeArg.FullName(includeNamespace));
             sb.Append('>');
         }
         sb.Append('(');
-        sb.AppendJoin(", ", mi.GetParameters().Select(p =>
+        sb.AppendJoin(", ", methodInfo.GetParameters().Select(p =>
             $"{p.GetType().FullName(includeNamespace)} {p.Name} {(p.HasDefaultValue ? $" = {p.DefaultValue}" : "")}"));
         sb.Append(')');
 
@@ -86,14 +109,21 @@ public static class ReflectionHelper
     #region get property nullabillity
 
     // source: https://stackoverflow.com/questions/58453972/how-to-use-net-reflection-to-check-for-nullable-reference-type
+    
+    /// <returns>whether the <paramref name="property"/> is nullable</returns>
     public static bool IsNullable(this PropertyInfo property) =>
         IsNullableHelper(property.PropertyType, property.DeclaringType, property.CustomAttributes);
 
+    /// <returns>whether the <paramref name="field"/> is nullable</returns>
     public static bool IsNullable(this FieldInfo field) =>
+    /// <returns>whether the <paramref name="property"/> is nullable</returns>
         IsNullableHelper(field.FieldType, field.DeclaringType, field.CustomAttributes);
 
+    /// <returns>whether the <paramref name="parameter"/> is nullable</returns>
     public static bool IsNullable(this ParameterInfo parameter) =>
         IsNullableHelper(parameter.ParameterType, parameter.Member, parameter.CustomAttributes);
+    public static bool IsNullable(this Type genericTypeParameter, MemberInfo declaringType) =>
+        IsNullableHelper(genericTypeParameter, declaringType, genericTypeParameter.CustomAttributes);
 
     private static bool IsNullableHelper(Type memberType, MemberInfo? declaringType,
         IEnumerable<CustomAttributeData> customAttributes)
@@ -103,7 +133,7 @@ public static class ReflectionHelper
 
         var nullable = customAttributes
             .FirstOrDefault(x => x.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute");
-        if (nullable != null && nullable.ConstructorArguments.Count == 1)
+        if (nullable is { ConstructorArguments.Count: 1 })
         {
             var attributeArgument = nullable.ConstructorArguments[0];
             if (attributeArgument.ArgumentType == typeof(byte[]))

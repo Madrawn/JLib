@@ -58,15 +58,21 @@ public static class ExpressionHelper
     }
 
     /// <summary>
-    /// Replaces all calls to the specified <paramref name="method"/> with the specified <paramref name="replacementExpression"/> in the given <paramref name="inputExpression"/> of type <typeparamref name="T"/> using an <see cref="ExpressionVisitor"/>.
+    /// Replaces all calls to the specified <paramref name="method"/> with the specified <paramref name="replacementExpression"/> in the given <paramref name="inputExpression"/> of type <typeparamref name="T"/> using an <see cref="ExpressionVisitor"/>.<br/>
+    ///     <list type="bullet">
+    ///         <item>must be a <see cref="LambdaExpression"/></item>
+    ///         <item>all parameter types must match those of <paramref name="method"/></item>
+    ///         <item>return type must match that of <paramref name="method"/></item>
+    ///         <item>return type must match that of <paramref name="method"/></item>
+    ///     </list>
     /// </summary>
     /// <typeparam name="T">The type of the <paramref name="inputExpression"/> and the Return Value.</typeparam>
     /// <param name="inputExpression">The expression to be edited.</param>
     /// <param name="method">The method to be replaced.</param>
-    /// <param name="replacementExpression">The expression to replace the <paramref name="method"/> with.</param>
+    /// <param name="replacementExpression">The <see cref="LambdaExpression"/> to replace the <paramref name="method"/> with. <br/></param> 
     /// <returns>An expression with all occurrences of the <paramref name="method"/> replaced with the <paramref name="replacementExpression"/> expression.</returns>
     public static Expression<T> ReplaceMethod<T>(this Expression<T> inputExpression, MethodInfo method,
-        Expression replacementExpression)
+        LambdaExpression replacementExpression)
     {
         var visitor = new ReplaceExpressionVisitor(method, replacementExpression);
         var ex = visitor.Visit(inputExpression);
@@ -104,7 +110,9 @@ public static class ExpressionHelper
                         throw new ArgumentException($"parameter type mismatch: " +
                                                     $"found: ({string.Join(", ", parameterPairs.Select(x => x.lambdaPar.Type.Name + " " + x.lambdaPar.Name))}) | " +
                                                     $"compare:  {replace.ToInfoString()}");
-                    if (lambda.ReturnType != replace.ReturnType)
+                    if (replace.ReturnType.IsGenericParameter
+                        ? lambda.ReturnType.IsAssignableTo(replace.ReturnType)
+                        : lambda.ReturnType != replace.ReturnType)
                         throw new ArgumentException("return type mismatch");
                     break;
                 default:
