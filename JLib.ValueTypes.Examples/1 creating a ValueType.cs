@@ -29,7 +29,7 @@ public class Creating_a_ValueType
     public void SuccessfulInstantiation()
     {
         var sut = () => new EmailAddress("my@example.com");
-<        sut.Should().NotThrow();
+        sut.Should().NotThrow();
     }
     [Fact]
     public void FailingInstantiation()

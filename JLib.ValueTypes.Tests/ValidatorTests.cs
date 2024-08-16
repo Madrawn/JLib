@@ -23,6 +23,13 @@ public class ValidatorTests
             => must.BeAlphanumeric();
     }
 
+    public record PositiveNumber(int Value) : IntValueType(Value)
+    {
+        [Validation]
+        private static void Validate(IValidationContext<int> must)
+            => must.BePositive();
+    }
+
     [Fact]
     public void T1_1()
         => ValueType.GetErrors<DemoAsciiString, string>(null!)
@@ -47,5 +54,13 @@ public class ValidatorTests
     [Fact]
     public void T2_4()
         => ValueType.GetErrors<DemoAsciiString, string>("\u0868")
+            .GetException().Should().NotBeNull();
+    [Fact]
+    public void T3_1()
+        => ValueType.GetErrors<PositiveNumber, int>(1)
+            .GetException().Should().BeNull();
+    [Fact]
+    public void T3_2()
+        => ValueType.GetErrors<PositiveNumber, int>(-1)
             .GetException().Should().NotBeNull();
 }
