@@ -11,6 +11,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value is not null.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> NotBeNull(this IValidationContext<string?> context)
     {
@@ -22,6 +23,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value is not null or empty.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> NotBeNullOrEmpty(this IValidationContext<string?> context)
     {
@@ -33,7 +35,8 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value is one of the specified valid context.Values.
     /// </summary>
-    /// <param name="validValues.Values">The collection of valid context.Values.</param>
+    /// <param name="context">the context which will be validated.</param>
+    /// <param name="validValues">The collection of valid context.Values.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> BeOneOf(this IValidationContext<string?> context, IReadOnlyCollection<string> validValues)
     {
@@ -45,6 +48,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value is alphanumeric.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> BeAlphanumeric(this IValidationContext<string?> context)
         => context.SatisfyCondition(char.IsLetterOrDigit, "context.Value must be alphanumeric");
@@ -89,6 +93,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value is not null or whitespace.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> NotBeNullOrWhitespace(this IValidationContext<string?> context)
     {
@@ -100,6 +105,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value starts with the specified prefix.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <param name="prefix">The prefix to check.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> StartWith(this IValidationContext<string?> context, string prefix)
@@ -111,6 +117,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value does not start with the specified prefix.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <param name="prefix">The prefix to check.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> NotStartWith(this IValidationContext<string?> context, string prefix)
@@ -122,6 +129,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value starts with the specified prefix.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <param name="prefix">The prefix to check.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> StartWith(this IValidationContext<string?> context, char prefix)
@@ -133,6 +141,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value does not start with the specified prefix.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <param name="prefix">The prefix to check.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> NotStartWith(this IValidationContext<string?> context, char prefix)
@@ -145,6 +154,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value does not contain the specified context.Value.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <param name="value">The context.Value to check.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> Contain(this IValidationContext<string?> context, string value)
@@ -157,6 +167,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value does not contain the specified context.Value.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <param name="value">The Value to check.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> Contain(this IValidationContext<string?> context, char value)
@@ -168,6 +179,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value does not contain the specified context.Value.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <param name="value">The context.Value to check.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> NotContain(this IValidationContext<string?> context, string value)
@@ -176,10 +188,23 @@ public static class StringValidationContextExtensions
             context.AddError($"context.Value must not contain {value}");
         return context;
     }
+    /// <summary>
+    /// Validates that the context.Value does not contain the specified context.Value.
+    /// </summary>
+    /// <param name="context">the context which will be validated.</param>
+    /// <param name="values">The context.Value to check.</param>
+    /// <returns>The string validator instance.</returns>
+    public static IValidationContext<string?> NotContain(this IValidationContext<string?> context, IReadOnlyCollection<string> values)
+    {
+        foreach (var value in values)
+            context.NotContain(value);
+        return context;
+    }
 
     /// <summary>
     /// Validates that the context.Value does not contain the specified context.Value.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <param name="value">The context.Value to check.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> NotContain(this IValidationContext<string?> context, char value)
@@ -188,10 +213,23 @@ public static class StringValidationContextExtensions
             context.AddError($"context.Value must not contain {value}");
         return context;
     }
+    /// <summary>
+    /// Validates that the context.Value does not contain the specified context.Value.
+    /// </summary>
+    /// <param name="context">the context which will be validated.</param>
+    /// <param name="values">The context.Value to check.</param>
+    /// <returns>The string validator instance.</returns>
+    public static IValidationContext<string?> NotContain(this IValidationContext<string?> context, IReadOnlyCollection<char> values)
+    {
+        foreach (var value in values)
+            context.NotContain(value);
+        return context;
+    }
 
     /// <summary>
     /// Validates that the context.Value is a URL of the specified kind.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <param name="kind">The kind of URL to validate.</param>
     /// <param name="uriValidator">An optional validator for the created Uri object.</param>
     /// <returns>The string validator instance.</returns>
@@ -211,6 +249,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// must be an absolute url without query parameters
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <returns></returns>
     public static IValidationContext<string?> BeBaseUrl(this IValidationContext<string?> context)
         => context.BeUrl(UriKind.Absolute)
@@ -219,6 +258,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Checks whether the context.Value is an absolute URL and has one of the specified schemes.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <param name="scheme">The supported schemes.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> BeUrlWithScheme(this IValidationContext<string?> context, params string[] scheme)
@@ -233,6 +273,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value is a valid HTTP URL.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> BeRelativeUrl(this IValidationContext<string?> context)
         => context.BeUrl(UriKind.Relative);
@@ -240,6 +281,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value matches the specified regular expression.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <param name="expression">The regular expression to match.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> MatchRegex(this IValidationContext<string?> context, Regex expression)
@@ -255,6 +297,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value contains only ASCII characters.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> BeAscii(this IValidationContext<string?> context)
         => context.SatisfyCondition(char.IsAscii, nameof(BeAscii));
@@ -269,17 +312,19 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value does not contain whitespace characters.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> NotContainWhitespace(this IValidationContext<string?> context)
     {
-        return context.Value is null 
-            ? context 
+        return context.Value is null
+            ? context
             : context.SatisfyCondition(c => !char.IsWhiteSpace(c), nameof(NotContainWhitespace));
     }
 
     /// <summary>
     /// Validates that the context.Value contains only numeric characters.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> BeNumeric(this IValidationContext<string?> context)
         => context.SatisfyCondition(char.IsNumber, nameof(BeNumeric));
@@ -287,6 +332,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value has a minimum length.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <param name="length">The minimum length.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> MinimumLength(this IValidationContext<string?> context, int length)
@@ -300,6 +346,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value has a maximum length.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <param name="length">The maximum length.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> MaximumLength(this IValidationContext<string?> context, int length)
@@ -313,6 +360,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value has a specific length.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <param name="length">The expected length.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> BeOfLength(this IValidationContext<string?> context, int length)
@@ -325,6 +373,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value ends with the specified context.Value.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <param name="value">The context.Value to check.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> EndWith(this IValidationContext<string?> context, string value)
@@ -336,6 +385,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value ends with the specified context.Value.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <param name="value">The context.Value to check.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> EndWith(this IValidationContext<string?> context, char value)
@@ -347,6 +397,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value ends with the specified context.Value.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <param name="value">The context.Value to check.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> NotEndWith(this IValidationContext<string?> context, string value)
@@ -358,6 +409,7 @@ public static class StringValidationContextExtensions
     /// <summary>
     /// Validates that the context.Value ends with the specified context.Value.
     /// </summary>
+    /// <param name="context">the context which will be validated.</param>
     /// <param name="value">The context.Value to check.</param>
     /// <returns>The string validator instance.</returns>
     public static IValidationContext<string?> NotEndWith(this IValidationContext<string?> context, char value)

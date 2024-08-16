@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <description>Contains Validated implementations of File System path segments like file names, directories, and file extensions.</description>
+    </PropertyGroup>
+    <ItemGroup>
+    <ProjectReference Include="..\JLib.ValueTypes\JLib.ValueTypes.csproj" />
+  </ItemGroup>
+
+</Project>
