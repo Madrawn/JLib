@@ -86,7 +86,17 @@ public sealed class ExceptionBuilder : IExceptionProvider, IDisposable
     /// <inheritdoc cref="ExceptionBuilder"/>
     /// </summary>
     /// <param name="message">written to <see cref="JLibAggregateException.UserMessage"/></param>
-    public ExceptionBuilder(string message) : this(message, null) { }
+    public ExceptionBuilder(string message) : this(message, null as ExceptionBuilder) { }
+
+    /// <summary>
+    /// creates an <see cref="ExceptionBuilder"/> and adds the given <paramref name="children"/>
+    /// </summary>
+    /// <param name="message">written to <see cref="JLibAggregateException.UserMessage"/></param>
+    /// <param name="children">will be added to <see cref="AggregateException.InnerExceptions"/></param>
+    public ExceptionBuilder(string message, params IExceptionProvider[] children) : this(message)
+    {
+        AddChildren(children);
+    }
     private ExceptionBuilder(string message, ExceptionBuilder? parent)
     {
         _message = message;

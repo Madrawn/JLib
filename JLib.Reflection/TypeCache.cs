@@ -61,6 +61,7 @@ public interface ITypeCache
 
     public TTvt Single<TTvt>(Func<TTvt, bool> selector) where TTvt : TypeValueType
         => SingleOrDefault(selector) ?? throw new InvalidSetupException("no selector matched");
+    public ITypePackage TypePackage { get; }
 }
 
 /// <summary>

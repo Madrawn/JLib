@@ -76,7 +76,7 @@ public sealed class TypePackage : ITypePackage
 
     /// <summary>
     /// creates a <see cref="ITypePackage"/> which contains all types nested in the given types, but not the types themselves.<br/>
-    /// this can be usefull for testing purposes
+    /// this can be useful for testing purposes
     /// </summary>
     public static ITypePackage GetNested(params Type[] types)
         => new TypePackage(types.SelectMany(x => x.GetNestedTypes()), null,
@@ -88,13 +88,30 @@ public sealed class TypePackage : ITypePackage
     public static ITypePackage GetNested<T>()
         => GetNested(typeof(T));
 
+    /// <summary>
+    /// combines all <paramref name="assemblies"/> and <paramref name="types"/> into one <see cref="ITypePackage"/>
+    /// </summary>
+    /// <param name="assemblies">the <see cref="Assembly"/>s to be included in this <see cref="ITypePackage"/></param>
+    /// <param name="types">the <see cref="Type"/>s to be included in this <see cref="ITypePackage"/></param>
+    /// <returns>a new <see cref="ITypePackage"/> which contains all the given <paramref name="assemblies"/> and <paramref name="types"/></returns>
     public static ITypePackage Get(IEnumerable<Assembly> assemblies, IEnumerable<Type> types,
         string name = "{Children} Assemblies and {Types} types")
         => new TypePackage(types, assemblies.Select(a => Get(a)), name);
 
+    /// <summary>
+    /// combines all <paramref name="packages"/> into one <see cref="ITypePackage"/>
+    /// </summary>
+    /// <param name="packages">the <see cref="ITypePackage.Children"/> of the new <see cref="ITypePackage"/></param>
+    /// <returns>a new <see cref="ITypePackage"/> which contains all the given <paramref name="packages"/></returns>
     public static ITypePackage Get(params ITypePackage[] packages)
         => Get(packages.AsEnumerable());
 
+    /// <summary>
+    /// combines all <paramref name="packages"/> into one <see cref="ITypePackage"/>
+    /// </summary>
+    /// <param name="packages"></param>
+    /// <param name="name"></param>
+    /// <returns>a new <see cref="ITypePackage"/> which contains all the given <paramref name="packages"/></returns>
     public static ITypePackage Get(IEnumerable<ITypePackage> packages, string name = "{Children} Packages")
         // ReSharper disable  PossibleMultipleEnumeration
         => packages.Multiple()

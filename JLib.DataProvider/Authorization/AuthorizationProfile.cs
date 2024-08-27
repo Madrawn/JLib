@@ -107,8 +107,71 @@ public abstract class AuthorizationProfile
     }
 
     #endregion
+
+    /// <summary>
+    /// Checks whether this <see cref="AuthorizationProfile"/> contains Rules for all instances of <typeparamref name="TDataObjectType"/> contained in the current <see cref="ITypeCache"/>
+    /// </summary>
+    /// <typeparam name="TDataObjectType"></typeparam>
+    /// <returns>an <see cref="IExceptionProvider"/> which contains an <see cref="Exception"/> for each <typeparamref name="TDataObjectType"/> that are not authorized within this <see cref="AuthorizationProfile"/></returns>
+    public IExceptionProvider EnsureAuthorised<TDataObjectType>()
+        where TDataObjectType : class, IDataObjectType
+    {
+        var exceptions = new ExceptionBuilder($"Some {typeof(TDataObjectType).FullName(true)} types are not authorized");
+
+        if (_typeCache.KnownTypeValueTypes.Contains(typeof(TDataObjectType)) is false)
+            exceptions.Add(new UnknownDataObjectTypeException<TDataObjectType>());
+
+        exceptions.Add(
+            _typeCache.All<TDataObjectType>()
+                .Except(this.AuthorizedTypes.OfType<TDataObjectType>())
+                .Select(tdo => new MissingAuthorizationException(tdo))
+            );
+        return exceptions;
+    }
+
+}
+/// <summary>
+/// Indicates, that <see cref="TypeWithoutAuthorization"/> Is not authorized in a given <see cref="AuthorizationProfile"/> but should be.
+/// </summary>
+public class MissingAuthorizationException : JLibException
+{
+    /// <summary>
+    /// the type which is not authorized
+    /// </summary>
+    public IDataObjectType TypeWithoutAuthorization { get; }
+
+    internal MissingAuthorizationException(IDataObjectType typeWithoutAuthorization)
+    {
+        TypeWithoutAuthorization = typeWithoutAuthorization;
+        Data.Add(nameof(TypeWithoutAuthorization), typeWithoutAuthorization);
+    }
 }
 
+/// <summary>
+/// Indicates, that the type parameter of <see cref="AuthorizationProfile.EnsureAuthorised{TDataObjectType}"/> is not known to the <see cref="ITypeCache"/>.
+/// </summary>
+public abstract class UnknownDataObjectTypeException : InvalidSetupException
+{
+    /// <summary>
+    /// the type which is not known to the type cache
+    /// </summary>
+    public Type UnknownDataObjectType { get; }
+
+    internal UnknownDataObjectTypeException(Type unknownDataObjectType) : base($"The {nameof(IDataObjectType)} {unknownDataObjectType.FullName()} is not known to the type cache")
+    {
+        UnknownDataObjectType = unknownDataObjectType;
+        Data[nameof(UnknownDataObjectType)] = unknownDataObjectType;
+    }
+}
+
+/// <summary>
+/// <inheritdoc cref="UnknownDataObjectTypeException"/>
+/// </summary>
+public sealed class UnknownDataObjectTypeException<TDataObjectType> : UnknownDataObjectTypeException
+    where TDataObjectType : class, IDataObjectType
+{
+    internal UnknownDataObjectTypeException() : base(typeof(IDataObjectType)) { }
+}
 internal class ParToConstVisitor : ExpressionVisitor
 {
     private readonly ParameterExpression _par;

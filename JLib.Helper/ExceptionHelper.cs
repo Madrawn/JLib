@@ -15,4 +15,16 @@ public static class ExceptionHelper
             throw exception;
     }
 
+    /// <summary>
+    /// recursively flattens the given <see cref="Exception"/> and returns them as a flat list, including all nested parents and all <see cref="Exception.InnerException"/> as separate entries.
+    /// </summary>
+    public static IEnumerable<Exception> FlattenAll(this Exception? exception) 
+        => exception switch
+        {
+            AggregateException aggregate => 
+                aggregate.InnerExceptions.SelectMany(FlattenAll)
+                .Prepend(exception),
+            not null => FlattenAll(exception.InnerException).Prepend(exception),
+            _ => Enumerable.Empty<Exception>()
+        };
 }
