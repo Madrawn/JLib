@@ -6,11 +6,21 @@ using static JLib.Reflection.TvtFactoryAttribute;
 
 namespace JLib.DataProvider.Authorization;
 
+/// <summary>
+/// Represents a non-abstract type that is derived from <see cref="AuthorizationProfile"/>
+/// </summary>
+/// <param name="Value"></param>
 [NotAbstract, IsDerivedFrom(typeof(AuthorizationProfile))]
 public record AuthorizationProfileType(Type Value) : TypeValueType(Value), IPostNavigationInitializedType
 {
+    /// <summary>
+    /// the singleton instance of this <see cref="Value"/>
+    /// </summary>
     public AuthorizationProfile Instance { get; private set; } = null!;
 
+    /// <summary>
+    /// Internal use only. Initializes the instance of the AuthorizationProfile
+    /// </summary>
     public void Initialize(ITypeCache cache, ExceptionBuilder exceptions)
     {
         Instance = Activator.CreateInstance(Value, new object[] { cache })?.As<AuthorizationProfile>()
@@ -27,9 +37,18 @@ public abstract class AuthorizationProfile
     private readonly ITypeCache _typeCache;
     private readonly List<IUnboundAuthorizationInfo> _authorizationProvider = new();
 
+    /// <summary>
+    /// the types that are authorized by this profile
+    /// </summary>
+    protected IEnumerable<DataObjectType> AuthorizedTypes => _authorizationProvider.Select(x => x.Target);
+
     internal IReadOnlyCollection<IUnboundAuthorizationInfo> Build()
         => _authorizationProvider;
 
+    /// <summary>
+    /// Creates a new instance of <see cref="AuthorizationProfile"/>
+    /// </summary>
+    /// <param name="typeCache"></param>
     protected AuthorizationProfile(ITypeCache typeCache)
     {
         _typeCache = typeCache;
@@ -38,7 +57,7 @@ public abstract class AuthorizationProfile
     #region AddAuthorization
 
     /// <summary>
-    /// adds a authorization rule for all <typeparamref name="TDataObject"/>s
+    /// adds an authorization rule for all <typeparamref name="TDataObject"/>s
     /// <br/>the <paramref name="queryPredicate"/> and <paramref name="dataObjectPredicate"/> are applied as is
     /// </summary>
     /// <typeparam name="TDataObject">the dataObject to be authorized</typeparam>
@@ -55,7 +74,7 @@ public abstract class AuthorizationProfile
             new UnboundAuthorizationInfo<TDataObject, TS1>(queryPredicate, dataObjectPredicate, _typeCache));
 
     /// <summary>
-    /// adds a authorization rule for all <typeparamref name="TDataObject"/>
+    /// adds an authorization rule for all <typeparamref name="TDataObject"/>
     /// the <paramref name="predicate"/> will be
     /// - once compiled and used for data object Authorization
     /// - visited so that the service parameter becomes a constant. this happens each time a query is authorized
