@@ -2,8 +2,42 @@
 using System.Reflection;
 using System.Text;
 using JLib.Helper;
+using JLib.ValueTypes;
+using ValueType = System.ValueType;
 
 namespace JLib.Reflection;
+
+/// <summary>
+/// Extension methods for <see cref="ITypePackage"/>
+/// </summary>
+public static class TypePackageExtensions
+{
+    /// <summary>
+    /// applies the given <paramref name="filter"/> to the typePackage <paramref name="typePackage"/>
+    /// </summary>
+    public static ITypePackage ApplyFilter(this ITypePackage typePackage, Func<Type, bool> filter, string? filterDescription = null)
+        => TypePackage.Get(
+            typePackage.Types.Where(filter),
+            typePackage.Children.Select(c => c.ApplyFilter(filter, filterDescription)),
+            typePackage.DescriptionTemplate + (filterDescription is null ? "" : $"Filtered: {filterDescription}"));
+
+    /// <summary>
+    /// Creates a <see cref="ITypePackage"/> from the given <paramref name="typePackage"/> which contains only <see cref="TypeValueType"/>s and <see cref="ITypeValueType"/>s
+    /// </summary>
+    public static ITypePackage RemoveNonTypeValueTypes(this ITypePackage typePackage) 
+        => typePackage.ApplyFilter(
+            type => type.IsDerivedFromAny<ITypeValueType>() || type.IsDerivedFromAny<TypeValueType>(),
+            nameof(RemoveNonTypeValueTypes)
+            );
+    /// <summary>
+    /// Creates a <see cref="ITypePackage"/> from the given <paramref name="typePackage"/> which contains only <see cref="ValueTypes.ValueType"/>s
+    /// </summary>
+    public static ITypePackage RemoveNonValueTypes(this ITypePackage typePackage)
+        => typePackage.ApplyFilter(
+            type => type.IsDerivedFromAny<ValueType<Ignored>>(),
+            nameof(RemoveNonValueTypes)
+        );
+}
 
 /// <summary>
 /// Contains Content to be used by the <see cref="TypeCache"/>
@@ -36,6 +70,9 @@ public sealed class TypePackage : ITypePackage
 
     public static ITypePackage Get(IReadOnlyCollection<Type> types)
         => new TypePackage(types, null, "{Types} Types");
+
+    internal static ITypePackage Get(IEnumerable<Type> types, IEnumerable<ITypePackage> children, string name)
+        => new TypePackage(types, children, name);
 
     /// <summary>
     /// creates a <see cref="ITypePackage"/> which contains all types nested in the given types, but not the types themselves.<br/>
@@ -91,7 +128,7 @@ public sealed class TypePackage : ITypePackage
         return Get(assemblies);
     }
 
-    private TypePackage(IEnumerable<Type>? types, IEnumerable<ITypePackage>? children, string nameTemplate, Version? version = null)
+    private TypePackage(IEnumerable<Type>? types, IEnumerable<ITypePackage>? children, string nameTemplate)
     {
         Types = types ?? Enumerable.Empty<Type>();
         Children = children ?? Array.Empty<ITypePackage>();
