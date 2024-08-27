@@ -101,12 +101,28 @@ public sealed class ExceptionBuilder : IExceptionProvider, IDisposable
     public void CreateChild(string message, IEnumerable<Exception> childExceptions)
     {
         CheckDisposed();
-        var exceptions = childExceptions.ToArray();
+        var exceptions = childExceptions.ToReadOnlyCollection();
         if (exceptions.None())
             return;
         var child = CreateChild(message);
         child.Add(exceptions);
     }
+
+    /// <summary>
+    /// adds a nested <see cref="JLibAggregateException"/> with the given <paramref name="messages"/> as <see cref="JLibAggregateException.InnerExceptions"/> if the <paramref name="messages"/> are not empty
+    /// </summary>
+    /// <param name="message">written to <see cref="JLibAggregateException.UserMessage"/></param>
+    /// <param name="messages">written to <see cref="AggregateException.InnerExceptions"/></param>
+    public void CreateChild(string message, IEnumerable<string> messages)
+    {
+        CheckDisposed();
+        var exceptions = messages.ToReadOnlyCollection();
+        if (exceptions.None())
+            return;
+        var child = CreateChild(message);
+        child.Add(exceptions.Select(msg => new Exception(msg)));
+    }
+
 
     private void CheckDisposed()
     {
