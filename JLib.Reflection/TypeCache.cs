@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using JLib.Exceptions;
 using JLib.Helper;
-using JLib.Reflection.Exceptions;
 using JLib.ValueTypes;
 using Microsoft.Extensions.Logging;
 
@@ -78,9 +77,9 @@ public class TypeCache : ITypeCache
         public ValueTypeForTypeValueTypes(Type Value) : base(Value)
         {
             if (!Value.IsAssignableTo(typeof(TypeValueType)))
-                throw new TvtNavigationFailedException($"{Value.Name} does not derive from {nameof(TypeValueType)}");
+                throw new InvalidSetupException($"{Value.Name} does not derive from {nameof(TypeValueType)}");
             if (Value.IsAbstract)
-                throw new TvtNavigationFailedException($"{Value.Name} is abstract");
+                throw new InvalidSetupException($"{Value.Name} is abstract");
         }
 
         public bool Filter(Type otherType)

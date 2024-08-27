@@ -37,7 +37,7 @@
             ],
             "InnerExceptions": [
               {
-                "Type": "JLib.Reflection.Exceptions.InvalidTypeException",
+                "Type": "JLib.Reflection.InvalidTypeException",
                 "MessageLines": [
                   "JLib.Reflection.Tests.TypeCacheTests.TypeValueTypeWithoutFactoryAttribute.InvalidTypeValueType"
                 ],

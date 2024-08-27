@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using JLib.Helper;
 
@@ -37,9 +38,11 @@ public sealed class ExceptionBuilder : IExceptionProvider, IDisposable
     /// </summary>
     public void Add(Exception exception)
     {
-        CheckDisposed();
         lock (_exceptionLock)
+        {
+            CheckDisposed();
             _exceptions.Add(exception);
+        }
     }
 
     /// <summary>
@@ -47,8 +50,19 @@ public sealed class ExceptionBuilder : IExceptionProvider, IDisposable
     /// </summary>
     public void Add(IEnumerable<Exception> exceptions)
     {
-        foreach (var exception in exceptions)
-            Add(exception);
+        lock (_exceptionLock)
+        {
+            CheckDisposed();
+            _exceptions.AddRange(exceptions);
+        }
+    }
+
+    /// <summary>
+    /// adds all <paramref name="exceptions"/> to <see cref="JLibAggregateException.InnerExceptions"/>
+    /// </summary>
+    public void Add(IEnumerable<string> exceptions)
+    {
+        Add(exceptions.Select(msg => new Exception(msg)));
     }
 
     /// <summary>
