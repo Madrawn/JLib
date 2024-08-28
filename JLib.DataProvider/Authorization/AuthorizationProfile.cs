@@ -140,7 +140,7 @@ public class MissingAuthorizationException : JLibException
     /// </summary>
     public IDataObjectType TypeWithoutAuthorization { get; }
 
-    internal MissingAuthorizationException(IDataObjectType typeWithoutAuthorization)
+    internal MissingAuthorizationException(IDataObjectType typeWithoutAuthorization):base($"{typeWithoutAuthorization.Value.FullName()} is not authorized.")
     {
         TypeWithoutAuthorization = typeWithoutAuthorization;
         Data.Add(nameof(TypeWithoutAuthorization), typeWithoutAuthorization);
