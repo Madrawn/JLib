@@ -92,7 +92,7 @@ public class ValueTypeProfile : Profile
 
     public ValueTypeProfile(ITypeCache cache, ILogger<ValueTypeProfile> logger)
     {
-        foreach (var valueType in cache.All<ValueTypeType>(vt => vt is { Mapped: true }))
+        foreach (var valueType in cache.All<ValueTypeType>().Where(vt => vt is { Mapped: true }))
         {
             if (valueType.NativeType.IsClass)
             {

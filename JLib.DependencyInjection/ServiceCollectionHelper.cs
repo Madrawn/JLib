@@ -17,7 +17,7 @@ namespace JLib.DependencyInjection;
 
 public static class ServiceCollectionHelper
 {
-    
+
     #region AddAlias
 
     /// <summary>
@@ -139,7 +139,7 @@ public static class ServiceCollectionHelper
             "Linking {provided} to Alias {alias} for each {tvt} with lifetime {lifetime}",
             providedType.Name, aliasType.Name, typeof(TTvt).Name, lifetime);
 
-        foreach (var valueType in typeCache.All(filter))
+        foreach (var valueType in typeCache.All<TTvt>().Where(filter))
         {
             try
             {
@@ -214,7 +214,7 @@ public static class ServiceCollectionHelper
             "Providing {implementation} as {service} for each {tvt} with lifetime {lifetime}",
             implementationType.Name, serviceType.Name, typeof(TTvt).Name, lifetime);
 
-        foreach (var valueType in typeCache.All(filter))
+        foreach (var valueType in typeCache.All<TTvt>().Where(filter))
         {
             try
             {

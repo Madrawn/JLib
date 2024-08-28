@@ -149,8 +149,13 @@ public static class ExceptionExtensions
     /// <returns>A <see cref="JsonObject"/> representation of the <paramref name="exception"/>.</returns>
     public static JsonObject ToHumanOptimizedJsonObject(this Exception exception, bool includeType = true)
     {
-        var json = new JsonObject();
-        json.Add("Message", GetJsonString(exception is JLibAggregateException jLibAgg ? jLibAgg.UserMessage : exception.Message));
+        var json = new JsonObject
+        {
+            {
+                "Message",
+                GetJsonString(exception is JLibAggregateException jLibAgg ? jLibAgg.UserMessage : exception.Message)
+            }
+        };
         if (includeType && new[] { typeof(Exception), typeof(JLibAggregateException), typeof(AggregateException) }.Contains(exception.GetType()) == false)
             json.Add("Type", exception.GetType().Name);
 
@@ -188,6 +193,8 @@ public static class ExceptionExtensions
                 json.Add("InnerException", exception.InnerException.ToHumanOptimizedJsonObject());
         }
 
+        return json;
+
         JsonNode? GetJsonString(string? text)
         {
             if (text is null)
@@ -202,7 +209,5 @@ public static class ExceptionExtensions
             return msg;
 
         }
-
-        return json;
     }
 }

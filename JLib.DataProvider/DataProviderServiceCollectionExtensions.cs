@@ -118,7 +118,7 @@ public static class DataProviderServiceCollectionExtensions
 
         #region read/write mode mismatch check
 
-        var repos = typeCache.All<RepositoryType>(repo => repo.ProvidedDataObject is TTvt).ToArray();
+        var repos = typeCache.All<RepositoryType>().Where(repo => repo.ProvidedDataObject is TTvt).ToArray();
         var implementationCanWrite = implementation.ImplementsAny<IDataProviderRw<IEntity>>();
         foreach (var repo in repos)
         {
