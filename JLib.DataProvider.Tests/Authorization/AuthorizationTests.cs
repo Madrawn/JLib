@@ -14,103 +14,9 @@ using Xunit.Abstractions;
 
 namespace JLib.DataProvider.Tests.Authorization;
 
-public class AuthorizationTests
+public abstract class AuthorizationTestsBaseTypes
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly IDataProviderRw<TestDataObject> _dataProvider;
-    private readonly TestAuthorizationCondition _authEnabler;
-    private readonly TestObjectDataPackage _dataPackage;
 
-    public AuthorizationTests(ITestOutputHelper testOutputHelper)
-    {
-
-        using var loggerFactory = new LoggerFactory().AddXunit(testOutputHelper);
-
-        var exceptions = new ExceptionBuilder("test");
-        var services = new ServiceCollection()
-            .AddLogging()
-            .AddTypeCache(
-                out var typeCache, exceptions, loggerFactory,
-                JLibDataProviderTp.Instance,
-                JLibDataGenerationTp.Instance,
-                JLibCqrsTp.Instance,
-                TypePackage.GetNested<AuthorizationTests>()
-                )
-            .AddSingleton<TestAuthorizationCondition>()
-            .AddDataPackages(typeCache)
-            .AddScopeProvider()
-            .AddDataAuthorization(typeCache)
-            .AddAutoMapper(b => { b.CreateMap<Guid, Guid>(); })
-            .AddDataProvider<CommandEntityType, InMemoryDataProvider<IEntity>, IEntity>(
-                typeCache, null, null, null, exceptions, loggerFactory)
-            ;
-        _serviceProvider = services.BuildServiceProvider();
-        _serviceProvider.IncludeDataPackages<TestObjectDataPackage>();
-        _dataProvider = _serviceProvider.GetRequiredService<IDataProviderRw<TestDataObject>>();
-        _authEnabler = _serviceProvider.GetRequiredService<TestAuthorizationCondition>();
-        _authEnabler.AuthorizationEnabled = true;
-        _dataPackage = _serviceProvider.GetRequiredService<TestObjectDataPackage>();
-    }
-
-    [Fact]
-    public void SetupWorks()
-    {
-        _authEnabler.AuthorizationEnabled = false;
-        var p = _serviceProvider.GetRequiredService<IDataProviderRw<TestDataObject>>();
-        p.Get().Should().HaveCount(6);
-        p.Get().Select(x => x.Id).Should().NotContain(Guid.Empty);
-        _authEnabler.AuthorizationEnabled = true;
-    }
-    [Fact]
-    public void GetWorks()
-    {
-        _dataProvider.Get().Should().HaveCount(3);
-    }
-    [Fact]
-    public void GetByIdWorks()
-    {
-        _dataProvider.Get(_dataPackage.FirstAuthorizedId)
-            .Id
-            .Should()
-            .Be(_dataPackage.FirstAuthorizedId);
-    }
-    [Fact]
-    public void GetByIdUnauthorizedWorks()
-    {
-        var f = () =>
-        {
-            _dataProvider.Get(_dataPackage.FirstUnauthorizedId)
-                .Id
-                .Should()
-                .Be(_dataPackage.FirstUnauthorizedId);
-        };
-        f.Should().Throw<InvalidOperationException>();
-    }
-
-    [Fact]
-    public void GetByIdsUnauthorizedWorks()
-    {
-        var id1 = _dataPackage.FirstAuthorizedId.Value;
-        var idU1 = _dataPackage.FirstUnauthorizedId.Value;
-        var idU2 = _dataPackage.SecondAuthorizedId.Value;
-        var f = () =>
-        {
-            _dataProvider.Get(new[] { id1, idU1, idU2 });
-        };
-        f.Should().Throw<AggregateException>();
-    }
-    [Fact]
-    public void ContainsUnauthorized()
-    {
-        var id = _dataPackage.FirstUnauthorizedId.Value;
-        _dataProvider.Contains(id).Should().BeFalse();
-    }
-    [Fact]
-    public void ContainsAuthorized()
-    {
-        var id = _dataPackage.FirstAuthorizedId.Value;
-        _dataProvider.Contains(id).Should().BeTrue();
-    }
     #region test classes
     public class TestDataObject : ICommandEntity
     {
@@ -181,6 +87,115 @@ public class AuthorizationTests
     {
         public bool AuthorizationEnabled;
     }
+    #endregion
+}
+public abstract class AuthorizationTestsBase<TProfile>: AuthorizationTestsBaseTypes
+    where TProfile : AuthorizationProfile
+{
+    private readonly IServiceProvider _serviceProvider;
+    private readonly IDataProviderRw<TestDataObject> _dataProvider;
+    private readonly TestAuthorizationCondition _authEnabler;
+    private readonly TestObjectDataPackage _dataPackage;
+
+    protected AuthorizationTestsBase(ITestOutputHelper testOutputHelper)
+    {
+
+        using var loggerFactory = new LoggerFactory().AddXunit(testOutputHelper);
+
+        var exceptions = new ExceptionBuilder("test");
+        var services = new ServiceCollection()
+            .AddLogging()
+            .AddTypeCache(
+                out var typeCache, exceptions, loggerFactory,
+                JLibDataProviderTp.Instance,
+                JLibDataGenerationTp.Instance,
+                JLibCqrsTp.Instance,
+                TypePackage.GetNested<AuthorizationTestsBaseTypes>(),
+                TypePackage.GetNested(GetType())
+                    )
+            .AddSingleton<TestAuthorizationCondition>()
+            .AddDataPackages(typeCache)
+            .AddScopeProvider()
+            .AddDataAuthorization(typeCache)
+            .AddAutoMapper(b => { b.CreateMap<Guid, Guid>(); })
+            .AddDataProvider<CommandEntityType, InMemoryDataProvider<IEntity>, IEntity>(
+                typeCache, null, null, null, exceptions, loggerFactory)
+            ;
+        _serviceProvider = services.BuildServiceProvider();
+        _serviceProvider.IncludeDataPackages<TestObjectDataPackage>();
+        _dataProvider = _serviceProvider.GetRequiredService<IDataProviderRw<TestDataObject>>();
+        _authEnabler = _serviceProvider.GetRequiredService<TestAuthorizationCondition>();
+        _authEnabler.AuthorizationEnabled = true;
+        _dataPackage = _serviceProvider.GetRequiredService<TestObjectDataPackage>();
+    }
+    #region tests
+    [Fact]
+    public void SetupWorks()
+    {
+        _authEnabler.AuthorizationEnabled = false;
+        var p = _serviceProvider.GetRequiredService<IDataProviderRw<TestDataObject>>();
+        p.Get().Should().HaveCount(6);
+        p.Get().Select(x => x.Id).Should().NotContain(Guid.Empty);
+        _authEnabler.AuthorizationEnabled = true;
+    }
+    [Fact]
+    public void GetWorks()
+    {
+        _dataProvider.Get().Should().HaveCount(3);
+    }
+    [Fact]
+    public void GetByIdWorks()
+    {
+        _dataProvider.Get(_dataPackage.FirstAuthorizedId)
+            .Id
+            .Should()
+            .Be(_dataPackage.FirstAuthorizedId);
+    }
+    [Fact]
+    public void GetByIdUnauthorizedWorks()
+    {
+        var f = () =>
+        {
+            _dataProvider.Get(_dataPackage.FirstUnauthorizedId)
+                .Id
+                .Should()
+                .Be(_dataPackage.FirstUnauthorizedId);
+        };
+        f.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void GetByIdsUnauthorizedWorks()
+    {
+        var id1 = _dataPackage.FirstAuthorizedId.Value;
+        var idU1 = _dataPackage.FirstUnauthorizedId.Value;
+        var idU2 = _dataPackage.SecondAuthorizedId.Value;
+        var f = () =>
+        {
+            _dataProvider.Get(new[] { id1, idU1, idU2 });
+        };
+        f.Should().Throw<AggregateException>();
+    }
+    [Fact]
+    public void ContainsUnauthorized()
+    {
+        var id = _dataPackage.FirstUnauthorizedId.Value;
+        _dataProvider.Contains(id).Should().BeFalse();
+    }
+    [Fact]
+    public void ContainsAuthorized()
+    {
+        var id = _dataPackage.FirstAuthorizedId.Value;
+        _dataProvider.Contains(id).Should().BeTrue();
+    }
+    #endregion
+}
+
+public class AuthorizationTests : AuthorizationTestsBase<AuthorizationTests.TestAuthProfile>
+{
+    public AuthorizationTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+    {
+    }
     public class TestAuthProfile : AuthorizationProfile
     {
         public TestAuthProfile(ITypeCache typeCache) : base(typeCache)
@@ -190,5 +205,19 @@ public class AuthorizationTests
                 (srv, e) => !srv.AuthorizationEnabled || e.IsAuthorized);
         }
     }
-    #endregion
+}
+public class OtherAuthorizationTests : AuthorizationTestsBase<AuthorizationTests.TestAuthProfile>
+{
+    public OtherAuthorizationTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+    {
+    }
+    public class TestAuthProfile : AuthorizationProfile
+    {
+        public TestAuthProfile(ITypeCache typeCache) : base(typeCache)
+        {
+            AddGenericAuthorization<TestDataObject>(
+                (srv, e) => !srv.GetRequiredService<TestAuthorizationCondition>().AuthorizationEnabled || e.IsAuthorized,
+                typeof(TestDataObject));
+        }
+    }
 }

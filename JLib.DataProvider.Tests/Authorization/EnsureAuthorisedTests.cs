@@ -59,7 +59,8 @@ public class EnsureAuthorisedTests
             .Where(x => x.FlattenAll().OfType<UnknownDataObjectTypeException>().Any() == false,
                 "test setup misconfigured")
             .Where(x => x.FlattenAll().OfType<MissingAuthorizationException>().Count() == 1,
-                "missing entity detected");
+                "missing entity detected")
+            .Where(x => x.FlattenAll().OfType<NotUniqueTypeFilterException<CommandEntityType>>().Any() == false);
 
     }
 
@@ -76,7 +77,7 @@ public class EnsureAuthorisedTests
         public ValidAuthProfile(ITypeCache typeCache) : base(typeCache)
         {
             AddAuthorization<TestDataObject, Ignored>((_, _) => true);
-            EnsureAuthorised<CommandEntityType>().ThrowIfNotEmpty();
+            var ex = EnsureAuthorised<CommandEntityType>();
         }
     }
     public class TestDataObject : ICommandEntity

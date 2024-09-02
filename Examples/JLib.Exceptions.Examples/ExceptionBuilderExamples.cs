@@ -1,4 +1,6 @@
 ﻿using FluentAssertions;
+using System.ComponentModel.DataAnnotations;
+using JLib.Helper;
 
 namespace JLib.Exceptions.Examples;
 public class ExceptionBuilderExamples
@@ -104,5 +106,40 @@ public class ExceptionBuilderExamples
         var exception = exceptionBuilder.GetException();
 
         exception.Should().BeNull();
+    }
+
+    [Fact]
+    public void Demo()
+    {
+        var sut = () =>
+        {
+
+            using var exceptionBuilder = new ExceptionBuilder("Example");
+            exceptionBuilder.Add("test");
+
+            using var subBuilder = exceptionBuilder.CreateChild("sub");
+
+            exceptionBuilder.Add(new Exception("my fault", new MyCustomException(1)));
+
+            exceptionBuilder.ThrowIfNotEmpty();
+        };
+        sut.Should().Throw<Exception>()
+            .Where(ex => ex.FlattenAll().OfType<MyCustomException>().Count() == 1, "have my exception once")
+            .Where(ex => ex.FlattenAll().OfType<MyCustomException>().Single().InvalidValue == 1, "have my exception once");
+
+        //exceptionBuilder.
+        var res = exceptionBuilder.GetException().FlattenAll().ToArray();
+    }
+}
+
+
+public class MyCustomException : Exception
+{
+    public int InvalidValue { get; }
+
+    public MyCustomException(int invalidValue) : base($"value {invalidValue} is invalid")
+    {
+        InvalidValue = invalidValue;
+        Data[nameof(InvalidValue)] = invalidValue;
     }
 }

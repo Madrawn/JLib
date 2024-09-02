@@ -4,13 +4,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace JLib.DataProvider.Authorization;
 
-public interface IUnboundAuthorizationInfo
+internal interface IUnboundAuthorizationInfo
 {
     IAuthorizationInfo Bind(IServiceScope scope);
     DataObjectType Target { get; }
 }
 
-public interface IUnboundAuthorizationInfo<TDataObject> : IUnboundAuthorizationInfo
+internal interface IUnboundAuthorizationInfo<TDataObject> : IUnboundAuthorizationInfo
     where TDataObject : class, IDataObject
 {
     IAuthorizationInfo IUnboundAuthorizationInfo.Bind(IServiceScope scope)
