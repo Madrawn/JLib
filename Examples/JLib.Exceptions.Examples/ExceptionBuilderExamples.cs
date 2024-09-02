@@ -107,29 +107,6 @@ public class ExceptionBuilderExamples
 
         exception.Should().BeNull();
     }
-
-    [Fact]
-    public void Demo()
-    {
-        var sut = () =>
-        {
-
-            using var exceptionBuilder = new ExceptionBuilder("Example");
-            exceptionBuilder.Add("test");
-
-            using var subBuilder = exceptionBuilder.CreateChild("sub");
-
-            exceptionBuilder.Add(new Exception("my fault", new MyCustomException(1)));
-
-            exceptionBuilder.ThrowIfNotEmpty();
-        };
-        sut.Should().Throw<Exception>()
-            .Where(ex => ex.FlattenAll().OfType<MyCustomException>().Count() == 1, "have my exception once")
-            .Where(ex => ex.FlattenAll().OfType<MyCustomException>().Single().InvalidValue == 1, "have my exception once");
-
-        //exceptionBuilder.
-        var res = exceptionBuilder.GetException().FlattenAll().ToArray();
-    }
 }
 
 
