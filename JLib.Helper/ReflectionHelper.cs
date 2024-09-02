@@ -64,6 +64,12 @@ public static class ReflectionHelper
     /// </summary>
     public static Type TryGetGenericTypeDefinition(this Type type)
         => type.IsGenericType ? type.GetGenericTypeDefinition() : type;
+    /// <summary>
+    /// Executes <see cref="MethodInfo.GetGenericArguments"/> if the method is <see cref="MethodBase.IsGenericMethod"/> or <see cref="MethodBase.IsGenericMethodDefinition"/>, otherwise returns <see cref="Array.Empty{T}"/><br/>
+    /// <inheritdoc cref="MethodInfo.GetGenericArguments"/>
+    /// </summary>
+    public static Type[] TryGetGenericArguments(this MethodInfo method)
+        => (method.IsGenericMethodDefinition || method.IsGenericMethod) ? method.GetGenericArguments() : Array.Empty<Type>();
 
     /// <summary>
     /// filters the given <paramref name="src"/> for <see cref="Type"/>s decorated with the given <typeparamref name="TAttribute"/>
