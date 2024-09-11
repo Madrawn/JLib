@@ -70,6 +70,12 @@ public static class FilePathValidationExtensions
             context.AddError("Must have no extension");
         return context;
     }
+    public static IValidationContext<string?> HaveAnDirectory(this IValidationContext<string?> context)
+    {
+        if (Path.GetDirectoryName(context.Value) is null)
+            context.AddError($"Must have an directory");
+        return context;
+    }
 }
 
 /// <summary>
@@ -91,7 +97,7 @@ public record FileNameWithExtension(string Value) : StringValueType(Value), IPat
         => must
             .NotContainInvalidFileNameChars()
             .HaveAnExtension();
-    
+
     /// <returns>the <see cref="FileExtension"/></returns>
     public FileExtension GetExtension()
         => new(Path.GetExtension(Value).TrimStart('.'));
@@ -156,27 +162,6 @@ public record RelativeFilePath(string Value) : StringValueType(Value)
     /// <returns>the filename of this path</returns>
     public FileNameWithExtension GetFileName()
         => new(Path.GetFileName(Value));
-}
-/// <summary>
-/// an absolute path to a file which may or may not exist
-/// </summary>
-public record AbsoluteFilePath(string Value) : StringValueType(Value)
-{
-    [Validation]
-    private static void Validate(ValidationContext<string> must) 
-        => must
-            .BeRootPath()
-            .NotContain(Path.GetInvalidFileNameChars());
-
-    /// <returns>the directory of this path</returns>
-    public AbsoluteDirectoryPath? GetDirectory()
-        => ValueType.CreateNullable<AbsoluteDirectoryPath, string>(Path.GetDirectoryName(Value));
-    /// <returns>the filename of this path</returns>
-    public FileNameWithExtension GetFileName()
-        => new(Path.GetFileName(Value));
-    /// <returns>whether this file exists or not</returns>
-    public bool Exists()
-        => File.Exists(Value);
 }
 
 /// <summary>
@@ -269,11 +254,11 @@ public record AbsoluteDirectoryPath(string Value) : StringValueType(Value)
     /// <returns>All files contained in this directory</returns>
     public IReadOnlyCollection<AbsoluteFilePath> GetFiles()
     => Directory.GetFiles(Value).Select(x => new AbsoluteFilePath(x)).ToReadOnlyCollection();
-    
+
     /// <returns>All Subdirectories of this directory</returns>
     public IReadOnlyCollection<AbsoluteDirectoryPath> GetDirectories()
         => Directory.GetDirectories(Value).Select(x => new AbsoluteDirectoryPath(x)).ToReadOnlyCollection();
-    
+
     /// <returns>The directory which contains this directory</returns>
     public AbsoluteDirectoryPath? GetParent()
         => ValueType.CreateNullable<AbsoluteDirectoryPath, string>(Path.GetDirectoryName(Value));
@@ -283,6 +268,10 @@ public record AbsoluteDirectoryPath(string Value) : StringValueType(Value)
     /// <returns>whether this directory exists or not</returns>
     public bool Exists()
         => Directory.Exists(Value);
+    /// <summary>
+    /// Creates this directory
+    /// </summary>
+    public void Create() => Directory.CreateDirectory(Value);
 }
 /// <summary>
 /// The letter of a windows filesystem drive, e.g. 'C'
