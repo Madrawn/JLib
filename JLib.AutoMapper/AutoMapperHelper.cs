@@ -16,7 +16,7 @@ public static class AutoMapperHelper
     public static void AddProfiles(this IMapperConfigurationExpression builder, ITypeCache typeCache, ILoggerFactory loggerFactory)
     {
         var logger = loggerFactory.CreateLogger(typeof(AutoMapperHelper));
-        builder.AddProfiles(typeCache.All<AutoMapperProfileType>().Select(p =>
+        builder.AddProfiles(typeCache.All<AutoMapperProfileType>().Where(x => x.Value.IsGenericTypeDefinition is false).Select(p =>
         {
             logger.LogDebug("    Loading {profile}", p.Name);
             return p.Create(typeCache, loggerFactory);
