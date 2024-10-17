@@ -147,24 +147,6 @@ public record FileExtension(string Value) : StringValueType(Value)
             .NotContainInvalidFileNameChars();
 }
 /// <summary>
-/// a relative path to a file which may or may not exist
-/// </summary>
-public record RelativeFilePath(string Value) : StringValueType(Value)
-{
-    [Validation]
-    private static void Validate(ValidationContext<string> must)
-        => must
-            .BeRelativePath()
-            .NotContainInvalidFileNameChars();
-    /// <returns>the directory of this path</returns>
-    public RelativeDirectoryPath? GetDirectory()
-        => ValueType.CreateNullable<RelativeDirectoryPath, string>(Path.GetDirectoryName(Value));
-    /// <returns>the filename of this path</returns>
-    public FileNameWithExtension GetFileName()
-        => new(Path.GetFileName(Value));
-}
-
-/// <summary>
 /// the name of a single directory in a path, not a <see cref="RelativeDirectoryPath"/>, <see cref="AbsoluteDirectoryPath"/> or <see cref="DriveLetter"/><br/><br/>
 /// Validation may differ between operating systems due to the usage of <see cref="Path.GetInvalidPathChars"/><br/><br/>
 /// must not contain <see cref="Path.GetInvalidPathChars"/><br/>
