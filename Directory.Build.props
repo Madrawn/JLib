@@ -41,6 +41,7 @@
             JLib.HotChocolate
             JLib.Testing
             JLib.SystemTextJson
+            JLib.AspNetCore
         </PackageAssemblies>
 
     </PropertyGroup>

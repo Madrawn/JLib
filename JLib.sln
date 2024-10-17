@@ -108,7 +108,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.ValueTypes.Implementat
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Implementations", "Implementations", "{7F914D27-9431-4AC4-A0C2-1A5775E001B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.AutoMapper.Tests", "JLib.AutoMapper.Tests\JLib.AutoMapper.Tests.csproj", "{02732DD2-09BA-41FA-92BF-9F147583CF10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.AutoMapper.Tests", "JLib.AutoMapper.Tests\JLib.AutoMapper.Tests.csproj", "{02732DD2-09BA-41FA-92BF-9F147583CF10}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.AspNetCore", "JLib.AspNetCore\JLib.AspNetCore.csproj", "{596AB982-CCE1-4658-9703-16E814AA64BA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -280,6 +282,10 @@ Global
 		{02732DD2-09BA-41FA-92BF-9F147583CF10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02732DD2-09BA-41FA-92BF-9F147583CF10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02732DD2-09BA-41FA-92BF-9F147583CF10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{596AB982-CCE1-4658-9703-16E814AA64BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{596AB982-CCE1-4658-9703-16E814AA64BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{596AB982-CCE1-4658-9703-16E814AA64BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{596AB982-CCE1-4658-9703-16E814AA64BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

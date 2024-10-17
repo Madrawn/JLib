@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.*" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.*" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JLib.Exceptions\JLib.Exceptions.csproj" />
+    <ProjectReference Include="..\JLib.Helper\JLib.Helper.csproj" />
+  </ItemGroup>
+
+</Project>
