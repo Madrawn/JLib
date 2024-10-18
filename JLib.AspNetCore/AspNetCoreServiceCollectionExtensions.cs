@@ -17,6 +17,8 @@ public static class AspNetCoreServiceCollectionExtensions
     {
         public Guid ScopeId { get; } = Guid.NewGuid();
     }
+
+
     /// <summary>
     /// provides <typeparamref name="TService"/> once for each http request.
     /// <br/>
@@ -38,7 +40,6 @@ public static class AspNetCoreServiceCollectionExtensions
     {
         var ctor = typeof(TService).GetConstructors().Single();
         var ctorParams = ctor.GetParameters().Select(p => p.ParameterType).ToArray();
-        services.TryAddScoped<ScopeIdGenerator>();
 
 
         var getRequiredServiceMi = typeof(ServiceProviderServiceExtensions)
@@ -46,7 +47,7 @@ public static class AspNetCoreServiceCollectionExtensions
                                            "GetRequiredService",
                                            1,
                                            new[] { typeof(IServiceProvider) })
-            ?? throw new InvalidSetupException("IServiceProvider.GetRequiredService Method Info not found");
+                                   ?? throw new InvalidSetupException("IServiceProvider.GetRequiredService Method Info not found");
 
         var param = Expression.Parameter(typeof(IServiceProvider), "provider");
         var args = ctorParams
@@ -57,7 +58,30 @@ public static class AspNetCoreServiceCollectionExtensions
         var lambda = Expression.Lambda<Func<IServiceProvider, TService>>(body, param);
 
         var expression = lambda.Compile();
+        return services.AddRequestScopedService(expression);
+    }
 
+    /// <summary>
+    /// provides <typeparamref name="TService"/> once for each http request.
+    /// <br/>
+    /// <typeparamref name="TService"/> should be thread save, as scopes are often used to create new instances for each thread.
+    /// <remarks><br/>
+    /// This differs in comparison to a normal scoped service, in that when you create custom scopes for a request,
+    /// the service will be instanced multiple times when using a scoped service but only once using this method.
+    /// <br/>
+    /// this is useful for example when you have to make database requests to fetch a token based authentication info.
+    /// </remarks>
+    /// </summary>
+    /// <typeparam name="TService">the service to be provided</typeparam>
+    /// <param name="services">the service collection to add the service to</param>
+    /// <param name="factory">the factory to create the service instance</param>
+    /// <returns>the given <see cref="IServiceCollection"/></returns>
+    /// <exception cref="InvalidSetupException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static IServiceCollection AddRequestScopedService<TService>(this IServiceCollection services, Func<IServiceProvider, TService> factory)
+    where TService : class
+    {
+        services.TryAddScoped<ScopeIdGenerator>();
         services.AddScoped(provider =>
         {
             var context = provider.GetRequiredService<IHttpContextAccessor>().HttpContext;
@@ -78,7 +102,7 @@ public static class AspNetCoreServiceCollectionExtensions
 
             return contextScope != currentScope
                 ? context.RequestServices.GetRequiredService<TService>()
-                : expression(context.RequestServices);
+                : factory(context.RequestServices);
         });
         return services;
     }
