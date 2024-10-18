@@ -37,8 +37,30 @@ public static class AspNetCoreServiceCollectionExtensions
     /// <exception cref="InvalidOperationException"></exception>
     public static IServiceCollection AddRequestScopedService<TService>(this IServiceCollection services)
         where TService : class
+        => services.AddRequestScopedService<TService, TService>();
+
+    /// <summary>
+    /// provides <typeparamref name="TService"/> once for each http request.
+    /// <br/>
+    /// <typeparamref name="TService"/> should be thread save, as scopes are often used to create new instances for each thread.
+    /// <remarks><br/>
+    /// This differs in comparison to a normal scoped service, in that when you create custom scopes for a request,
+    /// the service will be instanced multiple times when using a scoped service but only once using this method.
+    /// <br/>
+    /// this is useful for example when you have to make database requests to fetch a token based authentication info.
+    /// </remarks>
+    /// </summary>
+    /// <typeparam name="TService">the service to be provided</typeparam>
+    /// <typeparam name="TImplementation">the implementation to be used for <typeparam name="TService"></typeparam></typeparam>
+    /// <param name="services">the service collection to add the service to</param>
+    /// <returns>the given <see cref="IServiceCollection"/></returns>
+    /// <exception cref="InvalidSetupException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static IServiceCollection AddRequestScopedService<TService, TImplementation>(this IServiceCollection services)
+        where TService : class
+        where TImplementation : class, TService
     {
-        var ctor = typeof(TService).GetConstructors().Single();
+        var ctor = typeof(TImplementation).GetConstructors().Single();
         var ctorParams = ctor.GetParameters().Select(p => p.ParameterType).ToArray();
 
 
@@ -55,10 +77,10 @@ public static class AspNetCoreServiceCollectionExtensions
             .Cast<Expression>()
             .ToArray();
         var body = Expression.New(ctor, args);
-        var lambda = Expression.Lambda<Func<IServiceProvider, TService>>(body, param);
+        var lambda = Expression.Lambda<Func<IServiceProvider, TImplementation>>(body, param);
 
         var expression = lambda.Compile();
-        return services.AddRequestScopedService(expression);
+        return services.AddRequestScopedService<TService>(provider => expression(provider));
     }
 
     /// <summary>
