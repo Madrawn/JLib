@@ -129,7 +129,7 @@ internal class IdRegistry : IIdRegistry, IDisposable
             return Interlocked.Increment(ref _idIncrement);
         }).CastTo<int>();
     }
-    
+
     /// <summary>
     /// returns the <see cref="IdIdentifier"/> for the given <paramref name="id"/><br/>
     /// consider using the <see cref="IdExtensions"/> to access the value.
@@ -194,7 +194,7 @@ internal class IdRegistry : IIdRegistry, IDisposable
             return _mapper.Value.Map(nativeId, nativeId.GetType(), idType);
         }
 
-        throw new ArgumentOutOfRangeException(nameof(idType), "unknown type");
+        throw new ArgumentOutOfRangeException(nameof(idType), "unknown type: " + idType.FullName());
     }
 
     public void SaveToFile()

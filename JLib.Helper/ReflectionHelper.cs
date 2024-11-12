@@ -5,11 +5,54 @@ using System.Text;
 
 namespace JLib.Helper;
 
+public enum AccessModifier
+{
+    Private,
+    Protected,
+    Internal,
+    ProtectedInternal,
+    PrivateProtected,
+    Public
+}
 /// <summary>
 /// Extension methods for reflection
 /// </summary>
 public static class ReflectionHelper
 {
+    public static AccessModifier GetAccessModifier(this MethodInfo methodInfo)
+    {
+        if (methodInfo.IsPrivate)
+            return AccessModifier.Private;
+        if (methodInfo.IsFamily)
+            return AccessModifier.Protected;
+        if (methodInfo.IsFamilyOrAssembly)
+            return AccessModifier.ProtectedInternal;
+        if (methodInfo.IsFamilyAndAssembly)
+            return AccessModifier.PrivateProtected;
+        if (methodInfo.IsAssembly)
+            return AccessModifier.Internal;
+        if (methodInfo.IsPublic)
+            return AccessModifier.Public;
+        throw new ArgumentException("Did not find access modifier", nameof(methodInfo));
+    }
+    public static AccessModifier GetAccessModifier(this FieldInfo fieldInfo)
+    {
+        if (fieldInfo.IsPrivate)
+            return AccessModifier.Private;
+        if (fieldInfo.IsFamily)
+            return AccessModifier.Protected;
+        if (fieldInfo.IsFamilyOrAssembly)
+            return AccessModifier.ProtectedInternal;
+        if (fieldInfo.IsFamilyAndAssembly)
+            return AccessModifier.PrivateProtected;
+        if (fieldInfo.IsAssembly)
+            return AccessModifier.Internal;
+        if (fieldInfo.IsPublic)
+            return AccessModifier.Public;
+        throw new ArgumentException("Did not find access modifier", nameof(fieldInfo));
+    }
+
+
     // https://alistairevans.co.uk/2020/11/01/detecting-init-only-properties-with-reflection-in-c-9/
     /// <summary>
     /// checks whether the property is init<br/>
@@ -37,6 +80,96 @@ public static class ReflectionHelper
     /// </summary>
     public static bool HasCustomAttribute(this MemberInfo type, Type attributeType, bool inherit = true)
         => type.GetCustomAttribute(attributeType, inherit) is not null;
+
+    /// <summary>
+    /// converts the member into a code-like representation.<br/>
+    /// <b>unstable</b>
+    /// <b>shall not be used on code but for debugging only</b>
+    /// </summary>
+    /// <param name="member"></param>
+    /// <param name="includeNamespace"></param>
+    /// <returns></returns>
+    public static string ToDebugInfo(this MemberInfo member, bool includeNamespace = false)
+    {
+        var sb = new StringBuilder();
+        if (member.DeclaringType != member.ReflectedType)
+        {
+            sb.Append('[').Append(member.ReflectedType?.FullName(includeNamespace)).Append(']');
+        }
+
+        sb.Append(member.DeclaringType?.FullName() ?? "");
+
+        sb.Append('.');
+        switch (member)
+        {
+            case MethodInfo methodInfo:
+                sb.Insert(0, methodInfo.GetAccessModifier()).Append(' ');
+                sb.Append(methodInfo.Name);
+                if (methodInfo.IsGenericMethod)
+                {
+                    sb.Append('<');
+                    sb.AppendJoin(", ", methodInfo.GetGenericArguments().Select(arg => $"{arg.FullName(includeNamespace)}"));
+                    sb.Append('>');
+                }
+                if (methodInfo.IsGenericMethodDefinition)
+                {
+                    sb.Append('<');
+                    sb.AppendJoin(", ", methodInfo.GetGenericArguments().Select(arg => $"{arg.Name}"));
+                    sb.Append('>');
+                }
+                sb.Append('(');
+                sb.AppendJoin(", ", methodInfo.GetParameters().Select(p => p.ParameterType.FullName(includeNamespace)));
+                sb.Append(')');
+                if (methodInfo.IsGenericMethodDefinition)
+                {
+                    foreach (var argument in methodInfo.GetGenericArguments())
+                    {
+                        var constraints = argument.GetGenericParameterConstraints();
+                        if (constraints.None())
+                            continue;
+                        sb.Append("where ");
+                        sb.Append(argument.Name).Append(" : ")
+                            .AppendJoin(", ", constraints.Select(c => c.FullName(includeNamespace)));
+                    }
+                }
+                break;
+            case PropertyInfo propertyInfo:
+                sb.Append(propertyInfo.Name)
+                    .Append(" { ");
+                if (propertyInfo.CanRead)
+                {
+                    sb.Append(propertyInfo.GetMethod?.GetAccessModifier());
+                    sb.Append("get; ");
+                }
+                if (propertyInfo.CanWrite)
+                {
+                    sb.Append(propertyInfo.SetMethod?.GetAccessModifier());
+                    sb.Append(propertyInfo.IsInit() ? "init; " : "set; ");
+                }
+                sb.Append('}');
+                break;
+            case FieldInfo fieldInfo:
+                sb.Append(fieldInfo.GetAccessModifier()).Append(' ');
+                if (fieldInfo.IsInitOnly)
+                    sb.Append("readonly ");
+                sb.Append(fieldInfo.Name);
+                break;
+            case ConstructorInfo constructorInfo:
+                sb.Append(constructorInfo.Name);
+                sb.Append('(');
+                sb.AppendJoin(", ", constructorInfo.GetParameters().Select(p => p.ParameterType.FullName(includeNamespace)));
+                sb.Append(')');
+                break;
+            case EventInfo eventInfo:
+                sb.Append(eventInfo.Name);
+                break;
+            default:
+                sb.Append(member.Name);
+                break;
+        }
+
+        return sb.ToString();
+    }
 
     /// <summary>
     /// Checks, whether the given <paramref name="type"/> is decorated with the given <typeparamref name="T"/>
@@ -115,7 +248,7 @@ public static class ReflectionHelper
     #region get property nullabillity
 
     // source: https://stackoverflow.com/questions/58453972/how-to-use-net-reflection-to-check-for-nullable-reference-type
-    
+
     /// <returns>whether the <paramref name="property"/> is nullable</returns>
     public static bool IsNullable(this PropertyInfo property) =>
         IsNullableHelper(property.PropertyType, property.DeclaringType, property.CustomAttributes);
