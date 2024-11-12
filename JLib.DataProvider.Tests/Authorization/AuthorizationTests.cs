@@ -38,9 +38,9 @@ public abstract class AuthorizationTestsBaseTypes
         public TestDataObjectId FirstUnauthorizedId { get; init; } = null!;
         public TestDataObjectId SecondUnAuthorizedId { get; init; } = null!;
         public TestDataObjectId ThirdUnAuthorizedId { get; init; } = null!;
-        public TestObjectDataPackage(IDataPackageManager packageManager, IDataProviderRw<TestDataObject> dataProvider) : base(packageManager)
+        public TestObjectDataPackage(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-
+            serviceProvider.GetRequiredServices(out IDataProviderRw<TestDataObject> dataProvider);
             dataProvider.Add(new TestDataObject[]
             {
                 new()
@@ -89,7 +89,7 @@ public abstract class AuthorizationTestsBaseTypes
     }
     #endregion
 }
-public abstract class AuthorizationTestsBase<TProfile>: AuthorizationTestsBaseTypes
+public abstract class AuthorizationTestsBase<TProfile> : AuthorizationTestsBaseTypes
     where TProfile : AuthorizationProfile
 {
     private readonly IServiceProvider _serviceProvider;

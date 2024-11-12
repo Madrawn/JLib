@@ -27,8 +27,9 @@ public sealed class DataDerivationViaInheritance : IDisposable
     public sealed class CustomerDp : DataPackage
     {
         public CustomerId CustomerId { get; set; } = null!;
-        public CustomerDp(ShoppingServiceMock shoppingService, IDataPackageManager packageManager) : base(packageManager)
+        public CustomerDp(IServiceProvider serviceProvider) : base(serviceProvider)
         {
+            serviceProvider.GetRequiredServices(out ShoppingServiceMock shoppingService);
             shoppingService.AddCustomer(new(GetInfoText(nameof(CustomerId)))
             {
                 Id = CustomerId
