@@ -167,14 +167,14 @@ public class AuthorizationTestsMulti
         public TestDataObjectId FirstUnauthorizedId { get; init; } = null!;
         public TestDataObjectId SecondUnAuthorizedId { get; init; } = null!;
         public TestDataObjectId ThirdUnAuthorizedId { get; init; } = null!;
-        protected TestObjectDpb(IDataPackageManager packageManager) : base(packageManager) { }
+        protected TestObjectDpb(IServiceProvider serviceProvider) : base(serviceProvider) { }
     }
     public abstract class TestObjectDpb<TDo> : TestObjectDpb
     where TDo : TestDataObjectBase, new()
     {
-        protected TestObjectDpb(IDataPackageManager packageManager, IDataProviderRw<TDo> dataProvider) : base(packageManager)
+        protected TestObjectDpb(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-
+            serviceProvider.GetRequiredServices(out IDataProviderRw<TDo> dataProvider);
             dataProvider.Add(new TDo[]
             {
                 new()
@@ -218,13 +218,13 @@ public class AuthorizationTestsMulti
     }
     public sealed class TestDataObjectDp : TestObjectDpb<TestDataObject>
     {
-        public TestDataObjectDp(IDataPackageManager packageManager, IDataProviderRw<TestDataObject> dataProvider) : base(packageManager, dataProvider)
+        public TestDataObjectDp(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
     }
     public sealed class OtherTestDataObjectDp : TestObjectDpb<OtherTestDataObject>
     {
-        public OtherTestDataObjectDp(IDataPackageManager packageManager, IDataProviderRw<OtherTestDataObject> dataProvider) : base(packageManager, dataProvider)
+        public OtherTestDataObjectDp(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
     }

@@ -37,18 +37,18 @@ public class GenericDataPackageTests : DataPackageTestBase
     {
         public T Id { get; init; } = null!;
         public int Id2 { get; init; }
-        protected Base1Dp(IDataPackageManager packageManager) : base(packageManager) { }
+        protected Base1Dp(IServiceProvider serviceProvider) : base(serviceProvider) { }
     }
 
     public abstract class Base2Dp<T> : Base1Dp<TestTypeId>
     {
-        protected Base2Dp(IDataPackageManager packageManager) : base(packageManager)
+        protected Base2Dp(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
     }
     public sealed class Test3Dp : Base2Dp<object>
     {
-        public Test3Dp(IDataPackageManager packageManager) : base(packageManager)
+        public Test3Dp(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
     }
@@ -56,7 +56,7 @@ public class GenericDataPackageTests : DataPackageTestBase
     public sealed class ThrowingDp : Base2Dp<object>
     {
         public TestTypeId Id { get; init; } = null!;
-        public ThrowingDp(IDataPackageManager packageManager) : base(packageManager)
+        public ThrowingDp(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
     }
