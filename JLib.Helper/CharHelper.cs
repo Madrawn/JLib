@@ -1,5 +1,8 @@
 ﻿namespace JLib.Helper;
 
+/// <summary>
+/// contains <see cref="char"/> extension methods.
+/// </summary>
 public static class CharHelper
 {
     /// <summary>

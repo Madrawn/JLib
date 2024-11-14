@@ -55,7 +55,7 @@ internal sealed class ValidationProfile<TValue> : IValidationProfile<TValue>
         => ProfileCache.GetOrAdd(targetType, _ => new(targetType));
     /// <summary>
     /// creates a <see cref="ValidationProfile{TValue}"/> for the given <typeparam name="TTargetType"/><br/>
-    /// when validating, the profile will use all methods decorated with the <see cref="ValidationAttribute"/> in the <paramref name="targetType"/><br/> and all its base types.<br/>
+    /// when validating, the profile will use all methods decorated with the <see cref="ValidationAttribute"/> in the <typeparamref name="TTargetType"/><br/> and all its base types.<br/>
     /// validators must follow this signature: <code>[<see cref="ValidationAttribute"/>>]</code>
     /// after the first call, instances will be reused.<br/>
     /// thread-safe.

@@ -3,6 +3,9 @@ using System.Reflection;
 
 namespace JLib.Helper;
 
+/// <summary>
+/// contains extension methods for working with <see cref="Expression"/>s
+/// </summary>
 public static class ExpressionHelper
 {
     /// <summary>

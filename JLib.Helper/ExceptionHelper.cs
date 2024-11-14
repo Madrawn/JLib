@@ -1,5 +1,8 @@
 ﻿namespace JLib.Helper;
 
+/// <summary>
+/// contains extension methods for <see cref="Exception"/>s
+/// </summary>
 public static class ExceptionHelper
 {
     /// <summary>

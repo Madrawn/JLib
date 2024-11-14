@@ -25,7 +25,7 @@ public static partial class ValueType
         /// Should the <typeparamref name="TVt"/> validations fail, an exceptions will be still be thrown<br/>
         /// If <paramref name="nullable"/> is false and a null value has been passed, an exception will be thrown according to the <typeparamref name="TVt"/> validation
         /// </summary>
-        /// <paramref name="nullable">If false, null values will be passed to the <paramref name="valueType"/> constructor.</paramref>
+        /// <paramref name="nullable">If false, null values will be passed to the constructor of <typeparamref name="TVt"/>.</paramref>
         /// <typeparam name="TVt">the <see cref="ValueType{T}"/> which should be created</typeparam>
         /// <typeparam name="T">the Native type of the <typeparamref name="TVt"/></typeparam>
         /// <returns>A <see cref="LambdaExpression"/> which can create an instance of <typeparamref name="TVt"/> from a parameter of type <typeparamref name="T"/><br/>which converts null arguments to null return values if and only if <paramref name="nullable"/> is true<br/></returns>

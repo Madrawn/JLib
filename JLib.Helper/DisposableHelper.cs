@@ -1,4 +1,8 @@
 ﻿namespace JLib.Helper;
+
+/// <summary>
+/// contains extension methods for working with <see cref="IDisposable"/>s
+/// </summary>
 public static class DisposableHelper
 {
     /// <summary>
