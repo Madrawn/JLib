@@ -86,7 +86,7 @@ public class ShopDbContext : DbContext
 public class MyDataPackage : DataPackage
 {
     public ArticleId ArticleId { get; init; }
-    public MyDataPackage(IDataPackageManager packageManager, MyDbContext dbContext):base(packageManager)
+    public MyDataPackage(DataPackageManager packageManager, MyDbContext dbContext):base(packageManager)
     {
         dbContext.Articles.Add(new()
         {

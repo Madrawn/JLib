@@ -5,21 +5,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace JLib.DataGeneration;
 
-public interface IDataPackageManager
-{
-    internal DataPackageInitState InitState { get; }
-
-    internal void IncludeDataPackages(Type[] packages);
-    internal void SetIdPropertyValue(object packageInstance, PropertyInfo property);
-}
 /// <summary>
 /// Manages the initialization of <see cref="DataPackage"/>s
 /// </summary>
-internal class DataPackageManager : IDataPackageManager
+internal sealed class DataPackageManager 
 {
     private readonly IIdRegistry _idRegistry;
     private readonly IServiceProvider _provider;
-    public DataPackageManager(IIdRegistry idRegistry, IServiceProvider provider, DataPackageConfiguration configuration)
+    internal DataPackageManager(IIdRegistry idRegistry, IServiceProvider provider, IdRegistryConfiguration configuration)
     {
         _idRegistry = idRegistry;
         _provider = provider;
@@ -28,7 +21,7 @@ internal class DataPackageManager : IDataPackageManager
 
     public DataPackageInitState InitState { get; private set; }
 
-    public DataPackageConfiguration Configuration { get; }
+    public IdRegistryConfiguration Configuration { get; }
 
     public void IncludeDataPackages(Type[] packages)
     {

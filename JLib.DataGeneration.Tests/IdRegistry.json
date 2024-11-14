@@ -1,10 +1,14 @@
 {
   "__registry__": {
-    "IdIncrement": 2
+    "IdIncrement": 3
   },
   "GenericDataPackageTests.Base3Dp:GenericDataPackageTests.Base2Dp<System.Object>:GenericDataPackageTests.Base1Dp<DataPackageTestBase.TestTypeId>": {
     "Id": "f3301c07-70f1-464a-a301-44c577d64406",
     "Id2": 2
+  },
+  "GenericDataPackageTests.Test3Dp:GenericDataPackageTests.Base2Dp<System.Object>:GenericDataPackageTests.Base1Dp<DataPackageTestBase.TestTypeId>": {
+    "Id": "69127dc0-fa17-45f1-8f4f-bc587ac809bf",
+    "Id2": 3
   },
   "GenericDataPackageTests.TestPackageInstance:GenericDataPackageTests.TestPackageBase<DataPackageTestBase.TestTypeId>": {
     "Id": "e0b5a385-ac0f-4c72-9ce0-f0906bf69c71",
