@@ -6,9 +6,5 @@
 // ReSharper disable once ConvertToStaticClass
 public sealed class Ignored
 {
-    private Ignored()
-    {
-    }
-
-    public static Ignored Instance { get; } = new();
+    private Ignored() { }
 }

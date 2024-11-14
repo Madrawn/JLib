@@ -5,13 +5,34 @@ using System.Text;
 
 namespace JLib.Helper;
 
+/// <summary>
+/// The access modifier of a <see cref="MemberInfo"/>
+/// </summary>
 public enum AccessModifier
 {
+    /// <summary>
+    /// <see langword="private"/>
+    /// </summary>
     Private,
+    /// <summary>
+    /// <see langword="protected"/>
+    /// </summary>
     Protected,
+    /// <summary>
+    /// <see langword="internal"/>
+    /// </summary>
     Internal,
+    /// <summary>
+    /// <see langword="protected internal"/>
+    /// </summary>
     ProtectedInternal,
+    /// <summary>
+    /// <see langword="private protected"/>
+    /// </summary>
     PrivateProtected,
+    /// <summary>
+    /// <see langword="public"/>
+    /// </summary>
     Public
 }
 /// <summary>
@@ -19,6 +40,8 @@ public enum AccessModifier
 /// </summary>
 public static class ReflectionHelper
 {
+    /// <returns>the <see cref="AccessModifier"/> of the given <paramref name="methodInfo"/></returns>
+    /// <exception cref="ArgumentException"></exception>
     public static AccessModifier GetAccessModifier(this MethodInfo methodInfo)
     {
         if (methodInfo.IsPrivate)
@@ -35,6 +58,8 @@ public static class ReflectionHelper
             return AccessModifier.Public;
         throw new ArgumentException("Did not find access modifier", nameof(methodInfo));
     }
+    /// <returns>the <see cref="AccessModifier"/> of the given <paramref name="fieldInfo"/></returns>
+    /// <exception cref="ArgumentException"></exception>
     public static AccessModifier GetAccessModifier(this FieldInfo fieldInfo)
     {
         if (fieldInfo.IsPrivate)
@@ -259,12 +284,13 @@ public static class ReflectionHelper
 
     /// <returns>whether the <paramref name="field"/> is nullable</returns>
     public static bool IsNullable(this FieldInfo field) =>
-    /// <returns>whether the <paramref name="property"/> is nullable</returns>
         IsNullableHelper(field.FieldType, field.DeclaringType, field.CustomAttributes);
 
     /// <returns>whether the <paramref name="parameter"/> is nullable</returns>
     public static bool IsNullable(this ParameterInfo parameter) =>
         IsNullableHelper(parameter.ParameterType, parameter.Member, parameter.CustomAttributes);
+
+    /// <returns>whether the <paramref name="genericTypeParameter"/> is nullable</returns>
     public static bool IsNullable(this Type genericTypeParameter, MemberInfo declaringType) =>
         IsNullableHelper(genericTypeParameter, declaringType, genericTypeParameter.CustomAttributes);
 
