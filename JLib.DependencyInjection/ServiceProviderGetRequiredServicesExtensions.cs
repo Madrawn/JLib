@@ -46,16 +46,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace JLib.DependencyInjection;
 
-public static class ServiceProviderHelper
+public static partial class ServiceProviderExtensions
 {
-    public static TSrvContainer GetServiceContainer<TSrvContainer>(this IServiceProvider provider)
-        where TSrvContainer : ServiceContainer, new()
-    {
-        var c = new TSrvContainer();
-        c.Init(provider);
-        return c;
-    }
-
 
     /// <returns>the requested services</returns>
     public static IServiceProvider GetRequiredServices
@@ -636,6 +628,5 @@ public static class ServiceProviderHelper
         s19 = provider.GetRequiredService<T19>();
         return provider;
     }
-
 }
 
