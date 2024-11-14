@@ -187,7 +187,7 @@ public class TypePackageTests
 #endif
             );
         expectedTypes.Should().OnlyContain(t => package.GetContent().Contains(t));
-        package.ToString(true)
+        package.ToJson()
 #if NET7_0
             .Replace("├ Types:5", "├ Types:3")
             .Replace(@"

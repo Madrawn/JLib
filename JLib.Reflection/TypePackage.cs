@@ -1,58 +1,23 @@
 ﻿using System.Collections.Immutable;
 using System.Reflection;
-using System.Text;
 using JLib.Helper;
-using JLib.ValueTypes;
-using ValueType = System.ValueType;
 
 namespace JLib.Reflection;
-
-/// <summary>
-/// Extension methods for <see cref="ITypePackage"/>
-/// </summary>
-public static class TypePackageExtensions
-{
-    /// <summary>
-    /// applies the given <paramref name="filter"/> to the typePackage <paramref name="typePackage"/>
-    /// </summary>
-    public static ITypePackage ApplyFilter(this ITypePackage typePackage, Func<Type, bool> filter, string? filterDescription = null)
-        => TypePackage.Get(
-            typePackage.Types.Where(filter),
-            typePackage.Children.Select(c => c.ApplyFilter(filter, filterDescription)),
-            typePackage.DescriptionTemplate + (filterDescription is null ? "" : $"Filtered: {filterDescription}"));
-
-    /// <summary>
-    /// Creates a <see cref="ITypePackage"/> from the given <paramref name="typePackage"/> which contains only <see cref="TypeValueType"/>s and <see cref="ITypeValueType"/>s
-    /// </summary>
-    public static ITypePackage RemoveNonTypeValueTypes(this ITypePackage typePackage) 
-        => typePackage.ApplyFilter(
-            type => type.IsDerivedFromAny<ITypeValueType>() || type.IsDerivedFromAny<TypeValueType>(),
-            nameof(RemoveNonTypeValueTypes)
-            );
-    /// <summary>
-    /// Creates a <see cref="ITypePackage"/> from the given <paramref name="typePackage"/> which contains only <see cref="ValueTypes.ValueType"/>s
-    /// </summary>
-    public static ITypePackage RemoveNonValueTypes(this ITypePackage typePackage)
-        => typePackage.ApplyFilter(
-            type => type.IsDerivedFromAny<ValueType<Ignored>>(),
-            nameof(RemoveNonValueTypes)
-        );
-}
 
 /// <summary>
 /// Contains Content to be used by the <see cref="TypeCache"/>
 /// </summary>
 public sealed class TypePackage : ITypePackage
 {
-    private static Version? _version;
-
+    /// <param name="assembly"></param>
+    /// <param name="name">the name of the type package, defaulting to <see cref="AssemblyName.Name"/></param>
+    /// <returns>an <see cref="ITypePackage"/> containing all <see cref="Assembly.GetTypes"/> of the given <paramref name="assembly"/></returns>
     public static ITypePackage Get(Assembly assembly, string? name = null)
     {
         var references = assembly
             .GetReferencedAssemblies()
             .Select(Assembly.Load)
             .SelectMany(TypePackageProviderType.GetInstances);
-        _version = assembly.GetName().Version;
         var root = new TypePackage(assembly.GetTypes(), references,
             name ?? assembly.GetName().Name ?? "Nameless Assembly with {Types} Types");
 
@@ -165,37 +130,4 @@ public sealed class TypePackage : ITypePackage
 
     public ITypePackage Combine(params ITypePackage[] packages)
         => Get(packages.Append(this));
-
-    public override string ToString()
-        => ToString(false);
-
-    public string ToString(bool includeTypes, bool includeVersion = false)
-    {
-        var sb = new StringBuilder();
-        ToString(this, 0, sb, includeTypes, includeVersion);
-        return sb.ToString();
-    }
-
-    static void ToString(ITypePackage package, int indent, StringBuilder sb, bool includeTypes, bool includeVersion)
-    {
-        var indentStr = new string(' ', indent * 2);
-        sb.Append(indentStr).Append('┐').AppendLine(package.DescriptionTemplate
-            .Replace("{Children}", package.Children.Count().ToString())
-            .Replace("{Types}", package.Types.Count().ToString())
-        );
-        if (includeVersion && _version is not null)
-            sb.Append(indentStr).Append("├ Version:").AppendLine(_version.ToString());
-        sb.Append(indentStr).Append("├ Types:").AppendLine(package.Types.Count().ToString());
-        if (package.Types.Count() <= 10 || includeTypes)
-        {
-            foreach (var type in package.Types)
-                sb.Append(indentStr).Append("│   ").AppendLine(type.FullName());
-        }
-        if (package.Children.Any())
-        {
-            sb.Append(indentStr).AppendLine("├ Children:");
-            foreach (var child in package.Children)
-                ToString(child, indent + 1, sb, includeTypes, includeVersion);
-        }
-    }
 }
