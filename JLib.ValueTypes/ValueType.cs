@@ -232,6 +232,9 @@ public abstract record ValueType<T>
         value = Value;
     }
 
+    /// <summary>
+    /// The value of the ValueType
+    /// </summary>
     public T Value { get; init; }
 
 }

@@ -13,7 +13,7 @@ public interface IDataPackageManager
     internal void SetIdPropertyValue(object packageInstance, PropertyInfo property);
 }
 /// <summary>
-/// init manager and ctor parameter bundle for <see cref="DataPackage"/>s
+/// Manages the initialization of <see cref="DataPackage"/>s
 /// </summary>
 internal class DataPackageManager : IDataPackageManager
 {

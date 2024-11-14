@@ -9,6 +9,9 @@ using static JLib.Reflection.TvtFactoryAttribute;
 
 namespace JLib.DataGeneration;
 
+/// <summary>
+/// <see cref="TypeValueType"/> for <see cref="DataPackage"/>s
+/// </summary>
 [IsDerivedFrom(typeof(DataPackage)), NotAbstract]
 public record DataPackageType(Type Value) : TypeValueType(Value), IValidatedType
 {
@@ -29,6 +32,9 @@ public record DataPackageType(Type Value) : TypeValueType(Value), IValidatedType
 [AttributeUsage(AttributeTargets.Property)]
 public class SkipIdAssignmentAttribute : Attribute { }
 
+/// <summary>
+/// Generates persistent, unique IDs and resolves dependencies using Dependency Injection.
+/// </summary>
 public abstract class DataPackage
 {
     /// <summary>
