@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
 using AutoMapper.Internal;
 using JLib.Exceptions;
 using JLib.Helper;

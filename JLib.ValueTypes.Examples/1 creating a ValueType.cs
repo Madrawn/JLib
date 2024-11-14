@@ -1,8 +1,8 @@
-using JLib.ValueTypes;
-using ValidationAttribute = JLib.ValueTypes.ValidationAttribute;
-using Xunit;
 using FluentAssertions;
 using JLib.Exceptions;
+using JLib.ValueTypes;
+using Xunit;
+using ValidationAttribute = JLib.ValueTypes.ValidationAttribute;
 using ValueType = JLib.ValueTypes.ValueType;
 
 namespace Examples;

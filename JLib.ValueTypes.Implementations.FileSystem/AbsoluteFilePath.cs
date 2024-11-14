@@ -1,6 +1,4 @@
-﻿using System.Security.AccessControl;
-
-namespace JLib.ValueTypes.Implementations.FileSystem;
+﻿namespace JLib.ValueTypes.Implementations.FileSystem;
 
 /// <summary>
 /// an absolute path to a file which may or may not exist

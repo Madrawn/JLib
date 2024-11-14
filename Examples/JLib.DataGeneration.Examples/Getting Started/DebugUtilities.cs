@@ -1,20 +1,15 @@
-﻿// Third party packages
-using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Xunit;
-using Xunit.Abstractions;
-
-// required JLib packages
+﻿using FluentAssertions;
 using JLib.AutoMapper;
+using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
 using JLib.DependencyInjection;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
-
-// referenced setup
-using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
 using JLib.Reflection.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Xunit;
+using Xunit.Abstractions;
 
 
 namespace JLib.DataGeneration.Examples.Getting_Started;

@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using JLib.Reflection;
+﻿using JLib.Reflection;
 
 namespace JLib.AutoMapper;
 
