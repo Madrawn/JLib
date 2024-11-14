@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
-using JLib.Helper;
+﻿using JLib.Helper;
 
 namespace JLib.Exceptions;
 
@@ -96,6 +93,15 @@ public sealed class ExceptionBuilder : IExceptionProvider, IDisposable
     public ExceptionBuilder(string message, params IExceptionProvider[] children) : this(message)
     {
         AddChildren(children);
+    }
+    /// <summary>
+    /// creates an <see cref="ExceptionBuilder"/> and adds the given <paramref name="children"/>
+    /// </summary>
+    /// <param name="message">written to <see cref="JLibAggregateException.UserMessage"/></param>
+    /// <param name="children">will be added to <see cref="AggregateException.InnerExceptions"/></param>
+    public ExceptionBuilder(string message, params Exception[] children) : this(message)
+    {
+        Add(children);
     }
     private ExceptionBuilder(string message, ExceptionBuilder? parent)
     {

@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Snapshooter.Xunit;
 using Xunit;
 
 namespace JLib.Helper.Tests;

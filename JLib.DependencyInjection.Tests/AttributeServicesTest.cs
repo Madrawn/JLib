@@ -32,7 +32,7 @@ public class AttributeServicesTest : IDisposable
     {
         var exceptions = new ExceptionBuilder("test");
         var typePackage = TypePackage.GetNested<T>();
-        _output.WriteLine(typePackage.ToString(true));
+        _output.WriteLine(typePackage.ToJson());
         services = new ServiceCollection()
             .AddTypeCache(out var typeCache, exceptions, _loggerFactory, typePackage)
             .AddServicesWithAttributes(typeCache, exceptions);

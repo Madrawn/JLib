@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
-using FluentAssertions;
-using JLib.DataGeneration.Abstractions;
+﻿using FluentAssertions;
 using JLib.Helper;
 using Microsoft.Extensions.DependencyInjection;
 using Snapshooter.Xunit;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace JLib.DataGeneration.Tests;
+
 public class TestingIdGeneratorTests : IDisposable
 {
     class Nested<T>

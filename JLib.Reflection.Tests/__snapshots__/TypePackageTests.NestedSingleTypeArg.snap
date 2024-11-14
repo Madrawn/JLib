@@ -1,5 +1,11 @@
-﻿┐nested types of TypePackageTests.NestingDemoClass
-├ Types:3
-│   TypePackageTests.NestingDemoClass.NestedDemoClassA
-│   TypePackageTests.NestingDemoClass.NestedDemoClassB
-│   TypePackageTests.NestingDemoClass.NestedDemoClassC
+﻿{
+  "Description": "nested types of TypePackageTests.NestingDemoClass",
+  "Types": {
+    "JLib.Reflection.Tests": [
+      "TypePackageTests.NestingDemoClass.NestedDemoClassA",
+      "TypePackageTests.NestingDemoClass.NestedDemoClassB",
+      "TypePackageTests.NestingDemoClass.NestedDemoClassC"
+    ]
+  },
+  "Children": []
+}

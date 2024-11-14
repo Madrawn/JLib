@@ -2,7 +2,6 @@
 using AutoMapper;
 using FluentAssertions;
 using JLib.AutoMapper;
-using JLib.DependencyInjection;
 using JLib.Exceptions;
 using JLib.Reflection;
 using JLib.Reflection.DependencyInjection;

@@ -39,34 +39,52 @@ public static class EnumerableExtensions
     public static IGrouping<TKey, TValue> ByKey<TKey, TValue>(this IEnumerable<IGrouping<TKey, TValue>> col, TKey key)
         => col.First(x => x.Key?.Equals(key) ?? key is null);
 
+    /// <summary>
+    /// <inheritdoc cref="Enumerable.Except{TSource}(IEnumerable{TSource},IEnumerable{TSource})"/>
+    /// </summary>
     public static IEnumerable<T> Except<T>(this IEnumerable<T> col, params T[] values)
         => col.Except(values.AsEnumerable());
 
-    public static void RemoveWhere<T>(this ICollection<T> col, Func<T, bool> filter)
+    /// <summary>
+    /// removes all elements from the <paramref name="collection"/> which match the <paramref name="filter"/>
+    /// </summary>
+    public static void RemoveWhere<T>(this ICollection<T> collection, Func<T, bool> filter)
     {
-        foreach (var i in col.Where(filter).ToArray())
-            col.Remove(i);
+        foreach (var i in collection.Where(filter).ToArray())
+            collection.Remove(i);
     }
 
-    public static void RemoveWhere<T>(this IList<T> col, Func<T, bool> filter)
+    /// <summary>
+    /// removes all elements from the <paramref name="list"/> which match the <paramref name="filter"/>
+    /// </summary>
+    public static void RemoveWhere<T>(this IList<T> list, Func<T, bool> filter)
     {
-        foreach (var i in col.Where(filter).ToArray())
-            col.Remove(i);
+        foreach (var i in list.Where(filter).ToArray())
+            list.Remove(i);
     }
 
-    public static void Remove<T>(this IList<T> col, IEnumerable<T> toRemove)
+    /// <summary>
+    /// removes all <paramref name="elements"/> from the <see cref="list"/>
+    /// </summary>
+    public static void Remove<T>(this IList<T> list, IEnumerable<T> elements)
     {
-        foreach (var i in toRemove)
-            col.Remove(i);
+        foreach (var i in elements)
+            list.Remove(i);
     }
 
-    public static IReadOnlyCollection<T> ToReadOnlyCollection<T>(this IEnumerable<T> col)
-        => col.ToArray();
+    /// <summary>
+    /// casts the <paramref name="enumerable"/> as <see cref="IReadOnlyCollection{T}"/>, materializing it and preventing all write operations
+    /// </summary>
+    public static IReadOnlyCollection<T> ToReadOnlyCollection<T>(this IEnumerable<T> enumerable)
+        => enumerable.ToArray();
 
+    /// <summary>
+    /// converts the dictionary to a <see cref="ConcurrentDictionary{TKey,TValue}"/>
+    /// </summary>
     public static ConcurrentDictionary<TKey, TValue> ToConcurrentDictionary<TKey, TValue>(
-        this IDictionary<TKey, TValue> source)
+        this IDictionary<TKey, TValue> dictionary)
         where TKey : notnull
-        => new(source);
+        => new(dictionary);
 
     public static ConcurrentDictionary<TKey, TValue> ToConcurrentDictionary<TKey, TValue>(
         this IEnumerable<TValue> col, Func<TValue, TKey> keySelector)

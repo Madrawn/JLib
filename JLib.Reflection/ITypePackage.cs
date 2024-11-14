@@ -32,6 +32,4 @@ public interface ITypePackage
     /// returns a type package which is a combination of the given packages
     /// </summary>
     public ITypePackage Combine(params ITypePackage[] packages);
-
-    public string ToString(bool includeTypes, bool includeVersion = false);
 }

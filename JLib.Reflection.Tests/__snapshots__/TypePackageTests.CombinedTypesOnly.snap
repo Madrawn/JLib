@@ -1,5 +1,11 @@
-﻿┐0 Assemblies and 3 types
-├ Types:3
-│   TypePackageTests.DemoClassA
-│   TypePackageTests.DemoClassB
-│   TypePackageTests.DemoClassC
+﻿{
+  "Description": "0 Assemblies and 3 types",
+  "Types": {
+    "JLib.Reflection.Tests": [
+      "TypePackageTests.DemoClassA",
+      "TypePackageTests.DemoClassB",
+      "TypePackageTests.DemoClassC"
+    ]
+  },
+  "Children": []
+}

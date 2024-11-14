@@ -10,6 +10,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\JLib.DataGeneration\JLib.DataGeneration.csproj" />
+      <ProjectReference Include="..\JLib.Reflection.DependencyInjection\JLib.Reflection.DependencyInjection.csproj" />
     </ItemGroup>
 
 </Project>

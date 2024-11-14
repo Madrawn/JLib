@@ -1,16 +1,34 @@
-﻿┐2 Assemblies and 3 types
-├ Types:3
-│   TypePackageTests.DemoClassA
-│   TypePackageTests.DemoClassB
-│   TypePackageTests.DemoClassC
-├ Children:
-  ┐JLib.Reflection.Tests.DemoAssembly1
-  ├ Types:3
-  │   TestAssemblyDemoClassA
-  │   TestAssemblyDemoClassB
-  │   TestAssemblyDemoClassC
-  ┐JLib.Reflection.Tests.DemoAssembly2
-  ├ Types:3
-  │   TestAssembly2DemoClassA
-  │   TestAssembly2DemoClassB
-  │   TestAssembly2DemoClassC
+﻿{
+  "Description": "2 Assemblies and 3 types",
+  "Types": {
+    "JLib.Reflection.Tests": [
+      "TypePackageTests.DemoClassA",
+      "TypePackageTests.DemoClassB",
+      "TypePackageTests.DemoClassC"
+    ]
+  },
+  "Children": [
+    {
+      "Description": "JLib.Reflection.Tests.DemoAssembly1",
+      "Types": {
+        "JLib.Reflection.Tests.DemoAssembly1": [
+          "TestAssemblyDemoClassA",
+          "TestAssemblyDemoClassB",
+          "TestAssemblyDemoClassC"
+        ]
+      },
+      "Children": []
+    },
+    {
+      "Description": "JLib.Reflection.Tests.DemoAssembly2",
+      "Types": {
+        "JLib.Reflection.Tests.DemoAssembly2": [
+          "TestAssembly2DemoClassA",
+          "TestAssembly2DemoClassB",
+          "TestAssembly2DemoClassC"
+        ]
+      },
+      "Children": []
+    }
+  ]
+}

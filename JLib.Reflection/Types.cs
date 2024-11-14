@@ -5,7 +5,7 @@ using static JLib.Reflection.TvtFactoryAttribute;
 namespace JLib.Reflection;
 
 /// <summary>
-/// <see cref="ValueType"/> for <see cref="Type"/>s
+/// <see cref="ValueType{T}"/> for <see cref="Type"/>s
 /// </summary>
 /// <param name="Value"></param>
 [DerivedFromAny(typeof(ValueType<>))]

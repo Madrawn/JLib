@@ -1,5 +1,11 @@
-﻿┐JLib.Reflection.Tests.DemoAssembly1
-├ Types:3
-│   TestAssemblyDemoClassA
-│   TestAssemblyDemoClassB
-│   TestAssemblyDemoClassC
+﻿{
+  "Description": "JLib.Reflection.Tests.DemoAssembly1",
+  "Types": {
+    "JLib.Reflection.Tests.DemoAssembly1": [
+      "TestAssemblyDemoClassA",
+      "TestAssemblyDemoClassB",
+      "TestAssemblyDemoClassC"
+    ]
+  },
+  "Children": []
+}

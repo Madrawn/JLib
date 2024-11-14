@@ -1,6 +1,14 @@
 {
   "__registry__": {
-    "IdIncrement": 0
+    "IdIncrement": 2
+  },
+  "GenericDataPackageTests.Base3Dp:GenericDataPackageTests.Base2Dp<System.Object>:GenericDataPackageTests.Base1Dp<DataPackageTestBase.TestTypeId>": {
+    "Id": "f3301c07-70f1-464a-a301-44c577d64406",
+    "Id2": 2
+  },
+  "GenericDataPackageTests.TestPackageInstance:GenericDataPackageTests.TestPackageBase<DataPackageTestBase.TestTypeId>": {
+    "Id": "e0b5a385-ac0f-4c72-9ce0-f0906bf69c71",
+    "Id2": 1
   },
   "TestingIdGeneratorTests": {
     "[Default]CreateGuid_ShouldReturnNewGuid()-1": "ec59f5b1-e545-45e7-97a6-a496bb4e5ff8"

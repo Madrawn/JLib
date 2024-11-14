@@ -1,10 +1,25 @@
-﻿┐2 Packages
-├ Types:0
-├ Children:
-  ┐1 Types
-  ├ Types:1
-  │   TypePackageTests.DemoClassA
-  ┐2 Types
-  ├ Types:2
-  │   TypePackageTests.DemoClassB
-  │   TypePackageTests.DemoClassC
+﻿{
+  "Description": "2 Packages",
+  "Types": {},
+  "Children": [
+    {
+      "Description": "1 Types",
+      "Types": {
+        "JLib.Reflection.Tests": [
+          "TypePackageTests.DemoClassA"
+        ]
+      },
+      "Children": []
+    },
+    {
+      "Description": "2 Types",
+      "Types": {
+        "JLib.Reflection.Tests": [
+          "TypePackageTests.DemoClassB",
+          "TypePackageTests.DemoClassC"
+        ]
+      },
+      "Children": []
+    }
+  ]
+}

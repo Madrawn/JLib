@@ -1,5 +1,11 @@
-﻿┐3 Types
-├ Types:3
-│   TypePackageTests.DemoClassA
-│   TypePackageTests.DemoClassB
-│   TypePackageTests.DemoClassC
+﻿{
+  "Description": "3 Types",
+  "Types": {
+    "JLib.Reflection.Tests": [
+      "TypePackageTests.DemoClassA",
+      "TypePackageTests.DemoClassB",
+      "TypePackageTests.DemoClassC"
+    ]
+  },
+  "Children": []
+}

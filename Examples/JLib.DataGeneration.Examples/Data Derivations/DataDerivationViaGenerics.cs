@@ -1,22 +1,17 @@
-﻿// Third party packages
+﻿using FluentAssertions;
+using JLib.AutoMapper;
+using JLib.DataGeneration.Examples.Setup.Models;
+using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
+using JLib.DependencyInjection;
+using JLib.Exceptions;
+using JLib.Helper;
+using JLib.Reflection;
+using JLib.Reflection.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Snapshooter.Xunit;
 using Xunit;
 using Xunit.Abstractions;
-using FluentAssertions;
-
-// required JLib packages
-using JLib.AutoMapper;
-using JLib.DependencyInjection;
-using JLib.Exceptions;
-using JLib.Helper;
-using JLib.Reflection;
-
-// referenced setup
-using JLib.DataGeneration.Examples.Setup.Models;
-using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
-using JLib.Reflection.DependencyInjection;
 
 namespace JLib.DataGeneration.Examples.Data_Derivations;
 public sealed class DataDerivationViaGenerics : IDisposable
@@ -27,8 +22,9 @@ public sealed class DataDerivationViaGenerics : IDisposable
     public abstract class CustomerDpb : DataPackage
     {
         public CustomerId Id { get; set; } = null!;
-        protected CustomerDpb(ShoppingServiceMock shoppingService, IDataPackageManager packageManager) : base(packageManager)
+        protected CustomerDpb(IServiceProvider serviceProvider) : base(serviceProvider)
         {
+            serviceProvider.GetRequiredServices(out ShoppingServiceMock shoppingService);
             shoppingService.AddCustomer(new(GetInfoText(nameof(Id)))
             {
                 Id = Id
@@ -38,14 +34,14 @@ public sealed class DataDerivationViaGenerics : IDisposable
 
     public sealed class CustomerDp : CustomerDpb
     {
-        public CustomerDp(ShoppingServiceMock shoppingService, IDataPackageManager packageManager) : base(shoppingService, packageManager)
+        public CustomerDp(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
     }
 
     public sealed class OtherCustomerDp : CustomerDpb
     {
-        public OtherCustomerDp(ShoppingServiceMock shoppingService, IDataPackageManager packageManager) : base(shoppingService, packageManager)
+        public OtherCustomerDp(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
     }
@@ -54,8 +50,9 @@ public sealed class DataDerivationViaGenerics : IDisposable
         where TCustomerDp : CustomerDpb
     {
         public OrderId Id { get; init; } = null!;
-        public OrderDp(TCustomerDp customerDp, ShoppingServiceMock shoppingServiceMock, IDataPackageManager packageManager) : base(packageManager)
+        public OrderDp(IServiceProvider serviceProvider) : base(serviceProvider)
         {
+            serviceProvider.GetRequiredServices(out ShoppingServiceMock shoppingServiceMock, out TCustomerDp customerDp);
             shoppingServiceMock.AddOrders(new OrderEntity(customerDp.Id, OrderStatus.Fulfilled)
             {
                 Id = Id,

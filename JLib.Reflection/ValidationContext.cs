@@ -1,9 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Reflection;
+﻿using System.Reflection;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.ValueTypes;
-using ValueType = JLib.ValueTypes.ValueType;
 
 namespace JLib.Reflection;
 

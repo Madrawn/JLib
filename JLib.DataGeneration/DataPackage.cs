@@ -3,10 +3,14 @@ using AutoMapper.Internal;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using static JLib.Reflection.TvtFactoryAttribute;
 
 namespace JLib.DataGeneration;
 
+/// <summary>
+/// <see cref="TypeValueType"/> for <see cref="DataPackage"/>s
+/// </summary>
 [IsDerivedFrom(typeof(DataPackage)), NotAbstract]
 public record DataPackageType(Type Value) : TypeValueType(Value), IValidatedType
 {
@@ -20,13 +24,22 @@ public record DataPackageType(Type Value) : TypeValueType(Value), IValidatedType
     }
 }
 
+/// <summary>
+/// may be used inside a <see cref="DataPackage"/> to skip the assignment of the id property.
+/// This may be used to create public, non id properties
+/// </summary>
+[AttributeUsage(AttributeTargets.Property)]
+public class SkipIdAssignmentAttribute : Attribute { }
+
+/// <summary>
+/// Generates persistent, unique IDs and resolves dependencies using Dependency Injection.
+/// </summary>
 public abstract class DataPackage
 {
     /// <summary>
     /// contains the binding flags which will be used to discover id properties
     /// </summary>
-    public const BindingFlags PropertyDiscoveryBindingFlags =
-        BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
+    public const BindingFlags PropertyDiscoveryBindingFlags = BindingFlags.Instance | BindingFlags.Public;
     public string GetInfoText(string propertyName)
     {
         var property = GetType().GetProperty(propertyName, PropertyDiscoveryBindingFlags) ??
@@ -35,8 +48,9 @@ public abstract class DataPackage
         return new DataPackageValues.IdGroupName(property).Value + "." + property.Name;
     }
 
-    protected DataPackage(IDataPackageManager packageManager)
+    protected DataPackage(IServiceProvider provider)
     {
+        var packageManager = provider.GetRequiredService<IDataPackageManager>();
         switch (packageManager.InitState)
         {
             case DataPackageInitState.Uninitialized:
@@ -44,14 +58,24 @@ public abstract class DataPackage
                     "invalid injection. inject directly after provider build using 'JLib.DataGeneration.DataPackageExtensions.IncludeDataPackages'.");
             case DataPackageInitState.Initialized:
                 throw new InvalidOperationException(
-                    "invalid injection: this type package has not been include when calling 'JLib.DataGeneration.DataPackageExtensions.IncludeDataPackages'.");
+                    "invalid injection: this type package has not been included when calling 'JLib.DataGeneration.DataPackageExtensions.IncludeDataPackages'.");
             case DataPackageInitState.Initializing:
                 break;
             default:
                 throw new IndexOutOfRangeException(nameof(packageManager.InitState));
         }
 
-        foreach (var propertyInfo in GetType().GetProperties(PropertyDiscoveryBindingFlags))
+        var propertyInfos = GetType().GetProperties(PropertyDiscoveryBindingFlags)
+            .Where(x =>
+                x.HasCustomAttribute<SkipIdAssignmentAttribute>() is false
+            ).ToReadOnlyCollection();
+
+        propertyInfos.GroupBy(x => x.Name)
+            .Where(x => x.Count() > 1)
+            .Select(x => new AggregateException($"property {x.Key} is defined multiple times.", x.Select(y => new Exception(y.ToDebugInfo()))))
+            .ThrowExceptionIfNotEmpty("duplicate properties found");
+
+        foreach (var propertyInfo in propertyInfos)
             packageManager.SetIdPropertyValue(this, propertyInfo);
     }
 }
