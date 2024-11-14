@@ -1,3 +1,9 @@
-﻿┐1 Types
-├ Types:1
-│   TypePackageTests.DemoClassA
+﻿{
+  "Description": "1 Types",
+  "Types": {
+    "JLib.Reflection.Tests": [
+      "TypePackageTests.DemoClassA"
+    ]
+  },
+  "Children": []
+}
