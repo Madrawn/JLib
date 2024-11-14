@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using JLib.Helper;
+﻿using JLib.Helper;
 
 namespace JLib.Exceptions
 {

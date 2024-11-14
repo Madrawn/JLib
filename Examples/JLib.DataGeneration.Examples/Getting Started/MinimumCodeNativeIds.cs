@@ -1,22 +1,17 @@
-﻿// Third party packages
+﻿using JLib.AutoMapper;
+using JLib.DataGeneration.Examples.Setup.Models;
+using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
+using JLib.DependencyInjection;
+using JLib.Exceptions;
+using JLib.Helper;
+using JLib.Reflection;
+using JLib.Reflection.DependencyInjection;
+using JLib.ValueTypes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Snapshooter.Xunit;
 using Xunit;
 using Xunit.Abstractions;
-
-// required JLib packages
-using JLib.AutoMapper;
-using JLib.DependencyInjection;
-using JLib.Exceptions;
-using JLib.Helper;
-using JLib.Reflection;
-
-// referenced setup
-using JLib.DataGeneration.Examples.Setup.Models;
-using JLib.DataGeneration.Examples.Setup.SystemUnderTest;
-using JLib.Reflection.DependencyInjection;
-using JLib.ValueTypes;
 
 namespace JLib.DataGeneration.Examples.Getting_Started;
 

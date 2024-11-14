@@ -1,8 +1,6 @@
 ﻿using FluentAssertions;
-using JLib.Exceptions;
 using JLib.ValueTypes;
 using Xunit;
-using ValueType = JLib.ValueTypes.ValueType;
 
 // ReSharper disable all
 

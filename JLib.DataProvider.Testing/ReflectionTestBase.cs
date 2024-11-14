@@ -1,7 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using FluentAssertions;
 using JLib.Cqrs;
-using JLib.DependencyInjection;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;

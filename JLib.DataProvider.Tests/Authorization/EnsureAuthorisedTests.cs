@@ -4,12 +4,10 @@ using JLib.DataProvider.Authorization;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
-using JLib.Reflection.DependencyInjection;
 using JLib.ValueTypes;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Xunit.Abstractions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace JLib.DataProvider.Tests.Authorization;
 

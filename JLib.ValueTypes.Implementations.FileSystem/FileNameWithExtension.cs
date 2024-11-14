@@ -1,4 +1,5 @@
 ﻿using JLib.Helper;
+
 // ReSharper disable UnusedMember.Local
 
 namespace JLib.ValueTypes.Implementations.FileSystem;

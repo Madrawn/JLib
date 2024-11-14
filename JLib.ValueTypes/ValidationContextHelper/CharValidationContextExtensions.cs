@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace JLib.ValueTypes;
+﻿namespace JLib.ValueTypes;
 /// <summary>
 /// Contains validation methods for ValidationContext&lt;char&gt;.
 /// </summary>
