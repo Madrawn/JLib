@@ -59,7 +59,7 @@ public static class TypePackageExtensions
             ["Types"] = typePackage.Types.GroupBy(t => t.Namespace)
                 .ToDictionary(
                     kv => kv.Key ?? "-",
-                    kv => kv.Select(t => t.Name).ToReadOnlyCollection()
+                    kv => kv.Select(t => t.FullName()).ToReadOnlyCollection()
                 ),
             ["Children"] = typePackage.Children.Select(ToJsonObject).ToReadOnlyCollection()
         };
