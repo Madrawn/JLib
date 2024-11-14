@@ -110,7 +110,7 @@ public static class IdExtensions
     public static IdInformation GetIdInfoObj(object? value, IIdRegistry? idRegistry = null)
     {
         if (value is null)
-            return new(typeof(object), new(new("unknown"), new("value is null")), null);
+            return new(typeof(object), new("unknown", "value is null"), null);
 
         if (idRegistry is null)
         {
@@ -124,7 +124,7 @@ public static class IdExtensions
 
         var identifier = idRegistry.GetIdentifierOfId(value);
         return identifier is null
-            ? new(value.GetType(), new(new("unknown"), new("this id is not registered")), value)
+            ? new(value.GetType(), new("unknown", "this id is not registered"), value)
             : new(value.GetType(), identifier, value);
     }
 
@@ -293,7 +293,7 @@ public static class IdExtensions
             ? GetIdInfoObj(null, idRegistry).ToSnapshotInfo()
             : Guid.TryParse(id, out var guid)
                 ? guid.IdSnapshot(idRegistry)
-                : new(new(new("invalid"), new("value is not a guid")), id);
+                : new(new("invalid","value is not a guid"), id);
 
     #endregion
 
