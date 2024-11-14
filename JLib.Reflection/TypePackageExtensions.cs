@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text.Encodings.Web;
+using System.Text.Json;
 using JLib.Helper;
 using JLib.ValueTypes;
 
@@ -35,13 +36,15 @@ public static class TypePackageExtensions
             nameof(RemoveNonValueTypes)
         );
 
+
+    private static readonly JsonSerializerOptions DefaultOptions =
+        new JsonSerializerOptions(JsonSerializerDefaults.General)
+        { WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
     /// <summary>
     /// returns a json representation of the given <paramref name="typePackage"/>
     /// </summary>
-    /// <param name="typePackage"></param>
-    /// <returns></returns>
-    public static string ToJson(this ITypePackage typePackage) 
-        => JsonSerializer.Serialize(typePackage.ToJsonObject());
+    public static string ToJson(this ITypePackage typePackage, JsonSerializerOptions? options = null)
+        => JsonSerializer.Serialize(typePackage.ToJsonObject(), options ?? DefaultOptions);
 
     /// <summary>
     /// returns a json optimized object representation of the given <paramref name="typePackage"/>
