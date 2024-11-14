@@ -25,9 +25,11 @@ public static class DataPackageValues
         /// Initializes a new instance of the <see cref="IdName"/> class with the specified property.
         /// </summary>
         /// <param name="property">The property to get the name from.</param>
-        public IdName(PropertyInfo property) : this(property.Name)
-        {
-        }
+        public IdName(PropertyInfo property, IdRegistryConfiguration packageConfig) : this(property.Name, packageConfig)
+        { }
+
+        public IdName(string value, IdRegistryConfiguration packageConfig) : this(packageConfig.ApplyDefaultNamespace(value))
+        { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IdName"/> class with the specified method and call number.
@@ -82,7 +84,9 @@ public static class DataPackageValues
             return string.Join(":", baseTypeTree);
         }
 
-        internal IdGroupName(PropertyInfo property) : this(ExtractKey(property))
+        internal IdGroupName(string value, IdRegistryConfiguration packageConfig) : this(packageConfig.ApplyDefaultNamespace(value))
+        { }
+        internal IdGroupName(PropertyInfo property, IdRegistryConfiguration packageConfig) : this(ExtractKey(property), packageConfig)
         {
         }
     }
@@ -96,7 +100,13 @@ public static class DataPackageValues
         /// Initializes a new instance of the <see cref="IdIdentifier"/> class with the specified property.
         /// </summary>
         /// <param name="property">The property to create the identifier from.</param>
-        public IdIdentifier(PropertyInfo property) : this(new(property), new(property))
+        public IdIdentifier(PropertyInfo property, IdRegistryConfiguration packageConfig) : this(new IdGroupName(property, packageConfig), new(property, packageConfig))
+        {
+        }
+
+        public IdIdentifier(string idGroup, string idName, IdRegistryConfiguration packageConfig) : this(new IdGroupName(idGroup, packageConfig), new(idName, packageConfig))
+        { }
+        public IdIdentifier(string idGroup, string idName) : this(new IdGroupName(idGroup), new(idName))
         {
         }
 

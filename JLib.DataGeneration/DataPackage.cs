@@ -1,10 +1,9 @@
 ﻿using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
-using AutoMapper.Internal;
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using static JLib.DataGeneration.DataPackageException.InitializationException.InvalidAccessException;
 using static JLib.Reflection.TvtFactoryAttribute;
 
 namespace JLib.DataGeneration;
@@ -13,15 +12,43 @@ namespace JLib.DataGeneration;
 /// <see cref="TypeValueType"/> for <see cref="DataPackage"/>s
 /// </summary>
 [IsDerivedFrom(typeof(DataPackage)), NotAbstract]
-public record DataPackageType(Type Value) : TypeValueType(Value), IValidatedType
+public record DataPackageType : TypeValueType, IValidatedType
 {
-    public void Validate(ITypeCache cache, TypeValidationContext value)
+    internal IReadOnlyCollection<PropertyInfo> IdProperties { get; }
+
+    internal const BindingFlags PropertyDiscoveryBindingFlags = BindingFlags.Instance | BindingFlags.Public;
+    /// <summary>
+    /// <inheritdoc cref="DataPackageType"/>
+    /// </summary>
+    public DataPackageType(Type value) : base(value)
+    {
+        IdProperties = GetType().GetProperties(PropertyDiscoveryBindingFlags)
+            .Where(x =>
+                x.HasCustomAttribute<SkipIdAssignmentAttribute>() is false
+            ).ToReadOnlyCollection();
+    }
+    void IValidatedType.Validate(ITypeCache cache, TypeValidationContext value)
     {
         value.ShouldBeSealed("a DataPackage has to be either Sealed or Abstract.");
 
-        value.ValidateProperties(p => p.IsPublic(), p => p
+        value.ValidateProperties(p => IdProperties.Contains(p), p => p
             .HavePublicInit()
             .HavePublicGet());
+
+        value.AddSubValidators(
+            new ExceptionBuilder("duplicate properties found",
+                IdProperties.GroupBy(x => x.Name)
+                    .Where(x => x.Count() > 1)
+                    .Select(x =>
+                        new AggregateException($"property {x.Key} is defined multiple times.",
+                            x.Select(y =>
+                                new Exception(y.ToDebugInfo())
+                            )
+                        )
+                    )
+                    .ToArray<Exception>()
+                ));
+
     }
 }
 
@@ -37,46 +64,36 @@ public class SkipIdAssignmentAttribute : Attribute { }
 /// </summary>
 public abstract class DataPackage
 {
-    /// <summary>
-    /// contains the binding flags which will be used to discover id properties
-    /// </summary>
-    public const BindingFlags PropertyDiscoveryBindingFlags = BindingFlags.Instance | BindingFlags.Public;
-    public string GetInfoText(string propertyName)
-    {
-        var property = GetType().GetProperty(propertyName, PropertyDiscoveryBindingFlags) ??
-                       throw new InvalidSetupException(
-                           $"property {propertyName} not found on {GetType().FullName()}");
-        return new DataPackageValues.IdGroupName(property).Value + "." + property.Name;
-    }
+    private readonly DataPackageManager _packageManager;
 
+    internal DataPackageValues.IdIdentifier IdentifierOfIdProperty(PropertyInfo prop)
+    => new(prop, _packageManager.Configuration);
+    /// <summary>
+    /// <inheritdoc cref="DataPackage"/>
+    /// </summary>
+    /// <param name="provider"></param>
+    /// <exception cref="PreInitializationInstantiationException"></exception>
+    /// <exception cref="PostInitializationAccessException"></exception>
+    /// <exception cref="IndexOutOfRangeException"></exception>
     protected DataPackage(IServiceProvider provider)
     {
-        var packageManager = provider.GetRequiredService<IDataPackageManager>();
-        switch (packageManager.InitState)
+        _packageManager = provider.GetRequiredService<DataPackageManager>();
+        switch (_packageManager.InitState)
         {
             case DataPackageInitState.Uninitialized:
-                throw new InvalidOperationException(
-                    "invalid injection. inject directly after provider build using 'JLib.DataGeneration.DataPackageExtensions.IncludeDataPackages'.");
+                throw new PreInitializationInstantiationException(this);
             case DataPackageInitState.Initialized:
-                throw new InvalidOperationException(
-                    "invalid injection: this type package has not been included when calling 'JLib.DataGeneration.DataPackageExtensions.IncludeDataPackages'.");
+                throw new PostInitializationAccessException(this);
             case DataPackageInitState.Initializing:
                 break;
             default:
-                throw new IndexOutOfRangeException(nameof(packageManager.InitState));
+                throw new InvalidInitStateException(this, _packageManager.InitState);
         }
 
-        var propertyInfos = GetType().GetProperties(PropertyDiscoveryBindingFlags)
-            .Where(x =>
-                x.HasCustomAttribute<SkipIdAssignmentAttribute>() is false
-            ).ToReadOnlyCollection();
+        var typeCache = provider.GetRequiredService<ITypeCache>();
+        var tvt = typeCache.Get<DataPackageType>(GetType());
 
-        propertyInfos.GroupBy(x => x.Name)
-            .Where(x => x.Count() > 1)
-            .Select(x => new AggregateException($"property {x.Key} is defined multiple times.", x.Select(y => new Exception(y.ToDebugInfo()))))
-            .ThrowExceptionIfNotEmpty("duplicate properties found");
-
-        foreach (var propertyInfo in propertyInfos)
-            packageManager.SetIdPropertyValue(this, propertyInfo);
+        foreach (var propertyInfo in tvt.IdProperties)
+            _packageManager.SetIdPropertyValue(this, propertyInfo);
     }
 }
