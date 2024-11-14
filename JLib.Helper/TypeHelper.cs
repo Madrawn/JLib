@@ -3,6 +3,9 @@ using System.Text;
 
 namespace JLib.Helper;
 
+/// <summary>
+/// contains extension methods for working with <see cref="Type"/>s
+/// </summary>
 public static class TypeHelper
 {
     /// <summary>
@@ -142,12 +145,9 @@ public static class TypeHelper
         => type.IsAssignableTo(typeof(T));
 
     /// <summary>
-    /// if T is generic, the type-parameters will be ignored. Use the <see cref="Ignored"/> type in this case when possible<br/>
+    /// if T is generic, the type-parameters will be ignored. Use the JLib.ValueTypes.Ignored value-type when possible.<br/>
     /// if you don't want it to be ignored, use <see cref="Implements{T}"/> instead
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="type"></param>
-    /// <returns></returns>
     public static bool ImplementsAny<T>(this Type type)
         => type.GetInterface(typeof(T).Name) is not null || type.IsInterface &&
             (type.TryGetGenericTypeDefinition()) == (typeof(T).TryGetGenericTypeDefinition());
@@ -166,7 +166,7 @@ public static class TypeHelper
     public static bool Implements<T>(this Type type)
         => type.Implements(typeof(T));
     /// <summary>
-    /// returns true, if <paramref name="type"/> implements <paramref name="@interface"/> ignoring the type parameters
+    /// returns true, if <paramref name="type"/> implements <paramref name="interface"/> ignoring the type parameters
     /// if T is generic, the type-parameters will NOT be ignored.<br/>
     /// if you want it to be ignored, use <seealso cref="ImplementsAny"/> instead
     /// </summary>
@@ -193,6 +193,10 @@ public static class TypeHelper
     public static IEnumerable<Type> WhichAreAssignableTo(this IEnumerable<Type> collection, Type type)
         => collection.Where(t => t.IsAssignableTo(type));
 
+    /// <summary>
+    /// returns the subset of <paramref name="collection"/>, which are instantiable.
+    /// </summary>
+    /// <seealso cref="IsInstantiable(Type)"/>
     public static IEnumerable<Type> WhichAreInstantiable(this IEnumerable<Type> collection)
         => collection.Where(t => t.IsInstantiable());
 
@@ -205,12 +209,22 @@ public static class TypeHelper
         // abstract results the type in being abstract sealed, therefore it is contained in this check
         => type is { IsAbstract: false, IsInterface: false };
 
+    /// <summary>
+    /// A generic wrapper for <see cref="Type.GetInterface(string)"/>.<br/>
+    /// Searches for the interface of type <typeparamref name="TInterface"/> by name (preferring <see cref="Type.FullName"/> if available.)
+    /// </summary>
     public static Type? GetInterface<TInterface>(this Type type)
     {
         var tInt = typeof(TInterface);
         return type.GetInterface(tInt.FullName ?? tInt.Name);
     }
 
+    /// <summary>
+    /// gets the implemented <see cref="Type"/> of <typeparamref name="TInterface"/> implemented by <paramref name="type"/> ignoring all of ity type arguments.
+    /// </summary>
+    /// <typeparam name="TInterface"></typeparam>
+    /// <param name="type"></param>
+    /// <returns></returns>
     public static Type? GetAnyInterface<TInterface>(this Type type)
     {
         var @interface = typeof(TInterface).TryGetGenericTypeDefinition();
@@ -219,9 +233,12 @@ public static class TypeHelper
             : type.GetInterfaces().FirstOrDefault(i => i.TryGetGenericTypeDefinition() == @interface);
     }
 
+
+    /// <returns>whether the <see cref="Type.GetGenericTypeDefinition"/> of <paramref name="type"/> equals that of <typeparamref name="T"/>.</returns>
     public static bool HasSameGenericTypeDefinition<T>(this Type type)
         => HasSameGenericTypeDefinition(type, typeof(T));
 
+    /// <returns>whether the <see cref="Type.GetGenericTypeDefinition"/> of <paramref name="type"/> equals that of <paramref name="other"/>.</returns>
     public static bool HasSameGenericTypeDefinition(this Type type, Type other)
     {
         var t1 = type.IsGenericType ? type.GetGenericTypeDefinition() : type;
@@ -294,6 +311,9 @@ public static class TypeHelper
         return result.ToString();
     }
 
+    /// <summary>
+    /// if the given <paramref name="type"/> is nested in another <see cref="Type"/>, all nesting parents including <paramref name="type"/> are rturned. otherwise an empty array is returned.
+    /// </summary>
     public static IReadOnlyCollection<Type> GetNestingParents(this Type type)
     {
         var result = new List<Type>();

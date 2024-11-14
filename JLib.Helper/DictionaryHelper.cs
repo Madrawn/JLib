@@ -2,6 +2,9 @@
 
 namespace JLib.Helper;
 
+/// <summary>
+/// contains extension methods for <see cref="IDictionary{TKey,TValue}"/>
+/// </summary>
 public static class DictionaryHelper
 {
     /// <summary>
@@ -31,10 +34,16 @@ public static class DictionaryHelper
         return value;
     }
 
+    /// <summary>
+    /// adds or overwrites the value of <paramref name="key"/> with <paramref name="value"/>
+    /// </summary>
     public static void AddOrReplace<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dict, TKey key, TValue value)
         where TKey : notnull
         => dict.AddOrUpdate(key, _ => value, (_, _) => value);
 
+    /// <summary>
+    /// returns the value of the given <paramref name="key"/>. if the <paramref name="key"/> is not found, the <see langword="default"/> value will be returned.
+    /// </summary>
     public static TValue? TryGetValue<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key)
     {
         return dict.TryGetValue(key, out var value)
