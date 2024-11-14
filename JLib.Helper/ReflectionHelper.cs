@@ -149,10 +149,14 @@ public static class ReflectionHelper
                 sb.Append('}');
                 break;
             case FieldInfo fieldInfo:
-                sb.Append(fieldInfo.GetAccessModifier()).Append(' ');
-                if (fieldInfo.IsInitOnly)
-                    sb.Append("readonly ");
                 sb.Append(fieldInfo.Name);
+                if (fieldInfo.IsLiteral)
+                    sb.Insert(0, "const ");
+                if (fieldInfo.IsInitOnly)
+                    sb.Insert(0, "readonly ");
+                if (fieldInfo.IsStatic)
+                    sb.Insert(0, "static ");
+                sb.Insert(0, fieldInfo.GetAccessModifier()).Append(' ');
                 break;
             case ConstructorInfo constructorInfo:
                 sb.Append(constructorInfo.Name);
