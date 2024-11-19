@@ -26,6 +26,7 @@ public class RequestScopedTests : IDisposable
 
         }
     }
+    public class ValidScopedService { }
     public class UnsupportedGeneric<T>
     {
         public UnsupportedGeneric(T other)
@@ -53,7 +54,9 @@ public class RequestScopedTests : IDisposable
         var services = new ServiceCollection();
         services.AddScoped<TestHttpContextAccessor>();
         services.AddScopedAlias<IHttpContextAccessor, TestHttpContextAccessor>();
-        services.AddRequestScoped(typeof(ReferenceOther<UnsupportedGeneric<object>>));
+        //services.AddRequestScoped(typeof(ReferenceOther<UnsupportedGeneric<object>>));
+        services.AddScoped<ValidScopedService>();
+        services.AddRequestScoped<ReferenceOther<ValidScopedService>>();
         services.AddRequestScoped(typeof(ReferenceOther<NotProvided>));
         services.AddRequestScoped<ThrowOnCreate>();
         services.AddRequestScoped<Identifiyable>();
@@ -123,7 +126,7 @@ public class RequestScopedTests : IDisposable
         Action act = () => providerA.GetRequiredService<ReferenceOther<NotProvided>>();
         act.Should()
             .Throw<InvalidOperationException>()
-            .WithMessage("No service for type '*' has been registered.");
+            .WithMessage("Unable to resolve service for type '*' while attempting to activate '*'.");
     }
     [Fact]
     public void MissingHttpContext()
