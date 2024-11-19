@@ -8,7 +8,7 @@ using Xunit;
 
 namespace JLib.AspNetCore.Tests;
 
-public class UnitTest1 : IDisposable
+public class RequestScopedTests : IDisposable
 {
     #region test services
     public class ThrowOnCreate
@@ -48,7 +48,7 @@ public class UnitTest1 : IDisposable
     public void Dispose() => _disposables.DisposeAll();
     private readonly ServiceProvider _provider;
 
-    public UnitTest1()
+    public RequestScopedTests()
     {
         var services = new ServiceCollection();
         services.AddScoped<TestHttpContextAccessor>();

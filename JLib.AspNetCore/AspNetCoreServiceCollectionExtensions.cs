@@ -1,13 +1,9 @@
-﻿using System.Linq.Expressions;
-using JLib.Exceptions;
+﻿using JLib.Exceptions;
 using JLib.Helper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using System.Linq.Expressions;
 using System.Reflection;
-using JLib.Exceptions;
-using JLib.Helper;
 using Microsoft.Extensions.Logging;
 using static JLib.AspNetCore.AspNetCoreServiceCollectionExtensions.AddRequestScopedServiceException;
 
@@ -57,7 +53,7 @@ public static class AspNetCoreServiceCollectionExtensions
         {
             public Type Requirement { get; }
 
-            internal MissingRequirementException(Type serviceType, Type? implementationType, Type requirement) 
+            internal MissingRequirementException(Type serviceType, Type? implementationType, Type requirement)
                 : base(serviceType, implementationType, $"Using Request Scoped Services requires the service {requirement} to be provided.", null)
             {
                 Requirement = requirement;
@@ -175,20 +171,10 @@ public static class AspNetCoreServiceCollectionExtensions
         {
             throw new UnsupportedGenericServiceException(serviceType, implementationType);
         }
-        var ctor = implementationType.GetConstructors().Single();
-        var ctorParams = ctor.GetParameters().Select(p => p.ParameterType).ToArray();
 
-        var param = Expression.Parameter(typeof(IServiceProvider), "provider");
-        var args = ctorParams
-            .Select(p => Expression.Call(null, GetRequiredServiceMi.MakeGenericMethod(p), param))
-            .ToArray<Expression>();
+        var factory = ActivatorUtilities.CreateFactory(serviceType, Array.Empty<Type>());
 
-
-        var body = Expression.New(ctor, args);
-        var lambda = Expression.Lambda<Func<IServiceProvider, object>>(body, param);
-
-        var expression = lambda.Compile();
-        return services.AddRequestScoped(provider => expression(provider), serviceType, implementationType);
+        return services.AddRequestScoped(provider => factory.Invoke(provider, null), serviceType, implementationType);
     }
     private static IServiceCollection AddRequestScoped(this IServiceCollection services, Func<IServiceProvider, object> factory, Type serviceType, Type? implementationType)
     {
