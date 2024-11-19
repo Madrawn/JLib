@@ -47,37 +47,37 @@ public abstract class AuthorizationTestsBaseTypes
                 {
                     Id= FirstAuthorizedId,
                     IsAuthorized = true,
-                    Name = GetInfoText(nameof(FirstAuthorizedId))
+                    Name = this.GetInfoText(x => x.FirstAuthorizedId)
                 },
                 new()
                 {
                     Id= SecondAuthorizedId,
                     IsAuthorized = true,
-                    Name = GetInfoText(nameof(SecondAuthorizedId))
+                    Name = this.GetInfoText(x => x.SecondAuthorizedId)
                 },
                 new()
                 {
                     Id= ThirdAuthorizedId,
                     IsAuthorized = true,
-                    Name = GetInfoText(nameof(ThirdAuthorizedId))
+                    Name = this.GetInfoText(x => x.ThirdAuthorizedId)
                 },
                 new()
                 {
                     Id= FirstUnauthorizedId,
                     IsAuthorized = false,
-                    Name = GetInfoText(nameof(FirstUnauthorizedId))
+                    Name = this.GetInfoText(x => x.FirstUnauthorizedId)
                 },
                 new()
                 {
                     Id= SecondUnAuthorizedId,
                     IsAuthorized = false,
-                    Name = GetInfoText(nameof(SecondUnAuthorizedId))
+                    Name = this.GetInfoText(x => x.SecondUnAuthorizedId)
                 },
                 new()
                 {
                     Id= ThirdUnAuthorizedId,
                     IsAuthorized = false,
-                    Name = GetInfoText(nameof(ThirdUnAuthorizedId))
+                    Name = this.GetInfoText(x => x.ThirdUnAuthorizedId)
                 },
             });
         }
