@@ -25,7 +25,7 @@ public sealed class DataDerivationViaGenerics : IDisposable
         protected CustomerDpb(IServiceProvider serviceProvider) : base(serviceProvider)
         {
             serviceProvider.GetRequiredServices(out ShoppingServiceMock shoppingService);
-            shoppingService.AddCustomer(new(GetInfoText(nameof(Id)))
+            shoppingService.AddCustomer(new(this.GetInfoText(x => x.Id))
             {
                 Id = Id
             });

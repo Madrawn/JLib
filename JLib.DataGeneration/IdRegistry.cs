@@ -94,7 +94,6 @@ internal class IdRegistry : IIdRegistry, IDisposable
     /// </summary>
     public string GetStringId(IdIdentifier identifier)
     {
-        identifier = _idIdentifierPostProcessor(identifier);
         return _dictionary.GetValueOrAdd(identifier, () =>
         {
             _isDirty = true;
@@ -108,7 +107,6 @@ internal class IdRegistry : IIdRegistry, IDisposable
     /// </summary>
     public Guid GetGuidId(IdIdentifier identifier)
     {
-        identifier = _idIdentifierPostProcessor(identifier);
         return _dictionary.GetValueOrAdd(identifier, () =>
         {
             _isDirty = true;
@@ -121,7 +119,6 @@ internal class IdRegistry : IIdRegistry, IDisposable
     /// </summary>
     public int GetIntId(IdIdentifier identifier)
     {
-        identifier = _idIdentifierPostProcessor(identifier);
         return _dictionary.GetValueOrAdd(identifier, () =>
         {
             _isDirty = true;
@@ -158,7 +155,7 @@ internal class IdRegistry : IIdRegistry, IDisposable
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     void IIdRegistry.SetIdPropertyValue(object packageInstance, PropertyInfo property)
     {
-        var id = GetId(new(property, conf), property.PropertyType);
+        var id = GetId(new(property, _config), property.PropertyType);
         property.SetValue(packageInstance, id);
     }
 

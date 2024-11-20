@@ -6,6 +6,7 @@ namespace JLib.DataGeneration.Examples.Setup.SystemUnderTest;
 public class ShoppingServiceMock : IShoppingService
 {
     private readonly IIdRegistry _idRegistry;
+    private readonly IdRegistryConfiguration _idRegistryConfiguration;
     private readonly Dictionary<CustomerId, CustomerEntity> _customers = new();
     private readonly Dictionary<OrderId, OrderEntity> _orders = new();
     private readonly Dictionary<OrderItemId, OrderItemEntity> _orderItems = new();
@@ -18,9 +19,10 @@ public class ShoppingServiceMock : IShoppingService
     public IReadOnlyDictionary<ArticleId, ArticleEntity> Articles => _articles;
     public IReadOnlyDictionary<CustomerId, OrderId> Carts => _carts;
 
-    public ShoppingServiceMock(IIdRegistry idRegistry)
+    public ShoppingServiceMock(IIdRegistry idRegistry, IdRegistryConfiguration idRegistryConfiguration)
     {
         _idRegistry = idRegistry;
+        _idRegistryConfiguration = idRegistryConfiguration;
     }
 
     /*
@@ -65,8 +67,9 @@ public class ShoppingServiceMock : IShoppingService
         if (cartId is null)
         {
             var orderIdIdentifier = new DataPackageValues.IdIdentifier(
-                new(nameof(ShoppingServiceMock)),
-                new(customerId.Value.IdInfo(_idRegistry))
+                nameof(ShoppingServiceMock),
+                customerId.Value.IdInfo(_idRegistry),
+                _idRegistryConfiguration
             );
 
             var newCart = new OrderEntity(customerId, OrderStatus.Cart)
@@ -79,8 +82,9 @@ public class ShoppingServiceMock : IShoppingService
         }
 
         var orderItemIdIdentifier = new DataPackageValues.IdIdentifier(
-            new(nameof(ShoppingServiceMock)),
-            new(customerId.Value.IdInfo(_idRegistry))
+            nameof(ShoppingServiceMock),
+            customerId.Value.IdInfo(_idRegistry),
+            _idRegistryConfiguration
         );
 
         var article = _articles[articleId];

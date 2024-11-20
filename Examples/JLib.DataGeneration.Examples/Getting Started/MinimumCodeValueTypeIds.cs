@@ -24,7 +24,7 @@ public sealed class MinimumCodeValueTypeIds : IDisposable
         public CustomerDp(IServiceProvider serviceProvider) : base(serviceProvider)
         {
             serviceProvider.GetRequiredServices(out ShoppingServiceMock shoppingService);
-            shoppingService.AddCustomer(new(GetInfoText(nameof(CustomerId)))
+            shoppingService.AddCustomer(new(this.GetInfoText(x => x.CustomerId))
             {
                 Id = CustomerId
             });

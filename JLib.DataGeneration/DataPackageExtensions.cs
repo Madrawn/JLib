@@ -24,22 +24,12 @@ public static class DataPackageExtensions
     /// <param name="services">The service collection.</param>
     /// <param name="defaultNamespace">The default namespace for ID group names. It will be removed from all <see cref="DataPackageValues.IdIdentifier"/>s</param>
     /// <returns>The modified service collection.</returns>
-    public static IServiceCollection AddIdRegistry(this IServiceCollection services, IdRegistryConfiguration idRegistryConfiguration)
+    public static IServiceCollection AddIdRegistry(this IServiceCollection services, IdRegistryConfiguration? idRegistryConfiguration)
     {
-
+        idRegistryConfiguration ??= new();
         return services.AddSingleton(idRegistryConfiguration)
             .AddSingleton<IIdRegistry, IdRegistry>(provider =>
-            {
-                var defaultNamespace = provider.GetRequiredService<IdRegistryConfiguration>().DefaultNamespace;
-                var replaceNamespace = defaultNamespace is null
-                    ? null
-                    : defaultNamespace.EndsWith(".")
-                        ? defaultNamespace
-                        : defaultNamespace + ".";
-
-                return new(provider.GetRequiredLazyService<IMapper>(), idRegistryConfiguration);
-
-            });
+                new(provider.GetRequiredLazyService<IMapper>(), idRegistryConfiguration));
     }
 
     /// <summary>
@@ -60,7 +50,7 @@ public static class DataPackageExtensions
     /// <returns>The modified service collection.</returns>
     public static IServiceCollection AddDataPackages(this IServiceCollection services, ITypeCache typeCache, IdRegistryConfiguration? configuration = null)
     {
-        services.AddIdRegistry(configuration?.DefaultNamespace)
+        services.AddIdRegistry(configuration)
             .AddTestingIdGenerator();
 
         services.AddSingleton(configuration ?? new IdRegistryConfiguration());
