@@ -152,6 +152,28 @@ public static partial class ValueType
             ? null
             : Create<TVt, T>(value);
 
+
+    /// <summary>
+    /// Checks whether <paramref name="value"/> is a valid <paramref name="tValueType"/> value and returns the value if it is valid, otherwise throws an <see cref="AggregateException"/>.<br/>
+    /// values may be null. if they are, null will be returned.
+    /// </summary>
+    /// <typeparam name="T">The native value of the <paramref name="tValueType"/></typeparam>
+    /// <param name="tValueType">The specific <see cref="ValueType{T}"/> to create the <paramref name="value"/> for</param>
+    /// <param name="value">the value to create to a new <paramref name="tValueType"/></param>
+    /// <exception cref="AggregateException"></exception>
+    /// <returns>a new instance of <paramref name="tValueType"/> containing <paramref name="value"/> as it's value ot null, if the validation failed.</returns>
+    [return: NotNullIfNotNull("value")]
+    public static ValueType<T>? Create<T>(Type tValueType, T? value)
+        => typeof(T).IsValueType
+            ? CompiledExpressionCache.GetOrAdd(
+                GetExpressionCacheKey(typeof(T), false),
+                _ => FactoryExpressions.ForAnyType(tValueType, false).Compile()
+            ).DynamicInvoke(value) as ValueType<T> // let's hope this is not too slow
+            : CompiledExpressionCache.GetOrAdd(
+                GetExpressionCacheKey(typeof(T), false),
+                _ => FactoryExpressions.ForAnyType(tValueType, false).Compile()
+            ).CastTo<Func<T?, ValueType<T>?>>().Invoke(value);
+
     /// <summary>
     /// Checks whether <paramref name="value"/> is a valid <typeparamref name="TVt"/> and returns the value if it is valid, otherwise throws an <see cref="AggregateException"/>.<br/>
     /// values may be null. if they are, null will be returned.
@@ -164,15 +186,15 @@ public static partial class ValueType
     [return: NotNullIfNotNull("value")]
     public static TVt? Create<TVt, T>(T? value)
         where TVt : ValueType<T>
-    => typeof(T).IsValueType
-        ? CompiledExpressionCache.GetOrAdd(
-            GetExpressionCacheKey<TVt>(false),
-            _ => FactoryExpressions.ForAnyType<TVt, T>(false).Compile()
-        ).DynamicInvoke(value) as TVt // let's hope this is not too slow
-        : CompiledExpressionCache.GetOrAdd(
-            GetExpressionCacheKey<TVt>(false),
-            _ => FactoryExpressions.ForAnyType<TVt, T>(false).Compile()
-        ).CastTo<Func<T?, TVt?>>().Invoke(value);
+        => typeof(T).IsValueType
+            ? CompiledExpressionCache.GetOrAdd(
+                GetExpressionCacheKey<TVt>(false),
+                _ => FactoryExpressions.ForAnyType<TVt, T>(false).Compile()
+            ).DynamicInvoke(value) as TVt // let's hope this is not too slow
+            : CompiledExpressionCache.GetOrAdd(
+                GetExpressionCacheKey<TVt>(false),
+                _ => FactoryExpressions.ForAnyType<TVt, T>(false).Compile()
+            ).CastTo<Func<T?, TVt?>>().Invoke(value);
 
     /// <summary>
     /// Checks whether <paramref name="value"/> is a valid <typeparamref name="TVt"/> and returns the value if it is valid, otherwise throws an <see cref="AggregateException"/>.<br/>
