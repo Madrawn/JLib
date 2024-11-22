@@ -16,6 +16,12 @@ public class TryCreateTests
         private static void Validate(ValidationContext<string?> must)
             => must.BeOfLength(5);
     }
+    public record ThreeCharacterString(string Value) : StringValueType(Value)
+    {
+        [Validation]
+        private static void Validate(ValidationContext<string?> must)
+            => must.BeOfLength(3);
+    }
 
     public record PositiveInt(int Value) : IntValueType(Value)
     {
@@ -23,6 +29,33 @@ public class TryCreateTests
         private static void Validate(ValidationContext<int> must)
             => must.BePositive();
     }
+    public record NegativeInt(int Value) : IntValueType(Value)
+    {
+        [Validation]
+        private static void Validate(ValidationContext<int> must)
+            => must.BeNegative();
+    }
+
+
+    [Fact]
+    public void ClassFullyGeneric()
+    {
+        var t1 = ValueType.TryCreate<FiveCharacterString, string>("12345", out var errors1);
+        var t2 = ValueType.TryCreate<ThreeCharacterString, string>("123", out var errors2);
+        errors1.GetException()?.ToString().Should().BeNull();
+        errors2.GetException()?.ToString().Should().BeNull();
+        t1.Should().BeOfType<FiveCharacterString>();
+        t2.Should().BeOfType<ThreeCharacterString>();
+    }
+
+
+
+
+
+
+
+
+
 
     [Fact]
     public void StringIsValid()

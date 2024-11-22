@@ -61,6 +61,13 @@ public static class IntIValidationContextExtensions
         => context.BeGreaterThanOrEqualTo(0);
 
     /// <summary>
+    /// Validates that the value is not negative (greater than or equal to 0).
+    /// </summary>
+    /// <returns>The current instance of the <see cref="IValidationContext{T}"/> class.</returns>
+    public static IValidationContext<int> BeNegative(this IValidationContext<int> context)
+        => context.BeLessThan(0);
+
+    /// <summary>
     /// Validates that the value is positive (greater than 0).
     /// </summary>
     /// <returns>The current instance of the <see cref="IValidationContext{T}"/> class.</returns>
