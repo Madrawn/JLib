@@ -2,6 +2,7 @@
 using AutoMapper;
 using JLib.DataGeneration.Abstractions;
 using JLib.DependencyInjection;
+using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +14,9 @@ namespace JLib.DataGeneration;
 /// </summary>
 public static class DataPackageExtensions
 {
+    /// <summary>
+    /// serializes the <see cref="DataPackageValues.IdIdentifier"/> for the given <paramref name="propertySelector"/> and returns it as string, to be uses as human optimized identification in a generated entity
+    /// </summary>
     public static string GetInfoText<TDataPackage>(this TDataPackage dataPackage,
         Expression<Func<TDataPackage, object>> propertySelector)
         where TDataPackage : DataPackage
@@ -22,7 +26,7 @@ public static class DataPackageExtensions
     /// Adds the ID registry to the service collection. Should be omitted when calling <see cref="AddDataPackages"/>.
     /// </summary>
     /// <param name="services">The service collection.</param>
-    /// <param name="defaultNamespace">The default namespace for ID group names. It will be removed from all <see cref="DataPackageValues.IdIdentifier"/>s</param>
+    /// <param name="idRegistryConfiguration">The configuration which will be used for the <see cref="IIdRegistry"/></param>
     /// <returns>The modified service collection.</returns>
     public static IServiceCollection AddIdRegistry(this IServiceCollection services, IdRegistryConfiguration? idRegistryConfiguration)
     {
@@ -50,6 +54,12 @@ public static class DataPackageExtensions
     /// <returns>The modified service collection.</returns>
     public static IServiceCollection AddDataPackages(this IServiceCollection services, ITypeCache typeCache, IdRegistryConfiguration? configuration = null)
     {
+
+        if (typeCache.KnownTypeValueTypes.Contains(typeof(DataPackageType)))
+            throw new InvalidSetupException(
+                $"The TypeCache is not aware of the {typeof(DataPackageType).FullName(true)}. To solve this issue, include the {typeof(JLibDataGenerationTp)} Type package.");
+
+
         services.AddIdRegistry(configuration)
             .AddTestingIdGenerator();
 
