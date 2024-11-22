@@ -163,16 +163,39 @@ public static partial class ValueType
     /// <exception cref="AggregateException"></exception>
     /// <returns>a new instance of <paramref name="tValueType"/> containing <paramref name="value"/> as it's value ot null, if the validation failed.</returns>
     [return: NotNullIfNotNull("value")]
+    public static IValueType? Create(Type tValueType, object? value)
+    {
+        if (value is null)
+            return null;
+        var del = CompiledExpressionCache.GetOrAdd(
+            GetExpressionCacheKey(tValueType, false),
+            _ => FactoryExpressions.ForAnyType(tValueType, false).Compile()
+        );
+        return del.DynamicInvoke(value) as IValueType ?? throw new NullReferenceException(
+            $"unexpected null result of type '{tValueType.FullName()}' with value '{value}'"); // let's hope this is not too slow
+    }
+
+
+    /// <summary>
+    /// Checks whether <paramref name="value"/> is a valid <paramref name="tValueType"/> value and returns the value if it is valid, otherwise throws an <see cref="AggregateException"/>.<br/>
+    /// values may be null. if they are, null will be returned.
+    /// </summary>
+    /// <typeparam name="T">The native value of the <paramref name="tValueType"/></typeparam>
+    /// <param name="tValueType">The specific <see cref="ValueType{T}"/> to create the <paramref name="value"/> for</param>
+    /// <param name="value">the value to create to a new <paramref name="tValueType"/></param>
+    /// <exception cref="AggregateException"></exception>
+    /// <returns>a new instance of <paramref name="tValueType"/> containing <paramref name="value"/> as it's value ot null, if the validation failed.</returns>
+    [return: NotNullIfNotNull("value")]
     public static ValueType<T>? Create<T>(Type tValueType, T? value)
-        => typeof(T).IsValueType
-            ? CompiledExpressionCache.GetOrAdd(
-                GetExpressionCacheKey(typeof(T), false),
-                _ => FactoryExpressions.ForAnyType(tValueType, false).Compile()
-            ).DynamicInvoke(value) as ValueType<T> // let's hope this is not too slow
-            : CompiledExpressionCache.GetOrAdd(
-                GetExpressionCacheKey(typeof(T), false),
-                _ => FactoryExpressions.ForAnyType(tValueType, false).Compile()
-            ).CastTo<Func<T?, ValueType<T>?>>().Invoke(value);
+    {
+        var del = CompiledExpressionCache.GetOrAdd(
+            GetExpressionCacheKey(tValueType, false),
+            _ => FactoryExpressions.ForAnyType(tValueType, false).Compile()
+        );
+        return typeof(T).IsValueType
+            ? del.DynamicInvoke(value) as ValueType<T> // let's hope this is not too slow
+            : del.CastTo<Func<T?, ValueType<T>?>>().Invoke(value);
+    }
 
     /// <summary>
     /// Checks whether <paramref name="value"/> is a valid <typeparamref name="TVt"/> and returns the value if it is valid, otherwise throws an <see cref="AggregateException"/>.<br/>
@@ -186,15 +209,15 @@ public static partial class ValueType
     [return: NotNullIfNotNull("value")]
     public static TVt? Create<TVt, T>(T? value)
         where TVt : ValueType<T>
-        => typeof(T).IsValueType
-            ? CompiledExpressionCache.GetOrAdd(
-                GetExpressionCacheKey<TVt>(false),
-                _ => FactoryExpressions.ForAnyType<TVt, T>(false).Compile()
-            ).DynamicInvoke(value) as TVt // let's hope this is not too slow
-            : CompiledExpressionCache.GetOrAdd(
-                GetExpressionCacheKey<TVt>(false),
-                _ => FactoryExpressions.ForAnyType<TVt, T>(false).Compile()
-            ).CastTo<Func<T?, TVt?>>().Invoke(value);
+    {
+        var del = CompiledExpressionCache.GetOrAdd(
+            GetExpressionCacheKey<TVt>(false),
+            _ => FactoryExpressions.ForAnyType<TVt, T>(false).Compile()
+        );
+        return typeof(T).IsValueType
+            ? del.DynamicInvoke(value) as TVt // let's hope this is not too slow
+            : del.CastTo<Func<T?, TVt?>>().Invoke(value);
+    }
 
     /// <summary>
     /// Checks whether <paramref name="value"/> is a valid <typeparamref name="TVt"/> and returns the value if it is valid, otherwise throws an <see cref="AggregateException"/>.<br/>
@@ -209,7 +232,6 @@ public static partial class ValueType
     public static TVt? CreateNullable<TVt, T>(T? value)
         where TVt : ValueType<T>
         where T : struct
-        // todo: use compiled expression to improve runtime performance
         => value is null
             ? null
             : CompiledExpressionCache.GetOrAdd(
@@ -226,10 +248,16 @@ public static partial class ValueType
 }
 
 /// <summary>
+/// A <see cref="ValueType{T}"/> of unknown type.<br/>
+/// Should not be implemented directly, but by deriving from <see cref="ValueType{T}"/>
+/// </summary>
+public interface IValueType { }
+
+/// <summary>
 /// Base class for all value types<br/>
 /// JLib.ValueTypes.Mapping adds Automapper and native json support for System.Text.Json
 /// </summary>
-public abstract record ValueType<T>
+public abstract record ValueType<T> : IValueType
 {
     /// <summary>
     /// Base class for all value types<br/>
@@ -243,6 +271,9 @@ public abstract record ValueType<T>
         errors.ThrowIfNotEmpty();
     }
 
+    /// <summary>
+    /// Deconstructs the ValueType
+    /// </summary>
     public virtual void Deconstruct(out T value)
     {
         value = Value;

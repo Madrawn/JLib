@@ -5,7 +5,7 @@
 /// <inheritdoc cref="NumericValueType{T}"/>
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public interface INumericValueType<out T>
+public interface INumericValueType<out T> : IValueType
     where T : struct
 #if NET7_0_OR_GREATER
     , System.Numerics.INumber<T>
