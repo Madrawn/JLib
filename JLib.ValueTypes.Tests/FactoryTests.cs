@@ -7,6 +7,26 @@ using Xunit;
 
 namespace JLib.ValueTypes.Tests;
 
+// required methods:
+//     Create, TryCreate, CreateNullable
+
+// required test variants:
+//     class, struct
+
+// required parameters types:
+//     Invalid, Null, Valid
+
+// required overloads:
+//     FullyGeneric, HalfGeneric, NonGeneric
+
+// total number of required tests:
+//     total: 52
+//     per method: 16/18
+//     per test variant: 7/9
+//     per parameter type: 1/3
+//     per overload: 0/1
+// Note: since it is impossible to call Create with a null value as long as it is not non-generic, create/struct/null has no Fully- or HalfGeneric tests.
+// therefore, the total number of tests is decreased by 2 from 54 to 52.
 public class FactoryTests
 {
 
@@ -118,11 +138,11 @@ public class FactoryTests
                 act2.Should().Throw<AggregateException>();
             }
         }
-        public class ClassValues
+        public class Class
         {
-            public class NotNull : ValidBase<ThreeCharacterString, FiveCharacterString, string>
+            public class Valid : ValidBase<ThreeCharacterString, FiveCharacterString, string>
             {
-                public NotNull() : base("123", "12345")
+                public Valid() : base("123", "12345")
                 {
                 }
             }
@@ -163,11 +183,11 @@ public class FactoryTests
             }
         }
 
-        public class StructValues
+        public class Struct
         {
-            public class NotNull : ValidBase<NegativeInt, PositiveInt, int>
+            public class Valid : ValidBase<NegativeInt, PositiveInt, int>
             {
-                public NotNull() : base(-1, 1)
+                public Valid() : base(-1, 1)
                 {
                 }
             }
@@ -234,6 +254,46 @@ public class FactoryTests
             }
         }
 
+        public abstract class NullableStructBase<TVt1, TVt2, TV>
+            where TVt1 : ValueType<TV>
+            where TVt2 : ValueType<TV>
+            where TV : struct
+        {
+            private readonly TV? _value1;
+            private readonly TV? _value2;
+
+            protected NullableStructBase(TV? value1, TV? value2)
+            {
+                _value1 = value1;
+                _value2 = value2;
+            }
+            [Fact]
+            public void ClassFullyGeneric()
+            {
+                var t1 = ValueType.CreateNullable<TVt1, TV>(_value1);
+                var t2 = ValueType.CreateNullable<TVt2, TV>(_value2);
+                t1.Should().BeOfType<TVt1>();
+                t2.Should().BeOfType<TVt2>();
+            }
+
+            [Fact]
+            public void ClassHalfGeneric()
+            {
+                var t1 = ValueType.CreateNullable(typeof(TVt1), _value1);
+                var t2 = ValueType.CreateNullable(typeof(TVt2), _value2);
+                t1.Should().BeOfType<TVt1>();
+                t2.Should().BeOfType<TVt2>();
+            }
+
+            [Fact]
+            public void ClassNonGeneric()
+            {
+                var t1 = ValueType.CreateNullable(typeof(TVt1), ObjectCastExtensions.As<object>(_value1!));
+                var t2 = ValueType.CreateNullable(typeof(TVt2), ObjectCastExtensions.As<object>(_value2!));
+                t1.Should().BeOfType<TVt1>();
+                t2.Should().BeOfType<TVt2>();
+            }
+        }
         public abstract class InvalidBase<TVt1, TVt2, TV>
             where TVt1 : ValueType<TV>
             where TVt2 : ValueType<TV>
@@ -274,17 +334,17 @@ public class FactoryTests
             }
         }
 
-        public class StructValues
+        public class Struct
         {
-            public class NotNull : Base<ThreeCharacterString, FiveCharacterString, string>
+            public class Valid : Base<NegativeInt, PositiveInt, int>
             {
-                public NotNull() : base("123", "12345")
+                public Valid() : base(-1, 1)
                 {
                 }
             }
-            public class Invalid : InvalidBase<ThreeCharacterString, FiveCharacterString, string>
+            public class Invalid : InvalidBase<NegativeInt, PositiveInt, int>
             {
-                public Invalid() : base("1234", "123456")
+                public Invalid() : base(1, -1)
                 {
                 }
             }
@@ -319,17 +379,17 @@ public class FactoryTests
             }
         }
 
-        public class ClassValues
+        public class Class
         {
-            public class NotNull : Base<NegativeInt, PositiveInt, int>
+            public class Valid : Base<ThreeCharacterString, FiveCharacterString, string>
             {
-                public NotNull() : base(-1, 1)
+                public Valid() : base("123", "12345")
                 {
                 }
             }
-            public class Invalid : InvalidBase<NegativeInt, PositiveInt, int>
+            public class Invalid : InvalidBase<ThreeCharacterString, FiveCharacterString, string>
             {
-                public Invalid() : base(1, -1)
+                public Invalid() : base("1234", "123456")
                 {
                 }
             }
@@ -512,7 +572,7 @@ public class FactoryTests
                 _value2 = value2;
             }
             [Fact]
-            public void ClassFullyGeneric()
+            public void FullyGeneric()
             {
                 var act1 = () => ValueType.CreateNullable<TVt1, TV>(_value1);
                 var act2 = () => ValueType.CreateNullable<TVt2, TV>(_value2);
@@ -521,7 +581,7 @@ public class FactoryTests
             }
 
             [Fact]
-            public void ClassHalfGeneric()
+            public void HalfGeneric()
             {
                 var act1 = () => ValueType.CreateNullable<TV>(typeof(TVt1), _value1);
                 var act2 = () => ValueType.CreateNullable<TV>(typeof(TVt2), _value2);
@@ -530,7 +590,7 @@ public class FactoryTests
             }
 
             [Fact]
-            public void ClassNonGeneric()
+            public void NonGeneric()
             {
                 var act1 = () => ValueType.CreateNullable(typeof(TVt1), ObjectCastExtensions.As<object>(_value1!));
                 var act2 = () => ValueType.CreateNullable(typeof(TVt2), ObjectCastExtensions.As<object>(_value2!));
@@ -539,11 +599,11 @@ public class FactoryTests
             }
         }
 
-        public class ClassValues
+        public class Class
         {
-            public class NotNull : Base<ThreeCharacterString, FiveCharacterString, string>
+            public class Valid : Base<ThreeCharacterString, FiveCharacterString, string>
             {
-                public NotNull() : base("123", "12345")
+                public Valid() : base("123", "12345")
                 {
                 }
             }
@@ -584,56 +644,12 @@ public class FactoryTests
             }
         }
 
-        public class StructValues
+
+        public class Struct
         {
-            public class NotNull : Base<NegativeInt, PositiveInt, int>
+            public class Valid : NullableStructBase<NegativeInt, PositiveInt, int>
             {
-                public NotNull() : base(-1, 1)
-                {
-                }
-            }
-            public class Invalid : InvalidBase<NegativeInt, PositiveInt, int>
-            {
-                public Invalid() : base(1, -1)
-                {
-                }
-            }
-            public class Null
-            {
-                [Fact]
-                public void ClassFullyGeneric()
-                {
-                    var t1 = ValueType.CreateNullable<NegativeInt, int>(null!);
-                    var t2 = ValueType.CreateNullable<PositiveInt, int>(null!);
-                    t1.Should().BeNull();
-                    t2.Should().BeNull();
-                }
-
-                [Fact]
-                public void ClassHalfGeneric()
-                {
-                    var t1 = ValueType.CreateNullable<int>(typeof(NegativeInt), null);
-                    var t2 = ValueType.CreateNullable<int>(typeof(PositiveInt), null);
-                    t1.Should().BeNull();
-                    t2.Should().BeNull();
-                }
-
-                [Fact]
-                public void ClassNonGeneric()
-                {
-                    var t1 = ValueType.CreateNullable(typeof(NegativeInt), ObjectCastExtensions.As<object>(null!));
-                    var t2 = ValueType.CreateNullable(typeof(PositiveInt), ObjectCastExtensions.As<object>(null!));
-                    t1.Should().BeNull();
-                    t2.Should().BeNull();
-                }
-            }
-        }
-
-        public class NullableStructValues
-        {
-            public class NotNull : NullableStructBase<NegativeInt, PositiveInt, int>
-            {
-                public NotNull() : base(-1, 1)
+                public Valid() : base(-1, 1)
                 {
                 }
             }
