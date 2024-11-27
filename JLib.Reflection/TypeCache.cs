@@ -155,7 +155,7 @@ public class TypeCache : ITypeCache
         using var _ = _logger.BeginScope(this);
         KnownTypes = typePackage.GetContent().ToArray();
         const string exceptionMessage = "Cache setup failed";
-        var exceptions = parentExceptionManager.CreateChild(exceptionMessage);
+        using var exceptions = parentExceptionManager.CreateChild(exceptionMessage);
 
         var availableTypeValueTypes = KnownTypes
             .Where(type => !type.HasCustomAttribute<IgnoreInCache>())

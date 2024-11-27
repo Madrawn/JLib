@@ -192,8 +192,8 @@ public sealed class ExceptionBuilder : IExceptionProvider, IDisposable
         _disposed = true;
         if (_parent is not null && HasErrors() is false)
             _parent._children.Remove(this);
-        else
-            this.ThrowIfNotEmpty();
+        if(_parent is null)
+            ThrowIfNotEmpty();
     }
     /// <summary>
     /// <inheritdoc cref="IExceptionProvider.ThrowIfNotEmpty"/>

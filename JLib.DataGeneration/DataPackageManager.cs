@@ -12,7 +12,7 @@ internal sealed class DataPackageManager
 {
     private readonly IIdRegistry _idRegistry;
     private readonly IServiceProvider _provider;
-    internal DataPackageManager(IIdRegistry idRegistry, IServiceProvider provider, IdRegistryConfiguration configuration)
+    public DataPackageManager(IIdRegistry idRegistry, IServiceProvider provider, IdRegistryConfiguration configuration)
     {
         _idRegistry = idRegistry;
         _provider = provider;

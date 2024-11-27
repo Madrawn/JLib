@@ -1,0 +1,34 @@
+﻿{
+  "TestName": "ExceptionConstellations",
+  "Environment": {
+    "Types": {
+      "DemoType": {
+        "Kind": "Class",
+        "Attributes": [],
+        "ImplementedInterfaces": []
+      },
+      "DemoTypeValueType": {
+        "Kind": "Class",
+        "Attributes": [
+          "NullableAttribute",
+          "NullableContextAttribute",
+          "TvtFactoryAttribute.DerivedFromAnyAttribute",
+          "UnmappedAttribute"
+        ],
+        "ImplementedInterfaces": [
+          "IEquatable<TypeCacheTests.ExceptionConstellations.DemoTypeValueType>",
+          "IEquatable<TypeValueType>",
+          "IEquatable<ValueType<Type>>",
+          "ITypeValueType",
+          "IValidatedType",
+          "IValueType"
+        ]
+      }
+    }
+  },
+  "Exceptions": null,
+  "CachedTypes": {},
+  "KnownTypeValueTypes": [
+    "DemoTypeValueType"
+  ]
+}

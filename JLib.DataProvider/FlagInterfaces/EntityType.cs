@@ -13,7 +13,7 @@ public record EntityType(Type Value) : DataObjectType(Value), IValidatedType
 
     public virtual void Validate(ITypeCache cache, TypeValidationContext value)
     {
-        if (GetType() == typeof(EntityType))
+        if (GetType() == typeof(EntityType) && value.Value != typeof(IgnoredEntity))
             value.AddError(
                 $"You have to specify which type of entity this is by implementing a derivation of the {nameof(IEntity)} interface");
     }

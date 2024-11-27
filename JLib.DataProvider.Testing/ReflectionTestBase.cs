@@ -72,6 +72,9 @@ public abstract class ReflectionTestBase
         AddServices(services, cache, _exceptions.CreateChild(nameof(AddServices)));
         serviceFactory(services, cache, _loggerFactory, _exceptions.CreateChild("Service Factory"));
 
+        if (expectException is false && _exceptions.HasErrors())
+            _exceptions.GetException()?.ToHumanOptimizedJsonObject().Should().BeNull();
+
         object serviceValidator;
         try
         {
@@ -81,7 +84,7 @@ public abstract class ReflectionTestBase
         {
             serviceValidator = e.PrepareSnapshot() as object ?? "evaluation failed";
         }
-
+        
         var maxDescriptionLength = expectedBehavior.Max(x => x.Length);
         new Dictionary<string, object?>
         {

@@ -13,7 +13,8 @@
           "IEquatable<TypeCacheTests.TypeValueTypeWithoutFactoryAttribute.InvalidTypeValueType>",
           "IEquatable<TypeValueType>",
           "IEquatable<ValueType<Type>>",
-          "ITypeValueType"
+          "ITypeValueType",
+          "IValueType"
         ]
       }
     }

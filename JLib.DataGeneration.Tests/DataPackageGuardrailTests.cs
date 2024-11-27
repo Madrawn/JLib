@@ -45,6 +45,7 @@ public class DataPackageGuardrailTests
                 .AddDataPackages(typeCache, new() { DefaultNamespace = "JLib.DataGeneration.Tests" });
             using var provider = services.BuildServiceProvider();
             providerAction(provider);
+            exceptions.ThrowIfNotEmpty();
         };
         return action.Should().Throw<TException>().And;
     }

@@ -1,11 +1,16 @@
 ﻿using System.Collections.Immutable;
+
 using FluentAssertions;
+
 using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Testing;
+
 using Microsoft.Extensions.Logging;
+
 using Snapshooter;
 using Snapshooter.Xunit;
+
 using Xunit;
 using Xunit.Abstractions;
 
@@ -36,6 +41,18 @@ public class TypeCacheTests : IDisposable
         public record DemoTypeValueTypeB(Type Value) : TypeValueType(Value);
         public class InconclusiveType : IDemoTypeA, IDemoTypeB { }
     }
+    public static class ExceptionConstellations
+    {
+        [TvtFactoryAttribute.DerivedFromAny(typeof(DemoType))]
+        public record DemoTypeValueType(Type Value) : TypeValueType(Value), IValidatedType
+        {
+            public void Validate(ITypeCache cache, TypeValidationContext value)
+            {
+                value.AddSubValidators(new Exception("this should fail").ToProvider());
+            }
+        }
+        public class DemoType { }
+    }
 
     public TypeCacheTests(ITestOutputHelper testOutputHelper)
     {
@@ -65,6 +82,10 @@ public class TypeCacheTests : IDisposable
         return d;
     }
 
+    /// <summary>
+    /// runs the test for each nested class in <see cref="TypeCacheTests"/>
+    /// </summary>
+    /// <param name="sut"></param>
     [Theory]
     [MemberData(nameof(GetTestTypes))]
     public void Test(Type sut)
