@@ -6,6 +6,7 @@ using JLib.Exceptions;
 using JLib.Helper;
 using JLib.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace JLib.DataGeneration;
 
@@ -55,15 +56,17 @@ public static class DataPackageExtensions
     public static IServiceCollection AddDataPackages(this IServiceCollection services, ITypeCache typeCache, IdRegistryConfiguration? configuration = null)
     {
 
-        if (typeCache.KnownTypeValueTypes.Contains(typeof(DataPackageType)))
+        if (typeCache.KnownTypeValueTypes.Contains(typeof(DataPackageType)) is false)
             throw new InvalidSetupException(
                 $"The TypeCache is not aware of the {typeof(DataPackageType).FullName(true)}. To solve this issue, include the {typeof(JLibDataGenerationTp)} Type package.");
 
 
+        
+
         services.AddIdRegistry(configuration)
             .AddTestingIdGenerator();
 
-        services.AddSingleton(configuration ?? new IdRegistryConfiguration());
+        services.TryAddSingleton(configuration ?? new IdRegistryConfiguration());
 
         services.AddSingleton<DataPackageManager, DataPackageManager>();
 

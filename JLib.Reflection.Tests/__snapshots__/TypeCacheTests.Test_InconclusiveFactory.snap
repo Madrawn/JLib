@@ -14,7 +14,8 @@
           "IEquatable<TypeCacheTests.InconclusiveFactory.DemoTypeValueTypeA>",
           "IEquatable<TypeValueType>",
           "IEquatable<ValueType<Type>>",
-          "ITypeValueType"
+          "ITypeValueType",
+          "IValueType"
         ]
       },
       "DemoTypeValueTypeB": {
@@ -29,7 +30,8 @@
           "IEquatable<TypeCacheTests.InconclusiveFactory.DemoTypeValueTypeB>",
           "IEquatable<TypeValueType>",
           "IEquatable<ValueType<Type>>",
-          "ITypeValueType"
+          "ITypeValueType",
+          "IValueType"
         ]
       },
       "IDemoTypeA": {

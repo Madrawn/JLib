@@ -128,7 +128,7 @@ public static class ReflectionHelper
         switch (member)
         {
             case MethodInfo methodInfo:
-                sb.Insert(0, methodInfo.GetAccessModifier()).Append(' ');
+                sb.Insert(0, ' ').Insert(0, methodInfo.GetAccessModifier().ToString().ToLower());
                 sb.Append(methodInfo.Name);
                 if (methodInfo.IsGenericMethod)
                 {
@@ -163,12 +163,12 @@ public static class ReflectionHelper
                     .Append(" { ");
                 if (propertyInfo.CanRead)
                 {
-                    sb.Append(propertyInfo.GetMethod?.GetAccessModifier());
-                    sb.Append("get; ");
+                    sb.Append(propertyInfo.GetMethod?.GetAccessModifier().ToString().ToLower());
+                    sb.Append(" get; ");
                 }
                 if (propertyInfo.CanWrite)
                 {
-                    sb.Append(propertyInfo.SetMethod?.GetAccessModifier());
+                    sb.Append(propertyInfo.SetMethod?.GetAccessModifier().ToString().ToLower());
                     sb.Append(propertyInfo.IsInit() ? "init; " : "set; ");
                 }
                 sb.Append('}');

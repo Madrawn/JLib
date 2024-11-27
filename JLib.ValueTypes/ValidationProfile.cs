@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
+
 using JLib.Exceptions;
 using JLib.Helper;
 
@@ -78,6 +79,7 @@ internal sealed class ValidationProfile<TValue> : IValidationProfile<TValue>
                     .SelectMany(t => t.GetMethods(sharedFlags))
                 )
             .Where(method => method.HasCustomAttribute<ValidationAttribute>()
+                // we don't want to get methods of base classes to prevent that we validate them multiple times since we climb the entire inheritance tree
                 && method.DeclaringType == method.ReflectedType)
             .ToReadOnlyCollection();
 
@@ -103,24 +105,23 @@ internal sealed class ValidationProfile<TValue> : IValidationProfile<TValue>
 
             if (validationContextType == typeof(IValidationContext<TValue>) || validationContextType == typeof(ValidationContext<TValue>))
                 continue;
-            else
-            {
-                if (validationContextType?.Implements<IValidationContext<TValue>>() is false or null)
-                    methodErrors.Add("parameter is not assignable to " + typeof(IValidationContext<TValue>).FullName(true));
-                if (validationContextType?.IsInstantiable() is false or null)
-                    methodErrors.Add("parameter can not be created (it is either static or an interface)");
-                var validationContextCtors = validationContextType?.GetConstructors() ?? Array.Empty<ConstructorInfo>();
-                if (validationContextCtors.Length != 1)
-                    methodErrors.Add($"the ValidationContext {validationContextType?.FullName()} should have only one constructor");
-                var validationContextCtorParameters = validationContextCtors.FirstOrDefault()?.GetParameters() ?? Array.Empty<ParameterInfo>();
-                if (validationContextCtorParameters.Length != 2)
-                    methodErrors.Add($"the ValidationContext {validationContextType?.FullName()} requires exactly 2 parameters");
-                if (validationContextCtorParameters.ElementAtOrDefault(0)?.ParameterType != typeof(TValue))
-                    methodErrors.Add($"the first ctor parameter of ValidationContext {validationContextType?.FullName()} must be of type {typeof(TValue).FullName()}");
-                if (validationContextCtorParameters.ElementAtOrDefault(1)?.ParameterType != typeof(Type))
-                    methodErrors.Add($"the second ctor parameter of ValidationContext {validationContextType?.FullName()} must be of type {typeof(Type).FullName()}");
 
-            }
+            if (validationContextType?.Implements<IValidationContext<TValue>>() is false or null)
+                methodErrors.Add("parameter is not assignable to " + typeof(IValidationContext<TValue>).FullName(true));
+            if (validationContextType?.IsInstantiable() is false or null)
+                methodErrors.Add("parameter can not be created (it is either static or an interface)");
+            var validationContextCtors = validationContextType?.GetConstructors() ?? Array.Empty<ConstructorInfo>();
+            if (validationContextCtors.Length != 1)
+                methodErrors.Add($"the ValidationContext {validationContextType?.FullName()} should have only one constructor");
+            var validationContextCtorParameters = validationContextCtors.FirstOrDefault()?.GetParameters() ?? Array.Empty<ParameterInfo>();
+            if (validationContextCtorParameters.Length != 2)
+                methodErrors.Add($"the ValidationContext {validationContextType?.FullName()} requires exactly 2 parameters");
+            if (validationContextCtorParameters.ElementAtOrDefault(0)?.ParameterType != typeof(TValue))
+                methodErrors.Add($"the first ctor parameter of ValidationContext {validationContextType?.FullName()} must be of type {typeof(TValue).FullName()}");
+            if (validationContextCtorParameters.ElementAtOrDefault(1)?.ParameterType != typeof(Type))
+                methodErrors.Add($"the second ctor parameter of ValidationContext {validationContextType?.FullName()} must be of type {typeof(Type).FullName()}");
+
+
 
         }
 

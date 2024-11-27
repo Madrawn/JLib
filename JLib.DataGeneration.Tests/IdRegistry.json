@@ -1,6 +1,17 @@
 {
   "__registry__": {
-    "IdIncrement": 3
+    "IdIncrement": 5
+  },
+  "~..DataPackageGuardrailTests.DuplicatePropertyDp": {
+    "Id": "ac0f6ffa-c0c0-48a2-a676-ef2821f79b2d"
+  },
+  "~..DataPackageGuardrailTests.DuplicatePropertyDp:~..ValidDataPackages.Base2Dp<System.Object>:~..ValidDataPackages.Base1Dp<~..DataPackageTestBase.TestTypeId>": {
+    "Id": "dc250b4d-5819-49c9-9e76-e5680f952280",
+    "Id2": 5
+  },
+  "~..ValidDataPackages.Test3Dp:~..ValidDataPackages.Base2Dp<System.Object>:~..ValidDataPackages.Base1Dp<~..DataPackageTestBase.TestTypeId>": {
+    "Id": "74b6aa0d-6237-497f-a992-b1e2cf0f11da",
+    "Id2": 4
   },
   "GenericDataPackageTests.Base3Dp:GenericDataPackageTests.Base2Dp<System.Object>:GenericDataPackageTests.Base1Dp<DataPackageTestBase.TestTypeId>": {
     "Id": "f3301c07-70f1-464a-a301-44c577d64406",
@@ -13,6 +24,15 @@
   "GenericDataPackageTests.TestPackageInstance:GenericDataPackageTests.TestPackageBase<DataPackageTestBase.TestTypeId>": {
     "Id": "e0b5a385-ac0f-4c72-9ce0-f0906bf69c71",
     "Id2": 1
+  },
+  "JLib.DataGeneration.Tests.TestingIdGeneratorTests": {
+    "[Default]CreateGuid_ShouldReturnNewGuid()-1": "b0c74dcd-143a-4417-85bd-8f503c648257"
+  },
+  "JLib.DataGeneration.Tests.TestingIdGeneratorTests.Nested<>": {
+    "[Default]CreateId<,>()-1": "82a15361-b69d-43b2-b887-01b2556cd6d5",
+    "[Default]CreateId<>(System.Int32)-1": "74519d31-bb45-48c3-a7fa-f2e55a2c365f",
+    "[Default]CreateId<>(System.Int32)-2": "d0aeebf2-c993-4a1b-86b0-a132e56f9477",
+    "[otherScope]CreateId<>(System.Int32)-1": "09835d40-a7f1-4413-8269-e2199b9a193d"
   },
   "TestingIdGeneratorTests": {
     "[Default]CreateGuid_ShouldReturnNewGuid()-1": "ec59f5b1-e545-45e7-97a6-a496bb4e5ff8"

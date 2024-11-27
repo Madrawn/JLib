@@ -4,8 +4,18 @@ using System.Text.Json.Nodes;
 using JLib.Helper;
 
 namespace JLib.Exceptions;
+
+/// <summary>
+/// Extension methods which simplify the usage of <see cref="Exception"/>s, <see cref="JLibAggregateException"/>s and <see cref="ExceptionBuilder"/>s
+/// </summary>
 public static class ExceptionExtensions
 {
+    /// <summary>
+    /// Converts the given <param name="exception"/> to an <see cref="IExceptionProvider"/>
+    /// </summary>
+    public static IExceptionProvider ToProvider(this Exception exception)
+        => new ConstantExceptionProvider(exception);
+
     /// <summary>
     /// throws a <see cref="JLibAggregateException"/> with the given <paramref name="message"/> containing all <paramref name="exceptions"/> if <paramref name="exceptions"/> is not empty.
     /// </summary>

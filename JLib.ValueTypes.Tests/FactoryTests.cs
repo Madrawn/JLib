@@ -1,6 +1,8 @@
 ﻿using FluentAssertions;
+
 using JLib.Exceptions;
 using JLib.Helper;
+
 using Xunit;
 
 namespace JLib.ValueTypes.Tests;
@@ -25,10 +27,13 @@ namespace JLib.ValueTypes.Tests;
 //     per overload: 0/1
 // Note: since it is impossible to call Create with a null value as long as it is not non-generic, create/struct/null has no Fully- or HalfGeneric tests.
 // therefore, the total number of tests is decreased by 2 from 54 to 52.
+
+
+/// <summary>
+/// Tests, whether the <see cref="ValueType"/> factories work as expected
+/// </summary>
 public class FactoryTests
 {
-
-
     public record FiveCharacterString(string Value) : StringValueType(Value)
     {
         [Validation]
@@ -69,13 +74,21 @@ public class FactoryTests
                 _value1 = value1;
                 _value2 = value2;
             }
+
+            private void Validate(IValueType? t1, IValueType? t2)
+            {
+                t1.Should().BeOfType<TVt1>()
+                    .Which.Value.Should().Be(_value1);
+                t2.Should().BeOfType<TVt2>()
+                    .Which.Value.Should().Be(_value2);
+            }
+
             [Fact]
             public void ClassFullyGeneric()
             {
                 var t1 = ValueType.Create<TVt1, TV>(_value1);
                 var t2 = ValueType.Create<TVt2, TV>(_value2);
-                t1.Should().BeOfType<TVt1>();
-                t2.Should().BeOfType<TVt2>();
+                Validate(t1, t2);
             }
 
             [Fact]
@@ -83,8 +96,7 @@ public class FactoryTests
             {
                 var t1 = ValueType.Create<TV>(typeof(TVt1), _value1);
                 var t2 = ValueType.Create<TV>(typeof(TVt2), _value2);
-                t1.Should().BeOfType<TVt1>();
-                t2.Should().BeOfType<TVt2>();
+                Validate(t1, t2);
             }
 
             [Fact]
@@ -92,8 +104,7 @@ public class FactoryTests
             {
                 var t1 = ValueType.Create(typeof(TVt1), ObjectCastExtensions.As<object>(_value1!));
                 var t2 = ValueType.Create(typeof(TVt2), ObjectCastExtensions.As<object>(_value2!));
-                t1.Should().BeOfType<TVt1>();
-                t2.Should().BeOfType<TVt2>();
+                Validate(t1, t2);
             }
         }
 
@@ -153,7 +164,7 @@ public class FactoryTests
             public class Null
             {
                 [Fact]
-                public void ClassFullyGeneric()
+                public void FullyGeneric()
                 {
                     var act1 = () => ValueType.Create<ThreeCharacterString, string>(null!);
                     var act2 = () => ValueType.Create<FiveCharacterString, string>(null!);
@@ -162,7 +173,7 @@ public class FactoryTests
                 }
 
                 [Fact]
-                public void ClassHalfGeneric()
+                public void HalfGeneric()
                 {
                     var act1 = () => ValueType.Create<string>(typeof(ThreeCharacterString), null!);
                     var act2 = () => ValueType.Create<string>(typeof(FiveCharacterString), null!);
@@ -171,7 +182,7 @@ public class FactoryTests
                 }
 
                 [Fact]
-                public void ClassNonGeneric()
+                public void NonGeneric()
                 {
                     var act1 = () => ValueType.Create(typeof(ThreeCharacterString), ObjectCastExtensions.As<object>(null!));
                     var act2 = () => ValueType.Create(typeof(FiveCharacterString), ObjectCastExtensions.As<object>(null!));
@@ -189,6 +200,14 @@ public class FactoryTests
                 {
                 }
             }
+
+            public class Invalid : InvalidBase<NegativeInt, PositiveInt, int>
+            {
+                public Invalid() : base(1, -1)
+                {
+                }
+            }
+
             public class Null
             {
                 [Fact]
@@ -198,13 +217,6 @@ public class FactoryTests
                     var act2 = () => ValueType.Create(typeof(PositiveInt), ObjectCastExtensions.As<object>(null!));
                     act1.Should().Throw<AggregateException>();
                     act2.Should().Throw<AggregateException>();
-                }
-            }
-
-            public class Invalid : InvalidBase<NegativeInt, PositiveInt, int>
-            {
-                public Invalid() : base(1, -1)
-                {
                 }
             }
         }
@@ -224,13 +236,19 @@ public class FactoryTests
                 _value1 = value1;
                 _value2 = value2;
             }
+            private void Validate(IValueType? t1, IValueType? t2)
+            {
+                t1.Should().BeOfType<TVt1>()
+                    .Which.Value.Should().Be(_value1);
+                t2.Should().BeOfType<TVt2>()
+                    .Which.Value.Should().Be(_value2);
+            }
             [Fact]
             public void ClassFullyGeneric()
             {
                 var t1 = ValueType.CreateNullable<TVt1, TV>(_value1);
                 var t2 = ValueType.CreateNullable<TVt2, TV>(_value2);
-                t1.Should().BeOfType<TVt1>();
-                t2.Should().BeOfType<TVt2>();
+                Validate(t1, t2);
             }
 
             [Fact]
@@ -238,60 +256,18 @@ public class FactoryTests
             {
                 var t1 = ValueType.CreateNullable<TV>(typeof(TVt1), _value1);
                 var t2 = ValueType.CreateNullable<TV>(typeof(TVt2), _value2);
-                t1.Should().BeOfType<TVt1>();
-                t2.Should().BeOfType<TVt2>();
+                Validate(t1, t2);
             }
 
             [Fact]
             public void ClassNonGeneric()
             {
-                var t1 = ValueType.CreateNullable(typeof(TVt1), ObjectCastExtensions.As<object>(_value1!));
-                var t2 = ValueType.CreateNullable(typeof(TVt2), ObjectCastExtensions.As<object>(_value2!));
-                t1.Should().BeOfType<TVt1>();
-                t2.Should().BeOfType<TVt2>();
+                var t1 = ValueType.CreateNullable(typeof(TVt1), (object)_value1!);
+                var t2 = ValueType.CreateNullable(typeof(TVt2), (object)_value2!);
+                Validate(t1, t2);
             }
         }
 
-        public abstract class NullableStructBase<TVt1, TVt2, TV>
-            where TVt1 : ValueType<TV>
-            where TVt2 : ValueType<TV>
-            where TV : struct
-        {
-            private readonly TV? _value1;
-            private readonly TV? _value2;
-
-            protected NullableStructBase(TV? value1, TV? value2)
-            {
-                _value1 = value1;
-                _value2 = value2;
-            }
-            [Fact]
-            public void ClassFullyGeneric()
-            {
-                var t1 = ValueType.CreateNullable<TVt1, TV>(_value1);
-                var t2 = ValueType.CreateNullable<TVt2, TV>(_value2);
-                t1.Should().BeOfType<TVt1>();
-                t2.Should().BeOfType<TVt2>();
-            }
-
-            [Fact]
-            public void ClassHalfGeneric()
-            {
-                var t1 = ValueType.CreateNullable(typeof(TVt1), _value1);
-                var t2 = ValueType.CreateNullable(typeof(TVt2), _value2);
-                t1.Should().BeOfType<TVt1>();
-                t2.Should().BeOfType<TVt2>();
-            }
-
-            [Fact]
-            public void ClassNonGeneric()
-            {
-                var t1 = ValueType.CreateNullable(typeof(TVt1), ObjectCastExtensions.As<object>(_value1!));
-                var t2 = ValueType.CreateNullable(typeof(TVt2), ObjectCastExtensions.As<object>(_value2!));
-                t1.Should().BeOfType<TVt1>();
-                t2.Should().BeOfType<TVt2>();
-            }
-        }
         public abstract class InvalidBase<TVt1, TVt2, TV>
             where TVt1 : ValueType<TV>
             where TVt2 : ValueType<TV>
@@ -425,52 +401,6 @@ public class FactoryTests
 
     public class TryCreate
     {
-        public abstract class NullableStructBase<TVt1, TVt2, TV>
-            where TVt1 : ValueType<TV>
-            where TVt2 : ValueType<TV>
-            where TV : struct
-        {
-            private readonly TV? _value1;
-            private readonly TV? _value2;
-
-            protected NullableStructBase(TV? value1, TV? value2)
-            {
-                _value1 = value1;
-                _value2 = value2;
-            }
-            [Fact]
-            public void FullyGeneric()
-            {
-                var t1 = ValueType.TryCreate<TVt1, TV>(_value1, out var e1);
-                var t2 = ValueType.TryCreate<TVt2, TV>(_value2, out var e2);
-                e1.GetException()?.ToHumanOptimizedJsonObject().Should().BeNull();
-                e2.GetException()?.ToHumanOptimizedJsonObject().Should().BeNull();
-                t1.Should().BeOfType<TVt1>();
-                t2.Should().BeOfType<TVt2>();
-            }
-
-            [Fact]
-            public void HalfGeneric()
-            {
-                var t1 = ValueType.TryCreate<TV>(typeof(TVt1), (TV?)_value1, out var e1);
-                var t2 = ValueType.TryCreate<TV>(typeof(TVt2), (TV?)_value2, out var e2);
-                e1.GetException()?.ToHumanOptimizedJsonObject().Should().BeNull();
-                e2.GetException()?.ToHumanOptimizedJsonObject().Should().BeNull();
-                t1.Should().BeOfType<TVt1>();
-                t2.Should().BeOfType<TVt2>();
-            }
-
-            [Fact]
-            public void NonGeneric()
-            {
-                var t1 = ValueType.TryCreate(typeof(TVt1), ObjectCastExtensions.As<object>(_value1!), out var e1);
-                var t2 = ValueType.TryCreate(typeof(TVt2), ObjectCastExtensions.As<object>(_value2!), out var e2);
-                e1.GetException()?.ToHumanOptimizedJsonObject().Should().BeNull();
-                e2.GetException()?.ToHumanOptimizedJsonObject().Should().BeNull();
-                t1.Should().BeOfType<TVt1>();
-                t2.Should().BeOfType<TVt2>();
-            }
-        }
         public abstract class InvalidNullableStructBase<TVt1, TVt2, TV>
             where TVt1 : ValueType<TV>
             where TVt2 : ValueType<TV>
@@ -511,17 +441,24 @@ public class FactoryTests
                 act2.Should().Throw<AggregateException>();
             }
         }
-        public abstract class Base<TVt1, TVt2, TV>
+        public abstract class ValidBase<TVt1, TVt2, TV>
             where TVt1 : ValueType<TV>
             where TVt2 : ValueType<TV>
         {
             private readonly TV? _value1;
             private readonly TV? _value2;
 
-            protected Base(TV? value1, TV? value2)
+            protected ValidBase(TV? value1, TV? value2)
             {
                 _value1 = value1;
                 _value2 = value2;
+            }
+            private void Validate(IValueType? t1, IValueType? t2)
+            {
+                t1.Should().BeOfType<TVt1>()
+                    .Which.Value.Should().Be(_value1);
+                t2.Should().BeOfType<TVt2>()
+                    .Which.Value.Should().Be(_value2);
             }
             [Fact]
             public void ClassFullyGeneric()
@@ -530,8 +467,7 @@ public class FactoryTests
                 var t2 = ValueType.TryCreate<TVt2, TV>(_value2, out var e2);
                 e1.GetException()?.ToHumanOptimizedJsonObject().Should().BeNull();
                 e2.GetException()?.ToHumanOptimizedJsonObject().Should().BeNull();
-                t1.Should().BeOfType<TVt1>();
-                t2.Should().BeOfType<TVt2>();
+                Validate(t1, t2);
             }
 
             [Fact]
@@ -541,8 +477,7 @@ public class FactoryTests
                 var t2 = ValueType.TryCreate<TV>(typeof(TVt2), _value2, out var e2);
                 e1.GetException()?.ToHumanOptimizedJsonObject().Should().BeNull();
                 e2.GetException()?.ToHumanOptimizedJsonObject().Should().BeNull();
-                t1.Should().BeOfType<TVt1>();
-                t2.Should().BeOfType<TVt2>();
+                Validate(t1, t2);
             }
 
             [Fact]
@@ -552,8 +487,7 @@ public class FactoryTests
                 var t2 = ValueType.TryCreate(typeof(TVt2), ObjectCastExtensions.As<object>(_value2!), out var e2);
                 e1.GetException()?.ToHumanOptimizedJsonObject().Should().BeNull();
                 e2.GetException()?.ToHumanOptimizedJsonObject().Should().BeNull();
-                t1.Should().BeOfType<TVt1>();
-                t2.Should().BeOfType<TVt2>();
+                Validate(t1, t2);
             }
         }
 
@@ -599,7 +533,7 @@ public class FactoryTests
 
         public class Class
         {
-            public class Valid : Base<ThreeCharacterString, FiveCharacterString, string>
+            public class Valid : ValidBase<ThreeCharacterString, FiveCharacterString, string>
             {
                 public Valid() : base("123", "12345")
                 {
@@ -645,7 +579,7 @@ public class FactoryTests
 
         public class Struct
         {
-            public class Valid : NullableStructBase<NegativeInt, PositiveInt, int>
+            public class Valid : ValidBase<NegativeInt, PositiveInt, int>
             {
                 public Valid() : base(-1, 1)
                 {

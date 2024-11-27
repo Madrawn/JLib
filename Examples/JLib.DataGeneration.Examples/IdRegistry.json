@@ -2,6 +2,9 @@
   "__registry__": {
     "IdIncrement": 0
   },
+  "~..CustomerDp": {
+    "CustomerId": "df25a34e-2b49-4faa-92c2-1243409542d9"
+  },
   "CustomerDp": {
     "CustomerId": "5e384704-f4df-42a3-a062-9c17edca1952"
   },

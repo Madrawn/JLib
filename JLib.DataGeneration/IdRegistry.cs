@@ -156,6 +156,8 @@ internal class IdRegistry : IIdRegistry, IDisposable
     void IIdRegistry.SetIdPropertyValue(object packageInstance, PropertyInfo property)
     {
         var id = GetId(new(property, _config), property.PropertyType);
+        if (property.CanWrite is false)
+            throw new InvalidOperationException($"can't write to property {property.ToDebugInfo()}");
         property.SetValue(packageInstance, id);
     }
 

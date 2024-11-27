@@ -22,7 +22,7 @@ public record DataPackageType : TypeValueType, IValidatedType
     /// </summary>
     public DataPackageType(Type value) : base(value)
     {
-        IdProperties = GetType().GetProperties(PropertyDiscoveryBindingFlags)
+        IdProperties = value.GetProperties(PropertyDiscoveryBindingFlags)
             .Where(x =>
                 x.HasCustomAttribute<SkipIdAssignmentAttribute>() is false
             ).ToReadOnlyCollection();

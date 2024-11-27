@@ -17,7 +17,9 @@ public class TypeValidationContext : ValidationContext<Type>
     protected override Exception? BuildException(IReadOnlyCollection<string> messages, IReadOnlyCollection<IExceptionProvider> provider)
         => JLibAggregateException.ReturnIfNotEmpty(
             $"{_valueType.Value.FullName(true)} is not a valid {_valueType.GetType().FullName(true)}",
-            messages.Select(msg => new InvalidTypeException(_valueType.GetType(), _valueType.Value, msg)));
+            messages.Select(msg => new InvalidTypeException(_valueType.GetType(), _valueType.Value, msg))
+                .Concat(provider.Select(p=>p.GetException()).WhereNotNull())
+            );
 
     public TypeValidationContext ValidateProperties(Func<PropertyInfo, bool> filter, Action<ValidationContext<PropertyInfo>> validator)
     {

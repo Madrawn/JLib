@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.InteropServices;
+
 using JLib.Exceptions;
 using JLib.Helper;
 
@@ -126,19 +127,14 @@ public static partial class ValueType
     /// <returns>an <see cref="IExceptionProvider"/> containing all validation errors. Use <see cref="IExceptionProvider.HasErrors"/> to check if the value is valid</returns>
     public static IExceptionProvider GetErrors(Type tVt, object? value)
     {
+        // doing it parallel to the generic overloads instead of calling them directly avoids having to deal with the struct or class overload selection
 
-        var getErrorsMi = typeof(ValueType).GetMethod(nameof(GetErrors), 2, new[] { typeof(Type), typeof(object) });
-
-        var eb = new ExceptionBuilder(tVt.FullName());
         var tvtBase = tVt.GetAnyBaseType<ValueType<Ignored>>();
         if (tvtBase is null)
-        {
-            eb.Add("does not derive from ValueType");
-            return eb;
-        }
+            return new ArgumentException($"{ErrorPrefix()}{tVt.FullName()} is not derived from {typeof(ValueType<Ignored>).FullName(true)}").ToProvider();
 
         var tValue = tvtBase.GenericTypeArguments[0];
-
+        
         var tValidator = typeof(ValidationProfile<>).MakeGenericType(tValue);
         var tValidatorInterface = typeof(IValidationProfile<>).MakeGenericType(tValue);
 
@@ -149,22 +145,18 @@ public static partial class ValueType
             BindingFlags.Instance | BindingFlags.Public, new[] { tValue });
 
         if (miGet is null)
-            eb.Add($"{tValidator.FullName()}.{nameof(ValidationProfile<Ignored>.Get)} could not be found");
+            return new InvalidOperationException($"{ErrorPrefix()}{tValidator.FullName()}.{nameof(ValidationProfile<Ignored>.Get)} could not be found").ToProvider();
         if (miValidate is null)
-            eb.Add($"{tValidatorInterface.FullName()}.{nameof(IValidationProfile<Ignored>.Validate)} could not be found");
-        if (miGet is null || miValidate is null || eb.HasErrors())
-            return eb;
+            return new InvalidOperationException($"{ErrorPrefix()}{tValidatorInterface.FullName()}.{nameof(IValidationProfile<Ignored>.Validate)} could not be found").ToProvider();
 
-        var instance = miGet.Invoke(null, new[] { tVt });
+        var instance = miGet.Invoke(null, new object[] { tVt });
         var result = miValidate.Invoke(instance, new[] { value });
 
-        if (result is not null)
-            return result.CastTo<IExceptionProvider>();
+        return result is null 
+            ? new InvalidOperationException("validator unexpectedly returned null").ToProvider() 
+            : (IExceptionProvider)result;
 
-
-        eb.Add("validator unexpectedly returned null");
-        return eb;
-
+        string ErrorPrefix() => $"{tVt.FullName()}.{nameof(GetErrors)}: ";
     }
 
     #region try create
@@ -293,6 +285,24 @@ public static partial class ValueType
             : Create<TVt, T>(value);
 
     /// <summary>
+    /// Checks whether <paramref name="value"/> is a valid <typeparamref name="TVt"/> and returns the value if it is valid, otherwise throws an <see cref="AggregateException"/>.<br/>
+    /// values may be null. if they are, null will be returned.
+    /// </summary>
+    /// <typeparam name="TVt">The specific <see cref="ValueType{T}"/> to create the <paramref name="value"/> for</typeparam>
+    /// <typeparam name="T">The native value of the <typeparamref name="TVt"/></typeparam>
+    /// <param name="value">the value to create to a new <typeparamref name="TVt"/></param>
+    /// <exception cref="AggregateException"></exception>
+    /// <returns>a new instance of <typeparamref name="TVt"/> containing <paramref name="value"/> as it's value ot null, if the validation failed.</returns>
+    [return: NotNullIfNotNull("value")]
+    public static TVt? CreateNullable<TVt, T>(T? value)
+        where TVt : ValueType<T>
+        where T : struct
+        => value is null
+            ? null
+            : Create<TVt, T>(value.Value);
+
+
+    /// <summary>
     /// Checks whether <paramref name="value"/> is a valid <typeparamref name="TVt"/> and returns the value if it is valid, otherwise throws an <see cref="AggregateException"/>.
     /// </summary>
     /// <typeparam name="TVt">The specific <see cref="ValueType{T}"/> to create the <paramref name="value"/> for</typeparam>
@@ -326,6 +336,8 @@ public static partial class ValueType
         => value is null
             ? null
             : Create(tValueType, value);
+
+
     #endregion
 
     #region create
@@ -425,25 +437,6 @@ public static partial class ValueType
         }
     }
 
-    /// <summary>
-    /// Checks whether <paramref name="value"/> is a valid <typeparamref name="TVt"/> and returns the value if it is valid, otherwise throws an <see cref="AggregateException"/>.<br/>
-    /// values may be null. if they are, null will be returned.
-    /// </summary>
-    /// <typeparam name="TVt">The specific <see cref="ValueType{T}"/> to create the <paramref name="value"/> for</typeparam>
-    /// <typeparam name="T">The native value of the <typeparamref name="TVt"/></typeparam>
-    /// <param name="value">the value to create to a new <typeparamref name="TVt"/></param>
-    /// <exception cref="AggregateException"></exception>
-    /// <returns>a new instance of <typeparamref name="TVt"/> containing <paramref name="value"/> as it's value ot null, if the validation failed.</returns>
-    [return: NotNullIfNotNull("value")]
-    public static TVt? CreateNullable<TVt, T>(T? value)
-        where TVt : ValueType<T>
-        where T : struct
-        => value is null
-            ? null
-            : CompiledExpressionCache.GetOrAdd(
-                GetExpressionCacheKey<TVt>(true),
-                _ => FactoryExpressions.ForNullableStruct<TVt, T>().Compile()
-            ).CastTo<Func<T?, TVt?>>().Invoke(value);
     #endregion
 
     private static string GetExpressionCacheKey<TVt>(bool nullable)
