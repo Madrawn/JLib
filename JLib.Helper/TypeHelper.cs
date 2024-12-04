@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Concurrent;
+using System.Reflection;
 using System.Text;
 
 namespace JLib.Helper;
@@ -326,26 +327,67 @@ public static class TypeHelper
         return result;
     }
 
+    private static readonly ConcurrentDictionary<(Type type, bool includeNamespace), string> _fullNameCache = new();
+
     /// <summary>
     /// the name of the class and its declaring type, excluding the namespace
     /// </summary>
     public static string FullName(this Type type, bool includeNamespace = false)
     {
-        var name = (type.FullName ?? type.Name);
-        string res = name
-            .Split("[")
-            .First();
-        ;
-        if (!includeNamespace)
-            res = res.Split(".").Last();
-        res = res
-            .Replace("+", ".")
-            .Split("`").First();
+        var key = (type, includeNamespace);
+        if (_fullNameCache.TryGetValue(key, out var cachedName))
+        {
+            return cachedName;
+        }
+
+        string name;
+        if (includeNamespace)
+        {
+            name = type.Namespace + "." + type.Name;
+        }
+        else
+        {
+            name = type.Name;
+        }
+
+        // Remove backticks
+        int backtickIndex = name.IndexOf('`');
+        if (backtickIndex != -1)
+        {
+            name = name.Substring(0, backtickIndex);
+        }
+
+        // Handle nested types
+        Type declaringType = type;
+        while (declaringType.DeclaringType != null)
+        {
+            declaringType = declaringType.DeclaringType;
+            if (includeNamespace)
+            {
+                name = declaringType.Name + "." + name;
+            }
+            else
+            {
+                name = declaringType.Name + "." + name;
+            }
+
+            backtickIndex = declaringType.Name.IndexOf('`');
+            if (backtickIndex != -1)
+            {
+                name = declaringType.Name.Substring(0, backtickIndex) + "." + name;
+            }
+        }
 
         if (type.IsGenericType)
-            res += $"<{string.Join(", ", type.GenericTypeArguments.Select(a => a.FullName(includeNamespace)))}>";
+        {
+            var genericArgs = type.GenericTypeArguments.Select(t => t.FullName(includeNamespace)).ToList();
+            name += $"<{string.Join(", ", genericArgs)}>";
+        }
 
-        return res;
+        // Store in cache
+        _fullNameCache[key] = name;
+        return name;
     }
+
 
 }
