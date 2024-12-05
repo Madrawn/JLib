@@ -21,7 +21,7 @@ public sealed class DataDerivationViaGenerics : IDisposable
     \*************************************************************/
     public abstract class CustomerDpb : DataPackage
     {
-        public CustomerId Id { get; set; } = null!;
+        public CustomerId Id { get; init; } = null!;
         protected CustomerDpb(IServiceProvider serviceProvider) : base(serviceProvider)
         {
             serviceProvider.GetRequiredServices(out ShoppingServiceMock shoppingService);

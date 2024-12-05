@@ -98,7 +98,7 @@ public class ValidationContext<TValue> : IValidationContext<TValue>
     /// </summary>
      protected virtual Exception? BuildException(IReadOnlyCollection<string> messages, IReadOnlyCollection<IExceptionProvider> provider)
         => JLibAggregateException.ReturnIfNotEmpty(
-            $"{TargetType.FullName()} validation failed: '{Value}' is not a valid Value.",
+            $"{TargetType.FullName()} validation failed: '{Value}' is set up incorrectly.",
             provider
                 .Select(p => p.GetException())
                 .Prepend(
