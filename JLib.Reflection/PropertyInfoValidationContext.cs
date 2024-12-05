@@ -20,20 +20,20 @@ public static class PropertyInfoValidationContextHelper
     }
     public static IValidationContext<PropertyInfo> HavePublicInit(this IValidationContext<PropertyInfo> context)
     {
-        if (!context.Value.IsInit())
-            context.AddError("must have public static init");
+        if (context.Value.IsInit() is false)
+            context.AddError("must have public init");
         return context;
     }
     public static IValidationContext<PropertyInfo> HavePublicSet(this IValidationContext<PropertyInfo> context)
     {
         if (context.Value.SetMethod?.IsPublic != true)
-            context.AddError("must have public static set");
+            context.AddError("must have public set");
         return context;
     }
 
     public static IValidationContext<PropertyInfo> BeOfType(this IValidationContext<PropertyInfo> context, Type propertyType)
     {
-        if (context.Value.ReflectedType != propertyType)
+        if (context.Value.PropertyType != propertyType)
             context.AddError($"must be of type {propertyType.FullName()}");
         return context;
     }
@@ -43,7 +43,7 @@ public static class PropertyInfoValidationContextHelper
         => context.BeOfType(typeof(T));
     public static IValidationContext<PropertyInfo> HaveNoSet(this IValidationContext<PropertyInfo> context)
     {
-        if (context.Value.SetMethod?.IsPrivate != true)
+        if (context.Value.SetMethod?.IsPrivate == false)
             context.AddError("must have no set");
         return context;
     }

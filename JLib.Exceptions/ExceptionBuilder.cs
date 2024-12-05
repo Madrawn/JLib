@@ -15,14 +15,6 @@ public sealed class ExceptionBuilder : IExceptionProvider, IDisposable
     private readonly ExceptionBuilder? _parent;
     private bool _disposed;
 
-    private IReadOnlyCollection<Exception?> BuildExceptionList()
-    {
-        lock (_exceptionLock)
-            lock (_childrenLock)
-                return _exceptions
-                    .Concat(_children.Select(c => c.GetException()))
-                    .ToReadOnlyCollection();
-    }
     /// <summary>
     /// adds the given <paramref name="message"/> as <see cref="Exception"/> to <see cref="AggregateException.InnerExceptions"/>
     /// </summary>
@@ -69,15 +61,28 @@ public sealed class ExceptionBuilder : IExceptionProvider, IDisposable
     {
         lock (_exceptionLock)
             lock (_childrenLock)
-                return _exceptions.Count > 0 || _children.Any(c => c.HasErrors());
+                return UnlockedHasErrors();
     }
 
+    private bool UnlockedHasErrors()
+        => _exceptions.Count > 0 || _children.Any(c => c.HasErrors());
     /// <summary>
     /// builds the exception based on the current builder state.
     /// </summary>
     /// <returns>null, if the builder has no exceptions</returns>
     public Exception? GetException()
-        => JLibAggregateException.ReturnIfNotEmpty(_message, BuildExceptionList().WhereNotNull());
+    {
+
+        lock (_exceptionLock)
+            lock (_childrenLock)
+                // building the exception takes a lot more resources than checking if there are any exceptions.
+                // therefore, we only build the exception if it is actually needed
+                return UnlockedHasErrors()
+                    ? new JLibAggregateException(_message, _exceptions.Concat(
+                            _children.Select(c => c.GetException())
+                        ).WhereNotNull().ToArray())
+                    : null;
+    }
 
     /// <summary>
     /// <inheritdoc cref="ExceptionBuilder"/>
@@ -192,7 +197,7 @@ public sealed class ExceptionBuilder : IExceptionProvider, IDisposable
         _disposed = true;
         if (_parent is not null && HasErrors() is false)
             _parent._children.Remove(this);
-        if(_parent is null)
+        if (_parent is null)
             ThrowIfNotEmpty();
     }
     /// <summary>

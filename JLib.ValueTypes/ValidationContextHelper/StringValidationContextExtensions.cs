@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+
 using JLib.Helper;
 
 namespace JLib.ValueTypes;
@@ -283,14 +284,15 @@ public static class StringValidationContextExtensions
     /// </summary>
     /// <param name="context">the context which will be validated.</param>
     /// <param name="expression">The regular expression to match.</param>
+    /// <param name="hint">a hint to be added to the exception, explaining to the user what went wrong</param>
     /// <returns>The string validator instance.</returns>
-    public static IValidationContext<string?> MatchRegex(this IValidationContext<string?> context, Regex expression)
+    public static IValidationContext<string?> MatchRegex(this IValidationContext<string?> context, Regex expression, string? hint = null)
     {
         context.NotBeNull();
         if (context.Value is null)
             return context;
         if (expression.IsMatch(context.Value) == false)
-            context.AddError($"context.Value must match regex {expression}");
+            context.AddError($"context.Value must match regex {expression}{(hint is null ? "" : $" - {hint}")}");
         return context;
     }
 
