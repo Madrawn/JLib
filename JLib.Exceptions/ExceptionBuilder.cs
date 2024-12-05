@@ -20,7 +20,7 @@ public sealed class ExceptionBuilder : IExceptionProvider, IDisposable
         lock (_exceptionLock)
             lock (_childrenLock)
                 return _exceptions
-                    .Concat(_children.Select(c => c.HasErrors() ? c.GetException(): null))
+                    .Concat(_children.Select(c => c.GetException()))
                     .ToReadOnlyCollection();
     }
     /// <summary>
