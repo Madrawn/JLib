@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Collections;
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text;
 
@@ -340,49 +341,55 @@ public static class TypeHelper
             return cachedName;
         }
 
-        string name;
+        var sb = new StringBuilder();
+
+        // Build the base name
+        string namePart;
         if (includeNamespace)
         {
-            name = type.Namespace + "." + type.Name;
+            namePart = $"{type.Namespace}.{type.Name}";
         }
         else
         {
-            name = type.Name;
+            namePart = type.Name;
         }
-
         // Remove backticks
-        int backtickIndex = name.IndexOf('`');
+        int backtickIndex = namePart.IndexOf('`');
         if (backtickIndex != -1)
         {
-            name = name.Substring(0, backtickIndex);
+            namePart = namePart.Substring(0, backtickIndex);
         }
+
+
+        sb.Append(namePart);
 
         // Handle nested types
-        Type declaringType = type;
-        while (declaringType.DeclaringType != null)
+        Type? declaringType = type.DeclaringType;
+        while (declaringType != null)
         {
-            declaringType = declaringType.DeclaringType;
-            if (includeNamespace)
-            {
-                name = declaringType.Name + "." + name;
-            }
-            else
-            {
-                name = declaringType.Name + "." + name;
-            }
+            string declaringName = declaringType.Name;
 
-            backtickIndex = declaringType.Name.IndexOf('`');
+            // Remove backticks from declaring type name
+            backtickIndex = declaringName.IndexOf('`');
             if (backtickIndex != -1)
             {
-                name = declaringType.Name.Substring(0, backtickIndex) + "." + name;
+                declaringName = declaringName.Substring(0, backtickIndex);
             }
+
+            sb.Insert(0, $"{declaringName}.");
+            declaringType = declaringType.DeclaringType;
         }
 
+        // Handle generic types
         if (type.IsGenericType)
         {
-            var genericArgs = type.GenericTypeArguments.Select(t => t.FullName(includeNamespace)).ToList();
-            name += $"<{string.Join(", ", genericArgs)}>";
+            var genericArgs = type.GenericTypeArguments
+                .Select(t => t.FullName(includeNamespace))
+                .ToList();
+            sb.Append($"<{string.Join(", ", genericArgs)}>");
         }
+
+        string name = sb.ToString();
 
         // Store in cache
         _fullNameCache[key] = name;
