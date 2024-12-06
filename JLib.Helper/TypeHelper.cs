@@ -362,8 +362,8 @@ public static class TypeHelper
         {
             sb.Append(type.Name.Substring(0, backtickIndex));
             // Handle generic types
-            var containsGenericArguments = genericArgs.MoveNext();
-            if (type.IsGenericType && containsGenericArguments)
+            var containsGenericArguments = genericArgs.MoveNext(); 
+            if (type.IsGenericType)// && containsGenericArguments)// Match empty generic arguments snapshots
             {
                 sb.Append('<');
                 sb.Append(genericArgs.Current);
