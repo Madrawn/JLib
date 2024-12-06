@@ -114,6 +114,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JLib.AspNetCore", "JLib.Asp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.AspNetCore.Tests", "JLib.AspNetCore.Tests\JLib.AspNetCore.Tests.csproj", "{8528D4F4-378D-4726-853F-EE2A274A52B0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JLib.Tools.Benchmarks", "Tools\JLib.Tools.Benchmarks\JLib.Tools.Benchmarks.csproj", "{E1F532D6-E313-4D3A-9785-820681E04748}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -292,6 +294,10 @@ Global
 		{8528D4F4-378D-4726-853F-EE2A274A52B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8528D4F4-378D-4726-853F-EE2A274A52B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8528D4F4-378D-4726-853F-EE2A274A52B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1F532D6-E313-4D3A-9785-820681E04748}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1F532D6-E313-4D3A-9785-820681E04748}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1F532D6-E313-4D3A-9785-820681E04748}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1F532D6-E313-4D3A-9785-820681E04748}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -325,6 +331,7 @@ Global
 		{FE000CC5-9E55-4729-9ED5-28CEDA1ECCFB} = {B450BA69-F38B-4EF5-81A5-7551941524E4}
 		{F3F9EFA8-6DEF-4557-B00C-87901C6D010C} = {7F914D27-9431-4AC4-A0C2-1A5775E001B4}
 		{7F914D27-9431-4AC4-A0C2-1A5775E001B4} = {80BEDE7B-0252-461E-B890-C652AA9F0A01}
+		{E1F532D6-E313-4D3A-9785-820681E04748} = {19B7F873-28AD-4EE6-B981-51A3FD42CAB0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9007D83B-9D61-4FD9-927F-EEAC8281BF90}
