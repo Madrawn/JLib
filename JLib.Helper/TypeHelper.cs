@@ -340,61 +340,56 @@ public static class TypeHelper
         {
             return cachedName;
         }
-
-        var sb = new StringBuilder();
-
-        // Build the base name
-        string namePart;
-        if (includeNamespace)
-        {
-            namePart = $"{type.Namespace}.{type.Name}";
-        }
-        else
-        {
-            namePart = type.Name;
-        }
-        // Remove backticks
-        int backtickIndex = namePart.IndexOf('`');
-        if (backtickIndex != -1)
-        {
-            namePart = namePart.Substring(0, backtickIndex);
-        }
-
-
-        sb.Append(namePart);
-
-        // Handle nested types
-        Type? declaringType = type.DeclaringType;
-        while (declaringType != null)
-        {
-            string declaringName = declaringType.Name;
-
-            // Remove backticks from declaring type name
-            backtickIndex = declaringName.IndexOf('`');
-            if (backtickIndex != -1)
-            {
-                declaringName = declaringName.Substring(0, backtickIndex);
-            }
-
-            sb.Insert(0, $"{declaringName}.");
-            declaringType = declaringType.DeclaringType;
-        }
-
-        // Handle generic types
-        if (type.IsGenericType)
-        {
-            var genericArgs = type.GenericTypeArguments
+        var genericArgs = type.GenericTypeArguments
                 .Select(t => t.FullName(includeNamespace))
-                .ToList();
-            sb.Append($"<{string.Join(", ", genericArgs)}>");
-        }
-
-        string name = sb.ToString();
+                .Reverse()
+                .GetEnumerator();
+        var name = BuildFullTypeName(type, includeNamespace, genericArgs).ToString();
 
         // Store in cache
         _fullNameCache[key] = name;
         return name;
     }
 
+    private static StringBuilder BuildFullTypeName(Type type, bool includeNamespace, IEnumerator<string> genericArgs)
+    {
+        var sb = new StringBuilder();
 
+        // Build the base name
+        // Remove backticks
+        int backtickIndex = type.Name.IndexOf('`');
+        if (backtickIndex != -1)
+        {
+            sb.Append(type.Name.Substring(0, backtickIndex));
+            // Handle generic types
+            var containsGenericArguments = genericArgs.MoveNext();
+            if (type.IsGenericType && containsGenericArguments)
+            {
+                sb.Append('<');
+                sb.Append(genericArgs.Current);
+                sb.Append('>');
+
+            }
+        }
+        else
+        {
+            sb.Append(type.Name);
+        }
+
+        // Handle nested types
+        Type? declaringType = type.DeclaringType;
+        if (declaringType != null)
+        {
+            var chunks = sb.GetChunks();
+            sb = BuildFullTypeName(declaringType, includeNamespace, genericArgs).Append('.');
+            foreach (var chunk in chunks)
+                sb.Append(chunk);
+        }
+        else if (includeNamespace)
+        {
+            sb.Insert(0, $"{type.Namespace}.");
+        }
+
+        return sb;
+    }
 }
